@@ -6,7 +6,6 @@ export function AppInitializer({
   canvasElement
 }) {
   const Emitter = new Phaser.Events.EventEmitter();
-
   const Game = new Phaser.Game({
     type: Phaser.WEBGL,
     width: window.innerWidth,
@@ -15,7 +14,6 @@ export function AppInitializer({
   });
 
   Game.emitter = Emitter
-
   Game.scene.add('MainScene', MainScene, true, {});
 
   return { Game, Emitter }

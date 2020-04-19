@@ -50,7 +50,9 @@ export function dragTool({ pointer, scene }) {
             scene.py = scene.imageHeight;
           }
 
-        } // set new drag origin to current position
+        } 
+        
+        // set new drag origin to current position
         scene.game.origDragPoint = pointer.position.clone();
         scene.updateLand();
       break;
@@ -121,16 +123,5 @@ export function setGameMode({ scene, mode }) {
 
       scene.selectionRect = createSelectionBlock({ pointer: scene.input.activePointer, scene })
       break;
-  }
-}
-
-
-// Set zoom
-export function setCameraZoom({ camera, dy }) {
-  if (dy != 0) {
-    const zoomLevel = (dy > 0) ? camera.zoom - 1 : camera.zoom + 1
-
-    if (zoomLevel > 0 && zoomLevel < 8)
-      camera.setZoom(zoomLevel)
   }
 }
