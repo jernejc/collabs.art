@@ -1,6 +1,7 @@
 
 import Phaser from 'phaser'
 import { dragTool, createSelectionBlock, setGameMode, setCustomZoon } from '@scripts/actions/index'
+import CustomPipeline from '@scripts/util/pipeline'
 import { ApplicationScene } from '@scenes/application_scene'
 
 export class MainScene extends ApplicationScene {
@@ -10,6 +11,8 @@ export class MainScene extends ApplicationScene {
 
   preload() {
     this.load.image('terrain', 'assets/terrain2.png');
+    // MINIMAP
+    //this.minimapPipeline = this.game.renderer.addPipeline('Minimap', new CustomPipeline(this.game));
   }
 
   create(data) {
@@ -20,18 +23,26 @@ export class MainScene extends ApplicationScene {
     // Height settings
     this.color = new Phaser.Display.Color();
     this.size = 20;
+    this.strokeSize = 1;
     this.gridWidth = window.innerWidth / this.size;
     this.gridHeight = window.innerHeight / this.size;
     this.px = 0;
     this.py = 0;
+    this.pMax = 1000;
     this.land = []
+    this.landColors = ['#8173BF','#564D80','#AC99FF','#7C6DBF','#9C8BE6'].map(color => Phaser.Display.Color.HexStringToColor(color).color)
+    this.worldmap = {};
 
-    const src = this.textures.get('terrain').getSourceImage();
-    this.imageWidth = src.width;
-    this.imageHeight = src.height;
-    
-    this.heightmap = this.textures.createCanvas('map', this.imageWidth, this.imageHeight);
-    this.heightmap.draw(0, 0, src);
+    for (let x = 0; x < this.pMax; x++) {
+      for (let y = 0; y < this.pMax; y++) {
+        for (let colorIndex = 0; colorIndex < this.landColors.length; colorIndex++) {
+          if ((x+y) % colorIndex == 0)
+            this.worldmap[`${x}x${y}`] = this.landColors[colorIndex]
+        }
+      }
+    }
+
+    console.log("worldmap length", Object.keys(this.worldmap).length, JSON.stringify(this.worldmap))
 
     this.createVisiblePixels()
 
@@ -58,7 +69,7 @@ export class MainScene extends ApplicationScene {
   }
 
   updateLand() {
-    console.log("updateLand", this.gridWidth, this.gridHeight)
+    console.log("updateLand", this.gridWidth, this.gridHeight, this.px, this.py)
     for (let y = 0; y < this.gridHeight; y++) {
       if (!this.land[y])
         this.land[y] = []
@@ -102,32 +113,33 @@ export class MainScene extends ApplicationScene {
     const tx = this.size * x;
     const ty = this.size * y;
 
-    return this.add.rectangle(tx, ty, this.size, this.size);
+    const tile = this.add.rectangle(tx, ty, this.size, this.size);
+    tile.setStrokeStyle(this.strokeSize, Phaser.Display.Color.HexStringToColor('#dedede').color, 0.8);
+    return tile;
   }
 
   colorPixel(x,y) {
-    const cx = Phaser.Math.Wrap(this.px + x, 0, this.imageWidth);
-    const cy = Phaser.Math.Wrap(this.py + y, 0, this.imageHeight);
-
-    this.heightmap.getPixel(cx, cy, this.color);
-    this.land[y][x].setFillStyle(this.color.color);
-
+    this.land[y][x].setFillStyle(this.worldmap[`${x}x${y}`]);
     return;
   }
 
   resizePixel(x,y) {
     const oldSize = this.land[y][x].width;
 
-    if (oldSize != this.size) {
-      this.land[y][x].width = this.size;
-      this.land[y][x].height = this.size;
+    if (oldSize != getFullBoxWidth(this)) {
+      this.land[y][x].width = getFullBoxWidth(this);
+      this.land[y][x].height = getFullBoxWidth(this);
 
-      this.land[y][x].x = x * this.size;
-      this.land[y][x].y = y * this.size;
+      this.land[y][x].x = x * getFullBoxWidth(this);
+      this.land[y][x].y = y * getFullBoxWidth(this);
 
-      this.land[y][x].setDepth(this.size);
+      this.land[y][x].setDepth(getFullBoxWidth(this));
     }
 
     return;
+
+    function getFullBoxWidth(self) {
+      return self.size + self.strokeSize;
+    }
   }
 }
