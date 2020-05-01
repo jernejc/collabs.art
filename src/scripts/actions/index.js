@@ -37,12 +37,12 @@ export function dragTool({ pointer, scene }) {
           scene.py += scene.game.origDragPoint.y - pointer.position.y;
 
           if (scene.px === scene.pMax || scene.px > scene.pMax) 
-            scene.px === scene.pMax
+            scene.px = scene.pMax;
           else if (scene.px < 0) 
             scene.px = 0;
           
           if (scene.py === scene.pMax || scene.py > scene.pMax)
-            scene.py = scene.imageHeight;  
+            scene.py = scene.pMax;  
           else if (scene.py < 0) 
             scene.py = 0;
 
