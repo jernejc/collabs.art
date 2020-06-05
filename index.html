@@ -6,36 +6,28 @@
 	<meta name="MobileOptimized" content="320">
 	<meta http-equiv="cleartype" content="on">
 
-	<style>
-		html,
-		body,
-		canvas {
-			margin: 0 !important;
-			padding: 0 !important;
-			overflow: hidden !important;
-		}
-	</style>
+	<link rel="stylesheet" href="assets/css/main.css">
 	<script src="vendors.app.js"></script>
 	<script src="app.js"></script>
 </head>
 
 <body>
-	<div class="app"></div>
+	<div class="app">
+		<div id="game"></div>
+	</div>
 
 	<script>
 		const world = new PixelWorld.Main()
 		const { Game, Emitter } = world.AppInitializer({
-			canvasElement: '.app'
+			canvasElement: 'game',
+			canvasWidth: 1200,
+			canvasHeight: 750,
+			gridSize: 25,
+			strokeSize: 0.2
 		})
 
 		Emitter.on('scene/ready', () => {
 			console.log('scene ready triggered')
-			/*const drawer = world.Drawer()
-			const myBlock = drawer.drawAt({
-				position: [1, 2],
-				bgColor: '0xff0000',
-				strokeColor: '0xff0000',
-			})*/
 		})
 	</script>
 </body>

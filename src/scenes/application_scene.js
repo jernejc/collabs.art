@@ -7,6 +7,12 @@ export class ApplicationScene extends Phaser.Scene {
 
   create(params = {}) {
     this.currentScene = this
+    this.appConfig = this.game.appConfig
+
+    this.sceneEssentials = {
+      appConfig: this.appConfig,
+      scene: this.scene
+    }
   }
 
   exportToBase64() {

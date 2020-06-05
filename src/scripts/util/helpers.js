@@ -1,5 +1,5 @@
 export function buildGridKey(x, y) {
-  return `block_${x},${y}`
+  return `${x}x${y}`
 }
 
 export function calculateAxisPosition(pixelAxisAmount, gridSize) {
