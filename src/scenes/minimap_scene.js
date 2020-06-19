@@ -12,16 +12,15 @@ export class MinimapScene extends ApplicationScene {
     //console.log("Minimap scene create", this, this.x, this.y, this.width, this.height)
     this.sizeRatio = 4;
     this.minimap = this.add.image(0, 0, 'worldmap').setAlpha(0.2);
-    console.log("minimap". minimap)
-    //this.minimap.width = this.width;
-    //this.minimap.height = this.height;
-
     // Calculate width/height and position
     
     this.width = this.minimap.width / this.sizeRatio;
     this.height = this.minimap.height / this.sizeRatio;
-    this.x = (this.config.canvasWidth / 2) - (this.width / 2);
-    this.y = this.config.canvasHeight - this.height;
+    this.x = 10 //(this.config.canvasWidth / 2) - (this.width / 2);
+    this.y = this.config.canvasHeight - (this.height + 10);
+
+    console.log("minimap". minimap, this.width, this.heighth);
+    this.minimap.setDisplaySize(this.width * 2, this.height * 2)
 
     this.cameras.main.setViewport(this.x, this.y, this.width, this.height);
     this.cameras.main.setBackgroundColor(0x000000);

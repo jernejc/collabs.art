@@ -1,28 +1,48 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 	<meta name="HandheldFriendly" content="True">
 	<meta name="MobileOptimized" content="320">
 	<meta http-equiv="cleartype" content="on">
 
+	<link href='https://css.gg/css' rel='stylesheet'>
 	<link rel="stylesheet" href="assets/css/main.css">
 	<script src="vendors.app.js"></script>
 	<script src="app.js"></script>
+	<title>PixelWorld</title>
 </head>
 
 <body>
 	<div class="app">
+		<div id="header">
+			<h1>PixelWorld</h1>
+		</div>
+		<div id="tools">
+			<span class="tool account">
+				<i class="gg-profile"></i>
+			</span>
+			<span class="tool color">
+				<i class="gg-color-bucket"></i>
+			</span>
+			<span class="tool buy">
+				<i class="gg-dollar"></i>
+			</span>
+		</div>
 		<div id="game"></div>
 	</div>
 
 	<script>
 		const world = new PixelWorld.Main()
-		const { Game, Emitter } = world.AppInitializer({
+		const {
+			Game,
+			Emitter
+		} = world.AppInitializer({
 			canvasElement: 'game',
-			canvasWidth: 1200,
-			canvasHeight: 750,
-			gridSize: 25,
+			canvasWidth: window.innerWidth,
+			canvasHeight: window.innerHeight,
+			gridSize: 35,
 			strokeSize: 0.2
 		})
 
@@ -31,4 +51,5 @@
 		})
 	</script>
 </body>
+
 </html>

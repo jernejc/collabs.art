@@ -13,8 +13,8 @@ export function AppInitializer({
   blockPadding
 }) {
   console.log('Init Phaser', canvasElement, canvasWidth, canvasHeight)
+  
   const canvas = document.querySelector('#' + canvasElement)
-  console.log('canvas', canvas.clientWidth, canvas.scrollHeight)
   const Emitter = new Phaser.Events.EventEmitter();
   const Game = new Phaser.Game({
     type: Phaser.WEBGL,
