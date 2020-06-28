@@ -33,18 +33,18 @@ export function dragTool({ pointer, scene }) {
         //console.log('handle move dragTool event')
         if (scene.game.origDragPoint) {
           // move the camera by the amount the mouse has moved since last update
-          scene.px += scene.game.origDragPoint.x - pointer.position.x;
-          scene.py += scene.game.origDragPoint.y - pointer.position.y;
+          scene.cameraX += scene.game.origDragPoint.x - pointer.position.x;
+          scene.cameraY += scene.game.origDragPoint.y - pointer.position.y;
 
-          if (scene.px === scene.pMax || scene.px > scene.pMax) 
-            scene.px = scene.pMax;
-          else if (scene.px < 0) 
-            scene.px = 0;
+          if (scene.cameraX === scene.pMax || scene.cameraX > scene.pMax) 
+            scene.cameraX = scene.pMax;
+          else if (scene.cameraX < 0) 
+            scene.cameraX = 0;
           
-          if (scene.py === scene.pMax || scene.py > scene.pMax)
-            scene.py = scene.pMax;  
-          else if (scene.py < 0) 
-            scene.py = 0;
+          if (scene.cameraY === scene.pMax || scene.cameraY > scene.pMax)
+            scene.cameraY = scene.pMax;  
+          else if (scene.cameraY < 0) 
+            scene.cameraY = 0;
 
         } 
         

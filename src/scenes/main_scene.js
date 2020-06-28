@@ -19,25 +19,22 @@ export class MainScene extends ApplicationScene {
       }
     }*/
 
-    this.load.image('worldmap', 'assets/images/terrain2-bw.png');
+    this.load.image('worldmap', 'assets/images/unicorn.png');
   }
 
   create(data) {
     super.create(data)
 
-    this.blockPadding = this.appConfig.blockPadding || 2
+    //this.blockPadding = this.appConfig.blockPadding || 2
     this.size = this.appConfig.gridSize;
-    this.tileWidthHalf = parseInt(this.size / 1.8);
-    this.tileHeightHalf = parseInt(this.size / 2.3);
     this.strokeSize = this.appConfig.strokeSize;
-    this.gridWidth = this.appConfig.canvasWidth / (this.tileWidthHalf - this.blockPadding);
-    this.gridHeight = this.appConfig.canvasHeight / (this.tileHeightHalf - this.blockPadding);
-    this.px = 400;
-    this.py = 400;
+    this.strokeColor = Phaser.Display.Color.HexStringToColor(this.appConfig.strokeColor);
+    this.gridWidth = Math.ceil(this.appConfig.canvasWidth / Math.floor(this.size + this.strokeSize));
+    this.gridHeight = Math.ceil(this.appConfig.canvasHeight / Math.floor(this.size + this.strokeSize));
+    this.cameraX = 400;
+    this.cameraY = 400;
     this.pMax = 1000;
-    this.hMax = 20;
-    this.centerX = this.appConfig.canvasWidth / 2.0;
-    this.centerY = -(this.appConfig.canvasHeight / 1.6);
+    //this.hMax = 20;
     this.land = []
     this.color = new Phaser.Display.Color();
 
@@ -50,13 +47,18 @@ export class MainScene extends ApplicationScene {
 
     this.worldmap = this.textures.createCanvas('map', this.imageWidth, this.imageHeight);
     this.worldmap.draw(0, 0, src);
-    console.log('this', this)
 
     //this.container = this.add.container(0, 0);
-    this.minimap = new MinimapScene(this.appConfig)
-    this.scene.add('MinimapScene', this.minimap, true);
-    console.log("this.minimap", this.minimap);
+    this.minimap = new MinimapScene({
+      appConfig: this.appConfig,
+      sceneConfig: {
+        gridWidth: this.gridWidth,
+        gridHeight: this.gridHeight,
+        size: this.size
+      }
+    })
 
+    this.scene.add('MinimapScene', this.minimap, true);
     this.createVisiblePixels()
 
     this.input.on('pointermove', (pointer) => {
@@ -69,7 +71,7 @@ export class MainScene extends ApplicationScene {
 
       const newSize = (dy < 0) ? this.size + 1 : this.size - 1;
       console.log("newSize", newSize)
-     /* if (newSize > 5 && newSize < 35) {
+     /*if (newSize > 5 && newSize < 35) {
         this.size = newSize;
         this.gridWidth = this.appConfig / this.size;
         this.gridHeight = window.innerHeight / this.size;
@@ -82,22 +84,10 @@ export class MainScene extends ApplicationScene {
   }
 
   updateLand() {
-    //console.log("updateLand", this.gridWidth, this.gridHeight, this.px, this.py)
+    //console.log("updateLand", this.gridWidth, this.gridHeight, this.cameraX, this.cameraY)
     for (let y = 0; y < this.gridHeight; y++) {
-      //if (!this.land[y])
-        //this.land[y] = []
-
       for (let x = 0; x < this.gridWidth; x++) {
-        /*if (!this.land[y][x]) {
-          console.log("Missing pixel, adding it!")
-          let tile = this.createPixel(x, y)
-          this.land[y][x] = tile
-        }*/
-
         this.colorPixel(x, y);
-
-        /*if (this.size != this.land[y][x].width)
-          this.resizePixel(x, y)*/
       }
     }
 
@@ -126,28 +116,18 @@ export class MainScene extends ApplicationScene {
     const tile = this.add.rectangle(tx, ty, this.size, this.size); // this.add.isobox(this.centerX + tx, this.centerY + ty, this.size, this.size); //this.add.rectangle(tx, ty, this.size, this.size);
 
     if (this.strokeSize > 0)
-      tile.setStrokeStyle(this.strokeSize, Phaser.Display.Color.HexStringToColor('#dedede').color, 0.8);
+      tile.setStrokeStyle(this.strokeSize, this.strokeColor.color, 0.8);
 
-    tile.setDepth(this.centerY + ty);
-    //this.container.add(tile);
+    //tile.setDepth(this.centerY + ty);
 
     return tile;
   }
 
   colorPixel(x, y) {
-    const cx = Phaser.Math.Wrap(this.px + x, 0, this.imageWidth);
-    const cy = Phaser.Math.Wrap(this.py + y, 0, this.imageHeight);
+    const cx = Phaser.Math.Wrap(this.cameraX + x, 0, this.imageWidth);
+    const cy = Phaser.Math.Wrap(this.cameraY + y, 0, this.imageHeight);
 
     this.worldmap.getPixel(cx, cy, this.color);
-
-    /*const h = this.color.v * this.hMax;
-    const top = this.color.color;
-    const left = this.color.darken(30).color;
-    const right = this.color.lighten(15).color;
-    //console.log("colorPixel", top, right, left)
-    this.land[y][x].setFillStyle(top, right, left);
-    //this.land[y][x].setDepth(this.centerY + ty);
-    this.land[y][x].height = h;*/
     this.land[y][x].setFillStyle(this.color.color);
   }
 
