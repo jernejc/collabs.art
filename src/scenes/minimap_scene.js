@@ -4,7 +4,7 @@ import { ApplicationScene } from '@scenes/application_scene'
 export class MinimapScene extends ApplicationScene {
   constructor(config) {
     super({ key: 'MinimapScene', active: true })
-    this.config = config.appConfig;
+    this.appConfig = config.appConfig;
     this.sceneConfig = config.sceneConfig;
   }
 
@@ -19,17 +19,21 @@ export class MinimapScene extends ApplicationScene {
     this.minimap.setDisplaySize(this.width, this.height);
 
     this.x = 10;
-    this.y = this.config.canvasHeight - (this.height + 10);
-    this.aspectRatio = this.config.canvasWidth / this.config.canvasHeight;
-    this.minimapGridSize = Math.ceil(1000 / this.sceneConfig.gridWidth)
+    this.y = this.appConfig.canvasHeight - (this.height + 10);
+    this.aspectRatio = this.appConfig.canvasWidth / this.appConfig.canvasHeight;
+
+    console.log('this.minimapGridSize', this.gridSize)
 
     // Main camera for scene
     this.cameras.main.setViewport(this.x, this.y, this.width, this.height);
     this.cameras.main.setBackgroundColor(0x000000);
 
     // Visible field box / mask
-    this.fieldWidth = (this.minimapGridSize * this.sceneConfig.size) / this.sizeRatio // viewport width
-    this.fieldHeight = ((this.minimapGridSize * this.sceneConfig.size) / this.aspectRatio) / this.sizeRatio // viewport height
+    this.fieldWidth = (this.appConfig.canvasWidth / this.sceneConfig.size) / this.sizeRatio // viewport width
+    this.fieldHeight = (this.appConfig.canvasHeight / this.sceneConfig.size) / this.sizeRatio // viewport height
+
+    console.log('this.fieldWidth', this.fieldWidth)
+    console.log('this.fieldHeight', this.fieldHeight)
 
     this.visibleField = this.add.rectangle(
       this.mainscene.cameraX / this.sizeRatio, // initial X position
@@ -37,7 +41,7 @@ export class MinimapScene extends ApplicationScene {
       this.fieldWidth,
       this.fieldHeight,
       Phaser.Display.Color.HexStringToColor('#ffffff').color, 0 // background color
-    )
+    ).setStrokeStyle(0.5, Phaser.Display.Color.HexStringToColor('#ffffff').color, 0.3)
 
     // Setup alpha mask
     this.mapoverlay = this.add.rectangle(
@@ -47,12 +51,20 @@ export class MinimapScene extends ApplicationScene {
       this.height,
       Phaser.Display.Color.HexStringToColor('#000000').color
     )
-    this.mapoverlay.setAlpha(0.75)
+    this.mapoverlay.setAlpha(0.79)
     this.mapoverlay.mask = new Phaser.Display.Masks.GeometryMask(this, this.visibleField)
     this.mapoverlay.mask.invertAlpha = true
+
+    this.input.on('pointermove', (pointer) => {
+      if (pointer.camera)
+        console.log('MINIMAP pointerover', pointer)
+    })
 	}
 
 	update() {
-    this.visibleField.setPosition((this.mainscene.cameraX / this.sizeRatio) + (this.fieldWidth / 2), (this.mainscene.cameraY / this.sizeRatio) + (this.fieldHeight / 2))
+    this.visibleField.setPosition(
+      (this.mainscene.cameraX / this.sizeRatio) + (this.fieldWidth / 2), 
+      (this.mainscene.cameraY / this.sizeRatio) + (this.fieldHeight / 2)
+    )
 	}
 }

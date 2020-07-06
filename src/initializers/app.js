@@ -7,10 +7,8 @@ export function AppInitializer({
   canvasWidth,
   canvasHeight,
   gridSize,
-  bgColor,
   strokeColor,
-  strokeSize,
-  blockPadding
+  strokeSize
 }) {
   console.log('Init Phaser', canvasElement, canvasWidth, canvasHeight)
   
@@ -20,8 +18,7 @@ export function AppInitializer({
     type: Phaser.WEBGL,
     width: canvas.clientWidth,
     height: canvas.clientHeight,
-    parent: canvasElement,
-    mode: Phaser.DOM.FIT
+    parent: canvasElement
   });
 
   Game.emitter = Emitter
@@ -30,10 +27,8 @@ export function AppInitializer({
     canvasHeight,
     gridSize,
     canvasElement,
-    bgColor,
     strokeColor,
-    strokeSize,
-    blockPadding
+    strokeSize
   }
   Game.scene.add('MainScene', MainScene, true, {});
   //Game.scene.add('MinimapScene', MinimapScene, true, {});

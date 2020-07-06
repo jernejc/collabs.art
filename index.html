@@ -23,15 +23,15 @@
 			<span class="tool account">
 				<i class="gg-profile"></i>
 			</span>
-			<span class="tool move active">
+			<span class="tool move active" data-game-mode="move">
 				<i class="gg-controller"></i>
 			</span>
-			<span class="tool color">
-				<i class="gg-color-bucket"></i>
+			<span class="tool select" data-game-mode="select">
+				<i class="gg-tap-single"></i>
 			</span>
-			<span class="tool buy">
+			<!--<span class="tool buy">
 				<i class="gg-dollar"></i>
-			</span>
+			</span>-->
 		</div>
 		<div id="game"></div>
 	</div>
@@ -39,19 +39,48 @@
 	<script>
 		const world = new PixelWorld.Main()
 		const {
-			Emitter
+			Emitter,
+			Game
 		} = world.AppInitializer({
 			canvasElement: 'game',
 			canvasWidth: window.innerWidth,
 			canvasHeight: window.innerHeight,
 			gridSize: 15,
-			strokeSize: 0.2,
+			strokeSize: 0.21,
 			strokeColor: '#dedede'
-		})
+		});
+
+		document.querySelector('#tools').addEventListener('click', (e) => {
+			const gameMode = e.target.dataset.gameMode || e.target.parentNode.dataset.gameMode;
+
+			if (gameMode)
+				Emitter.emit('scene/mode', gameMode)
+		});
 
 		Emitter.on('scene/ready', () => {
 			console.log('scene ready triggered')
-		})
+		});
+
+		Emitter.on('scene/mode', (mode) => {
+			console.log('scene/mode', mode)
+			setActiveTool(mode)
+		});
+
+		function setActiveTool(mode) {
+			const tools = document.querySelectorAll('.tool');
+
+			for (let index = 0; index < tools.length; index++) {
+				const tool = tools[index];
+				if (tool.classList.contains(mode)) {
+					if (!tool.classList.contains('active'))
+						tool.classList.add('active')
+				} else {
+					if (tool.classList.contains('active'))
+						tool.classList.remove('active')
+				}
+			}
+
+		}
 	</script>
 </body>
 

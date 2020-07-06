@@ -1,6 +1,6 @@
 
 import Phaser from 'phaser'
-import { dragTool, createSelectionBlock, setGameMode, setCustomZoon } from '@scripts/actions/index'
+import { handleMove, handleClick, generalResetStrokeStyle, setGameMode, setCustomZoon } from '@scripts/actions/index'
 import { ApplicationScene } from '@scenes/application_scene'
 import { MinimapScene } from '@scenes/minimap_scene'
 
@@ -28,17 +28,18 @@ export class MainScene extends ApplicationScene {
     //this.blockPadding = this.appConfig.blockPadding || 2
     this.size = this.appConfig.gridSize;
     this.strokeSize = this.appConfig.strokeSize;
+    this.pixelSize = this.size + this.strokeSize;
     this.strokeColor = Phaser.Display.Color.HexStringToColor(this.appConfig.strokeColor);
-    this.gridWidth = Math.ceil(this.appConfig.canvasWidth / Math.floor(this.size + this.strokeSize));
-    this.gridHeight = Math.ceil(this.appConfig.canvasHeight / Math.floor(this.size + this.strokeSize));
-    this.cameraX = 400;
-    this.cameraY = 400;
+    this.gridWidth = Math.ceil(this.appConfig.canvasWidth / this.size);
+    this.gridHeight = Math.ceil(this.appConfig.canvasHeight / this.size);
+    
+    this.cameraX = 700;
+    this.cameraY = 600;
     this.pMax = 1000;
-    //this.hMax = 20;
-    this.land = []
+    this.land = [];
     this.color = new Phaser.Display.Color();
 
-    setGameMode({ scene: this, mode: "move" })
+    setGameMode({ scene: this, mode: "select" })
 
     const src = this.textures.get('worldmap').getSourceImage();
 
@@ -48,7 +49,6 @@ export class MainScene extends ApplicationScene {
     this.worldmap = this.textures.createCanvas('map', this.imageWidth, this.imageHeight);
     this.worldmap.draw(0, 0, src);
 
-    //this.container = this.add.container(0, 0);
     this.minimap = new MinimapScene({
       appConfig: this.appConfig,
       sceneConfig: {
@@ -62,8 +62,12 @@ export class MainScene extends ApplicationScene {
     this.createVisiblePixels()
 
     this.input.on('pointermove', (pointer) => {
-      dragTool({ pointer, scene: this })
-      //console.log('mouse move', pointer)
+      handleMove({ pointer, scene: this })
+      //console.log('MAINSCENE mouse move', pointer)
+    })
+    this.input.on('pointerdown', (pointer) => {
+      handleClick({ pointer, scene: this })
+      //console.log('MAINSCENE mouse move', pointer)
     })
 
     this.input.on('wheel', (pointer, currentlyOver, dx, dy, dz, event) => {
@@ -80,16 +84,24 @@ export class MainScene extends ApplicationScene {
       }*/
     })
 
-    this.game.emitter.emit('scene/ready')
+    this.game.emitter.on('scene/mode', (mode) => {
+      console.log('this.game.emitter.on', mode);
+
+      if (mode == 'move')
+        generalResetStrokeStyle(this)
+
+      if (this.game.mode != mode)
+        setGameMode({ scene: this, mode: mode })
+    })
+
+    this.game.emitter.emit('scene/ready');
   }
 
   updateLand() {
     //console.log("updateLand", this.gridWidth, this.gridHeight, this.cameraX, this.cameraY)
-    for (let y = 0; y < this.gridHeight; y++) {
-      for (let x = 0; x < this.gridWidth; x++) {
+    for (let y = 0; y < this.gridHeight; y++) 
+      for (let x = 0; x < this.gridWidth; x++) 
         this.colorPixel(x, y);
-      }
-    }
 
     return;
   }
@@ -110,28 +122,35 @@ export class MainScene extends ApplicationScene {
   }
 
   createPixel(x, y) {
-    const tx = this.size * x //this.tileWidthHalf * x //(x - y) * this.tileWidthHalf // this.size * x;
-    const ty = this.size * y //this.tileHeightHalf * y //(x + y) * this.tileHeightHalf //this.size * y;
+    //console.log('createPixel',x,y)
+    const tx = this.size * x;
+    const ty = this.size * y;
+    //console.log('tx ty', tx, ty)
 
-    const tile = this.add.rectangle(tx, ty, this.size, this.size); // this.add.isobox(this.centerX + tx, this.centerY + ty, this.size, this.size); //this.add.rectangle(tx, ty, this.size, this.size);
-
-    if (this.strokeSize > 0)
-      tile.setStrokeStyle(this.strokeSize, this.strokeColor.color, 0.8);
-
-    //tile.setDepth(this.centerY + ty);
+    const tile = this.add.rectangle(tx, ty, this.size, this.size);
+    
+    //if (this.strokeSize > 0)
+    //  tile.setStrokeStyle(this.strokeSize, this.strokeColor.color, 0.2);
 
     return tile;
   }
 
   colorPixel(x, y) {
+    //console.log('colorPixel')
+    const color = this.getColor(x, y, this.color);
+    this.land[y][x].setFillStyle(color.color);
+  }
+
+  getColor(x, y, color) {
+    color = color || new Phaser.Display.Color();
     const cx = Phaser.Math.Wrap(this.cameraX + x, 0, this.imageWidth);
     const cy = Phaser.Math.Wrap(this.cameraY + y, 0, this.imageHeight);
 
-    this.worldmap.getPixel(cx, cy, this.color);
-    this.land[y][x].setFillStyle(this.color.color);
+    this.worldmap.getPixel(cx, cy, color);
+    return color;
   }
 
-  resizePixel(x, y) {
+  /*resizePixel(x, y) {
     const oldSize = this.land[y][x].width;
 
     if (oldSize != getFullBoxWidth(this)) {
@@ -149,5 +168,5 @@ export class MainScene extends ApplicationScene {
     function getFullBoxWidth(self) {
       return self.size + self.strokeSize;
     }
-  }
+  }*/
 }
