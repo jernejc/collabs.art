@@ -55,7 +55,8 @@ export function selectPixel({ pointer, scene }) {
   const color = scene.getColor(x,y)
   const tile = scene.land[y][x];
 
-  console.log('selectPixel', x, y, color.color, tile)
+  console.log('selectpixel', scene, color.color, tile)
+  scene.game.emitter.emit('scene/selectpixel', { tile, color });
 }
 
 // Set the Position of the Selection Block

@@ -61,9 +61,13 @@
 			console.log('scene ready triggered')
 		});
 
-		Emitter.on('scene/mode', (mode) => {
+		Emitter.on('scene/mode', mode => {
 			console.log('scene/mode', mode)
 			setActiveTool(mode)
+		});
+
+		Emitter.on('scene/selectpixel', pixel => {
+			console.log('scene/selectpixel', pixel)
 		});
 
 		function setActiveTool(mode) {

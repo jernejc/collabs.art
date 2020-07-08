@@ -14,15 +14,12 @@ export class MinimapScene extends ApplicationScene {
 
     this.width = 1000 / this.sizeRatio;
     this.height = 1000 / this.sizeRatio;
-
+    this.appConfig.canvasWidth / this.sceneConfig.size
     this.minimap = this.add.image(this.width / 2, this.height / 2, 'worldmap');
     this.minimap.setDisplaySize(this.width, this.height);
 
     this.x = 10;
     this.y = this.appConfig.canvasHeight - (this.height + 10);
-    this.aspectRatio = this.appConfig.canvasWidth / this.appConfig.canvasHeight;
-
-    console.log('this.minimapGridSize', this.gridSize)
 
     // Main camera for scene
     this.cameras.main.setViewport(this.x, this.y, this.width, this.height);
@@ -31,9 +28,6 @@ export class MinimapScene extends ApplicationScene {
     // Visible field box / mask
     this.fieldWidth = (this.appConfig.canvasWidth / this.sceneConfig.size) / this.sizeRatio // viewport width
     this.fieldHeight = (this.appConfig.canvasHeight / this.sceneConfig.size) / this.sizeRatio // viewport height
-
-    console.log('this.fieldWidth', this.fieldWidth)
-    console.log('this.fieldHeight', this.fieldHeight)
 
     this.visibleField = this.add.rectangle(
       this.mainscene.cameraX / this.sizeRatio, // initial X position

@@ -30,8 +30,8 @@ export class MainScene extends ApplicationScene {
     this.strokeSize = this.appConfig.strokeSize;
     this.pixelSize = this.size + this.strokeSize;
     this.strokeColor = Phaser.Display.Color.HexStringToColor(this.appConfig.strokeColor);
-    this.gridWidth = Math.ceil(this.appConfig.canvasWidth / this.size);
-    this.gridHeight = Math.ceil(this.appConfig.canvasHeight / this.size);
+    this.gridWidth = this.appConfig.canvasWidth / this.size;
+    this.gridHeight = this.appConfig.canvasHeight / this.size;
     
     this.cameraX = 700;
     this.cameraY = 600;
@@ -128,6 +128,7 @@ export class MainScene extends ApplicationScene {
     //console.log('tx ty', tx, ty)
 
     const tile = this.add.rectangle(tx, ty, this.size, this.size);
+    tile.setDisplayOrigin(0,0)
     
     //if (this.strokeSize > 0)
     //  tile.setStrokeStyle(this.strokeSize, this.strokeColor.color, 0.2);
