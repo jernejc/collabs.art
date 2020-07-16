@@ -55,7 +55,7 @@ export function selectPixel({ pointer, scene }) {
   const color = scene.getColor(x,y)
   const tile = scene.land[y][x];
 
-  console.log('selectpixel', scene, color.color, tile)
+  //console.log('selectpixel', scene, color.color, tile)
   scene.game.emitter.emit('scene/selectpixel', { tile, color });
 }
 
@@ -109,7 +109,7 @@ export function generalResetStrokeStyle(scene) {
 export function resetStrokeStyle(tile, scene) {
   // Reset stroke around the tile
   if (tile) {
-    tile.setStrokeStyle(scene.strokeSize, scene.strokeColor.color, 0.2);
+    tile.setStrokeStyle(scene.strokeSize, scene.strokeColor.color, 0.9);
     tile.setDepth(1)
   }
 }

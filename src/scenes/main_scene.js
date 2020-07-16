@@ -1,6 +1,6 @@
 
 import Phaser from 'phaser'
-import { handleMove, handleClick, generalResetStrokeStyle, setGameMode, setCustomZoon } from '@scripts/actions/index'
+import { handleMove, handleClick, generalResetStrokeStyle, setGameMode } from '@scripts/actions/index'
 import { ApplicationScene } from '@scenes/application_scene'
 import { MinimapScene } from '@scenes/minimap_scene'
 
@@ -19,7 +19,7 @@ export class MainScene extends ApplicationScene {
       }
     }*/
 
-    this.load.image('worldmap', 'assets/images/unicorn.png');
+    this.load.image('worldmap', 'assets/images/milliondollarwebsite.png');
   }
 
   create(data) {
@@ -128,7 +128,7 @@ export class MainScene extends ApplicationScene {
     //console.log('tx ty', tx, ty)
 
     const tile = this.add.rectangle(tx, ty, this.size, this.size);
-    tile.setDisplayOrigin(0,0)
+    tile.setDisplayOrigin(0,0);
     
     //if (this.strokeSize > 0)
     //  tile.setStrokeStyle(this.strokeSize, this.strokeColor.color, 0.2);

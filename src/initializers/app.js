@@ -1,6 +1,5 @@
 import Phaser from 'phaser'
 import { MainScene } from '@scenes/main_scene'
-import { AvailableColors } from '@scripts/util/colors'
 
 export function AppInitializer({
   canvasElement,

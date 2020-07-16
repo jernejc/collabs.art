@@ -46,7 +46,7 @@
 			canvasWidth: window.innerWidth,
 			canvasHeight: window.innerHeight,
 			gridSize: 15,
-			strokeSize: 0.21,
+			strokeSize: 0.22,
 			strokeColor: '#dedede'
 		});
 
@@ -68,7 +68,21 @@
 
 		Emitter.on('scene/selectpixel', pixel => {
 			console.log('scene/selectpixel', pixel)
+			displayInfoBox(pixel)
 		});
+
+		function displayInfoBox(pixel) {
+			const infoboxes = document.body.querySelectorAll('.info-box');
+			const parent = document.body.querySelector('#game');
+
+			// cleanup existing
+			if (infoboxes.length > 0) 
+				for (let index = 0; index < infoboxes.length; index++) 
+					parent.removeChild(infoboxes[index]);
+
+			// needs to handle multiple pixels..
+			new PixelWorld.InfoBox(pixel, parent)
+		}
 
 		function setActiveTool(mode) {
 			const tools = document.querySelectorAll('.tool');
