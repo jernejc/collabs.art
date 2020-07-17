@@ -31,7 +31,7 @@ body, h1 {
 }
 
 	#header {
-		background: rgba(0, 0, 0, 0.7);
+		background: rgba(0, 0, 0, 0.8);
 	}
 
 		#header h1 {
@@ -45,7 +45,7 @@ body, h1 {
 
 	.tool {
 		cursor: pointer;
-		background: rgba(0, 0, 0, 0.7);
+		background: rgba(0, 0, 0, 0.8);
     padding: 10px;
     margin: 0 auto 5px;
     border-radius: 50%;
@@ -100,7 +100,7 @@ Info Box
 	position: absolute;
 	min-height: 100px;
 	min-width: 100px;
-	background-color: rgba(0, 0, 0, 0.9);
+	background-color: rgba(0, 0, 0, 0.8);
 	color: rgba(255, 255, 255, 0.9);
 	padding: 10px;
 }

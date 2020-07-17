@@ -138,17 +138,24 @@ export class MainScene extends ApplicationScene {
 
   colorPixel(x, y) {
     //console.log('colorPixel')
-    const color = this.getColor(x, y, this.color);
-    this.land[y][x].setFillStyle(color.color);
+    const mapPixel = this.getColor(x, y, this.color);
+
+    this.land[y][x].cx = mapPixel.cx;
+    this.land[y][x].cy = mapPixel.cy;
+    this.land[y][x].id = `${mapPixel.cx}x${mapPixel.cy}`;
+
+    this.land[y][x].setFillStyle(mapPixel.color.color);
   }
 
   getColor(x, y, color) {
     color = color || new Phaser.Display.Color();
-    const cx = Phaser.Math.Wrap(this.cameraX + x, 0, this.imageWidth);
-    const cy = Phaser.Math.Wrap(this.cameraY + y, 0, this.imageHeight);
+
+    const cx = parseInt(Phaser.Math.Wrap(this.cameraX + x, 0, this.imageWidth));
+    const cy = parseInt(Phaser.Math.Wrap(this.cameraY + y, 0, this.imageHeight));
 
     this.worldmap.getPixel(cx, cy, color);
-    return color;
+
+    return { cx, cy, color };
   }
 
   /*resizePixel(x, y) {

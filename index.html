@@ -29,9 +29,6 @@
 			<span class="tool select" data-game-mode="select">
 				<i class="gg-tap-single"></i>
 			</span>
-			<!--<span class="tool buy">
-				<i class="gg-dollar"></i>
-			</span>-->
 		</div>
 		<div id="game"></div>
 	</div>
@@ -50,6 +47,9 @@
 			strokeColor: '#dedede'
 		});
 
+		const SelectionManager = world.SelectionInitializer(Game, Emitter)
+		Game.SelectionManager = SelectionManager;
+
 		document.querySelector('#tools').addEventListener('click', (e) => {
 			const gameMode = e.target.dataset.gameMode || e.target.parentNode.dataset.gameMode;
 
@@ -66,24 +66,6 @@
 			setActiveTool(mode)
 		});
 
-		Emitter.on('scene/selectpixel', pixel => {
-			console.log('scene/selectpixel', pixel)
-			displayInfoBox(pixel)
-		});
-
-		function displayInfoBox(pixel) {
-			const infoboxes = document.body.querySelectorAll('.info-box');
-			const parent = document.body.querySelector('#game');
-
-			// cleanup existing
-			if (infoboxes.length > 0) 
-				for (let index = 0; index < infoboxes.length; index++) 
-					parent.removeChild(infoboxes[index]);
-
-			// needs to handle multiple pixels..
-			new PixelWorld.InfoBox(pixel, parent)
-		}
-
 		function setActiveTool(mode) {
 			const tools = document.querySelectorAll('.tool');
 
@@ -97,7 +79,6 @@
 						tool.classList.remove('active')
 				}
 			}
-
 		}
 	</script>
 </body>

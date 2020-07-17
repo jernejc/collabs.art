@@ -1,17 +1,21 @@
 
+import { InfoBox } from '../objects/info_box'
 
 // Fired when user moves pointer through the grid
 export function handleMove({ pointer, scene }) {
   //console.log('handleMove')
-
-  if (scene.game.mode == 'select')
-    positionSelectionBlock({ pointer, scene })
 
   if (pointer.isDown) {
     //console.log('pointer.isDown')
     handleClick({ pointer, scene })
   } else 
     scene.game.origDragPoint = null;
+
+  // Reset existing selectors
+  generalResetStrokeStyle(scene)
+
+  if (scene.game.mode == 'select')
+    positionSelectionBlock({ pointer, scene })
 
 };
 
@@ -55,15 +59,14 @@ export function selectPixel({ pointer, scene }) {
   const color = scene.getColor(x,y)
   const tile = scene.land[y][x];
 
+  tile.selected = true;
+
   //console.log('selectpixel', scene, color.color, tile)
   scene.game.emitter.emit('scene/selectpixel', { tile, color });
 }
 
 // Set the Position of the Selection Block
 export function positionSelectionBlock({ pointer, scene }) {
-
-  // Reset existing selectors
-  generalResetStrokeStyle(scene)
 
   const xPixel = parseInt(pointer.x / scene.size);
   const yPixel = parseInt(pointer.y / scene.size);
@@ -73,13 +76,9 @@ export function positionSelectionBlock({ pointer, scene }) {
   if (scene.land[yPixel])
     tile = scene.land[yPixel][xPixel];
 
-  if (tile) {
-    const invertedColor = invertColor(tile.fillColor.toString());
-    const brightBorder = Phaser.Display.Color.HexStringToColor(invertedColor);
-
-    tile.setStrokeStyle(scene.strokeSize + 1, brightBorder.color, 1);
-    tile.setDepth(10);
-  }
+  if (tile) 
+    setInvertedStroke(tile, scene) 
+  
 }
 
 // Set scene mode
@@ -101,22 +100,66 @@ export function setGameMode({ scene, mode }) {
 }
 
 export function generalResetStrokeStyle(scene) {
-  for (let y = 0; y < scene.gridHeight; y++) 
-    for (let x = 0; x < scene.gridWidth; x++) 
-      resetStrokeStyle(scene.land[y][x], scene)
+  //console.log('generalStrokeReset', scene.game.SelectionManager)
+  for (let y = 0; y < scene.gridHeight; y++) {
+    for (let x = 0; x < scene.gridWidth; x++) {
+      const tile = scene.land[y][x];
+
+      if (tile) {
+        if(scene.game.SelectionManager.isSelected(tile))
+          setInvertedStroke(tile, scene) 
+        else
+          resetStrokeStyle(tile, scene)
+      }
+    }
+  }
 }
 
 export function resetStrokeStyle(tile, scene) {
   // Reset stroke around the tile
   if (tile) {
     tile.setStrokeStyle(scene.strokeSize, scene.strokeColor.color, 0.9);
-    tile.setDepth(1)
+    tile.setDepth(0)
   }
 }
 
-export function invertColor(hex) {
-  if (hex.indexOf('#') === 0)
-    hex = hex.slice(1);
+export function setInvertedStroke(tile, scene) {
+  const color = Phaser.Display.Color.HexStringToColor('#' + tile.fillColor.toString(16))
+  const invertedColor = invertColor(color, true);
 
-  return (Number(`0x${hex}`) ^ 0xFFFFFF).toString(16).substr(1).toUpperCase()
+  tile.setStrokeStyle(scene.strokeSize + 1, invertedColor.color, 1);
+  tile.setDepth(10);
+}
+
+export function invertColor(color, bw) {
+  let { r,g,b } = color;
+
+  if (bw) {
+    const rgbaAverage = (r+g+b) / 3;
+
+    if (rgbaAverage < 186) { // Black and white is also inverted, this is a bit weird
+      r = 0;
+      g = 0;
+      b = 0;
+    } else {
+      r = 255;
+      g = 255;
+      b = 255;
+    }
+  }
+  
+  return Phaser.Display.Color.RGBStringToColor(`rgb(${255-r}, ${255-g}, ${255-b})`); // Given r,g,b is inverted with 255-
+}
+
+export function displayInfoBox(pixel) {
+  const infoboxes = document.body.querySelectorAll('.info-box');
+  const parent = document.body.querySelector('#game');
+
+  // cleanup existing
+  if (infoboxes.length > 0) 
+    for (let index = 0; index < infoboxes.length; index++) 
+      parent.removeChild(infoboxes[index]);
+
+  // needs to handle multiple pixels..
+  new InfoBox(pixel, parent)
 }
