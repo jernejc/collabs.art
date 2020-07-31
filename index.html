@@ -48,7 +48,7 @@
 		});
 
 		const SelectionManager = world.SelectionInitializer(Game, Emitter)
-		Game.SelectionManager = SelectionManager;
+		Game.selectionManager = SelectionManager;
 
 		document.querySelector('#tools').addEventListener('click', (e) => {
 			const gameMode = e.target.dataset.gameMode || e.target.parentNode.dataset.gameMode;

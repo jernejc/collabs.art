@@ -1,5 +1,5 @@
 
-import { InfoBox } from '../objects/info_box'
+import InfoBox from '../objects/info_box'
 
 // Fired when user moves pointer through the grid
 export function handleMove({ pointer, scene }) {
@@ -46,24 +46,81 @@ export function handleClick({ pointer, scene }) {
       scene.updateLand();
       break;
     case 'select':
-      selectPixel({ pointer, scene })
+      clickPixel({ pointer, scene })
       break;
   }
 }
 
 
-export function selectPixel({ pointer, scene }) {
+export function clickPixel({ pointer, scene }) {
   const x = parseInt(pointer.x / scene.size);
   const y = parseInt(pointer.y / scene.size);
 
-  const color = scene.getColor(x,y)
+  const color = getColor({ x, y, scene })
   const tile = scene.land[y][x];
 
-  tile.selected = true;
-
-  //console.log('selectpixel', scene, color.color, tile)
-  scene.game.emitter.emit('scene/selectpixel', { tile, color });
+  if (scene.game.selectionManager.isSelected(tile))
+    scene.game.emitter.emit('scene/deselectpixel', { tile, color });
+  else
+    scene.game.emitter.emit('scene/selectpixel', { tile, color });
 }
+
+export function createPixel({ x, y, scene }) {
+  //console.log('createPixel',x,y)
+  const tx = scene.size * x;
+  const ty = scene.size * y;
+  //console.log('tx ty', tx, ty)
+
+  const tile = scene.add.rectangle(tx, ty, scene.size, scene.size);
+  tile.setDisplayOrigin(0,0);
+  
+  //if (this.strokeSize > 0)
+  //  tile.setStrokeStyle(this.strokeSize, this.strokeColor.color, 0.2);
+
+  return tile;
+}
+
+export function colorPixel({ x, y, scene }) {
+  //console.log('colorPixel')
+  const mapPixel = getColor({ x, y, color: scene.color, scene });
+
+  scene.land[y][x].cx = mapPixel.cx;
+  scene.land[y][x].cy = mapPixel.cy;
+  scene.land[y][x].id = `${mapPixel.cx}x${mapPixel.cy}`;
+
+  scene.land[y][x].setFillStyle(mapPixel.color.color);
+}
+
+export function getColor({ x, y, color, scene }) {
+  color = color || new Phaser.Display.Color();
+
+  const cx = parseInt(Phaser.Math.Wrap(scene.cameraX + x, 0, scene.imageWidth));
+  const cy = parseInt(Phaser.Math.Wrap(scene.cameraY + y, 0, scene.imageHeight));
+
+  scene.worldmap.getPixel(cx, cy, color);
+
+  return { cx, cy, color };
+}
+
+/*resizePixel(x, y) {
+  const oldSize = this.land[y][x].width;
+
+  if (oldSize != getFullBoxWidth(this)) {
+    this.land[y][x].width = getFullBoxWidth(this);
+    this.land[y][x].height = getFullBoxWidth(this);
+
+    this.land[y][x].x = x * getFullBoxWidth(this);
+    this.land[y][x].y = y * getFullBoxWidth(this);
+
+    this.land[y][x].setDepth(getFullBoxWidth(this));
+  }
+
+  return;
+
+  function getFullBoxWidth(self) {
+    return self.size + self.strokeSize;
+  }
+}*/
 
 // Set the Position of the Selection Block
 export function positionSelectionBlock({ pointer, scene }) {
@@ -100,13 +157,13 @@ export function setGameMode({ scene, mode }) {
 }
 
 export function generalResetStrokeStyle(scene) {
-  //console.log('generalStrokeReset', scene.game.SelectionManager)
+  //console.log('generalStrokeReset', scene.game.selectionManager)
   for (let y = 0; y < scene.gridHeight; y++) {
     for (let x = 0; x < scene.gridWidth; x++) {
       const tile = scene.land[y][x];
 
       if (tile) {
-        if(scene.game.SelectionManager.isSelected(tile))
+        if(scene.game.selectionManager.isSelected(tile))
           setInvertedStroke(tile, scene) 
         else
           resetStrokeStyle(tile, scene)
@@ -151,7 +208,7 @@ export function invertColor(color, bw) {
   return Phaser.Display.Color.RGBStringToColor(`rgb(${255-r}, ${255-g}, ${255-b})`); // Given r,g,b is inverted with 255-
 }
 
-export function displayInfoBox(pixel) {
+export function displayInfoBox({ pixel, scene }) {
   const infoboxes = document.body.querySelectorAll('.info-box');
   const parent = document.body.querySelector('#game');
 
@@ -161,5 +218,5 @@ export function displayInfoBox(pixel) {
       parent.removeChild(infoboxes[index]);
 
   // needs to handle multiple pixels..
-  new InfoBox(pixel, parent)
+  new InfoBox({ pixel, parent, scene })
 }

@@ -1,12 +1,15 @@
 
+import Slider from './slider';
+
 /**
  * InfoBox Class
  */
 
-export class InfoBox {
+export default class InfoBox {
 
-  constructor(pixel, parent) {
+  constructor({ pixel, parent, scene }) {
     //console.log('InfoBox pixel', pixel, parent)
+    this.scene = scene;
     this.setupTemplate(pixel, parent);
     this.setPosition(pixel, parent);
   }
@@ -26,9 +29,22 @@ export class InfoBox {
   }
 
   setupTemplate(pixel, parent) {
+    console.log('Setup template', pixel, parent);
+
     this.wrapper = document.createElement('div');
     this.wrapper.classList.add('info-box');
-    this.wrapper.innerHTML = 'Some content here'
+
+    this.position = document.createElement('div')
+    this.position.classList.add('position');
+    this.position.innerHTML = `${pixel.tile.cx} x ${pixel.tile.cy}`
+
+    this.wrapper.appendChild(this.position)
+
+    // Setup color sliders
+    this.colors = ['red', 'green', 'blue'];
+    this.colors.forEach(color => {
+      this.wrapper.appendChild(new Slider(pixel, `color.color.${color}`, 0, 255, 1, color, this.scene))
+    });
 
     try {
       parent.appendChild(this.wrapper);

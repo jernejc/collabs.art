@@ -9,7 +9,7 @@ export function SelectionInitializer (game, emitter) {
 	Emitter.on('scene/selectpixel', pixel => {
 		console.log('scene/selectpixel', pixel)
 		manager.add(pixel)
-		displayInfoBox(pixel)
+		displayInfoBox({ pixel, scene: game.scene.keys.MainScene })
 	});
 
 	Emitter.on('scene/deselectpixel', pixel => {

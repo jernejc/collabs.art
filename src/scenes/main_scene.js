@@ -1,6 +1,6 @@
 
 import Phaser from 'phaser'
-import { handleMove, handleClick, generalResetStrokeStyle, setGameMode } from '@scripts/actions/index'
+import { handleMove, handleClick, generalResetStrokeStyle, setGameMode, createPixel, colorPixel, getColor } from '@scripts/actions/index'
 import { ApplicationScene } from '@scenes/application_scene'
 import { MinimapScene } from '@scenes/minimap_scene'
 
@@ -101,7 +101,7 @@ export class MainScene extends ApplicationScene {
     //console.log("updateLand", this.gridWidth, this.gridHeight, this.cameraX, this.cameraY)
     for (let y = 0; y < this.gridHeight; y++) 
       for (let x = 0; x < this.gridWidth; x++) 
-        this.colorPixel(x, y);
+        colorPixel({x, y, scene: this});
 
     return;
   }
@@ -113,68 +113,11 @@ export class MainScene extends ApplicationScene {
         this.land[y] = []
 
       for (let x = 0; x < this.gridWidth; x++) {
-        this.land[y][x] = this.createPixel(x, y);
-        this.colorPixel(x, y);
+        this.land[y][x] = createPixel({x, y, scene: this});
+        colorPixel({x, y, scene: this});
       }
     }
 
     return;
   }
-
-  createPixel(x, y) {
-    //console.log('createPixel',x,y)
-    const tx = this.size * x;
-    const ty = this.size * y;
-    //console.log('tx ty', tx, ty)
-
-    const tile = this.add.rectangle(tx, ty, this.size, this.size);
-    tile.setDisplayOrigin(0,0);
-    
-    //if (this.strokeSize > 0)
-    //  tile.setStrokeStyle(this.strokeSize, this.strokeColor.color, 0.2);
-
-    return tile;
-  }
-
-  colorPixel(x, y) {
-    //console.log('colorPixel')
-    const mapPixel = this.getColor(x, y, this.color);
-
-    this.land[y][x].cx = mapPixel.cx;
-    this.land[y][x].cy = mapPixel.cy;
-    this.land[y][x].id = `${mapPixel.cx}x${mapPixel.cy}`;
-
-    this.land[y][x].setFillStyle(mapPixel.color.color);
-  }
-
-  getColor(x, y, color) {
-    color = color || new Phaser.Display.Color();
-
-    const cx = parseInt(Phaser.Math.Wrap(this.cameraX + x, 0, this.imageWidth));
-    const cy = parseInt(Phaser.Math.Wrap(this.cameraY + y, 0, this.imageHeight));
-
-    this.worldmap.getPixel(cx, cy, color);
-
-    return { cx, cy, color };
-  }
-
-  /*resizePixel(x, y) {
-    const oldSize = this.land[y][x].width;
-
-    if (oldSize != getFullBoxWidth(this)) {
-      this.land[y][x].width = getFullBoxWidth(this);
-      this.land[y][x].height = getFullBoxWidth(this);
-
-      this.land[y][x].x = x * getFullBoxWidth(this);
-      this.land[y][x].y = y * getFullBoxWidth(this);
-
-      this.land[y][x].setDepth(getFullBoxWidth(this));
-    }
-
-    return;
-
-    function getFullBoxWidth(self) {
-      return self.size + self.strokeSize;
-    }
-  }*/
 }
