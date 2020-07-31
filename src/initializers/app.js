@@ -10,7 +10,7 @@ export function AppInitializer({
   strokeSize
 }) {
   console.log('Init Phaser', canvasElement, canvasWidth, canvasHeight)
-  
+
   const canvas = document.querySelector('#' + canvasElement)
   const Emitter = new Phaser.Events.EventEmitter();
   const Game = new Phaser.Game({

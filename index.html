@@ -2,85 +2,85 @@
 <html>
 
 <head>
-	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-	<meta name="HandheldFriendly" content="True">
-	<meta name="MobileOptimized" content="320">
-	<meta http-equiv="cleartype" content="on">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta http-equiv="cleartype" content="on">
 
-	<link href='https://css.gg/css' rel='stylesheet'>
-	<link rel="stylesheet" href="assets/css/main.css">
-	<script src="vendors.app.js"></script>
-	<script src="app.js"></script>
-	<title>PixelWorld</title>
+  <link href='https://css.gg/css' rel='stylesheet'>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <script src="vendors.app.js"></script>
+  <script src="app.js"></script>
+  <title>PixelWorld</title>
 </head>
 
 <body>
-	<div id="app">
-		<div id="header">
-			<h1>PixelWorld</h1>
-		</div>
-		<div id="tools">
-			<span class="tool account">
-				<i class="gg-profile"></i>
-			</span>
-			<span class="tool move active" data-game-mode="move">
-				<i class="gg-controller"></i>
-			</span>
-			<span class="tool select" data-game-mode="select">
-				<i class="gg-tap-single"></i>
-			</span>
-		</div>
-		<div id="game"></div>
-	</div>
+  <div id="app">
+    <div id="header">
+      <h1>PixelWorld</h1>
+    </div>
+    <div id="tools">
+      <span class="tool account">
+        <i class="gg-profile"></i>
+      </span>
+      <span class="tool move active" data-game-mode="move">
+        <i class="gg-controller"></i>
+      </span>
+      <span class="tool select" data-game-mode="select">
+        <i class="gg-tap-single"></i>
+      </span>
+    </div>
+    <div id="game"></div>
+  </div>
 
-	<script>
-		const world = new PixelWorld.Main()
-		const {
-			Emitter,
-			Game
-		} = world.AppInitializer({
-			canvasElement: 'game',
-			canvasWidth: window.innerWidth,
-			canvasHeight: window.innerHeight,
-			gridSize: 15,
-			strokeSize: 0.22,
-			strokeColor: '#dedede'
-		});
+  <script>
+    const world = new PixelWorld.Main()
+    const {
+      Emitter,
+      Game
+    } = world.AppInitializer({
+      canvasElement: 'game',
+      canvasWidth: window.innerWidth,
+      canvasHeight: window.innerHeight,
+      gridSize: 15,
+      strokeSize: 0.22,
+      strokeColor: '#dedede'
+    });
 
-		const SelectionManager = world.SelectionInitializer(Game, Emitter)
-		Game.selectionManager = SelectionManager;
+    const SelectionManager = world.SelectionInitializer(Game, Emitter)
+    Game.selectionManager = SelectionManager;
 
-		document.querySelector('#tools').addEventListener('click', (e) => {
-			const gameMode = e.target.dataset.gameMode || e.target.parentNode.dataset.gameMode;
+    document.querySelector('#tools').addEventListener('click', (e) => {
+      const gameMode = e.target.dataset.gameMode || e.target.parentNode.dataset.gameMode;
 
-			if (gameMode)
-				Emitter.emit('scene/mode', gameMode)
-		});
+      if (gameMode)
+        Emitter.emit('scene/mode', gameMode)
+    });
 
-		Emitter.on('scene/ready', () => {
-			console.log('scene ready triggered')
-		});
+    Emitter.on('scene/ready', () => {
+      console.log('scene ready triggered')
+    });
 
-		Emitter.on('scene/mode', mode => {
-			console.log('scene/mode', mode)
-			setActiveTool(mode)
-		});
+    Emitter.on('scene/mode', mode => {
+      console.log('scene/mode', mode)
+      setActiveTool(mode)
+    });
 
-		function setActiveTool(mode) {
-			const tools = document.querySelectorAll('.tool');
+    function setActiveTool(mode) {
+      const tools = document.querySelectorAll('.tool');
 
-			for (let index = 0; index < tools.length; index++) {
-				const tool = tools[index];
-				if (tool.classList.contains(mode)) {
-					if (!tool.classList.contains('active'))
-						tool.classList.add('active')
-				} else {
-					if (tool.classList.contains('active'))
-						tool.classList.remove('active')
-				}
-			}
-		}
-	</script>
+      for (let index = 0; index < tools.length; index++) {
+        const tool = tools[index];
+        if (tool.classList.contains(mode)) {
+          if (!tool.classList.contains('active'))
+            tool.classList.add('active')
+        } else {
+          if (tool.classList.contains('active'))
+            tool.classList.remove('active')
+        }
+      }
+    }
+  </script>
 </body>
 
 </html>

@@ -1,34 +1,34 @@
 
 export default class SelectionManager {
-	
-	constructor() {
-		this.selection = [];
-	}
 
-	add(pixel) {
-		console.log('SelectionManager add', pixel);
+  constructor() {
+    this.selection = [];
+  }
 
-		if (!pixel.tile)
-			return;
+  add(pixel) {
+    console.log('SelectionManager add', pixel);
 
-		if (!this.isSelected(pixel.tile))
-			this.selection.push(pixel.tile.id);
+    if (!pixel.tile)
+      return;
 
-		console.log('this.selection', this.selection);
-	}
+    if (!this.isSelected(pixel.tile))
+      this.selection.push(pixel.tile.id);
 
-	remove(pixel) {
-		console.log('SelectionManager remove', pixel);
+    console.log('this.selection', this.selection);
+  }
 
-		if (!pixel.tile)
-			return;
+  remove(pixel) {
+    console.log('SelectionManager remove', pixel);
 
-		if (this.isSelected(pixel.tile))
-			this.selection = this.selection.filter(id => id != pixel.tile.id);
-	}
+    if (!pixel.tile)
+      return;
 
-	isSelected(tile) {
-		//console.log('isSelected', tile)
-		return this.selection.includes(tile.id);
-	}
+    if (this.isSelected(pixel.tile))
+      this.selection = this.selection.filter(id => id != pixel.tile.id);
+  }
+
+  isSelected(tile) {
+    //console.log('isSelected', tile)
+    return this.selection.includes(tile.id);
+  }
 }

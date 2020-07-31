@@ -8,7 +8,7 @@ export function handleMove({ pointer, scene }) {
   if (pointer.isDown) {
     //console.log('pointer.isDown')
     handleClick({ pointer, scene })
-  } else 
+  } else
     scene.game.origDragPoint = null;
 
   // Reset existing selectors
@@ -72,8 +72,8 @@ export function createPixel({ x, y, scene }) {
   //console.log('tx ty', tx, ty)
 
   const tile = scene.add.rectangle(tx, ty, scene.size, scene.size);
-  tile.setDisplayOrigin(0,0);
-  
+  tile.setDisplayOrigin(0, 0);
+
   //if (this.strokeSize > 0)
   //  tile.setStrokeStyle(this.strokeSize, this.strokeColor.color, 0.2);
 
@@ -133,9 +133,9 @@ export function positionSelectionBlock({ pointer, scene }) {
   if (scene.land[yPixel])
     tile = scene.land[yPixel][xPixel];
 
-  if (tile) 
-    setInvertedStroke(tile, scene) 
-  
+  if (tile)
+    setInvertedStroke(tile, scene)
+
 }
 
 // Set scene mode
@@ -163,8 +163,8 @@ export function generalResetStrokeStyle(scene) {
       const tile = scene.land[y][x];
 
       if (tile) {
-        if(scene.game.selectionManager.isSelected(tile))
-          setInvertedStroke(tile, scene) 
+        if (scene.game.selectionManager.isSelected(tile))
+          setInvertedStroke(tile, scene)
         else
           resetStrokeStyle(tile, scene)
       }
@@ -189,10 +189,10 @@ export function setInvertedStroke(tile, scene) {
 }
 
 export function invertColor(color, bw) {
-  let { r,g,b } = color;
+  let { r, g, b } = color;
 
   if (bw) {
-    const rgbaAverage = (r+g+b) / 3;
+    const rgbaAverage = (r + g + b) / 3;
 
     if (rgbaAverage < 186) { // Black and white is also inverted, this is a bit weird
       r = 0;
@@ -204,8 +204,8 @@ export function invertColor(color, bw) {
       b = 255;
     }
   }
-  
-  return Phaser.Display.Color.RGBStringToColor(`rgb(${255-r}, ${255-g}, ${255-b})`); // Given r,g,b is inverted with 255-
+
+  return Phaser.Display.Color.RGBStringToColor(`rgb(${255 - r}, ${255 - g}, ${255 - b})`); // Given r,g,b is inverted with 255-
 }
 
 export function displayInfoBox({ pixel, scene }) {
@@ -213,8 +213,8 @@ export function displayInfoBox({ pixel, scene }) {
   const parent = document.body.querySelector('#game');
 
   // cleanup existing
-  if (infoboxes.length > 0) 
-    for (let index = 0; index < infoboxes.length; index++) 
+  if (infoboxes.length > 0)
+    for (let index = 0; index < infoboxes.length; index++)
       parent.removeChild(infoboxes[index]);
 
   // needs to handle multiple pixels..
