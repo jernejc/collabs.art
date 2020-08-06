@@ -1,5 +1,5 @@
 
-import Slider from './slider';
+import ColorPicker from './color_picker';
 
 /**
  * InfoBox Class
@@ -42,9 +42,9 @@ export default class InfoBox {
 
     // Setup color sliders
     this.colors = ['red', 'green', 'blue'];
-    this.colors.forEach(color => {
-      this.wrapper.appendChild(new Slider(pixel, `color.color.${color}`, 0, 255, 1, color, this.scene))
-    });
+    //this.colors.forEach(color => {
+      this.wrapper.appendChild(new ColorPicker(pixel, `color.color.h`, 0, 1, 0.001))
+    //});
 
     try {
       parent.appendChild(this.wrapper);

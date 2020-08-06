@@ -108,7 +108,9 @@ Info Box
 
 .info-box .position {
   text-align: center;
-  margin: 0 0 10px 0;
+  margin: 0 0 5px 0;
+  padding: 0 0 5px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.9);
 }
 
 
@@ -116,23 +118,42 @@ Info Box
 	Slider
 **/
 
-.color-wrap {
+.color-picker {
   cursor: auto;
   height: 22px;
   line-height: 27px;
-  padding: 0 4px 0 0px;
+  padding: 0;
   width: 100%;
 }
 
-.slider {
-  background: #303030;
+.track {
+  background: linear-gradient(to right, rgb(204, 0, 0), rgb(204, 204, 0), rgb(51, 204, 0), rgb(0, 204, 204), rgb(0, 0, 204), rgb(204, 0, 204), rgb(204, 0, 0));
+  /* #303030;*/
   cursor: ew-resize;
   height: 14px;
 }
 
-.slider-fg {
-  max-width: 100%;
-  height: 100%;
+.pointer {
+  position: relative;
+  z-index: 2;
+  top: 0px;
+  height: 22px;
+  width: 0px;
+  display: inline-block;
+}
+
+.shape {
+  position: absolute;
+  width: calc(100% + 2px);
+  margin-left: -3px;
+  margin-top: -2px;
+  height: 14px;
+  border: 2px solid;
+  border-radius: 2px;
+  border-top-color: rgb(220, 220, 220);
+  border-right-color: rgb(220, 220, 220);
+  border-bottom-color: rgb(220, 220, 220);
+  border-left-color: rgb(220, 220, 220);
 }
 
 .color-wrap.red .slider-fg {

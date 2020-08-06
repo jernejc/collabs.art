@@ -2,13 +2,13 @@ import _ from 'lodash';
 
 
 /**
- * Slider Class
+ * ColorPicker Class
  */
 
-export default class Slider {
+export default class ColorPicker {
 
-  constructor(object, property, min, max, step, color, scene) {
-    //console.log('SLider init', arguments)
+  constructor(object, property, min, max, step, scene) {
+    //console.log('ColorPicker init', arguments)
     const self = this;
 
     this.domElement = document.createElement('div');
@@ -18,20 +18,21 @@ export default class Slider {
     this.min = min;
     this.max = max;
     this.step = step;
-    this.color = color;
 
     this.rangetrack = document.createElement('div');
-    this.rangeslider = document.createElement('div');
+    this.rangepointer = document.createElement('div');
+    this.rangeshape = document.createElement('div');
 
     this.rangetrack.addEventListener('mousedown', onMouseDown);
     this.rangetrack.addEventListener('touchstart', onTouchStart);
 
-    this.rangetrack.classList.add('slider');
-    this.rangeslider.classList.add('slider-fg');
-    this.domElement.classList.add('color-wrap');
-    this.domElement.classList.add(this.color);
+    this.rangetrack.classList.add('track');
+    this.rangepointer.classList.add('pointer');
+    this.rangeshape.classList.add('shape');
+    this.domElement.classList.add('color-picker');
 
-    this.rangetrack.appendChild(this.rangeslider);
+    this.rangepointer.appendChild(this.rangeshape);
+    this.rangetrack.appendChild(this.rangepointer);
     this.domElement.appendChild(this.rangetrack);
 
     this.updateDisplay();
@@ -93,10 +94,10 @@ export default class Slider {
   updateDisplay() {
     const pct = (this.getValue() - this.min) / (this.max - this.min);
 
-    this.rangeslider.style.width = pct * 100 + '%';
+    this.rangepointer.style.left = pct * 100 + '%';
 
     if (this.object.tile && this.object.color) {
-      this.object.color.color.setTo(this.object.color.color.red, this.object.color.color.green, this.object.color.color.blue)
+      //this.object.color.color.setTo(this.object.color.color.red, this.object.color.color.green, this.object.color.color.blue)
       this.object.tile.setFillStyle(this.object.color.color.color);
     }
 
