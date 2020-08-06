@@ -1,23 +1,18 @@
-import _ from 'lodash';
 
+import Color from './color';
 
 /**
  * ColorPicker Class
  */
 
-export default class ColorPicker {
+export default class ColorPicker extends Color {
 
-  constructor(object, property, min, max, step, scene) {
+  constructor(object, property, params) {
     //console.log('ColorPicker init', arguments)
+
+    super(object, property, params);
+
     const self = this;
-
-    this.domElement = document.createElement('div');
-
-    this.object = object;
-    this.property = property;
-    this.min = min;
-    this.max = max;
-    this.step = step;
 
     this.rangetrack = document.createElement('div');
     this.rangepointer = document.createElement('div');
@@ -29,6 +24,7 @@ export default class ColorPicker {
     this.rangetrack.classList.add('track');
     this.rangepointer.classList.add('pointer');
     this.rangeshape.classList.add('shape');
+
     this.domElement.classList.add('color-picker');
 
     this.rangepointer.appendChild(this.rangeshape);
@@ -96,36 +92,10 @@ export default class ColorPicker {
 
     this.rangepointer.style.left = pct * 100 + '%';
 
-    if (this.object.tile && this.object.color) {
-      //this.object.color.color.setTo(this.object.color.color.red, this.object.color.color.green, this.object.color.color.blue)
+    if (this.object.tile && this.object.color) 
       this.object.tile.setFillStyle(this.object.color.color.color);
-    }
 
-    return;
-  }
-
-  getValue() {
-    return _.get(this.object, this.property);
-  }
-
-  setValue(v) {
-    let _v = v;
-
-    if (this.min !== undefined && _v <= this.min) {
-      _v = this.min;
-    } else if (this.max !== undefined && _v >= this.max) {
-      _v = this.max;
-    }
-
-    if (this.step !== undefined && _v % this.step !== 0) {
-      _v = Math.round(_v / this.step) * this.step;
-    }
-
-    _.set(this.object, this.property, _v);
-
-    this.updateDisplay();
-
-    return;
+    return super.updateDisplay();
   }
 }
 

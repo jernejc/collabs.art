@@ -1,5 +1,6 @@
 
-import ColorPicker from './color_picker';
+import ColorPicker from './color/color_picker';
+import ColorInput from './color/color_input';
 
 /**
  * InfoBox Class
@@ -39,12 +40,17 @@ export default class InfoBox {
     this.position.innerHTML = `${pixel.tile.cx} x ${pixel.tile.cy}`
 
     this.wrapper.appendChild(this.position)
+    
+    // Hex Input
+    this.wrapper.appendChild(new ColorInput(pixel, 'color.color.color', {min: 0, max: 255, step: 2, label: 'hex', width: '100%'}))
 
-    // Setup color sliders
-    this.colors = ['red', 'green', 'blue'];
-    //this.colors.forEach(color => {
-      this.wrapper.appendChild(new ColorPicker(pixel, `color.color.h`, 0, 1, 0.001))
-    //});
+    // RGB Inputs
+    this.wrapper.appendChild(new ColorInput(pixel, 'color.color.red', {min: 0, max: 255, step: 2, label: 'r', width: '33%'}))
+    this.wrapper.appendChild(new ColorInput(pixel, 'color.color.green', {min: 0, max: 255, step: 2, label: 'g', width: '33%'}))
+    this.wrapper.appendChild(new ColorInput(pixel, 'color.color.blue', {min: 0, max: 255, step: 2, label: 'b', width: '33%'}))
+
+    // Hue slider
+    this.wrapper.appendChild(new ColorPicker(pixel, 'color.color.h', {min: 0, max: 1, step: 0.001}))
 
     try {
       parent.appendChild(this.wrapper);
