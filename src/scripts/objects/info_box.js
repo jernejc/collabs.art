@@ -40,17 +40,46 @@ export default class InfoBox {
     this.position.innerHTML = `${pixel.tile.cx} x ${pixel.tile.cy}`
 
     this.wrapper.appendChild(this.position)
-    
+
     // Hex Input
-    this.wrapper.appendChild(new ColorInput(pixel, 'color.color.color', {min: 0, max: 255, step: 2, label: 'hex', width: '100%'}))
+    this.wrapper.appendChild(new ColorInput(pixel, 'color.color.color', {
+      min: 0,
+      max: 255,
+      step: 2,
+      label: 'hex',
+      width: '100%',
+      scene: this.scene,
+      format: (value) => '#' + value.toString(16)
+    }))
 
     // RGB Inputs
-    this.wrapper.appendChild(new ColorInput(pixel, 'color.color.red', {min: 0, max: 255, step: 2, label: 'r', width: '33%'}))
-    this.wrapper.appendChild(new ColorInput(pixel, 'color.color.green', {min: 0, max: 255, step: 2, label: 'g', width: '33%'}))
-    this.wrapper.appendChild(new ColorInput(pixel, 'color.color.blue', {min: 0, max: 255, step: 2, label: 'b', width: '33%'}))
+    this.wrapper.appendChild(new ColorInput(pixel, 'color.color.red', {
+      min: 0,
+      max: 255,
+      step: 2,
+      label: 'r',
+      width: '33%',
+      scene: this.scene
+    }))
+    this.wrapper.appendChild(new ColorInput(pixel, 'color.color.green', { 
+      min: 0, 
+      max: 255, 
+      step: 2, 
+      label: 'g', 
+      width: '33%', 
+      scene: this.scene 
+    }))
+    this.wrapper.appendChild(new ColorInput(pixel, 'color.color.blue', { 
+      min: 0, 
+      max: 255, 
+      step: 2, 
+      label: 'b', 
+      width: '33%', 
+      scene: this.scene 
+    }))
 
     // Hue slider
-    this.wrapper.appendChild(new ColorPicker(pixel, 'color.color.h', {min: 0, max: 1, step: 0.001}))
+    this.wrapper.appendChild(new ColorPicker(pixel, 'color.color.h', { min: 0, max: 1, step: 0.001, scene: this.scene }))
 
     try {
       parent.appendChild(this.wrapper);

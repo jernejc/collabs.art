@@ -7,48 +7,59 @@ export default class Color {
 
 		this.object = object;
 		this.property = property;
-		
-    this.min = params.min;
-    this.max = params.max;
+
+		this.min = params.min;
+		this.max = params.max;
 		this.step = params.step;
 		this.label = params.label;
 		this.width = params.width;
-		
+		this.scene = params.scene;
+		this.format = params.format;
+
 		this.domElement = document.createElement('div');
 
-		if (this.width) 
+		if (this.width)
 			this.domElement.style.width = this.width;
-		
+
 		if (this.label) {
 			this.labelElement = document.createElement('label');
 			this.labelElement.textContent = this.label;
 			this.domElement.appendChild(this.labelElement)
 		}
+
+		if (this.scene) {
+			this.scene.game.emitter.on('infobox/update', pixel => {
+				this.updateDisplay();
+      });
+    }
 	}
 
 	getValue() {
-    return _.get(this.object, this.property);
-  }
+		return _.get(this.object, this.property);
+	}
 
-  setValue(v) {
-    let _v = v;
+	setValue(v) {
+		let _v = v;
 
-    if (this.min !== undefined && _v <= this.min) 
-      _v = this.min;
-    else if (this.max !== undefined && _v >= this.max) 
-      _v = this.max;
+		if (this.min !== undefined && _v <= this.min)
+			_v = this.min;
+		else if (this.max !== undefined && _v >= this.max)
+			_v = this.max;
 
-    if (this.step !== undefined && _v % this.step !== 0) 
-      _v = Math.round(_v / this.step) * this.step;
+		if (this.step !== undefined && _v % this.step !== 0)
+			_v = Math.round(_v / this.step) * this.step;
 
-    _.set(this.object, this.property, _v);
+		_.set(this.object, this.property, _v);
 
-    this.updateDisplay();
+		this.updateDisplay();
+
+		if (this.scene)
+			this.scene.game.emitter.emit('infobox/update', this.object);
 
 		return;
 	}
 
 	updateDisplay() {
-    return this;
-  }
+		return this;
+	}
 }

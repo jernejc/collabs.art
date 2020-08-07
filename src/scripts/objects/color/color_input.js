@@ -9,52 +9,53 @@ export default class ColorInput extends Color {
 
   constructor(object, property, params) {
 
-		super(object, property, params);
+    super(object, property, params);
 
     const self = this;
 
     let prevY;
 
-		this.input = document.createElement('input');
+    this.input = document.createElement('input');
 
-		if (params.type)
-			this.input.setAttribute('type', params.type);
-		else
-			this.input.setAttribute('type', 'text');
+    if (params.type)
+      this.input.setAttribute('type', params.type);
+    else
+      this.input.setAttribute('type', 'text');
 
-		this.border = document.createElement('div');
-		this.border.classList.add('input-border');
+    this.border = document.createElement('div');
+    this.border.classList.add('input-border');
 
-		this.domElement.appendChild(this.input);
-		this.domElement.appendChild(this.border);
-		this.domElement.classList.add('color-input');
-		
+    this.domElement.appendChild(this.input);
+    this.domElement.appendChild(this.border);
+    this.domElement.classList.add('color-input');
+
     this.input.addEventListener('change', onChange);
     this.input.addEventListener('blur', onBlur);
-    this.input.addEventListener('mousedown', onMouseDown);
     this.input.addEventListener('keydown', e => {
-      // When pressing enter, you can be as precise as you want.
-      if (e.keyCode === 13) {
-        self.blur();
+      if (e.keyCode === 13)
         onFinish();
-      }
     });
 
-		this.updateDisplay();
+    if (params.mouseevents) 
+      this.input.addEventListener('mousedown', onMouseDown);
 
-		return this.domElement;
+    this.updateDisplay();
 
-		// Helpers
-		
-		function onChange() {
-			const attempted = parseFloat(self.input.value);
-			
-      if (!isNaN(attempted)) 
+    return this.domElement;
+
+    // Helpers
+
+    function onChange(value) {
+      console.log('onChange', value, self.input.value)
+
+      const attempted = value || parseFloat(self.input.value);
+
+      if (!isNaN(attempted))
         self.setValue(attempted);
     }
 
     function onFinish() {
-      if (self.onFinishChange) 
+      if (self.onFinishChange)
         self.onFinishChange.call(self, self.getValue());
     }
 
@@ -80,10 +81,15 @@ export default class ColorInput extends Color {
       window.addEventListener('mouseup', onMouseUp);
       prevY = e.clientY;
     }
-	}
+  }
 
-	updateDisplay() {
-    this.input.value = this.getValue();
+  updateDisplay() {
+    let value = this.getValue();
+
+    if (this.format)
+      value = this.format(value);
+
+    this.input.value = value;
     return super.updateDisplay();
   }
 }
