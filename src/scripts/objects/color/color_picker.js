@@ -92,7 +92,7 @@ export default class ColorPicker extends Color {
 
     this.rangepointer.style.left = pct * 100 + '%';
 
-    if (this.object.tile && this.object.color) 
+    if (this.object.tile && this.object.color)
       this.object.tile.setFillStyle(this.object.color.color.color);
 
     return super.updateDisplay();

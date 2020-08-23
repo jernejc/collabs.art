@@ -36,7 +36,7 @@ export default class ColorInput extends Color {
         onFinish();
     });
 
-    if (params.mouseevents) 
+    if (params.mouseevents)
       this.input.addEventListener('mousedown', onMouseDown);
 
     this.updateDisplay();
