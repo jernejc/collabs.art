@@ -45,7 +45,7 @@ export class MinimapScene extends ApplicationScene {
       this.height,
       Phaser.Display.Color.HexStringToColor('#000000').color
     )
-    this.mapoverlay.setAlpha(0.71)
+    this.mapoverlay.setAlpha(0.82)
     this.mapoverlay.mask = new Phaser.Display.Masks.GeometryMask(this, this.visibleField)
     this.mapoverlay.mask.invertAlpha = true
 

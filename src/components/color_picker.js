@@ -1,11 +1,11 @@
 
-import Color from './color';
+import Controller from '@components/controller';
 
 /**
  * ColorPicker Class
  */
 
-export default class ColorPicker extends Color {
+export default class ColorPicker extends Controller {
 
   constructor(object, property, params) {
     //console.log('ColorPicker init', arguments)

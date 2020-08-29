@@ -16,9 +16,11 @@ module.exports = {
   resolve: {
     extensions: ['.js'],
     alias: {
+      '@actions': path.resolve(__dirname, 'src/actions/'),
+      '@components': path.resolve(__dirname, 'src/components/'),
       '@initializers': path.resolve(__dirname, 'src/initializers/'),
       '@scenes': path.resolve(__dirname, 'src/scenes/'),
-      '@scripts': path.resolve(__dirname, 'src/scripts/'),
+      '@util': path.resolve(__dirname, 'src/util/')
     }
   },
   

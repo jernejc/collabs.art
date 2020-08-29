@@ -1,7 +1,7 @@
 
 import _ from 'lodash';
 
-export default class Color {
+export default class Controller {
 
 	constructor(object, property, params) {
 
@@ -28,8 +28,9 @@ export default class Color {
 		}
 
 		if (this.scene) {
-			this.scene.game.emitter.on('infobox/update', pixel => {
-				this.updateDisplay();
+			this.scene.game.emitter.on('controller/update', property => {
+				if (this.property !== property)
+					this.updateDisplay();
       });
     }
 	}
@@ -54,7 +55,7 @@ export default class Color {
 		this.updateDisplay();
 
 		if (this.scene)
-			this.scene.game.emitter.emit('infobox/update', this.object);
+			this.scene.game.emitter.emit('controller/update', this.property);
 
 		return;
 	}

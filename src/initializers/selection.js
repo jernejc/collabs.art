@@ -1,6 +1,6 @@
 // Not yet implemented, but could come in handy.
-import { displayInfoBox } from '@scripts/actions'
-import SelectionManager from '@scripts/util/selection_manager'
+import { displayInfoBox } from '@actions/user_interactions'
+import SelectionManager from '@util/selection_manager'
 
 export function SelectionInitializer(game, emitter) {
   console.log('SelectionInitializer', game, emitter);

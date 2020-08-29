@@ -6,19 +6,19 @@ export default class SelectionManager {
   }
 
   add(pixel) {
-    console.log('SelectionManager add', pixel);
+    //console.log('SelectionManager add', pixel);
 
     if (!pixel.tile)
       return;
 
     if (!this.isSelected(pixel.tile))
-      this.selection.push(pixel.tile.id);
+      this.selection = [pixel.tile.id];
 
-    console.log('this.selection', this.selection);
+    //console.log('this.selection', this.selection);
   }
 
   remove(pixel) {
-    console.log('SelectionManager remove', pixel);
+    //console.log('SelectionManager remove', pixel);
 
     if (!pixel.tile)
       return;
@@ -30,5 +30,10 @@ export default class SelectionManager {
   isSelected(tile) {
     //console.log('isSelected', tile)
     return this.selection.includes(tile.id);
+  }
+
+  reset() {
+    //console.log('reset selection');
+    this.selection = [];
   }
 }

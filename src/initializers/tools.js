@@ -1,5 +1,5 @@
 // Not yet implemented, but could come in handy.
-import { ToolManager } from '@scripts/util/tool_manager'
+import { ToolManager } from '@util/tool_manager'
 
 export function ToolsInitializer (game) {
   const toolManager = new ToolManager(game);

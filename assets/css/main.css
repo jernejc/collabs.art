@@ -103,6 +103,8 @@ Info Box
   width: 120px;
   background-color: rgb(24, 26, 27);
   color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: rgba(255, 255, 255, 0.1);
   padding: 10px;
 }
 
@@ -110,6 +112,14 @@ Info Box
   text-align: center;
   margin: 0 0 7.5px 0;
 }
+
+.info-box.up.left {}
+
+.info-box.up.right {}
+
+.info-box.down.left {}
+
+.info-box.down.right {}
 
 
 .color-input {
@@ -212,54 +222,52 @@ Info Box
   Selection radio
 **/
 
-.selection-radio {
-	display: -webkit-box;
-	display: flex;
-	margin-bottom: 36px;
-	overflow: hidden;
+.selection-radio form {
+  display: -webkit-box;
+  display: flex;
+  margin: 0 0 6px;
+  overflow: hidden;
 }
 
 .selection-radio input {
-	position: absolute !important;
-	clip: rect(0, 0, 0, 0);
-	height: 1px;
-	width: 1px;
-	border: 0;
-	overflow: hidden;
+  position: absolute !important;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  width: 1px;
+  border: 0;
+  overflow: hidden;
 }
 
 .selection-radio label {
-	background-color: rgba(255, 255, 255, 0.1);
-	color: rgba(255, 255, 255, 0.9);
-	font-size: 14px;
-	line-height: 1;
-	text-align: center;
-	padding: 8px 15px;
-	margin-right: 0px;
-	border: 1px solid rgba(0, 0, 0, 0.2);
-	box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
-	-webkit-transition: all 0.1s ease-in-out;
-	transition: all 0.1s ease-in-out;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  line-height: 25px;
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+  -webkit-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out;
+  flex-grow: 1;
+  flex-basis: 0;
 }
 
 .selection-radio label:hover {
-	cursor: pointer;
+  cursor: pointer;
 }
 
-.selection-radio input:checked + label {
-	background-color: #a5dc86;
-	box-shadow: none;
+.selection-radio input:checked+label {
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: rgba(255, 255, 255, 0.1);
+  color: rgb(24, 26, 27);
 }
 
-.selection-radio label:first-of-type {
-	border-radius: 4px 0 0 4px;
-}
-
-.selection-radio label:last-of-type {
-	border-radius: 0 4px 4px 0;
-}
-
-.selection-radio input:checked + label {
-  background-color: rgb(74, 112, 32);
-  box-shadow: none;
+.bidnow {
+  border: 0;
+  font-size: 14px;
+  line-height: 25px;
+  font-family: inherit;
+  width: 100%;
+  background: rgb(0, 235, 0);
+  cursor: pointer;
 }

@@ -1,8 +1,8 @@
 
-import ColorPicker from './color/color_picker';
-import ColorInput from './color/color_input';
+import ColorPicker from '@components/color_picker';
+import Input from '@components/input';
 
-import SelectionRadio from './selection_radio';
+import SelectionRadio from '@components/selection_radio';
 
 /**
  * InfoBox Class
@@ -28,11 +28,11 @@ export default class InfoBox {
     const left = (horizontal === 'left') ? pixel.tile.x - this.wrapper.offsetWidth - padding : pixel.tile.x + pixel.tile.displayWidth + padding
 
     Object.assign(this.wrapper.style, { top: top + 'px', left: left + 'px' });
-    //this.wrapper.classList.add('animated', animationClass);
+    this.wrapper.classList.add(vertical, horizontal);
   }
 
   setupTemplate(pixel, parent) {
-    console.log('Setup template', pixel, parent);
+    //console.log('Setup template', pixel, parent);
 
     this.wrapper = document.createElement('div');
     this.wrapper.classList.add('info-box');
@@ -62,7 +62,7 @@ export default class InfoBox {
     // Rent / buy radio
     // Price calculation
     // Hex Input
-    this.ownershipUI.appendChild(new SelectionRadio(pixel, 'buyoption', [{
+    this.ownershipUI.appendChild(new SelectionRadio(pixel, 'tile.buyoption', {options: [{
       text: 'Buy',
       value: 'buy',
       name: 'buyoption'
@@ -70,7 +70,24 @@ export default class InfoBox {
       text: 'Rent',
       value: 'rent',
       name: 'buyoption'
-    }]))
+    }]}));
+
+    // Hex Input
+    this.ownershipUI.appendChild(new Input(pixel, 'tile.price', {
+      min: 0,
+      max: 1,
+      step: 0.001,
+      label: 'price',
+      width: '100%',
+      scene: this.scene,
+      format: (value) => value + ' ETH'
+    }));
+
+    this.bidnow = document.createElement('button');
+    this.bidnow.classList.add('bidnow');
+    this.bidnow.textContent = 'Bid now!';
+
+    this.ownershipUI.appendChild(this.bidnow);
 
     this.wrapper.appendChild(this.ownershipUI);
   }
@@ -81,7 +98,7 @@ export default class InfoBox {
     this.colorSelectionUI.classList.add('color-selection');
 
     // Hex Input
-    this.colorSelectionUI.appendChild(new ColorInput(pixel, 'color.color.color', {
+    this.colorSelectionUI.appendChild(new Input(pixel, 'color.color.color', {
       min: 0,
       max: 255,
       step: 2,
@@ -92,7 +109,7 @@ export default class InfoBox {
     }))
 
     // RGB Inputs
-    this.colorSelectionUI.appendChild(new ColorInput(pixel, 'color.color.red', {
+    this.colorSelectionUI.appendChild(new Input(pixel, 'color.color.red', {
       min: 0,
       max: 255,
       step: 2,
@@ -100,7 +117,7 @@ export default class InfoBox {
       width: '33%',
       scene: this.scene
     }))
-    this.colorSelectionUI.appendChild(new ColorInput(pixel, 'color.color.green', {
+    this.colorSelectionUI.appendChild(new Input(pixel, 'color.color.green', {
       min: 0,
       max: 255,
       step: 2,
@@ -108,7 +125,7 @@ export default class InfoBox {
       width: '33%',
       scene: this.scene
     }))
-    this.colorSelectionUI.appendChild(new ColorInput(pixel, 'color.color.blue', {
+    this.colorSelectionUI.appendChild(new Input(pixel, 'color.color.blue', {
       min: 0,
       max: 255,
       step: 2,
@@ -126,9 +143,5 @@ export default class InfoBox {
     }))
 
     this.wrapper.appendChild(this.colorSelectionUI);
-  }
-
-  setSellingUI() {
-
   }
 }

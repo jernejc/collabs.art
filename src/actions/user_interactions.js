@@ -1,22 +1,20 @@
-
-import InfoBox from '../objects/info_box'
+import InfoBox from '@components/info_box'
+import { clickPixel } from '@actions/pixel'
 
 // Fired when user moves pointer through the grid
 export function handleMove({ pointer, scene }) {
   //console.log('handleMove')
 
-  if (pointer.isDown) {
-    //console.log('pointer.isDown')
-    handleClick({ pointer, scene })
-  } else
+  if (pointer.isDown) 
+    handleClick({ pointer, scene });
+  else
     scene.game.origDragPoint = null;
 
-  // Reset existing selectors
-  generalResetStrokeStyle(scene)
-
-  if (scene.game.mode == 'select')
-    positionSelectionBlock({ pointer, scene })
-
+  if (scene.game.mode === 'select') {
+    // Reset existing selectors
+    generalResetStrokeStyle({ scene });
+    positionSelectionBlock({ pointer, scene });
+  }
 };
 
 export function handleClick({ pointer, scene }) {
@@ -46,81 +44,11 @@ export function handleClick({ pointer, scene }) {
       scene.updateLand();
       break;
     case 'select':
-      clickPixel({ pointer, scene })
+      clickPixel({ pointer, scene });
+      generalResetStrokeStyle({ scene });
       break;
   }
 }
-
-
-export function clickPixel({ pointer, scene }) {
-  const x = parseInt(pointer.x / scene.size);
-  const y = parseInt(pointer.y / scene.size);
-
-  const color = getColor({ x, y, scene })
-  const tile = scene.land[y][x];
-
-  if (scene.game.selectionManager.isSelected(tile))
-    scene.game.emitter.emit('scene/deselectpixel', { tile, color });
-  else
-    scene.game.emitter.emit('scene/selectpixel', { tile, color });
-}
-
-export function createPixel({ x, y, scene }) {
-  //console.log('createPixel',x,y)
-  const tx = scene.size * x;
-  const ty = scene.size * y;
-  //console.log('tx ty', tx, ty)
-
-  const tile = scene.add.rectangle(tx, ty, scene.size, scene.size);
-  tile.setDisplayOrigin(0, 0);
-
-  //if (this.strokeSize > 0)
-  //  tile.setStrokeStyle(this.strokeSize, this.strokeColor.color, 0.2);
-
-  return tile;
-}
-
-export function colorPixel({ x, y, scene }) {
-  //console.log('colorPixel')
-  const mapPixel = getColor({ x, y, color: scene.color, scene });
-
-  scene.land[y][x].cx = mapPixel.cx;
-  scene.land[y][x].cy = mapPixel.cy;
-  scene.land[y][x].id = `${mapPixel.cx}x${mapPixel.cy}`;
-
-  scene.land[y][x].setFillStyle(mapPixel.color.color);
-}
-
-export function getColor({ x, y, color, scene }) {
-  color = color || new Phaser.Display.Color();
-
-  const cx = parseInt(Phaser.Math.Wrap(scene.cameraX + x, 0, scene.imageWidth));
-  const cy = parseInt(Phaser.Math.Wrap(scene.cameraY + y, 0, scene.imageHeight));
-
-  scene.worldmap.getPixel(cx, cy, color);
-
-  return { cx, cy, color };
-}
-
-/*resizePixel(x, y) {
-  const oldSize = this.land[y][x].width;
-
-  if (oldSize != getFullBoxWidth(this)) {
-    this.land[y][x].width = getFullBoxWidth(this);
-    this.land[y][x].height = getFullBoxWidth(this);
-
-    this.land[y][x].x = x * getFullBoxWidth(this);
-    this.land[y][x].y = y * getFullBoxWidth(this);
-
-    this.land[y][x].setDepth(getFullBoxWidth(this));
-  }
-
-  return;
-
-  function getFullBoxWidth(self) {
-    return self.size + self.strokeSize;
-  }
-}*/
 
 // Set the Position of the Selection Block
 export function positionSelectionBlock({ pointer, scene }) {
@@ -134,7 +62,7 @@ export function positionSelectionBlock({ pointer, scene }) {
     tile = scene.land[yPixel][xPixel];
 
   if (tile)
-    setInvertedStroke(tile, scene)
+    setInvertedStroke({ tile, scene })
 
 }
 
@@ -142,46 +70,52 @@ export function positionSelectionBlock({ pointer, scene }) {
 export function setGameMode({ scene, mode }) {
   switch (mode) {
     case 'move':
-      scene.input.setDefaultCursor('grab')
+      scene.input.setDefaultCursor('grab');
       scene.game.mode = 'move';
+      
+      removeInfoBox();
+      scene.game.selectionManager.reset();
 
+      generalResetStrokeStyle({ scene, size: 0 });
       break;
     case 'select':
-      scene.input.setDefaultCursor('default')
+      scene.input.setDefaultCursor('default');
       scene.game.mode = 'select';
 
+      generalResetStrokeStyle({ scene });
       break;
   }
 
   scene.game.emitter.emit('scene/mode', mode);
 }
 
-export function generalResetStrokeStyle(scene) {
-  //console.log('generalStrokeReset', scene.game.selectionManager)
+export function generalResetStrokeStyle({ scene, size }) {
+  //console.log('generalStrokeReset', scene, size);
+
   for (let y = 0; y < scene.gridHeight; y++) {
     for (let x = 0; x < scene.gridWidth; x++) {
       const tile = scene.land[y][x];
 
       if (tile) {
         if (scene.game.selectionManager.isSelected(tile))
-          setInvertedStroke(tile, scene)
+          setInvertedStroke({ tile, scene });
         else
-          resetStrokeStyle(tile, scene)
+          resetStrokeStyle({ tile, scene, size });
       }
     }
   }
 }
 
-export function resetStrokeStyle(tile, scene) {
+export function resetStrokeStyle({ tile, scene, size=0.9 }) {
   // Reset stroke around the tile
   if (tile) {
-    tile.setStrokeStyle(scene.strokeSize, scene.strokeColor.color, 0.9);
-    tile.setDepth(0)
+    tile.setStrokeStyle(scene.strokeSize, scene.strokeColor.color, size);
+    tile.setDepth(0);
   }
 }
 
-export function setInvertedStroke(tile, scene) {
-  const color = Phaser.Display.Color.HexStringToColor('#' + tile.fillColor.toString(16))
+export function setInvertedStroke({ tile, scene }) {
+  const color = Phaser.Display.Color.HexStringToColor('#' + tile.fillColor.toString(16));
   const invertedColor = invertColor(color, true);
 
   tile.setStrokeStyle(scene.strokeSize + 1, invertedColor.color, 1);
@@ -218,5 +152,16 @@ export function displayInfoBox({ pixel, scene }) {
       parent.removeChild(infoboxes[index]);
 
   // needs to handle multiple pixels..
-  new InfoBox({ pixel, parent, scene })
+  new InfoBox({ pixel, parent, scene });
+}
+
+export function removeInfoBox() {
+  const infoboxes = document.body.querySelectorAll('.info-box');
+  const parent = document.body.querySelector('#game');
+
+  // cleanup existing
+  if (infoboxes.length > 0)
+    for (let index = 0; index < infoboxes.length; index++)
+      parent.removeChild(infoboxes[index]);
+
 }

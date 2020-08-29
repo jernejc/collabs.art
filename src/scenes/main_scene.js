@@ -1,12 +1,13 @@
 
-import Phaser from 'phaser'
-import { handleMove, handleClick, generalResetStrokeStyle, setGameMode, createPixel, colorPixel, getColor } from '@scripts/actions/index'
-import { ApplicationScene } from '@scenes/application_scene'
-import { MinimapScene } from '@scenes/minimap_scene'
+import Phaser from 'phaser';
+import { handleMove, handleClick, setGameMode } from '@actions/user_interactions';
+import { createPixel, colorPixel } from '@actions/pixel';
+import { ApplicationScene } from '@scenes/application_scene';
+import { MinimapScene } from '@scenes/minimap_scene';
 
 export class MainScene extends ApplicationScene {
   constructor() {
-    super({ key: 'MainScene', active: true })
+    super({ key: 'MainScene', active: true });
   }
 
   preload() {
@@ -25,7 +26,7 @@ export class MainScene extends ApplicationScene {
   create(data) {
     super.create(data)
 
-    //this.blockPadding = this.appConfig.blockPadding || 2
+    //this.blockPadding = this.appConfig.blockPadding || 2;
     this.size = this.appConfig.gridSize;
     this.strokeSize = this.appConfig.strokeSize;
     this.pixelSize = this.size + this.strokeSize;
@@ -38,8 +39,6 @@ export class MainScene extends ApplicationScene {
     this.pMax = 1000;
     this.land = [];
     this.color = new Phaser.Display.Color();
-
-    setGameMode({ scene: this, mode: "select" })
 
     const src = this.textures.get('worldmap').getSourceImage();
 
@@ -56,25 +55,27 @@ export class MainScene extends ApplicationScene {
         gridHeight: this.gridHeight,
         size: this.size
       }
-    })
+    });
 
     this.scene.add('MinimapScene', this.minimap, true);
-    this.createVisiblePixels()
+    this.createVisiblePixels();
+
+    setGameMode({ scene: this, mode: "select" });
 
     this.input.on('pointermove', (pointer) => {
-      handleMove({ pointer, scene: this })
+      handleMove({ pointer, scene: this });
       //console.log('MAINSCENE mouse move', pointer)
-    })
+    });
     this.input.on('pointerdown', (pointer) => {
-      handleClick({ pointer, scene: this })
+      handleClick({ pointer, scene: this });
       //console.log('MAINSCENE mouse move', pointer)
-    })
+    });
 
     this.input.on('wheel', (pointer, currentlyOver, dx, dy, dz, event) => {
-      console.log('wheel event', pointer, dx, dy, dz)
+      console.log('wheel event', pointer, dx, dy, dz);
 
       const newSize = (dy < 0) ? this.size + 1 : this.size - 1;
-      console.log("newSize", newSize)
+      console.log("newSize", newSize);
      /*if (newSize > 5 && newSize < 35) {
         this.size = newSize;
         this.gridWidth = this.appConfig / this.size;
@@ -82,16 +83,13 @@ export class MainScene extends ApplicationScene {
 
         this.updateLand()
       }*/
-    })
+    });
 
     this.game.emitter.on('scene/mode', (mode) => {
       console.log('this.game.emitter.on', mode);
 
-      if (mode == 'move')
-        generalResetStrokeStyle(this)
-
       if (this.game.mode != mode)
-        setGameMode({ scene: this, mode: mode })
+        setGameMode({ scene: this, mode: mode });
     })
 
     this.game.emitter.emit('scene/ready');
@@ -110,7 +108,7 @@ export class MainScene extends ApplicationScene {
 
     for (let y = 0; y < this.gridHeight; y++) {
       if (!this.land[y])
-        this.land[y] = []
+        this.land[y] = [];
 
       for (let x = 0; x < this.gridWidth; x++) {
         this.land[y][x] = createPixel({x, y, scene: this});
