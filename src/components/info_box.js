@@ -62,15 +62,18 @@ export default class InfoBox {
     // Rent / buy radio
     // Price calculation
     // Hex Input
-    this.ownershipUI.appendChild(new SelectionRadio(pixel, 'tile.buyoption', {options: [{
-      text: 'Buy',
-      value: 'buy',
-      name: 'buyoption'
-    }, {
-      text: 'Rent',
-      value: 'rent',
-      name: 'buyoption'
-    }]}));
+    this.ownershipUI.appendChild(new SelectionRadio(pixel, 'tile.buyoption', {
+      scene: this.scene,
+      options: [{
+        text: 'Buy',
+        value: 'buy',
+        name: 'buyoption'
+      }, {
+        text: 'Rent',
+        value: 'rent',
+        name: 'buyoption'
+      }]
+    }));
 
     // Hex Input
     this.ownershipUI.appendChild(new Input(pixel, 'tile.price', {
@@ -80,7 +83,15 @@ export default class InfoBox {
       label: 'price',
       width: '100%',
       scene: this.scene,
-      format: (value) => value + ' ETH'
+      format: (value) => {
+        let _v = value;
+
+        if (pixel.tile.buyoption === 'rent')
+          return (_v / 50).toFixed(3) + ' ETH / day'
+        else
+          return _v + ' ETH'
+      }
+
     }));
 
     this.bidnow = document.createElement('button');

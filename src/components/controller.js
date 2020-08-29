@@ -29,6 +29,8 @@ export default class Controller {
 
 		if (this.scene) {
 			this.scene.game.emitter.on('controller/update', property => {
+				console.log('controller/update', this.property, property);
+
 				if (this.property !== property)
 					this.updateDisplay();
       });

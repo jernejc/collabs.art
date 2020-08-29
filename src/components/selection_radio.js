@@ -48,9 +48,7 @@ export default class SelectionRadio extends Controller {
       console.log('onChange', e, self.radioinput[self.property].value)
 
       const attempted = self.radioinput[self.property].value;
-
-      if (!isNaN(attempted))
-        self.setValue(attempted);
+      self.setValue(attempted);
     }
   }
 
