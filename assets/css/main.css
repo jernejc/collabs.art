@@ -106,6 +106,7 @@ Info Box
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: rgba(255, 255, 255, 0.1);
   padding: 10px;
+  border: 2px solid transparent;
 }
 
 .info-box .position {
@@ -113,16 +114,46 @@ Info Box
   margin: 0 0 7.5px 0;
 }
 
-.info-box.up.left {}
+.info-box .arrow {
+  position: absolute;
+}
 
-.info-box.up.right {}
+.info-box.top.left .arrow {
+  top: 0;
+  left: 0;
 
-.info-box.down.left {}
+  width: 0;
+  height: 0;
+  border-top: 10px solid red;
+  border-right: 10px solid transparent;
+}
 
-.info-box.down.right {}
+.info-box.top.right .arrow {
+  top: -1px;
+  right: -1px;
+
+  border-top: 10px solid red;
+  border-left: 10px solid transparent;
+}
+
+.info-box.bottom.left .arrow {
+  bottom: -1px;
+  left: -1px;
+
+  border-bottom: 10px solid red;
+  border-right: 10px solid transparent;
+}
+
+.info-box.bottom.right .arrow {
+  bottom: -1px;
+  right: -1px;
+
+  border-bottom: 10px solid red;
+  border-left: 10px solid transparent;
+}
 
 
-.color-input {
+.text-input {
   position: relative;
   margin: 0;
   text-align: center;
@@ -130,7 +161,7 @@ Info Box
   display: inline-block;
 }
 
-.color-input label {
+.text-input label {
   position: absolute;
   padding: 0px 2px;
   background: rgb(24, 26, 27);
@@ -140,7 +171,7 @@ Info Box
   transform: translate(-50%, -25%);
 }
 
-.color-input input[type="text"] {
+.text-input input[type="text"] {
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.9);
@@ -155,17 +186,16 @@ Info Box
   letter-spacing: 0.15px;
 }
 
-.color-input input[type="text"]:focus {
+.text-input input[type="text"]:focus {
   outline: none;
 }
 
-.color-input .input-border {
+.text-input .input-border {
   border: 1px solid #dadce0;
   border-radius: 5px;
   height: 30px;
   margin: 4px auto 0px;
 }
-
 
 .color-picker {
   cursor: auto;
@@ -173,6 +203,7 @@ Info Box
   padding: 0;
   width: 100%;
   margin: 5px 0 0;
+  position: static;
 }
 
 .track {
@@ -222,11 +253,16 @@ Info Box
   Selection radio
 **/
 
-.selection-radio form {
+.selection-radio {
   display: -webkit-box;
   display: flex;
   margin: 0 0 6px;
-  overflow: hidden;
+  overflow: hidden; 
+}
+
+.selection-radio form {
+  display: flex;
+  width: 100%;
 }
 
 .selection-radio input {

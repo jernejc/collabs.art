@@ -1,4 +1,6 @@
 
+import InfoBox from '@components/info_box'
+
 export function clickPixel({ pointer, scene }) {
   const x = parseInt(pointer.x / scene.size);
   const y = parseInt(pointer.y / scene.size);
@@ -10,7 +12,9 @@ export function clickPixel({ pointer, scene }) {
     scene.game.emitter.emit('scene/deselectpixel', { tile, color });
   else*/
 
-  scene.game.emitter.emit('scene/selectpixel', { tile, color });
+  //scene.game.emitter.emit('scene/selectpixel', { tile, color });
+
+  scene.game.selectionManager.add({ tile, color }, scene);
 }
 
 export function createPixel({ x, y, scene }) {
@@ -52,6 +56,30 @@ export function getColor({ x, y, color, scene }) {
   scene.worldmap.getPixel(cx, cy, color);
 
   return { cx, cy, color };
+}
+
+export function displayInfoBox({ pixel, scene }) {
+  const infoboxes = document.body.querySelectorAll('.info-box');
+  const parent = document.body.querySelector('#game');
+
+  // cleanup existing
+  if (infoboxes.length > 0)
+    for (let index = 0; index < infoboxes.length; index++)
+      parent.removeChild(infoboxes[index]);
+
+  // needs to handle multiple pixels..
+  return new InfoBox({ pixel, parent, scene });
+}
+
+export function removeInfoBox() {
+  const infoboxes = document.body.querySelectorAll('.info-box');
+  const parent = document.body.querySelector('#game');
+
+  // cleanup existing
+  if (infoboxes.length > 0)
+    for (let index = 0; index < infoboxes.length; index++)
+      parent.removeChild(infoboxes[index]);
+
 }
 
 /*resizePixel(x, y) {

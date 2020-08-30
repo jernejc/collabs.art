@@ -1,5 +1,5 @@
-import InfoBox from '@components/info_box'
-import { clickPixel } from '@actions/pixel'
+
+import { clickPixel, removeInfoBox } from '@actions/pixel'
 
 // Fired when user moves pointer through the grid
 export function handleMove({ pointer, scene }) {
@@ -140,28 +140,4 @@ export function invertColor(color, bw) {
   }
 
   return Phaser.Display.Color.RGBStringToColor(`rgb(${255 - r}, ${255 - g}, ${255 - b})`); // Given r,g,b is inverted with 255-
-}
-
-export function displayInfoBox({ pixel, scene }) {
-  const infoboxes = document.body.querySelectorAll('.info-box');
-  const parent = document.body.querySelector('#game');
-
-  // cleanup existing
-  if (infoboxes.length > 0)
-    for (let index = 0; index < infoboxes.length; index++)
-      parent.removeChild(infoboxes[index]);
-
-  // needs to handle multiple pixels..
-  new InfoBox({ pixel, parent, scene });
-}
-
-export function removeInfoBox() {
-  const infoboxes = document.body.querySelectorAll('.info-box');
-  const parent = document.body.querySelector('#game');
-
-  // cleanup existing
-  if (infoboxes.length > 0)
-    for (let index = 0; index < infoboxes.length; index++)
-      parent.removeChild(infoboxes[index]);
-
 }

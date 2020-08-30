@@ -21,14 +21,16 @@ export default class InfoBox {
     //console.log('setPosition', pixel, parent.offsetWidth, pixel.tile.x, this.wrapper.offsetWidth, pixel.tile.displayWidth)
 
     const padding = 2;
-    const vertical = (pixel.tile.y > (parent.offsetHeight / 2)) ? 'down' : 'up'
-    const horizontal = (pixel.tile.x > (parent.offsetWidth / 2)) ? 'left' : 'right'
+    const vertical = (pixel.tile.y > (parent.offsetHeight / 2)) ?  'bottom' : 'top'
+    const horizontal = (pixel.tile.x > (parent.offsetWidth / 2)) ?  'right': 'left'
     //const animationClass = (vertical === 'up') ? 'fadeInUp' : 'fadeInDown'
-    const top = (vertical === 'down') ? pixel.tile.y - this.wrapper.offsetHeight - padding : pixel.tile.y + pixel.tile.displayHeight + padding
-    const left = (horizontal === 'left') ? pixel.tile.x - this.wrapper.offsetWidth - padding : pixel.tile.x + pixel.tile.displayWidth + padding
+    const top = (vertical === 'bottom') ? pixel.tile.y - this.wrapper.offsetHeight - padding : pixel.tile.y + pixel.tile.displayHeight + padding
+    const left = (horizontal === 'right') ? pixel.tile.x - this.wrapper.offsetWidth - padding : pixel.tile.x + pixel.tile.displayWidth + padding
 
     Object.assign(this.wrapper.style, { top: top + 'px', left: left + 'px' });
     this.wrapper.classList.add(vertical, horizontal);
+
+    //this.arrow.classList.add(`gg-arrow-${vertical}-${horizontal}-o`)
   }
 
   setupTemplate(pixel, parent) {
@@ -42,6 +44,11 @@ export default class InfoBox {
     this.position.innerHTML = `${pixel.tile.cx} x ${pixel.tile.cy}`;
 
     this.wrapper.appendChild(this.position);
+
+    this.arrow = document.createElement('i');
+    this.arrow.classList.add('arrow')
+
+    this.wrapper.appendChild(this.arrow);
 
     //this.setColorSelectionUI(pixel);
     this.setOwnershipUI(pixel);
@@ -154,5 +161,9 @@ export default class InfoBox {
     }))
 
     this.wrapper.appendChild(this.colorSelectionUI);
+  }
+
+  destroy() {
+
   }
 }

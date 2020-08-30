@@ -17,6 +17,8 @@ export default class Controller {
 		this.format = params.format;
 
 		this.domElement = document.createElement('div');
+		this.domElement.classList.add('controller');
+		this.domElement.classList.add(this.property.replace(/[^a-zA-Z]/g, ""));
 
 		if (this.width)
 			this.domElement.style.width = this.width;

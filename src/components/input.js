@@ -27,7 +27,7 @@ export default class Input extends Controller {
 
     this.domElement.appendChild(this.input);
     this.domElement.appendChild(this.border);
-    this.domElement.classList.add('color-input');
+    this.domElement.classList.add('text-input');
 
     this.input.addEventListener('change', onChange);
     this.input.addEventListener('blur', onBlur);
