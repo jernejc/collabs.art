@@ -2,50 +2,57 @@
 import { clickPixel, removeInfoBox } from '@actions/pixel'
 
 // Fired when user moves pointer through the grid
-export function handleMove({ pointer, scene }) {
-  //console.log('handleMove')
+export function handleMouseEvent({ pointer, scene }) {
+  //console.log('handleMove', pointer, scene);
 
-  if (pointer.isDown) 
-    handleClick({ pointer, scene });
-  else
-    scene.game.origDragPoint = null;
-
-  if (scene.game.mode === 'select') {
-    // Reset existing selectors
-    generalResetStrokeStyle({ scene });
-    positionSelectionBlock({ pointer, scene });
-  }
-};
-
-export function handleClick({ pointer, scene }) {
   switch (scene.game.mode) {
     case 'move':
-      //console.log('handle move event')
-      if (scene.game.origDragPoint) {
-        // move the camera by the amount the mouse has moved since last update
-        scene.cameraX += scene.game.origDragPoint.x - pointer.position.x;
-        scene.cameraY += scene.game.origDragPoint.y - pointer.position.y;
+      if (pointer.isDown) {
+        if (scene.game.origDragPoint) {
+          // move the camera by the amount the mouse has moved since last update
+          scene.cameraX += scene.game.origDragPoint.x - pointer.position.x;
+          scene.cameraY += scene.game.origDragPoint.y - pointer.position.y;
 
-        const maxX = scene.pMax - scene.gridWidth;
-        if (scene.cameraX === maxX || scene.cameraX > maxX)
-          scene.cameraX = maxX;
-        else if (scene.cameraX < 0)
-          scene.cameraX = 0;
+          const maxX = scene.pMax - scene.gridWidth;
+          if (scene.cameraX === maxX || scene.cameraX > maxX)
+            scene.cameraX = maxX;
+          else if (scene.cameraX < 0)
+            scene.cameraX = 0;
 
-        const maxY = scene.pMax - scene.gridHeight;
-        if (scene.cameraY === maxY || scene.cameraY > maxY)
-          scene.cameraY = maxY;
-        else if (scene.cameraY < 0)
-          scene.cameraY = 0;
-      }
+          const maxY = scene.pMax - scene.gridHeight;
+          if (scene.cameraY === maxY || scene.cameraY > maxY)
+            scene.cameraY = maxY;
+          else if (scene.cameraY < 0)
+            scene.cameraY = 0;
+        }
 
-      // set new drag origin to current position
-      scene.game.origDragPoint = pointer.position.clone();
-      scene.updateLand();
+        // set new drag origin to current position
+        scene.game.origDragPoint = pointer.position.clone();
+        scene.updateLand();
+      } else
+        scene.game.origDragPoint = null;
       break;
     case 'select':
-      clickPixel({ pointer, scene });
-      generalResetStrokeStyle({ scene });
+      if (pointer.isDown) {
+        console.log('select pointer isDown', pointer)
+
+        if (pointer.button === 2) { // Detect right click
+          resetActiveSelection({ scene });
+          generalResetStrokeStyle({ scene });
+          return;
+        }
+
+        clickPixel({ pointer, scene });
+        generalResetStrokeStyle({ scene });
+      } else {
+        generalResetStrokeStyle({ scene });
+        positionSelectionBlock({ pointer, scene });
+      }
+      break;
+    case 'drag':
+      if (pointer.isDown) {
+        console.log('drag pointer isDown', pointer)
+      }
       break;
   }
 }
@@ -68,14 +75,14 @@ export function positionSelectionBlock({ pointer, scene }) {
 
 // Set scene mode
 export function setGameMode({ scene, mode }) {
+  console.log('setGameMode', mode)
+
   switch (mode) {
     case 'move':
       scene.input.setDefaultCursor('grab');
       scene.game.mode = 'move';
-      
-      removeInfoBox();
-      scene.game.selectionManager.reset();
 
+      resetActiveSelection({ scene });
       generalResetStrokeStyle({ scene, size: 0 });
       break;
     case 'select':
@@ -84,9 +91,20 @@ export function setGameMode({ scene, mode }) {
 
       generalResetStrokeStyle({ scene });
       break;
-  }
+    case 'drag':
+      scene.input.setDefaultCursor('copy');
+      scene.game.mode = 'drag';
 
-  scene.game.emitter.emit('scene/mode', mode);
+      resetActiveSelection({ scene });
+      generalResetStrokeStyle({ scene });
+      break;
+  }
+  //scene.game.emitter.emit('scene/mode', mode);
+}
+
+export function resetActiveSelection({ scene }) {
+  removeInfoBox();
+  scene.game.selectionManager.reset();
 }
 
 export function generalResetStrokeStyle({ scene, size }) {
@@ -106,7 +124,7 @@ export function generalResetStrokeStyle({ scene, size }) {
   }
 }
 
-export function resetStrokeStyle({ tile, scene, size=0.9 }) {
+export function resetStrokeStyle({ tile, scene, size = 0.9 }) {
   // Reset stroke around the tile
   if (tile) {
     tile.setStrokeStyle(scene.strokeSize, scene.strokeColor.color, size);

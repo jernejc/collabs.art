@@ -1,6 +1,6 @@
 
 import Phaser from 'phaser';
-import { handleMove, handleClick, setGameMode } from '@actions/user_interactions';
+import { handleMouseEvent, setGameMode } from '@actions/user_interactions';
 import { createPixel, colorPixel } from '@actions/pixel';
 import { ApplicationScene } from '@scenes/application_scene';
 import { MinimapScene } from '@scenes/minimap_scene';
@@ -25,6 +25,8 @@ export class MainScene extends ApplicationScene {
 
   create(data) {
     super.create(data)
+
+    const _self = this;
 
     //this.blockPadding = this.appConfig.blockPadding || 2;
     this.size = this.appConfig.gridSize;
@@ -62,13 +64,22 @@ export class MainScene extends ApplicationScene {
 
     setGameMode({ scene: this, mode: "select" });
 
+    this.input.mouse.disableContextMenu(); // prevent right click context menu
+
     this.input.on('pointermove', (pointer) => {
-      handleMove({ pointer, scene: this });
-      //console.log('MAINSCENE mouse move', pointer)
+      //console.log('MAINSCENE EVENT:pointermove', pointer)
+      
+      pointer.event.preventDefault();
+      pointer.event.stopPropagation();
+      handleMouseEvent({ pointer, scene: this });
     });
+
     this.input.on('pointerdown', (pointer) => {
-      handleClick({ pointer, scene: this });
-      //console.log('MAINSCENE mouse move', pointer)
+      console.log('MAINSCENE EVENT:pointerdown', pointer);
+      
+      pointer.event.preventDefault();
+      pointer.event.stopPropagation();
+      handleMouseEvent({ pointer, scene: this });
     });
 
     this.input.on('wheel', (pointer, currentlyOver, dx, dy, dz, event) => {
@@ -85,11 +96,25 @@ export class MainScene extends ApplicationScene {
       }*/
     });
 
+    this.input.keyboard.on('keydown_SHIFT', (event) => {
+      console.log('keydown_SHIFT event', event, _self.game.mode);
+      
+      if (_self.game.mode === 'select')
+        setGameMode({ scene: _self, mode: 'drag' });
+    });
+
+    this.input.keyboard.on('keyup_SHIFT', (event) => {
+      console.log('keyup_SHIFT event', event, _self.game.mode);
+
+      if (_self.game.mode === 'drag')
+        setGameMode({ scene: _self, mode: 'select' });
+    })
+
     this.game.emitter.on('scene/mode', (mode) => {
       console.log('this.game.emitter.on', mode);
 
-      if (this.game.mode != mode)
-        setGameMode({ scene: this, mode: mode });
+      if (_self.game.mode !== mode)
+        setGameMode({ scene: _self, mode: mode });
     })
 
     this.game.emitter.emit('scene/ready');
