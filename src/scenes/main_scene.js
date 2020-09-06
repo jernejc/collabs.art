@@ -1,6 +1,6 @@
 
 import Phaser from 'phaser';
-import { handleMouseEvent, setGameMode } from '@actions/user_interactions';
+import { handleMouseMove, handleMouseDown, handleMouseUp, setGameMode } from '@actions/user_interactions';
 import { createPixel, colorPixel } from '@actions/pixel';
 import { ApplicationScene } from '@scenes/application_scene';
 import { MinimapScene } from '@scenes/minimap_scene';
@@ -66,20 +66,26 @@ export class MainScene extends ApplicationScene {
 
     this.input.mouse.disableContextMenu(); // prevent right click context menu
 
+    /** 
+     * Mouse Events
+     */
+
     this.input.on('pointermove', (pointer) => {
       //console.log('MAINSCENE EVENT:pointermove', pointer)
-      
-      pointer.event.preventDefault();
-      pointer.event.stopPropagation();
-      handleMouseEvent({ pointer, scene: this });
+
+      handleMouseMove({ pointer, scene: this });
     });
 
     this.input.on('pointerdown', (pointer) => {
-      console.log('MAINSCENE EVENT:pointerdown', pointer);
-      
-      pointer.event.preventDefault();
-      pointer.event.stopPropagation();
-      handleMouseEvent({ pointer, scene: this });
+      //console.log('MAINSCENE EVENT:pointerdown', pointer);
+
+      handleMouseDown({ pointer, scene: this });
+    });
+
+    this.input.on('pointerup', (pointer) => {
+      //console.log('MAINSCENE EVENT:pointerup', pointer);
+
+      handleMouseUp({ pointer, scene: this });
     });
 
     this.input.on('wheel', (pointer, currentlyOver, dx, dy, dz, event) => {
@@ -95,6 +101,10 @@ export class MainScene extends ApplicationScene {
         this.updateLand()
       }*/
     });
+
+    /** 
+     * Keyboard events
+     */
 
     this.input.keyboard.on('keydown_SHIFT', (event) => {
       console.log('keydown_SHIFT event', event, _self.game.mode);
@@ -115,8 +125,9 @@ export class MainScene extends ApplicationScene {
 
       if (_self.game.mode !== mode)
         setGameMode({ scene: _self, mode: mode });
-    })
+    });
 
+    // Main scene is ready.
     this.game.emitter.emit('scene/ready');
   }
 

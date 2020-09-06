@@ -2,59 +2,85 @@
 import { clickPixel, removeInfoBox } from '@actions/pixel'
 
 // Fired when user moves pointer through the grid
-export function handleMouseEvent({ pointer, scene }) {
+export function handleMouseMove({ pointer, scene }) {
   //console.log('handleMove', pointer, scene);
 
   switch (scene.game.mode) {
     case 'move':
       if (pointer.isDown) {
-        if (scene.game.origDragPoint) {
-          // move the camera by the amount the mouse has moved since last update
-          scene.cameraX += scene.game.origDragPoint.x - pointer.position.x;
-          scene.cameraY += scene.game.origDragPoint.y - pointer.position.y;
-
-          const maxX = scene.pMax - scene.gridWidth;
-          if (scene.cameraX === maxX || scene.cameraX > maxX)
-            scene.cameraX = maxX;
-          else if (scene.cameraX < 0)
-            scene.cameraX = 0;
-
-          const maxY = scene.pMax - scene.gridHeight;
-          if (scene.cameraY === maxY || scene.cameraY > maxY)
-            scene.cameraY = maxY;
-          else if (scene.cameraY < 0)
-            scene.cameraY = 0;
-        }
-
-        // set new drag origin to current position
-        scene.game.origDragPoint = pointer.position.clone();
-        scene.updateLand();
+        panDragMap({ pointer, scene });
       } else
         scene.game.origDragPoint = null;
       break;
     case 'select':
-      if (pointer.isDown) {
-        console.log('select pointer isDown', pointer)
-
-        if (pointer.button === 2) { // Detect right click
-          resetActiveSelection({ scene });
-          generalResetStrokeStyle({ scene });
-          return;
-        }
-
-        clickPixel({ pointer, scene });
-        generalResetStrokeStyle({ scene });
-      } else {
-        generalResetStrokeStyle({ scene });
-        positionSelectionBlock({ pointer, scene });
-      }
+      generalResetStrokeStyle({ scene });
+      positionSelectionBlock({ pointer, scene });
       break;
     case 'drag':
-      if (pointer.isDown) {
-        console.log('drag pointer isDown', pointer)
+      if (pointer.isDown && scene.selectionRectangle) {
+        // scene.selectionRectangle.clear();
+        scene.selectionRectangle.setSize(pointer.x - pointer.downX, pointer.y - pointer.downY);
       }
       break;
   }
+}
+
+export function handleMouseDown({ pointer, scene }) {
+  //console.log('handleMouseDown')
+
+  switch (scene.game.mode) {
+    case 'select':
+      //console.log('select pointer isDown', pointer)
+
+      if (pointer.button === 2) { // Detect right click
+        resetActiveSelection({ scene });
+        generalResetStrokeStyle({ scene });
+        return;
+      }
+
+      clickPixel({ pointer, scene });
+      generalResetStrokeStyle({ scene });
+      break;
+    case 'drag':
+      scene.selectionRectangle = scene.add.rectangle(pointer.downX, pointer.downY, pointer.x - pointer.downX, pointer.y - pointer.downY);
+      scene.selectionRectangle.setFillStyle(0xffffff, 0.2);
+      scene.selectionRectangle.setStrokeStyle(1, 0xffffff, 0.9);
+      break;
+  }
+}
+
+export function handleMouseUp({ pointer, scene }) {
+  //console.log('handleMouseUp', pointer, scene)
+
+  if (scene.selectionRectangle) {
+    scene.selectionRectangle.destroy()
+    scene.selectionRectangle = null;
+  }
+}
+
+export function panDragMap({ pointer, scene }) {
+
+  if (scene.game.origDragPoint) {
+    // move the camera by the amount the mouse has moved since last update
+    scene.cameraX += scene.game.origDragPoint.x - pointer.position.x;
+    scene.cameraY += scene.game.origDragPoint.y - pointer.position.y;
+
+    const maxX = scene.pMax - scene.gridWidth;
+    if (scene.cameraX === maxX || scene.cameraX > maxX)
+      scene.cameraX = maxX;
+    else if (scene.cameraX < 0)
+      scene.cameraX = 0;
+
+    const maxY = scene.pMax - scene.gridHeight;
+    if (scene.cameraY === maxY || scene.cameraY > maxY)
+      scene.cameraY = maxY;
+    else if (scene.cameraY < 0)
+      scene.cameraY = 0;
+  }
+
+  // set new drag origin to current position
+  scene.game.origDragPoint = pointer.position.clone();
+  scene.updateLand();
 }
 
 // Set the Position of the Selection Block
