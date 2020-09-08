@@ -17,9 +17,20 @@ export function handleMouseMove({ pointer, scene }) {
       positionSelectionBlock({ pointer, scene });
       break;
     case 'drag':
+
+      if (pointer.button === 2) // Ignore right click
+        return;
+
       if (pointer.isDown && scene.selectionRectangle) {
-        // scene.selectionRectangle.clear();
-        scene.selectionRectangle.setSize(pointer.x - pointer.downX, pointer.y - pointer.downY);
+        scene.selectionRectangleEndPixel = getPixelForPointer({ pointer, scene });
+
+        const W = scene.selectionRectangleEndPixel.x - scene.selectionRectangleBeginPixel.x;
+        const H = scene.selectionRectangleEndPixel.y - scene.selectionRectangleBeginPixel.y;
+
+        // Bug when changing rect size: https://phaser.discourse.group/t/how-to-resize-gameobjects-rectangle-without-changing-scale/4777
+        scene.selectionRectangle.geom.setSize(W, H);
+        scene.selectionRectangle.setSize(W, H);
+        scene.selectionRectangle.updateData();
       }
       break;
   }
@@ -30,7 +41,6 @@ export function handleMouseDown({ pointer, scene }) {
 
   switch (scene.game.mode) {
     case 'select':
-      //console.log('select pointer isDown', pointer)
 
       if (pointer.button === 2) { // Detect right click
         resetActiveSelection({ scene });
@@ -42,9 +52,24 @@ export function handleMouseDown({ pointer, scene }) {
       generalResetStrokeStyle({ scene });
       break;
     case 'drag':
-      scene.selectionRectangle = scene.add.rectangle(pointer.downX, pointer.downY, pointer.x - pointer.downX, pointer.y - pointer.downY);
-      scene.selectionRectangle.setFillStyle(0xffffff, 0.2);
+
+      if (pointer.button === 2) // Ignore right click
+        return;
+
+      scene.selectionRectangleBeginPixel = getPixelForPointer({ pointer, scene });
+
+      const X = scene.selectionRectangleBeginPixel.x;
+      const Y = scene.selectionRectangleBeginPixel.y
+      const W = pointer.x - scene.selectionRectangleBeginPixel.x;
+      const H = pointer.y - scene.selectionRectangleBeginPixel.y;
+
+      scene.selectionRectangle = scene.add.rectangle(X, Y, W, H);
+      scene.selectionRectangle.setFillStyle(0xffffff, 0.15);
       scene.selectionRectangle.setStrokeStyle(1, 0xffffff, 0.9);
+      scene.selectionRectangle.setDisplayOrigin(0, 0);
+
+      console.log('scene.selectionRectangleBeginPixel', scene.selectionRectangleBeginPixel);
+      console.log('scene.selectionRectangle', scene.selectionRectangle);
       break;
   }
 }
@@ -53,9 +78,37 @@ export function handleMouseUp({ pointer, scene }) {
   //console.log('handleMouseUp', pointer, scene)
 
   if (scene.selectionRectangle) {
-    scene.selectionRectangle.destroy()
+    scene.selectionRectangle.destroy();
     scene.selectionRectangle = null;
+    scene.selectionRectangleBeginPixel = null;
+    scene.selectionRectangleEndPixel = null;
   }
+}
+
+export function clearRectangleSelection({ scene }) {
+  if (scene.selectionRectangle) {
+    scene.selectionRectangle.destroy();
+    scene.selectionRectangle = null;
+    scene.selectionRectangleBeginPixel = null;
+    scene.selectionRectangleEndPixel = null;
+  }
+}
+
+export function handleShiftDown({ scene }) {
+  if (scene.game.mode === 'select')
+    setGameMode({ scene, mode: 'drag' });
+
+  scene.input.keyboard.off('keydown_SHIFT') // Events repeats as longs as the button is pressed, we only want it to trigger once.
+}
+
+export function handleShiftUp({ scene }) {
+  if (scene.game.mode === 'drag')
+    setGameMode({ scene, mode: 'select' });
+
+  scene.input.keyboard.on('keydown_SHIFT', (event) => {
+    console.log('keydown_SHIFT event', event, scene.game.mode);
+    handleShiftDown({ scene })
+  })
 }
 
 export function panDragMap({ pointer, scene }) {
@@ -86,6 +139,14 @@ export function panDragMap({ pointer, scene }) {
 // Set the Position of the Selection Block
 export function positionSelectionBlock({ pointer, scene }) {
 
+  const tile = getPixelForPointer({ pointer, scene })
+
+  if (tile)
+    setInvertedStroke({ tile, scene })
+
+}
+
+export function getPixelForPointer({ pointer, scene }) {
   const xPixel = parseInt(pointer.x / scene.size);
   const yPixel = parseInt(pointer.y / scene.size);
 
@@ -94,9 +155,7 @@ export function positionSelectionBlock({ pointer, scene }) {
   if (scene.land[yPixel])
     tile = scene.land[yPixel][xPixel];
 
-  if (tile)
-    setInvertedStroke({ tile, scene })
-
+  return tile;
 }
 
 // Set scene mode

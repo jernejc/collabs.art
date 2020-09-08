@@ -1,5 +1,5 @@
 const path = require('path');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   target: 'web',
@@ -23,25 +23,27 @@ module.exports = {
       '@util': path.resolve(__dirname, 'src/util/')
     }
   },
-  
+
   devtool: 'inline-source-map',
-  
+
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
     port: 8000
   },
 
   plugins: [
-    new CopyWebpackPlugin([
-      {
-        from: path.resolve(__dirname, 'index.html'),
-        to: path.resolve(__dirname, 'dist/index.html')
-      },
-      {
-        from: path.resolve(__dirname, 'assets'),
-        to: path.resolve(__dirname, 'dist/assets')
-      }
-    ])
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, 'index.html'),
+          to: path.resolve(__dirname, 'dist/index.html')
+        },
+        {
+          from: path.resolve(__dirname, 'assets'),
+          to: path.resolve(__dirname, 'dist/assets')
+        }
+      ]
+    })
   ],
 
   optimization: {

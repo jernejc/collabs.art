@@ -1,9 +1,15 @@
 
 import Phaser from 'phaser';
-import { handleMouseMove, handleMouseDown, handleMouseUp, setGameMode } from '@actions/user_interactions';
+
 import { createPixel, colorPixel } from '@actions/pixel';
 import { ApplicationScene } from '@scenes/application_scene';
 import { MinimapScene } from '@scenes/minimap_scene';
+import { handleMouseMove, 
+         handleMouseDown, 
+         handleMouseUp, 
+         handleShiftDown, 
+         handleShiftUp, 
+         setGameMode } from '@actions/user_interactions';
 
 export class MainScene extends ApplicationScene {
   constructor() {
@@ -108,16 +114,12 @@ export class MainScene extends ApplicationScene {
 
     this.input.keyboard.on('keydown_SHIFT', (event) => {
       console.log('keydown_SHIFT event', event, _self.game.mode);
-      
-      if (_self.game.mode === 'select')
-        setGameMode({ scene: _self, mode: 'drag' });
+      handleShiftDown({ scene: _self })
     });
 
     this.input.keyboard.on('keyup_SHIFT', (event) => {
       console.log('keyup_SHIFT event', event, _self.game.mode);
-
-      if (_self.game.mode === 'drag')
-        setGameMode({ scene: _self, mode: 'select' });
+      handleShiftUp({ scene: _self })
     })
 
     this.game.emitter.on('scene/mode', (mode) => {
