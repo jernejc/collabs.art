@@ -1,8 +1,9 @@
 
 import ColorPicker from '@components/color_picker';
 import Input from '@components/input';
-
 import SelectionRadio from '@components/selection_radio';
+
+import { numberToLetterColumn } from '@util/helpers';
 
 /**
  * InfoBox Class
@@ -10,14 +11,15 @@ import SelectionRadio from '@components/selection_radio';
 
 export default class InfoBox {
 
-  constructor({ pixel, parent, scene }) {
-    //console.log('InfoBox pixel', pixel, parent)
+  constructor({ pixels, parent, scene }) {
+    //console.log('InfoBox pixels', pixels, parent)
     this.scene = scene;
-    this.setupTemplate(pixel, parent);
-    this.setPosition(pixel, parent);
+    this.parent = parent;
+    this.setupTemplate(pixels, parent);
+    this.setPosition(pixels, parent);
   }
 
-  setPosition(pixel, parent) {
+  setPosition(pixels, parent) {
     //console.log('setPosition', pixel, parent.offsetWidth, pixel.tile.x, this.wrapper.offsetWidth, pixel.tile.displayWidth)
 
     const padding = 2;
@@ -33,7 +35,7 @@ export default class InfoBox {
     //this.arrow.classList.add(`gg-arrow-${vertical}-${horizontal}-o`)
   }
 
-  setupTemplate(pixel, parent) {
+  setupTemplate(pixels, parent) {
     //console.log('Setup template', pixel, parent);
 
     this.wrapper = document.createElement('div');
@@ -41,7 +43,7 @@ export default class InfoBox {
 
     this.position = document.createElement('div');
     this.position.classList.add('position');
-    this.position.innerHTML = `${pixel.tile.cx} x ${pixel.tile.cy}`;
+    this.position.innerHTML = `${numberToLetterColumn(pixel.tile.cy)}${pixel.tile.cx}`;
 
     this.wrapper.appendChild(this.position);
 
@@ -65,10 +67,6 @@ export default class InfoBox {
     this.ownershipUI = document.createElement('div');
     this.ownershipUI.classList.add('ownership');
 
-    // For sale / owned
-    // Rent / buy radio
-    // Price calculation
-    // Hex Input
     this.ownershipUI.appendChild(new SelectionRadio(pixel, 'tile.buyoption', {
       scene: this.scene,
       options: [{
@@ -164,6 +162,8 @@ export default class InfoBox {
   }
 
   destroy() {
-
+    console.log('Info box destroy');
+    this.scene.game.emitter.off('controller/update');
+    this.parent.removeChild(this.wrapper);
   }
 }

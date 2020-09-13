@@ -20,6 +20,7 @@ export default class SelectionRadio extends Controller {
 
     params.options.forEach(option => {
       const radiobox = document.createElement('input');
+
       radiobox.type = 'radio';
       radiobox.id = option.value;
       radiobox.value = option.value;
@@ -45,8 +46,6 @@ export default class SelectionRadio extends Controller {
     return this.domElement;
 
     function onChange(e) {
-      console.log('onChange', e, self.radioinput[self.property].value)
-
       const attempted = self.radioinput[self.property].value;
       self.setValue(attempted);
     }
@@ -56,9 +55,8 @@ export default class SelectionRadio extends Controller {
     let value = this.getValue();
     let currentValue = this.radioinput[this.property].value;
 
-    if (value !== currentValue) {
+    if (value !== currentValue) 
       this.radioinput[this.property].value = value;
-    }
 
     return super.updateDisplay();
   }

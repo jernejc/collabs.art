@@ -1,5 +1,6 @@
 
-import { clickPixel, removeInfoBox } from '@actions/pixel'
+import { clickPixel, getPixelForPointer } from '@actions/pixel'
+import { createSelectionRectangle, resizeSelectionRectangle, clearRectangleSelection } from '@actions/selection_rectangle'
 
 // Fired when user moves pointer through the grid
 export function handleMouseMove({ pointer, scene }) {
@@ -21,17 +22,9 @@ export function handleMouseMove({ pointer, scene }) {
       if (pointer.button === 2) // Ignore right click
         return;
 
-      if (pointer.isDown && scene.selectionRectangle) {
-        scene.selectionRectangleEndPixel = getPixelForPointer({ pointer, scene });
+      if (pointer.isDown && scene.selectionRectangle)
+        resizeSelectionRectangle({ pointer, scene })
 
-        const W = scene.selectionRectangleEndPixel.x - scene.selectionRectangleBeginPixel.x;
-        const H = scene.selectionRectangleEndPixel.y - scene.selectionRectangleBeginPixel.y;
-
-        // Bug when changing rect size: https://phaser.discourse.group/t/how-to-resize-gameobjects-rectangle-without-changing-scale/4777
-        scene.selectionRectangle.geom.setSize(W, H);
-        scene.selectionRectangle.setSize(W, H);
-        scene.selectionRectangle.updateData();
-      }
       break;
   }
 }
@@ -56,20 +49,7 @@ export function handleMouseDown({ pointer, scene }) {
       if (pointer.button === 2) // Ignore right click
         return;
 
-      scene.selectionRectangleBeginPixel = getPixelForPointer({ pointer, scene });
-
-      const X = scene.selectionRectangleBeginPixel.x;
-      const Y = scene.selectionRectangleBeginPixel.y
-      const W = pointer.x - scene.selectionRectangleBeginPixel.x;
-      const H = pointer.y - scene.selectionRectangleBeginPixel.y;
-
-      scene.selectionRectangle = scene.add.rectangle(X, Y, W, H);
-      scene.selectionRectangle.setFillStyle(0xffffff, 0.15);
-      scene.selectionRectangle.setStrokeStyle(1, 0xffffff, 0.9);
-      scene.selectionRectangle.setDisplayOrigin(0, 0);
-
-      console.log('scene.selectionRectangleBeginPixel', scene.selectionRectangleBeginPixel);
-      console.log('scene.selectionRectangle', scene.selectionRectangle);
+      createSelectionRectangle({ pointer, scene })
       break;
   }
 }
@@ -77,21 +57,7 @@ export function handleMouseDown({ pointer, scene }) {
 export function handleMouseUp({ pointer, scene }) {
   //console.log('handleMouseUp', pointer, scene)
 
-  if (scene.selectionRectangle) {
-    scene.selectionRectangle.destroy();
-    scene.selectionRectangle = null;
-    scene.selectionRectangleBeginPixel = null;
-    scene.selectionRectangleEndPixel = null;
-  }
-}
-
-export function clearRectangleSelection({ scene }) {
-  if (scene.selectionRectangle) {
-    scene.selectionRectangle.destroy();
-    scene.selectionRectangle = null;
-    scene.selectionRectangleBeginPixel = null;
-    scene.selectionRectangleEndPixel = null;
-  }
+  //clearRectangleSelection({ scene });
 }
 
 export function handleShiftDown({ scene }) {
@@ -146,18 +112,6 @@ export function positionSelectionBlock({ pointer, scene }) {
 
 }
 
-export function getPixelForPointer({ pointer, scene }) {
-  const xPixel = parseInt(pointer.x / scene.size);
-  const yPixel = parseInt(pointer.y / scene.size);
-
-  let tile;
-
-  if (scene.land[yPixel])
-    tile = scene.land[yPixel][xPixel];
-
-  return tile;
-}
-
 // Set scene mode
 export function setGameMode({ scene, mode }) {
   console.log('setGameMode', mode)
@@ -188,7 +142,6 @@ export function setGameMode({ scene, mode }) {
 }
 
 export function resetActiveSelection({ scene }) {
-  removeInfoBox();
   scene.game.selectionManager.reset();
 }
 

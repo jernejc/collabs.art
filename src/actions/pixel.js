@@ -8,13 +8,13 @@ export function clickPixel({ pointer, scene }) {
   const color = getColor({ x, y, scene })
   const tile = scene.land[y][x];
 
-  /*if (scene.game.selectionManager.isSelected(tile))
-    scene.game.emitter.emit('scene/deselectpixel', { tile, color });
-  else*/
+  // cleanup existing
+  console.log('clickPixel scene.game', scene.game, scene.game.selectionManager.selection.length);
 
-  //scene.game.emitter.emit('scene/selectpixel', { tile, color });
+  if (scene.game.selectionManager.selection.length > 0)
+    scene.game.selectionManager.reset();
 
-  scene.game.selectionManager.add({ tile, color }, scene);
+  scene.game.selectionManager.add([{ tile, color }], scene);
 }
 
 export function createPixel({ x, y, scene }) {
@@ -50,36 +50,36 @@ export function colorPixel({ x, y, scene }) {
 export function getColor({ x, y, color, scene }) {
   color = color || new Phaser.Display.Color();
 
-  const cx = parseInt(Phaser.Math.Wrap(scene.cameraX + x, 0, scene.imageWidth));
-  const cy = parseInt(Phaser.Math.Wrap(scene.cameraY + y, 0, scene.imageHeight));
-
+  const { cx, cy } = getRelativePosition({ x, y, scene });
   scene.worldmap.getPixel(cx, cy, color);
 
   return { cx, cy, color };
 }
 
-export function displayInfoBox({ pixel, scene }) {
-  const infoboxes = document.body.querySelectorAll('.info-box');
-  const parent = document.body.querySelector('#game');
+export function getRelativePosition({ x, y, scene }) {
+  const cx = parseInt(Phaser.Math.Wrap(scene.cameraX + x, 0, scene.imageWidth));
+  const cy = parseInt(Phaser.Math.Wrap(scene.cameraY + y, 0, scene.imageHeight));
 
-  // cleanup existing
-  if (infoboxes.length > 0)
-    for (let index = 0; index < infoboxes.length; index++)
-      parent.removeChild(infoboxes[index]);
-
-  // needs to handle multiple pixels..
-  return new InfoBox({ pixel, parent, scene });
+  return { cx, cy }
 }
 
-export function removeInfoBox() {
-  const infoboxes = document.body.querySelectorAll('.info-box');
+export function displayInfoBox({ pixels, scene }) {
   const parent = document.body.querySelector('#game');
 
-  // cleanup existing
-  if (infoboxes.length > 0)
-    for (let index = 0; index < infoboxes.length; index++)
-      parent.removeChild(infoboxes[index]);
+  // needs to handle multiple pixels..
+  return new InfoBox({ pixels, parent, scene });
+}
 
+export function getPixelForPointer({ pointer, scene }) {
+  const xPixel = parseInt(pointer.x / scene.size);
+  const yPixel = parseInt(pointer.y / scene.size);
+
+  let tile;
+
+  if (scene.land[yPixel])
+    tile = scene.land[yPixel][xPixel];
+
+  return tile;
 }
 
 /*resizePixel(x, y) {

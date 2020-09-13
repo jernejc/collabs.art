@@ -10,7 +10,7 @@ export class MinimapScene extends ApplicationScene {
 
   create(data) {
     this.mainscene = this.game.scene.keys["MainScene"];
-    this.sizeRatio = 4;
+    this.sizeRatio = 5;
 
     this.width = 1000 / this.sizeRatio;
     this.height = 1000 / this.sizeRatio;
