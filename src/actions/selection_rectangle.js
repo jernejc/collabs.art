@@ -1,5 +1,5 @@
 
-import { getPixelForPointer } from '@actions/pixel'
+import { getPixelForPointer } from '@actions/pixel';
 
 export function clearRectangleSelection({ scene }) {
 
@@ -27,7 +27,7 @@ export function createSelectionRectangle({ pointer, scene }) {
   scene.selectionRectangleBeginPixel = getPixelForPointer({ pointer, scene });
 
   const X = scene.selectionRectangleBeginPixel.x;
-  const Y = scene.selectionRectangleBeginPixel.y
+  const Y = scene.selectionRectangleBeginPixel.y;
   const W = pointer.x - scene.selectionRectangleBeginPixel.x;
   const H = pointer.y - scene.selectionRectangleBeginPixel.y;
 

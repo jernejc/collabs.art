@@ -26,11 +26,11 @@ export default class SelectionRadio extends Controller {
       radiobox.value = option.value;
       radiobox.name = property;
 
-      const label = document.createElement('label')
+      const label = document.createElement('label');
       label.htmlFor = option.value;
 
       const labelText = document.createTextNode(option.text);
-      label.appendChild(labelText)
+      label.appendChild(labelText);
 
       this.radioinput.appendChild(radiobox);
       this.radioinput.appendChild(label);

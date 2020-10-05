@@ -1,6 +1,6 @@
 
-import { clickPixel, getPixelForPointer } from '@actions/pixel'
-import { createSelectionRectangle, resizeSelectionRectangle, clearRectangleSelection } from '@actions/selection_rectangle'
+import { clickPixel, getPixelForPointer, getPixelForXY } from '@actions/pixel';
+import { createSelectionRectangle, resizeSelectionRectangle, clearRectangleSelection } from '@actions/selection_rectangle';
 
 // Fired when user moves pointer through the grid
 export function handleMouseMove({ pointer, scene }) {
@@ -14,7 +14,7 @@ export function handleMouseMove({ pointer, scene }) {
         scene.game.origDragPoint = null;
       break;
     case 'select':
-      generalResetStrokeStyle({ scene });
+      //generalResetStrokeStyle({ scene });
       positionSelectionBlock({ pointer, scene });
       break;
     case 'drag':
@@ -23,7 +23,7 @@ export function handleMouseMove({ pointer, scene }) {
         return;
 
       if (pointer.isDown && scene.selectionRectangle)
-        resizeSelectionRectangle({ pointer, scene })
+        resizeSelectionRectangle({ pointer, scene });
 
       break;
   }
@@ -37,19 +37,19 @@ export function handleMouseDown({ pointer, scene }) {
 
       if (pointer.button === 2) { // Detect right click
         resetActiveSelection({ scene });
-        generalResetStrokeStyle({ scene });
+        //generalResetStrokeStyle({ scene });
         return;
       }
 
       clickPixel({ pointer, scene });
-      generalResetStrokeStyle({ scene });
+      //generalResetStrokeStyle({ scene });
       break;
     case 'drag':
 
       if (pointer.button === 2) // Ignore right click
         return;
 
-      createSelectionRectangle({ pointer, scene })
+      createSelectionRectangle({ pointer, scene });
       break;
   }
 }
@@ -58,13 +58,21 @@ export function handleMouseUp({ pointer, scene }) {
   //console.log('handleMouseUp', pointer, scene)
 
   //clearRectangleSelection({ scene });
+  if (scene.selectionRectangle) {
+    const pixels = [
+      getPixelForXY({ x: scene.selectionRectangleBeginPixel.x, y: scene.selectionRectangleBeginPixel.y, scene, color: true }),
+      getPixelForXY({ x: scene.selectionRectangleEndPixel.x, y: scene.selectionRectangleEndPixel.y, scene, color: true })
+    ];
+
+    scene.game.selectionManager.create(pixels, scene);
+  }
 }
 
 export function handleShiftDown({ scene }) {
   if (scene.game.mode === 'select')
     setGameMode({ scene, mode: 'drag' });
 
-  scene.input.keyboard.off('keydown_SHIFT') // Events repeats as longs as the button is pressed, we only want it to trigger once.
+  scene.input.keyboard.off('keydown_SHIFT'); // Events repeats as longs as the button is pressed, we only want it to trigger once.
 }
 
 export function handleShiftUp({ scene }) {
@@ -73,8 +81,8 @@ export function handleShiftUp({ scene }) {
 
   scene.input.keyboard.on('keydown_SHIFT', (event) => {
     console.log('keydown_SHIFT event', event, scene.game.mode);
-    handleShiftDown({ scene })
-  })
+    handleShiftDown({ scene });
+  });
 }
 
 export function panDragMap({ pointer, scene }) {
@@ -104,17 +112,18 @@ export function panDragMap({ pointer, scene }) {
 
 // Set the Position of the Selection Block
 export function positionSelectionBlock({ pointer, scene }) {
+  console.log('positionSelectionBlock');
 
-  const tile = getPixelForPointer({ pointer, scene })
+  const tile = getPixelForPointer({ pointer, scene });
 
-  if (tile)
-    setInvertedStroke({ tile, scene })
+  /*if (tile)
+    setInvertedStroke({ tile, scene });*/
 
 }
 
 // Set scene mode
 export function setGameMode({ scene, mode }) {
-  console.log('setGameMode', mode)
+  console.log('setGameMode', mode);
 
   switch (mode) {
     case 'move':
@@ -135,7 +144,7 @@ export function setGameMode({ scene, mode }) {
       scene.game.mode = 'drag';
 
       resetActiveSelection({ scene });
-      generalResetStrokeStyle({ scene });
+      //generalResetStrokeStyle({ scene });
       break;
   }
   //scene.game.emitter.emit('scene/mode', mode);
@@ -151,13 +160,9 @@ export function generalResetStrokeStyle({ scene, size }) {
   for (let y = 0; y < scene.gridHeight; y++) {
     for (let x = 0; x < scene.gridWidth; x++) {
       const tile = scene.land[y][x];
-
-      if (tile) {
-        if (scene.game.selectionManager.isSelected(tile))
-          setInvertedStroke({ tile, scene });
-        else
+      
+      if (tile) 
           resetStrokeStyle({ tile, scene, size });
-      }
     }
   }
 }

@@ -153,6 +153,16 @@ Info Box
   border-left: 10px solid transparent;
 }
 
+.info-box .smaller {
+  font-size: 90%;
+}
+
+.info-box .gg-more-vertical {
+  --ggs: 0.4;
+  display: inline-block;
+  top: -2px;
+}
+
 
 .text-input {
   position: relative;
@@ -258,7 +268,7 @@ Info Box
   display: -webkit-box;
   display: flex;
   margin: 0 0 6px;
-  overflow: hidden; 
+  overflow: hidden;
 }
 
 .selection-radio form {

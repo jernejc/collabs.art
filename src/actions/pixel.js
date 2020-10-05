@@ -1,12 +1,6 @@
 
-import InfoBox from '@components/info_box'
-
 export function clickPixel({ pointer, scene }) {
-  const x = parseInt(pointer.x / scene.size);
-  const y = parseInt(pointer.y / scene.size);
-
-  const color = getColor({ x, y, scene })
-  const tile = scene.land[y][x];
+  const pixel = getPixelForPointer({ pointer, scene, color: true });
 
   // cleanup existing
   console.log('clickPixel scene.game', scene.game, scene.game.selectionManager.selection.length);
@@ -14,7 +8,7 @@ export function clickPixel({ pointer, scene }) {
   if (scene.game.selectionManager.selection.length > 0)
     scene.game.selectionManager.reset();
 
-  scene.game.selectionManager.add([{ tile, color }], scene);
+  scene.game.selectionManager.create([pixel], scene);
 }
 
 export function createPixel({ x, y, scene }) {
@@ -42,9 +36,6 @@ export function colorPixel({ x, y, scene }) {
   tile.id = `${mapPixel.cx}x${mapPixel.cy}`;
 
   tile.setFillStyle(mapPixel.color.color);
-
-  tile.price = Math.random().toFixed(3);
-  tile.buyoption = 'buy';
 }
 
 export function getColor({ x, y, color, scene }) {
@@ -60,17 +51,10 @@ export function getRelativePosition({ x, y, scene }) {
   const cx = parseInt(Phaser.Math.Wrap(scene.cameraX + x, 0, scene.imageWidth));
   const cy = parseInt(Phaser.Math.Wrap(scene.cameraY + y, 0, scene.imageHeight));
 
-  return { cx, cy }
+  return { cx, cy };
 }
 
-export function displayInfoBox({ pixels, scene }) {
-  const parent = document.body.querySelector('#game');
-
-  // needs to handle multiple pixels..
-  return new InfoBox({ pixels, parent, scene });
-}
-
-export function getPixelForPointer({ pointer, scene }) {
+export function getPixelForPointer({ pointer, scene, color }) {
   const xPixel = parseInt(pointer.x / scene.size);
   const yPixel = parseInt(pointer.y / scene.size);
 
@@ -79,7 +63,31 @@ export function getPixelForPointer({ pointer, scene }) {
   if (scene.land[yPixel])
     tile = scene.land[yPixel][xPixel];
 
-  return tile;
+  if (color) {
+    return {
+      tile: tile,
+      color: getColor({ x: xPixel, y: yPixel, scene })
+    }
+  } else
+    return tile;
+}
+
+export function getPixelForXY({ x, y, scene, color }) {
+  const xPixel = parseInt(x / scene.size);
+  const yPixel = parseInt(y / scene.size);
+
+  let tile;
+
+  if (scene.land[yPixel])
+    tile = scene.land[yPixel][xPixel];
+
+  if (color) {
+    return {
+      tile: tile,
+      color: getColor({ x: xPixel, y: yPixel, scene })
+    };
+  } else
+    return tile;
 }
 
 /*resizePixel(x, y) {
