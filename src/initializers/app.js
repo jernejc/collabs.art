@@ -1,5 +1,5 @@
-import Phaser from 'phaser'
-import { MainScene } from '@scenes/main_scene'
+import { Events, Game, WEBGL } from 'phaser';
+import { MainScene } from '@scenes/main_scene';
 
 export function AppInitializer({
   canvasElement,
@@ -12,16 +12,16 @@ export function AppInitializer({
   console.log('Init Phaser', canvasElement, canvasWidth, canvasHeight)
 
   const canvas = document.querySelector('#' + canvasElement)
-  const Emitter = new Phaser.Events.EventEmitter();
-  const Game = new Phaser.Game({
-    type: Phaser.WEBGL,
+  const Emitter = new Events.EventEmitter();
+  const GameInstance = new Game({
+    type: WEBGL,
     width: canvas.clientWidth,
     height: canvas.clientHeight,
     parent: canvasElement
   });
 
-  Game.emitter = Emitter
-  Game.appConfig = {
+  GameInstance.emitter = Emitter;
+  GameInstance.appConfig = {
     canvasWidth,
     canvasHeight,
     gridSize,
@@ -29,8 +29,8 @@ export function AppInitializer({
     strokeColor,
     strokeSize
   }
-  Game.scene.add('MainScene', MainScene, true, {});
+  GameInstance.scene.add('MainScene', MainScene, true, {});
   //Game.scene.add('MinimapScene', MinimapScene, true, {});
 
-  return { Game, Emitter }
+  return { GameInstance, Emitter };
 }
