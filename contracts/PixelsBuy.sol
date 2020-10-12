@@ -1,4 +1,4 @@
-pragma solidity >=0.6.0 < 0.7.3;
+pragma solidity >=0.6.0 <0.7.3;
 
 import "./Pixels.sol";
 
@@ -12,9 +12,10 @@ import "@openzeppelin/contracts/utils/Pausable.sol";
 
 contract PixelsBuy is Ownable, Pausable {
     event Sent(address indexed payee, uint256 amount, uint256 balance);
+
     event Received(
         address indexed payer,
-        uint256 position,
+        uint32 position,
         uint256 amount,
         uint256 balance
     );
@@ -40,7 +41,8 @@ contract PixelsBuy is Ownable, Pausable {
 
     /**
      * @dev Purchase _position
-     * @param _position uint32 pixel position
+     * @param _position string pixel position
+     * @param _color pixel HEX color
      */
     function purchasePosition(uint32 _position, string memory _color)
         public
@@ -56,11 +58,12 @@ contract PixelsBuy is Ownable, Pausable {
             "Purchase price must be greater than current price"
         );
 
-        if (!PixelsContract.exists(_position))
+        if (!PixelsContract.exists(_position)) {
             PixelsContract.createPixel(_position, _color, msg.sender);
-
-        address tokenSeller = PixelsContract.ownerOf(_position);
-        PixelsContract.safeTransferFrom(tokenSeller, msg.sender, _position);
+        } else {
+            address tokenSeller = PixelsContract.ownerOf(_position);
+            PixelsContract.safeTransferFrom(tokenSeller, msg.sender, _position);
+        }
 
         emit Received(msg.sender, _position, msg.value, address(this).balance);
     }

@@ -1,4 +1,4 @@
-pragma solidity >=0.6.0 < 0.7.3;
+pragma solidity >=0.6.0 <0.7.3;
 
 import "./RivalIntervalTreeLibrary.sol";
 
@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/Pausable.sol";
 
 /**
  * @title PixelsRent
- * PixelsRent - non-fungible pixels
+ * PixelsRent - ERC809 - rentable non-fungible pixels
  * Based on: https://github.com/gtaschuk/erc809/blob/master/contracts/ERC809.sol
  */
 
@@ -26,6 +26,7 @@ contract PixelsRent is Ownable, Pausable {
 
     mapping(uint256 => RivalIntervalTreeLibrary.Tree) calendars;
     mapping(uint256 => mapping(uint256 => Reservation)) reservations;
+
     /// @dev This emits when a successful reservation is made for accessing any NFT.
     event Reserve(
         address indexed _renter,

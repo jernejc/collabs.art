@@ -1,9 +1,8 @@
 pragma solidity >=0.6.0 <0.7.3;
+pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
 
 /**
  * @title Pixels
@@ -13,10 +12,9 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 contract Pixels is ERC721, Ownable {
     uint48 maxPixels = 1000000;
 
-    mapping(uint256 => Pixel) public pixels;
+    mapping(uint32 => Pixel) public pixels;
 
     struct Pixel {
-        uint32 position;
         uint48 createTime;
         string color;
     }
@@ -30,24 +28,26 @@ contract Pixels is ERC721, Ownable {
      * @dev Create new pixel
      * @param _position pixel position in the world / id
      * @param _color pixel HEX color
+     * @param _owner owner of the newly created pixel
      */
     function createPixel(
         uint32 _position,
         string memory _color,
         address _owner
     ) public {
-        require(_position > 0, "Position must be provided");
+        require(_position > 0, "Pixels: Position must be provided");
         require(
-            totalSupply() + 1 >= maxPixels,
-            "Cannot create more than max amount of pixels"
+            totalSupply() + 1 <= maxPixels,
+            "Pixels: Cannot create more than max amount of pixels"
         );
-        require(validateHEXStr(_color), "Must be a valid HEX color value");
+        require(
+            validateHEXStr(_color),
+            "Pixels: Must be a valid HEX color value"
+        );
 
-        pixels[_position] = Pixel({
-            position: _position,
-            createTime: uint48(now),
-            color: _color
-        });
+        Pixel memory p = Pixel({createTime: uint48(now), color: _color});
+
+        pixels[_position] = p;
 
         _mint(_owner, _position);
     }
@@ -59,7 +59,7 @@ contract Pixels is ERC721, Ownable {
     function getColor(uint32 _position) public view returns (string memory) {
         require(
             exists(_position),
-            "Make sure position exists before returning color"
+            "Pixels: Make sure position exists before returning color"
         );
 
         return pixels[_position].color;
@@ -73,13 +73,16 @@ contract Pixels is ERC721, Ownable {
     function setColor(uint32 _position, string memory _color) public {
         require(
             exists(_position),
-            "Make sure position exists before setting color"
+            "Pixels: Make sure position exists before setting color"
         );
         require(
             msg.sender == ownerOf(_position),
-            "Only the owner can change color"
+            "Pixels: Only the owner can change color"
         );
-        require(validateHEXStr(_color), "Must be a valid HEX color value");
+        require(
+            validateHEXStr(_color),
+            "Pixels: Must be a valid HEX color value"
+        );
 
         pixels[_position].color = _color;
     }
@@ -106,8 +109,7 @@ contract Pixels is ERC721, Ownable {
             if (
                 !(char >= 0x30 && char <= 0x39) && //9-0
                 !(char >= 0x41 && char <= 0x5A) && //A-Z
-                !(char >= 0x61 && char <= 0x7A) && //a-z
-                !(char == 0x2E) //.
+                !(char >= 0x61 && char <= 0x7A) //a-z
             ) return false;
         }
 
