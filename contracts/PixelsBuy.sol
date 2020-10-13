@@ -1,9 +1,9 @@
 pragma solidity >=0.6.0 <0.7.3;
 
-import "./Pixels.sol";
-
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
+
+import "./Pixels.sol";
 
 /**
  * @title PixelsBuy
@@ -21,22 +21,24 @@ contract PixelsBuy is Ownable, Pausable {
     );
 
     Pixels public PixelsContract;
-    uint256 public currentPrice;
+    uint256 public defaultPrice;
+
+    mapping(uint32 => uint256) public prices;
 
     /**
      * @dev Contract Constructor
      * @param _contractAddress address for Pixels non-fungible token contract
-     * @param _currentPrice initial sales price
+     * @param _defaultPrice initial sales price
      */
-    constructor(address _contractAddress, uint256 _currentPrice) public {
+    constructor(address _contractAddress, uint256 _defaultPrice) public {
         require(
             _contractAddress != address(0) && _contractAddress != address(this),
-            "Must have a valid contract address"
+            "PixelsBuy: Must have a valid contract address"
         );
-        require(_currentPrice > 0, "Price must be greater than 0");
+        require(_defaultPrice > 0, "PixelsBuy: Price must be greater than 0");
 
         PixelsContract = Pixels(_contractAddress);
-        currentPrice = _currentPrice;
+        defaultPrice = _defaultPrice;
     }
 
     /**
@@ -51,11 +53,11 @@ contract PixelsBuy is Ownable, Pausable {
     {
         require(
             msg.sender != address(0) && msg.sender != address(this),
-            "Must have valid purchase sender"
+            "PixelsBuy: Must have valid purchase sender"
         );
         require(
-            msg.value >= currentPrice,
-            "Purchase price must be greater than current price"
+            msg.value >= defaultPrice,
+            "PixelsBuy: Purchase price must be greater than current price"
         );
 
         if (!PixelsContract.exists(_position)) {
@@ -76,11 +78,11 @@ contract PixelsBuy is Ownable, Pausable {
     function sendTo(address payable _payee, uint256 _amount) public onlyOwner {
         require(
             _payee != address(0) && _payee != address(this),
-            "_payee address must be valid"
+            "PixelsBuy: _payee address must be valid"
         );
         require(
             _amount > 0 && _amount <= address(this).balance,
-            "_amount must be avalible and greater than 0"
+            "PixelsBuy: _amount must be avalible and greater than 0"
         );
 
         _payee.transfer(_amount);
@@ -89,13 +91,35 @@ contract PixelsBuy is Ownable, Pausable {
     }
 
     /**
-     * @dev Updates _currentPrice
-     * @dev Throws if _currentPrice is zero
-     * @param _currentPrice uint256
+     * @dev Updates _defaultPrice
+     * @dev Throws if _defaultPrice is zero
+     * @param _defaultPrice uint256
      */
-    function setCurrentPrice(uint256 _currentPrice) public onlyOwner {
-        require(_currentPrice > 0, "Current set price must be greater than 0");
+    function setDefaultPrice(uint256 _defaultPrice) public onlyOwner {
+        require(
+            _defaultPrice > 0,
+            "PixelsBuy: Default set price must be greater than 0"
+        );
 
-        currentPrice = _currentPrice;
+        defaultPrice = _defaultPrice;
+    }
+
+    /**
+     * @dev Updates pixel position price
+     * @param _position position for price update
+     * @param _price new position price
+     */
+    function setPixelPrice(uint32 _position, uint256 _price) public {
+        require(_price > 0, "PixelsBuy: Pixel price must be greater than 0");
+        require(
+            PixelsContract.exists(_position),
+            "PixelsBuy: Pixel position must exist"
+        );
+        require(
+            msg.sender == PixelsContract.ownerOf(_position),
+            "PixelsBuy: Only owner can change position price"
+        );
+
+        prices[_position] = _price;
     }
 }

@@ -19,8 +19,8 @@ contract("PixelsBuy tests", async accounts => {
     const instance = await PixelsBuy.deployed();
 
     try {
-      const currentPrice = await instance.currentPrice();
-      expect(currentPrice.toNumber()).to.equal(100, 'Default buy price should be 100');
+      const defaultPrice = await instance.defaultPrice();
+      expect(defaultPrice.toNumber()).to.equal(100, 'Default buy price should be 100');
 
       const PixelsContractAddress = await instance.PixelsContract();
       const PixelsContractInstance = await Pixels.at(PixelsContractAddress);

@@ -12,12 +12,13 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 contract Pixels is ERC721, AccessControl {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     uint48 maxPixels = 1000000;
-    mapping(uint32 => Pixel) public pixels;
 
     struct Pixel {
         uint48 createTime;
         string color;
     }
+
+    mapping(uint32 => Pixel) public pixels;
 
     /**
      * @dev Contract Constructor, calls ERC721 constructor and sets name and symbol
