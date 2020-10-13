@@ -2,16 +2,16 @@ pragma solidity >=0.6.0 <0.7.3;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /**
  * @title Pixels
  * Pixels - non-fungible ERC721 pixels
  */
 
-contract Pixels is ERC721, Ownable {
+contract Pixels is ERC721, AccessControl {
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     uint48 maxPixels = 1000000;
-
     mapping(uint32 => Pixel) public pixels;
 
     struct Pixel {
@@ -22,7 +22,10 @@ contract Pixels is ERC721, Ownable {
     /**
      * @dev Contract Constructor, calls ERC721 constructor and sets name and symbol
      */
-    constructor() public ERC721("PixelWorld", "PW") {}
+    constructor() public ERC721("PixelWorld", "PW") {
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _setupRole(MINTER_ROLE, msg.sender);
+    }
 
     /**
      * @dev Create new pixel
@@ -34,7 +37,7 @@ contract Pixels is ERC721, Ownable {
         uint32 _position,
         string memory _color,
         address _owner
-    ) public {
+    ) public onlyMinter {
         require(_position > 0, "Pixels: Position must be provided");
         require(
             totalSupply() + 1 <= maxPixels,
@@ -114,5 +117,47 @@ contract Pixels is ERC721, Ownable {
         }
 
         return true;
+    }
+
+    /********
+     * ACL
+     */
+
+    /**
+     * @dev add minter
+     * @param _account address to add as the new minter
+     */
+    function addMinter(address _account) public virtual onlyAdmin {
+        grantRole(MINTER_ROLE, _account);
+    }
+
+    /**
+     * @dev remove minter
+     * @param _account address to remove as minter
+     */
+    function removeMinter(address _account) public virtual onlyAdmin {
+        revokeRole(MINTER_ROLE, _account);
+    }
+
+    /**
+     * @dev Restricted to members of the admin role.
+     */
+    modifier onlyAdmin() {
+        require(
+            hasRole(DEFAULT_ADMIN_ROLE, msg.sender),
+            "Pixels: Restricted to admins."
+        );
+        _;
+    }
+
+    /**
+     * @dev Restricted to members of the minter role.
+     */
+    modifier onlyMinter() {
+        require(
+            hasRole(MINTER_ROLE, msg.sender),
+            "Pixels: Restricted to minters."
+        );
+        _;
     }
 }

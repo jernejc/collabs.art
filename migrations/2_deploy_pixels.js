@@ -11,7 +11,7 @@ module.exports = async (deployer, network) => {
   console.log('PixelsBuy.address', PixelsBuy.address);
 
   const PixelsInstance = await Pixels.deployed();
-  await PixelsInstance.setPixelsBuyContract(PixelsBuy.address);
+  await PixelsInstance.addMinter(PixelsBuy.address);
 
   return;
 };
