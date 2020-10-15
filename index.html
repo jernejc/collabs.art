@@ -37,7 +37,7 @@
     const world = new PixelWorld.Main()
     const {
       Emitter,
-      Game
+      GameInstance
     } = world.AppInitializer({
       canvasElement: 'game',
       canvasWidth: window.innerWidth,
@@ -47,8 +47,8 @@
       strokeColor: '#dedede'
     });
 
-    const SelectionManager = world.SelectionInitializer(Game, Emitter)
-    Game.selectionManager = SelectionManager;
+    const SelectionManager = world.SelectionInitializer(GameInstance, Emitter)
+    GameInstance.selectionManager = SelectionManager;
 
     document.querySelector('#tools').addEventListener('click', (e) => {
       const gameMode = e.target.dataset.gameMode || e.target.parentNode.dataset.gameMode;

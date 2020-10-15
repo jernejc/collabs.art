@@ -1,7 +1,7 @@
 
 import ColorPicker from '@components/color_picker';
 import Input from '@components/input';
-import SelectionRadio from '@components/selection_radio';
+import Radio from '@components/radio';
 
 /**
  * InfoBox Class
@@ -9,11 +9,11 @@ import SelectionRadio from '@components/selection_radio';
 
 export default class InfoBox {
 
-  constructor({ contract, parent, scene }) {
-    //console.log('InfoBox contract', contract, parent)
+  constructor({ selection, parent, scene }) {
+    //console.log('InfoBox selection', selection, parent)
     this.scene = scene;
     this.parent = parent;
-    this.contract = contract;
+    this.selection = selection;
 
     this.setupTemplate();
     this.setPosition();
@@ -27,7 +27,7 @@ export default class InfoBox {
 
     this.position = document.createElement('div');
     this.position.classList.add('position');
-    this.position.innerHTML = this.contract.title;
+    this.position.innerHTML = this.selection.title;
 
     this.wrapper.appendChild(this.position);
 
@@ -47,14 +47,14 @@ export default class InfoBox {
   }
 
   setPosition() {
-    //console.log('setPosition', pixel, parent.offsetWidth, this.contract.x, this.wrapper.offsetWidth, pixel.tile.displayWidth)
+    //console.log('setPosition', pixel, parent.offsetWidth, this.selection.x, this.wrapper.offsetWidth, pixel.tile.displayWidth)
 
     const padding = 2;
-    const vertical = (this.contract.y > (this.parent.offsetHeight / 2)) ?  'bottom' : 'top'
-    const horizontal = (this.contract.x > (this.parent.offsetWidth / 2)) ?  'right': 'left'
+    const vertical = (this.selection.y > (this.parent.offsetHeight / 2)) ?  'bottom' : 'top'
+    const horizontal = (this.selection.x > (this.parent.offsetWidth / 2)) ?  'right': 'left'
     //const animationClass = (vertical === 'up') ? 'fadeInUp' : 'fadeInDown'
-    const top = (vertical === 'bottom') ? this.contract.y - this.wrapper.offsetHeight - padding : this.contract.y + this.scene.size + padding
-    const left = (horizontal === 'right') ? this.contract.x - this.wrapper.offsetWidth - padding : this.contract.x + this.scene.size + padding
+    const top = (vertical === 'bottom') ? this.selection.y - this.wrapper.offsetHeight - padding : this.selection.y + this.scene.size + padding
+    const left = (horizontal === 'right') ? this.selection.x - this.wrapper.offsetWidth - padding : this.selection.x + this.scene.size + padding
 
     Object.assign(this.wrapper.style, { top: top + 'px', left: left + 'px' });
     this.wrapper.classList.add(vertical, horizontal);
@@ -66,7 +66,7 @@ export default class InfoBox {
     this.ownershipUI = document.createElement('div');
     this.ownershipUI.classList.add('ownership');
 
-    this.ownershipUI.appendChild(new SelectionRadio(this.contract, 'buyoption', {
+    this.ownershipUI.appendChild(new Radio(this.selection, 'buyoption', {
       scene: this.scene,
       options: [{
         text: 'Buy',
@@ -80,7 +80,7 @@ export default class InfoBox {
     }));
 
     // Hex Input
-    this.ownershipUI.appendChild(new Input(this.contract, 'price', {
+    this.ownershipUI.appendChild(new Input(this.selection, 'price', {
       min: 0,
       max: 1,
       step: 0.001,
@@ -90,7 +90,7 @@ export default class InfoBox {
       format: (value) => {
         let _v = value;
 
-        if (this.contract.buyoption === 'rent')
+        if (this.selection.buyoption === 'rent')
           return (_v / 50).toFixed(3) + ' ETH / day'
         else
           return _v + ' ETH'
@@ -113,7 +113,7 @@ export default class InfoBox {
     this.colorSelectionUI.classList.add('color-selection');
 
     // Hex Input
-    this.colorSelectionUI.appendChild(new Input(this.contract, 'color.color', {
+    this.colorSelectionUI.appendChild(new Input(this.selection, 'color.color', {
       min: 0,
       max: 255,
       step: 2,
@@ -124,7 +124,7 @@ export default class InfoBox {
     }))
 
     // RGB Inputs
-    this.colorSelectionUI.appendChild(new Input(this.contract, 'color.red', {
+    this.colorSelectionUI.appendChild(new Input(this.selection, 'color.red', {
       min: 0,
       max: 255,
       step: 2,
@@ -132,7 +132,7 @@ export default class InfoBox {
       width: '33%',
       scene: this.scene
     }))
-    this.colorSelectionUI.appendChild(new Input(this.contract, 'color.green', {
+    this.colorSelectionUI.appendChild(new Input(this.selection, 'color.green', {
       min: 0,
       max: 255,
       step: 2,
@@ -140,7 +140,7 @@ export default class InfoBox {
       width: '33%',
       scene: this.scene
     }))
-    this.colorSelectionUI.appendChild(new Input(this.contract, 'color.blue', {
+    this.colorSelectionUI.appendChild(new Input(this.selection, 'color.blue', {
       min: 0,
       max: 255,
       step: 2,
@@ -150,7 +150,7 @@ export default class InfoBox {
     }))
 
     // Hue slider
-    this.colorSelectionUI.appendChild(new ColorPicker(this.contract, 'color.h', {
+    this.colorSelectionUI.appendChild(new ColorPicker(this.selection, 'color.h', {
       min: 0,
       max: 1,
       step: 0.001,

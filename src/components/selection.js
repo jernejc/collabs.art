@@ -1,7 +1,7 @@
 
 import { numberToLetterColumn } from '@util/helpers';
 
-export default class Contract { 
+export default class Selection { 
 
 	constructor(pixels, parent) {
 

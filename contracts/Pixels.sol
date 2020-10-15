@@ -1,5 +1,4 @@
 pragma solidity >=0.6.0 <0.7.3;
-pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
@@ -11,11 +10,11 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract Pixels is ERC721, AccessControl {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-    uint48 maxPixels = 1000000;
+    uint48 public maxPixels;
 
     struct Pixel {
         uint48 createTime;
-        string color;
+        bytes6 color;
     }
 
     mapping(uint32 => Pixel) public pixels;
@@ -23,7 +22,11 @@ contract Pixels is ERC721, AccessControl {
     /**
      * @dev Contract Constructor, calls ERC721 constructor and sets name and symbol
      */
-    constructor() public ERC721("PixelWorld", "PW") {
+    constructor(uint48 _maxPixels) public ERC721("PixelWorld", "PW") {
+        require(_maxPixels > 0, "Pixels: Max pixels must be greater than 0");
+
+        maxPixels = _maxPixels;
+
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(MINTER_ROLE, msg.sender);
     }
@@ -36,7 +39,7 @@ contract Pixels is ERC721, AccessControl {
      */
     function createPixel(
         uint32 _position,
-        string memory _color,
+        bytes6 _color,
         address _owner
     ) public onlyMinter {
         require(_position > 0, "Pixels: Position must be provided");
@@ -45,7 +48,7 @@ contract Pixels is ERC721, AccessControl {
             "Pixels: Cannot create more than max amount of pixels"
         );
         require(
-            validateHEXStr(_color),
+            validateColor(_color),
             "Pixels: Must be a valid HEX color value"
         );
 
@@ -53,14 +56,14 @@ contract Pixels is ERC721, AccessControl {
 
         pixels[_position] = p;
 
-        _mint(_owner, _position);
+        _safeMint(_owner, _position);
     }
 
     /**
      * @dev Get pixel color
      * @param _position pixel position in the world / id
      */
-    function getColor(uint32 _position) public view returns (string memory) {
+    function getColor(uint32 _position) public view returns (bytes6) {
         require(
             exists(_position),
             "Pixels: Make sure position exists before returning color"
@@ -74,7 +77,7 @@ contract Pixels is ERC721, AccessControl {
      * @param _position pixel position in the world / id
      * @param _color pixel HEX color
      */
-    function setColor(uint32 _position, string memory _color) public {
+    function setColor(uint32 _position, bytes6 _color) public {
         require(
             exists(_position),
             "Pixels: Make sure position exists before setting color"
@@ -84,7 +87,7 @@ contract Pixels is ERC721, AccessControl {
             "Pixels: Only the owner can change color"
         );
         require(
-            validateHEXStr(_color),
+            validateColor(_color),
             "Pixels: Must be a valid HEX color value"
         );
 
@@ -100,15 +103,25 @@ contract Pixels is ERC721, AccessControl {
     }
 
     /**
-     * @dev validate hex color - https://ethereum.stackexchange.com/questions/50369/string-validation-solidity-alpha-numeric-and-length
-     * @param _str pixel position in the world / id
+     * @dev set maxPixels
+     * @param _maxPixels new maximum number of pixels
      */
-    function validateHEXStr(string memory _str) private pure returns (bool) {
-        bytes memory b = bytes(_str);
-        if (b.length != 6) return false;
+    function setMaxPixels(uint48 _maxPixels) public onlyAdmin {
+        require(
+            _maxPixels > 0 && _maxPixels > totalSupply(),
+            "Pixels: Max pixels must be greater than 0 and total current supply"
+        );
 
-        for (uint256 i; i < b.length; i++) {
-            bytes1 char = b[i];
+        maxPixels = _maxPixels;
+    }
+
+    /**
+     * @dev validate hex color - https://ethereum.stackexchange.com/questions/50369/string-validation-solidity-alpha-numeric-and-length
+     * @param _color color value to validate
+     */
+    function validateColor(bytes6 _color) private pure returns (bool) {
+        for (uint8 i; i < _color.length; i++) {
+            bytes1 char = _color[i];
 
             if (
                 !(char >= 0x30 && char <= 0x39) && //9-0

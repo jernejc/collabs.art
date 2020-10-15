@@ -1,17 +1,17 @@
 const Pixels = artifacts.require("Pixels");
-const PixelsBuy = artifacts.require("PixelsBuy");
+const PixelsPurchase = artifacts.require("PixelsPurchase");
 
 module.exports = async (deployer, network) => {
-  console.log('Deploying Pixels on network ' + network + ' using deployer ' + deployer);
+  console.log('Deploying Pixels on network ' + network);
 
-  await deployer.deploy(Pixels);
+  await deployer.deploy(Pixels, 1000000);
   console.log('Pixels.address', Pixels.address);
 
-  await deployer.deploy(PixelsBuy, Pixels.address, 100);
-  console.log('PixelsBuy.address', PixelsBuy.address);
+  await deployer.deploy(PixelsPurchase, Pixels.address, 100);
+  console.log('PixelsPurchase.address', PixelsPurchase.address);
 
   const PixelsInstance = await Pixels.deployed();
-  await PixelsInstance.addMinter(PixelsBuy.address);
+  await PixelsInstance.addMinter(PixelsPurchase.address);
 
   return;
 };

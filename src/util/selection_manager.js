@@ -1,5 +1,5 @@
 
-import Contract from '@components/contract';
+import Selection from '@components/selection';
 import InfoBox from '@components/info_box';
 
 import { getPixelForPointer } from '@actions/pixel';
@@ -24,7 +24,7 @@ export default class SelectionManager {
       this.selection = pixels;
     }
 
-    this.infobox = new InfoBox({ contract: new Contract(this.selection, this.parent), parent: this.parent, scene });
+    this.infobox = new InfoBox({ selection: new Selection(this.selection, this.parent), parent: this.parent, scene });
     //console.log('this.selection', this.selection);
   }
 
@@ -67,7 +67,7 @@ export default class SelectionManager {
   reset() {
     console.log('reset selection', this.selection);
 
-    clearRectangle();
+    this.clearRectangle();
     this.infobox.destroy();
   }
 

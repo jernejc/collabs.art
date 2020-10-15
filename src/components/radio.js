@@ -2,10 +2,10 @@
 import Controller from '@components/controller';
 
 /**
- * Selection Radio input Class
+ * Radio input Class
  */
 
-export default class SelectionRadio extends Controller {
+export default class Radio extends Controller {
 
   constructor(object, property, params) {
 

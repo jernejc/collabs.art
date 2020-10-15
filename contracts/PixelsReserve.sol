@@ -6,12 +6,12 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 
 /**
- * @title PixelsRent
- * PixelsRent - ERC809 - rentable non-fungible pixels
+ * @title PixelsReserve
+ * PixelsReserve - ERC809 - rentable non-fungible pixels
  * Based on: https://github.com/gtaschuk/erc809/blob/master/contracts/ERC809.sol
  */
 
-contract PixelsRent is Ownable, Pausable {
+contract PixelsReserve is Ownable, Pausable {
     using RivalIntervalTreeLibrary for RivalIntervalTreeLibrary.Tree;
 
     enum ReservationStatus {Created, Approved, Cancelled}
