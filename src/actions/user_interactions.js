@@ -1,10 +1,7 @@
 
-import { clickPixel, getPixelForPointer, getPixelForXY } from '@actions/pixel';
-import { createSelectionRectangle, resizeSelectionRectangle, clearRectangleSelection } from '@actions/selection_rectangle';
-
 // Fired when user moves pointer through the grid
 export function handleMouseMove({ pointer, scene }) {
-  //console.log('handleMove', pointer, scene);
+  //console.log('User interactions: handleMove');
 
   switch (scene.game.mode) {
     case 'move':
@@ -22,53 +19,49 @@ export function handleMouseMove({ pointer, scene }) {
       if (pointer.button === 2) // Ignore right click
         return;
 
-      if (pointer.isDown && scene.selectionRectangle)
-        resizeSelectionRectangle({ pointer, scene });
+      if (pointer.isDown && scene.game.selectionManager.rectangleSelection)
+        scene.game.selectionManager.resizeRectangleSelection({ pointer, scene });
 
       break;
   }
 }
 
 export function handleMouseDown({ pointer, scene }) {
-  //console.log('handleMouseDown')
+  console.log('User interactions: handleMouseDown')
 
   switch (scene.game.mode) {
     case 'select':
 
       if (pointer.button === 2) { // Detect right click
         resetActiveSelection({ scene });
-        //generalResetStrokeStyle({ scene });
         return;
       }
 
-      clickPixel({ pointer, scene });
-      //generalResetStrokeStyle({ scene });
+      if (scene.game.selectionManager.rectangleSelection)
+        scene.game.selectionManager.clearRectangleSelection();
+
+      scene.game.selectionManager.displayInfoBox({ scene });
       break;
     case 'drag':
 
       if (pointer.button === 2) // Ignore right click
         return;
 
-      createSelectionRectangle({ pointer, scene });
+      scene.game.selectionManager.createRectangleSelection({ pointer, scene });
       break;
   }
 }
 
 export function handleMouseUp({ pointer, scene }) {
-  //console.log('handleMouseUp', pointer, scene)
+  console.log('User interactions: handleMouseUp');
 
-  //clearRectangleSelection({ scene });
-  if (scene.selectionRectangle) {
-    const pixels = [
-      getPixelForXY({ x: scene.selectionRectangleBeginPixel.x, y: scene.selectionRectangleBeginPixel.y, scene, color: true }),
-      getPixelForXY({ x: scene.selectionRectangleEndPixel.x, y: scene.selectionRectangleEndPixel.y, scene, color: true })
-    ];
-
-    scene.game.selectionManager.create(pixels, scene);
-  }
+  if (scene.game.selectionManager.rectangleSelection) 
+    scene.game.selectionManager.displayInfoBox({ scene });
 }
 
 export function handleShiftDown({ scene }) {
+  console.log('User interactions: handleShiftDown');
+
   if (scene.game.mode === 'select')
     setGameMode({ scene, mode: 'drag' });
 
@@ -76,6 +69,8 @@ export function handleShiftDown({ scene }) {
 }
 
 export function handleShiftUp({ scene }) {
+  console.log('User interactions: handleShiftUp');
+
   if (scene.game.mode === 'drag')
     setGameMode({ scene, mode: 'select' });
 
@@ -86,6 +81,7 @@ export function handleShiftUp({ scene }) {
 }
 
 export function panDragMap({ pointer, scene }) {
+  console.log('User interactions: panDragMap');
 
   if (scene.game.origDragPoint) {
     // move the camera by the amount the mouse has moved since last update
@@ -112,18 +108,17 @@ export function panDragMap({ pointer, scene }) {
 
 // Set the Position of the Selection Block
 export function positionSelectionBlock({ pointer, scene }) {
-  console.log('positionSelectionBlock');
+  //console.log('User interactions: positionSelectionBlock');
 
-  const tile = getPixelForPointer({ pointer, scene });
-
-  /*if (tile)
-    setInvertedStroke({ tile, scene });*/
-
+  if (scene.game.selectionManager.singleSelection)
+    scene.game.selectionManager.repositionSingleSelection({ pointer, scene });
+  else
+    scene.game.selectionManager.createSingleSelection({ pointer, scene });
 }
 
 // Set scene mode
 export function setGameMode({ scene, mode }) {
-  console.log('setGameMode', mode);
+  console.log('User interactions: setGameMode', mode);
 
   switch (mode) {
     case 'move':
@@ -184,6 +179,8 @@ export function setInvertedStroke({ tile, scene }) {
 }
 
 export function invertColor(color, bw) {
+  //console.log('User interactions: invertColor');
+
   let { r, g, b } = color;
 
   if (bw) {

@@ -2,7 +2,8 @@
 import Selection from '@components/selection';
 import InfoBox from '@components/info_box';
 
-import { getPixelForPointer } from '@actions/pixel';
+import { getPixelForXY, getPixelForPointer } from '@actions/pixel';
+import { invertColor } from '@actions/user_interactions';
 
 export default class SelectionManager {
 
@@ -12,63 +13,120 @@ export default class SelectionManager {
     this.parent = document.body.querySelector('#game');
   }
 
-  create(pixels, scene) {
-    console.log('SelectionManager add', pixels);
+  displayInfoBox({ scene }) {
+    console.log('SelectionManager: displayInfoBox');
 
-    if (!pixels || pixels.length === 0)
-      return;
+    let selection;
 
-    if (pixels.length === 1) { // single pixel
-      this.selection = pixels;
-    } else if (pixels.length > 1) { // selection of pixels
-      this.selection = pixels;
-    }
+    if (this.singleSelection)
+      selection = [getPixelForXY({ x: this.singleSelection.x, y: this.singleSelection.y, scene, color: true })]
+    else if (this.rectangleSelection)
+      selection = [
+        getPixelForXY({ x: this.rectangleSelectionBeginPixel.x, y: this.rectangleSelectionBeginPixel.y, scene, color: true }),
+        getPixelForXY({ x: this.rectangleSelectionEndPixel.x, y: this.rectangleSelectionEndPixel.y, scene, color: true })
+      ]
 
-    this.infobox = new InfoBox({ selection: new Selection(this.selection, this.parent), parent: this.parent, scene });
-    //console.log('this.selection', this.selection);
+    if (this.infobox)
+      this.clearInfoBox();
+
+    this.infobox = new InfoBox({ selection: new Selection(selection, this.parent), parent: this.parent, scene });
   }
 
-  createRectangle({ pointer, scene }) {
-    this.rectangleBeginPixel = getPixelForPointer({ pointer, scene });
-  
-    const X = this.rectangleBeginPixel.x;
-    const Y = this.rectangleBeginPixel.y;
-    const W = pointer.x - this.rectangleBeginPixel.x;
-    const H = pointer.y - this.rectangleBeginPixel.y;
-  
-    this.rectangle = scene.add.rectangle(X, Y, W, H);
-    this.rectangle.setFillStyle(0xffffff, 0.15);
-    this.rectangle.setStrokeStyle(1, 0xffffff, 0.9);
-    this.rectangle.setDisplayOrigin(0, 0);
-    this.rectangle.setDepth(100);
+  createSingleSelection({ pointer, scene }) {
+    console.log('SelectionManager: createSingleSelection');
+
+    const pixel = getPixelForPointer({ pointer, scene, color: true });
+
+    const X = pixel.tile.x;
+    const Y = pixel.tile.y;
+
+    const invertedColor = invertColor(pixel.color.color, true);
+
+    this.singleSelection = scene.add.rectangle(X, Y, scene.size, scene.size);
+    this.singleSelection.setFillStyle(invertedColor.color, 0.15);
+    this.singleSelection.setStrokeStyle(1, invertedColor.color, 0.9);
+    this.singleSelection.setDisplayOrigin(0, 0);
+    this.singleSelection.setDepth(100);
   }
 
-  resizeRectangle({ pointer, scene }) {
-    this.rectangleEndPixel = getPixelForPointer({ pointer, scene });
-  
-    const W = this.rectangleEndPixel.x - this.rectangleBeginPixel.x;
-    const H = this.rectangleEndPixel.y - this.rectangleBeginPixel.y;
-  
+  repositionSingleSelection({ pointer, scene }) {
+    console.log('SelectionManager: repositionSingleSelection');
+
+    const pixel = getPixelForPointer({ pointer, scene, color: true });
+
+    const X = pixel.tile.x;
+    const Y = pixel.tile.y;
+
+    const invertedColor = invertColor(pixel.color.color, true);
+
+    this.singleSelection.setPosition(X, Y);
+    this.singleSelection.setFillStyle(invertedColor.color, 0.15);
+    this.singleSelection.setStrokeStyle(1, invertedColor.color, 0.9);
+  }
+
+  createRectangleSelection({ pointer, scene }) {
+    console.log('SelectionManager: createRectangleSelection');
+
+    const pixel = getPixelForPointer({ pointer, scene, color: true });
+
+    this.rectangleSelectionBeginPixel = pixel.tile
+
+    const X = this.rectangleSelectionBeginPixel.x;
+    const Y = this.rectangleSelectionBeginPixel.y;
+    const W = pointer.x - this.rectangleSelectionBeginPixel.x;
+    const H = pointer.y - this.rectangleSelectionBeginPixel.y;
+
+    const invertedColor = invertColor(pixel.color.color, true);
+
+    this.rectangleSelection = scene.add.rectangle(X, Y, W, H);
+    this.rectangleSelection.setFillStyle(invertedColor.color, 0.15);
+    this.rectangleSelection.setStrokeStyle(1, invertedColor.color, 0.9);
+    this.rectangleSelection.setDisplayOrigin(0, 0);
+    this.rectangleSelection.setDepth(100);
+  }
+
+  resizeRectangleSelection({ pointer, scene }) {
+    console.log('SelectionManager: resizeRectangleSelection');
+
+    this.rectangleSelectionEndPixel = getPixelForPointer({ pointer, scene });
+
+    const W = this.rectangleSelectionEndPixel.x - this.rectangleSelectionBeginPixel.x;
+    const H = this.rectangleSelectionEndPixel.y - this.rectangleSelectionBeginPixel.y;
+
     // Bug when changing rect size: https://phaser.discourse.group/t/how-to-resize-gameobjects-rectangle-without-changing-scale/4777
-    this.rectangle.geom.setSize(W, H);
-    this.rectangle.setSize(W, H);
-    this.rectangle.updateData();
+    this.rectangleSelection.geom.setSize(W, H);
+    this.rectangleSelection.setSize(W, H);
+    this.rectangleSelection.updateData();
   }
 
-  clearRectangle() {
-    if (this.rectangle) {
-      this.rectangle.destroy();
-      this.rectangle = null;
-      this.rectangleBeginPixel = null;
-      this.rectangleEndPixel = null;
-    }
+  clearRectangleSelection() {
+    this.rectangleSelection.destroy();
+    this.rectangleSelection = null;
+    this.rectangleSelectionBeginPixel = null;
+    this.rectangleSelectionEndPixel = null;
+  }
+
+  clearSingleSelection() {
+    this.singleSelection.destroy();
+    this.singleSelection = null;
+  }
+
+  clearInfoBox() {
+    this.infobox.destroy();
+    this.infobox = null;
   }
 
   reset() {
-    console.log('reset selection', this.selection);
+    console.log('SelectionManager: Reset');
 
-    this.clearRectangle();
-    this.infobox.destroy();
+    if (this.singleSelection)
+      this.clearSingleSelection();
+
+    if (this.rectangleSelection)
+      this.clearRectangleSelection();
+
+    if (this.infobox)
+      this.clearInfoBox();
   }
 
   isSelected(tile) {

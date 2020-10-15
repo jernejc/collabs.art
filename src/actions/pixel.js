@@ -1,16 +1,4 @@
 
-export function clickPixel({ pointer, scene }) {
-  const pixel = getPixelForPointer({ pointer, scene, color: true });
-
-  // cleanup existing
-  console.log('clickPixel scene.game', scene.game, scene.game.selectionManager.selection.length);
-
-  if (scene.game.selectionManager.selection.length > 0)
-    scene.game.selectionManager.reset();
-
-  scene.game.selectionManager.create([pixel], scene);
-}
-
 export function createPixel({ x, y, scene }) {
   //console.log('createPixel',x,y)
   const tx = scene.size * x;

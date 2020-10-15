@@ -20,9 +20,9 @@
       <h1>PixelWorld</h1>
     </div>
     <div id="tools">
-      <span class="tool account">
+      <!--<span class="tool account">
         <i class="gg-profile"></i>
-      </span>
+      </span>-->
       <span class="tool move" data-game-mode="move">
         <i class="gg-controller"></i>
       </span>
@@ -57,12 +57,8 @@
         Emitter.emit('scene/mode', gameMode)
     });
 
-    Emitter.on('scene/ready', () => {
-      console.log('scene/ready')
-    });
-
     Emitter.on('scene/mode', mode => {
-      console.log('scene/mode', mode)
+      console.log('Index Emitter: scene/mode')
       setActiveTool(mode)
     });
 

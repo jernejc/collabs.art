@@ -26,7 +26,7 @@ export class MainScene extends ApplicationScene {
       }
     }*/
 
-    this.load.image('worldmap', 'assets/images/milliondollarwebsite.png');
+    this.load.image('worldmap', 'assets/images/place.png');
   }
 
   create(data) {
@@ -46,7 +46,6 @@ export class MainScene extends ApplicationScene {
     this.cameraY = 600;
     this.pMax = 1000;
     this.land = [];
-    this.color = new Phaser.Display.Color();
 
     const src = this.textures.get('worldmap').getSourceImage();
 
@@ -113,18 +112,14 @@ export class MainScene extends ApplicationScene {
      */
 
     this.input.keyboard.on('keydown_SHIFT', (event) => {
-      console.log('keydown_SHIFT event', event, _self.game.mode);
       handleShiftDown({ scene: _self })
     });
 
     this.input.keyboard.on('keyup_SHIFT', (event) => {
-      console.log('keyup_SHIFT event', event, _self.game.mode);
       handleShiftUp({ scene: _self })
     })
 
     this.game.emitter.on('scene/mode', (mode) => {
-      console.log('this.game.emitter.on', mode);
-
       if (_self.game.mode !== mode)
         setGameMode({ scene: _self, mode: mode });
     });
@@ -134,7 +129,7 @@ export class MainScene extends ApplicationScene {
   }
 
   updateLand() {
-    //console.log("updateLand", this.gridWidth, this.gridHeight, this.cameraX, this.cameraY)
+    console.log("Main Scene: updateLand");
     for (let y = 0; y < this.gridHeight; y++) 
       for (let x = 0; x < this.gridWidth; x++) 
         colorPixel({x, y, scene: this});
@@ -143,7 +138,7 @@ export class MainScene extends ApplicationScene {
   }
 
   createVisiblePixels() {
-
+    console.log("Main Scene: createVisiblePixels");
     for (let y = 0; y < this.gridHeight; y++) {
       if (!this.land[y])
         this.land[y] = [];
