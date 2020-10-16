@@ -50,8 +50,8 @@ export class MinimapScene extends ApplicationScene {
     this.mapoverlay.mask.invertAlpha = true
 
     this.input.on('pointermove', (pointer) => {
-      //if (pointer.camera)
-        //console.log('MINIMAP pointerover', pointer)
+      if (pointer.camera)
+        console.log('MINIMAP pointerover', pointer)
     })
 	}
 

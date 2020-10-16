@@ -4,12 +4,14 @@ import Phaser from 'phaser';
 import { createPixel, colorPixel } from '@actions/pixel';
 import { ApplicationScene } from '@scenes/application_scene';
 import { MinimapScene } from '@scenes/minimap_scene';
-import { handleMouseMove, 
-         handleMouseDown, 
-         handleMouseUp, 
-         handleShiftDown, 
-         handleShiftUp, 
-         setGameMode } from '@actions/user_interactions';
+import {
+  handleMouseMove,
+  handleMouseDown,
+  handleMouseUp,
+  handleShiftDown,
+  handleShiftUp,
+  setGameMode
+} from '@actions/user_interactions';
 
 export class MainScene extends ApplicationScene {
   constructor() {
@@ -17,15 +19,6 @@ export class MainScene extends ApplicationScene {
   }
 
   preload() {
-    //this.landColors = ['#8173BF', '#564D80', '#AC99FF', '#7C6DBF', '#9C8BE6'].map(color => Phaser.Display.Color.HexStringToColor(color).color)
-
-    /*for (let x = 0; x < this.pMax; x++) {
-      for (let y = 0; y < this.pMax; y++) {
-        let colorIndex = Math.floor()
-        this.worldmap[`${x}x${y}`] = this.landColors[colorIndex]
-      }
-    }*/
-
     this.load.image('worldmap', 'assets/images/place.png');
   }
 
@@ -41,7 +34,7 @@ export class MainScene extends ApplicationScene {
     this.strokeColor = Phaser.Display.Color.HexStringToColor(this.appConfig.strokeColor);
     this.gridWidth = this.appConfig.canvasWidth / this.size;
     this.gridHeight = this.appConfig.canvasHeight / this.size;
-    
+
     this.cameraX = 700;
     this.cameraY = 600;
     this.pMax = 1000;
@@ -94,17 +87,18 @@ export class MainScene extends ApplicationScene {
     });
 
     this.input.on('wheel', (pointer, currentlyOver, dx, dy, dz, event) => {
-      console.log('wheel event', pointer, dx, dy, dz);
+      console.log('Main Scene: Wheel event');
 
       const newSize = (dy < 0) ? this.size + 1 : this.size - 1;
-      console.log("newSize", newSize);
-     /*if (newSize > 5 && newSize < 35) {
-        this.size = newSize;
-        this.gridWidth = this.appConfig / this.size;
-        this.gridHeight = window.innerHeight / this.size;
 
-        this.updateLand()
-      }*/
+      if (newSize > 15 && newSize < 35) {
+        this.size = newSize;
+        this.gridWidth = this.appConfig.canvasWidth / this.size;
+        this.gridHeight = this.appConfig.canvasHeight / this.size;
+
+        this.clearVisiblePixel();
+        this.createVisiblePixels();
+      }
     });
 
     /** 
@@ -128,26 +122,46 @@ export class MainScene extends ApplicationScene {
     this.game.emitter.emit('scene/ready');
   }
 
+  update() {
+    console.log("Main Scene: update")
+  }
+
   updateLand() {
     console.log("Main Scene: updateLand");
-    for (let y = 0; y < this.gridHeight; y++) 
-      for (let x = 0; x < this.gridWidth; x++) 
-        colorPixel({x, y, scene: this});
+    
+    for (let y = 0; y < this.gridHeight; y++)
+      for (let x = 0; x < this.gridWidth; x++)
+        colorPixel({ x, y, scene: this });
 
     return;
   }
 
   createVisiblePixels() {
     console.log("Main Scene: createVisiblePixels");
+
     for (let y = 0; y < this.gridHeight; y++) {
       if (!this.land[y])
         this.land[y] = [];
 
       for (let x = 0; x < this.gridWidth; x++) {
-        this.land[y][x] = createPixel({x, y, scene: this});
-        colorPixel({x, y, scene: this});
+        this.land[y][x] = createPixel({ x, y, scene: this });
+        colorPixel({ x, y, scene: this });
       }
     }
+
+    return;
+  }
+
+  clearVisiblePixel() {
+    console.log("Main Scene: clearVisiblePixel");
+
+    this.land.forEach(y => {
+      y.forEach(x => {
+        x.destroy();
+      });
+    });
+
+    this.land = [];
 
     return;
   }
