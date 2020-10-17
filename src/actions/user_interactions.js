@@ -1,7 +1,7 @@
 
 // Fired when user moves pointer through the grid
 export function handleMouseMove({ pointer, scene }) {
-  //console.log('User interactions: handleMove');
+  if (DEBUG) console.log('User interactions: handleMove');
 
   switch (scene.game.mode) {
     case 'move':
@@ -27,7 +27,7 @@ export function handleMouseMove({ pointer, scene }) {
 }
 
 export function handleMouseDown({ pointer, scene }) {
-  console.log('User interactions: handleMouseDown')
+  if (DEBUG) console.log('User interactions: handleMouseDown')
 
   switch (scene.game.mode) {
     case 'select':
@@ -53,14 +53,29 @@ export function handleMouseDown({ pointer, scene }) {
 }
 
 export function handleMouseUp({ pointer, scene }) {
-  console.log('User interactions: handleMouseUp');
+  if (DEBUG) console.log('User interactions: handleMouseUp');
 
   if (scene.game.selectionManager.rectangleSelection) 
     scene.game.selectionManager.displayInfoBox({ scene });
 }
 
+export function handleMouseWheel({ scene, dx, dy, dz }) {
+  if (DEBUG) console.log('User interactions: Mouse wheel event');
+
+  const newSize = (dy < 0) ? scene.size + 1 : scene.size - 1;
+
+  if (newSize > 15 && newSize < 35) {
+    scene.size = newSize;
+    scene.gridWidth = scene.appConfig.canvasWidth / scene.size;
+    scene.gridHeight = scene.appConfig.canvasHeight / scene.size;
+
+    scene.clearVisiblePixel();
+    scene.createVisiblePixels();
+  }
+}
+
 export function handleShiftDown({ scene }) {
-  console.log('User interactions: handleShiftDown');
+  if (DEBUG) console.log('User interactions: handleShiftDown');
 
   if (scene.game.mode === 'select')
     setGameMode({ scene, mode: 'drag' });
@@ -69,32 +84,31 @@ export function handleShiftDown({ scene }) {
 }
 
 export function handleShiftUp({ scene }) {
-  console.log('User interactions: handleShiftUp');
+  if (DEBUG) console.log('User interactions: handleShiftUp');
 
   if (scene.game.mode === 'drag')
     setGameMode({ scene, mode: 'select' });
 
   scene.input.keyboard.on('keydown_SHIFT', (event) => {
-    console.log('keydown_SHIFT event', event, scene.game.mode);
     handleShiftDown({ scene });
   });
 }
 
 export function panDragMap({ pointer, scene }) {
-  console.log('User interactions: panDragMap');
+  if (DEBUG) console.log('User interactions: panDragMap');
 
   if (scene.game.origDragPoint) {
     // move the camera by the amount the mouse has moved since last update
     scene.cameraX += scene.game.origDragPoint.x - pointer.position.x;
     scene.cameraY += scene.game.origDragPoint.y - pointer.position.y;
 
-    const maxX = scene.pMax - scene.gridWidth;
+    const maxX = scene.pMax - scene.gridWidth + 1;
     if (scene.cameraX === maxX || scene.cameraX > maxX)
       scene.cameraX = maxX;
     else if (scene.cameraX < 0)
       scene.cameraX = 0;
 
-    const maxY = scene.pMax - scene.gridHeight;
+    const maxY = scene.pMax - scene.gridHeight + 1;
     if (scene.cameraY === maxY || scene.cameraY > maxY)
       scene.cameraY = maxY;
     else if (scene.cameraY < 0)
@@ -108,7 +122,7 @@ export function panDragMap({ pointer, scene }) {
 
 // Set the Position of the Selection Block
 export function positionSelectionBlock({ pointer, scene }) {
-  //console.log('User interactions: positionSelectionBlock');
+  if (DEBUG) console.log('User interactions: positionSelectionBlock');
 
   if (scene.game.selectionManager.singleSelection)
     scene.game.selectionManager.repositionSingleSelection({ pointer, scene });
@@ -118,7 +132,7 @@ export function positionSelectionBlock({ pointer, scene }) {
 
 // Set scene mode
 export function setGameMode({ scene, mode }) {
-  console.log('User interactions: setGameMode', mode);
+  if (DEBUG) console.log('User interactions: setGameMode', mode);
 
   switch (mode) {
     case 'move':
@@ -150,7 +164,7 @@ export function resetActiveSelection({ scene }) {
 }
 
 export function generalResetStrokeStyle({ scene, size }) {
-  //console.log('generalStrokeReset', scene, size);
+  if (DEBUG) console.log('generalStrokeReset', scene, size);
 
   for (let y = 0; y < scene.gridHeight; y++) {
     for (let x = 0; x < scene.gridWidth; x++) {
@@ -179,7 +193,7 @@ export function setInvertedStroke({ tile, scene }) {
 }
 
 export function invertColor(color, bw) {
-  //console.log('User interactions: invertColor');
+  if (DEBUG) console.log('User interactions: invertColor');
 
   let { r, g, b } = color;
 

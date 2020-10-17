@@ -9,7 +9,7 @@ export function AppInitializer({
   strokeColor,
   strokeSize
 }) {
-  console.log('Init Phaser', canvasElement, canvasWidth, canvasHeight)
+  if (DEBUG) console.log('Init Phaser', canvasElement, canvasWidth, canvasHeight)
 
   const canvas = document.querySelector('#' + canvasElement)
   const Emitter = new Events.EventEmitter();

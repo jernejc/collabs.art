@@ -10,7 +10,8 @@ import Radio from '@components/radio';
 export default class InfoBox {
 
   constructor({ selection, parent, scene }) {
-    //console.log('InfoBox selection', selection, parent)
+    if (DEBUG) console.log('Info Box: constructor');
+
     this.scene = scene;
     this.parent = parent;
     this.selection = selection;
@@ -20,7 +21,7 @@ export default class InfoBox {
   }
 
   setupTemplate() {
-    //console.log('Setup template', pixel, parent);
+    if (DEBUG) console.log('Info Box:  Setup template');
 
     this.wrapper = document.createElement('div');
     this.wrapper.classList.add('info-box');
@@ -36,8 +37,8 @@ export default class InfoBox {
 
     this.wrapper.appendChild(this.arrow);
 
-    //this.setColorSelectionUI(pixel);
-    this.setOwnershipUI();
+    this.setColorSelectionUI(this.selection);
+    //this.setOwnershipUI();
 
     try {
       this.parent.appendChild(this.wrapper);
@@ -47,7 +48,7 @@ export default class InfoBox {
   }
 
   setPosition() {
-    //console.log('setPosition', pixel, parent.offsetWidth, this.selection.x, this.wrapper.offsetWidth, pixel.tile.displayWidth)
+    if (DEBUG) console.log('Info Box: setPosition')
 
     const padding = 2;
     const vertical = (this.selection.y > (this.parent.offsetHeight / 2)) ?  'bottom' : 'top'
@@ -62,11 +63,12 @@ export default class InfoBox {
   }
 
   setOwnershipUI() {
+    if (DEBUG) console.log('Info Box: setOwnershipUI', this.selection);
 
     this.ownershipUI = document.createElement('div');
     this.ownershipUI.classList.add('ownership');
 
-    this.ownershipUI.appendChild(new Radio(this.selection, 'buyoption', {
+    this.ownershipUI.appendChild(new Radio(this.selection.pixel, 'buyoption', {
       scene: this.scene,
       options: [{
         text: 'Buy',
@@ -80,7 +82,7 @@ export default class InfoBox {
     }));
 
     // Hex Input
-    this.ownershipUI.appendChild(new Input(this.selection, 'price', {
+    this.ownershipUI.appendChild(new Input(this.selection.pixel, 'price', {
       min: 0,
       max: 1,
       step: 0.001,
@@ -108,12 +110,13 @@ export default class InfoBox {
   }
 
   setColorSelectionUI() {
+    if (DEBUG) console.log('Info Box: setColorSelectionUI', this.selection);
 
     this.colorSelectionUI = document.createElement('div');
     this.colorSelectionUI.classList.add('color-selection');
 
     // Hex Input
-    this.colorSelectionUI.appendChild(new Input(this.selection, 'color.color', {
+    this.colorSelectionUI.appendChild(new Input(this.selection.pixel, 'color.color.color', {
       min: 0,
       max: 255,
       step: 2,
@@ -124,7 +127,7 @@ export default class InfoBox {
     }))
 
     // RGB Inputs
-    this.colorSelectionUI.appendChild(new Input(this.selection, 'color.red', {
+    this.colorSelectionUI.appendChild(new Input(this.selection.pixel, 'color.color.red', {
       min: 0,
       max: 255,
       step: 2,
@@ -132,7 +135,7 @@ export default class InfoBox {
       width: '33%',
       scene: this.scene
     }))
-    this.colorSelectionUI.appendChild(new Input(this.selection, 'color.green', {
+    this.colorSelectionUI.appendChild(new Input(this.selection.pixel, 'color.color.green', {
       min: 0,
       max: 255,
       step: 2,
@@ -140,7 +143,7 @@ export default class InfoBox {
       width: '33%',
       scene: this.scene
     }))
-    this.colorSelectionUI.appendChild(new Input(this.selection, 'color.blue', {
+    this.colorSelectionUI.appendChild(new Input(this.selection.pixel, 'color.color.blue', {
       min: 0,
       max: 255,
       step: 2,
@@ -150,7 +153,7 @@ export default class InfoBox {
     }))
 
     // Hue slider
-    this.colorSelectionUI.appendChild(new ColorPicker(this.selection, 'color.h', {
+    this.colorSelectionUI.appendChild(new ColorPicker(this.selection.pixel, 'color.color.h', {
       min: 0,
       max: 1,
       step: 0.001,
@@ -161,7 +164,8 @@ export default class InfoBox {
   }
 
   destroy() {
-    console.log('Info box destroy');
+    if (DEBUG) console.log('Info box destroy');
+
     this.scene.game.emitter.off('controller/update');
     this.parent.removeChild(this.wrapper);
   }

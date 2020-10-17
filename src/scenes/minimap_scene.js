@@ -35,7 +35,7 @@ export class MinimapScene extends ApplicationScene {
       this.fieldWidth,
       this.fieldHeight,
       Phaser.Display.Color.HexStringToColor('#ffffff').color, 0 // background color
-    ).setStrokeStyle(0.5, Phaser.Display.Color.HexStringToColor('#ffffff').color, 0.3)
+    ).setStrokeStyle(0.5, Phaser.Display.Color.HexStringToColor('#ffffff').color, 0.8)
 
     // Setup alpha mask
     this.mapoverlay = this.add.rectangle(
@@ -51,7 +51,7 @@ export class MinimapScene extends ApplicationScene {
 
     this.input.on('pointermove', (pointer) => {
       if (pointer.camera)
-        console.log('MINIMAP pointerover', pointer)
+        if (DEBUG) console.log('MINIMAP pointerover', pointer)
     })
 	}
 

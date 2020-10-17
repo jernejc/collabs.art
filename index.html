@@ -9,8 +9,7 @@
 
   <link href='https://css.gg/css' rel='stylesheet'>
   <link rel="stylesheet" href="assets/css/main.css">
-  <script src="vendors.app.js"></script>
-  <script src="app.js"></script>
+
   <title>PixelWorld</title>
 </head>
 
@@ -20,9 +19,6 @@
       <h1>PixelWorld</h1>
     </div>
     <div id="tools">
-      <!--<span class="tool account">
-        <i class="gg-profile"></i>
-      </span>-->
       <span class="tool move" data-game-mode="move">
         <i class="gg-controller"></i>
       </span>
@@ -42,7 +38,7 @@
       canvasElement: 'game',
       canvasWidth: window.innerWidth,
       canvasHeight: window.innerHeight,
-      gridSize: 20,
+      gridSize: 15,
       strokeSize: 0.5,
       strokeColor: '#cccccc'
     });
@@ -58,7 +54,6 @@
     });
 
     Emitter.on('scene/mode', mode => {
-      console.log('Index Emitter: scene/mode')
       setActiveTool(mode)
     });
 

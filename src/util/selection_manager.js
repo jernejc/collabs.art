@@ -14,7 +14,7 @@ export default class SelectionManager {
   }
 
   displayInfoBox({ scene }) {
-    console.log('SelectionManager: displayInfoBox');
+    if (DEBUG) console.log('SelectionManager: displayInfoBox');
 
     let selection;
 
@@ -33,7 +33,7 @@ export default class SelectionManager {
   }
 
   createSingleSelection({ pointer, scene }) {
-    console.log('SelectionManager: createSingleSelection');
+    if (DEBUG) console.log('SelectionManager: createSingleSelection');
 
     const pixel = getPixelForPointer({ pointer, scene, color: true });
 
@@ -50,7 +50,7 @@ export default class SelectionManager {
   }
 
   repositionSingleSelection({ pointer, scene }) {
-    console.log('SelectionManager: repositionSingleSelection');
+    if (DEBUG) console.log('SelectionManager: repositionSingleSelection');
 
     const pixel = getPixelForPointer({ pointer, scene, color: true });
 
@@ -65,7 +65,7 @@ export default class SelectionManager {
   }
 
   createRectangleSelection({ pointer, scene }) {
-    console.log('SelectionManager: createRectangleSelection');
+    if (DEBUG) console.log('SelectionManager: createRectangleSelection');
 
     const pixel = getPixelForPointer({ pointer, scene, color: true });
 
@@ -86,7 +86,7 @@ export default class SelectionManager {
   }
 
   resizeRectangleSelection({ pointer, scene }) {
-    console.log('SelectionManager: resizeRectangleSelection');
+    if (DEBUG) console.log('SelectionManager: resizeRectangleSelection');
 
     this.rectangleSelectionEndPixel = getPixelForPointer({ pointer, scene });
 
@@ -117,7 +117,7 @@ export default class SelectionManager {
   }
 
   reset() {
-    console.log('SelectionManager: Reset');
+    if (DEBUG) console.log('SelectionManager: Reset');
 
     if (this.singleSelection)
       this.clearSingleSelection();
@@ -130,7 +130,7 @@ export default class SelectionManager {
   }
 
   isSelected(tile) {
-    //console.log('isSelected', tile)
+    //if (DEBUG) console.log('isSelected', tile)
     return this.ids.includes(tile.id);
   }
 

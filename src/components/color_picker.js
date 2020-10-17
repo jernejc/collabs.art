@@ -8,7 +8,7 @@ import Controller from '@components/controller';
 export default class ColorPicker extends Controller {
 
   constructor(object, property, params) {
-    //console.log('ColorPicker init', arguments)
+    if (DEBUG) console.log('Color Picker: constructor')
 
     super(object, property, params);
 
@@ -88,6 +88,8 @@ export default class ColorPicker extends Controller {
   }
 
   updateDisplay() {
+    if (DEBUG) console.log('Color Picker: updateDisplay', this.object);
+
     const pct = (this.getValue() - this.min) / (this.max - this.min);
 
     this.rangepointer.style.left = pct * 100 + '%';

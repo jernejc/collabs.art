@@ -1,9 +1,9 @@
 
 export function createPixel({ x, y, scene }) {
-  //console.log('createPixel',x,y)
+  //if (DEBUG) console.log('createPixel',x,y)
   const tx = scene.size * x;
   const ty = scene.size * y;
-  //console.log('tx ty', tx, ty)
+  //if (DEBUG) console.log('tx ty', tx, ty)
 
   const tile = scene.add.rectangle(tx, ty, scene.size, scene.size);
   tile.setDisplayOrigin(0, 0);
@@ -15,7 +15,7 @@ export function createPixel({ x, y, scene }) {
 }
 
 export function colorPixel({ x, y, scene }) {
-  //console.log('colorPixel')
+  //if (DEBUG) console.log('colorPixel')
   const mapPixel = getColor({ x, y, color: scene.color, scene });
   const tile = scene.land[y][x];
 

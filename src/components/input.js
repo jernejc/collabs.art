@@ -46,7 +46,7 @@ export default class Input extends Controller {
     // Helpers
 
     function onChange(value) {
-      console.log('onChange', value, self.input.value)
+      if (DEBUG) console.log('onChange', value, self.input.value)
 
       const attempted = value || parseFloat(self.input.value);
 

@@ -8,6 +8,7 @@ import {
   handleMouseMove,
   handleMouseDown,
   handleMouseUp,
+  handleMouseWheel,
   handleShiftDown,
   handleShiftUp,
   setGameMode
@@ -27,7 +28,6 @@ export class MainScene extends ApplicationScene {
 
     const _self = this;
 
-    //this.blockPadding = this.appConfig.blockPadding || 2;
     this.size = this.appConfig.gridSize;
     this.strokeSize = this.appConfig.strokeSize;
     this.pixelSize = this.size + this.strokeSize;
@@ -69,37 +69,20 @@ export class MainScene extends ApplicationScene {
      */
 
     this.input.on('pointermove', (pointer) => {
-      //console.log('MAINSCENE EVENT:pointermove', pointer)
-
       handleMouseMove({ pointer, scene: this });
     });
 
     this.input.on('pointerdown', (pointer) => {
-      //console.log('MAINSCENE EVENT:pointerdown', pointer);
-
       handleMouseDown({ pointer, scene: this });
     });
 
     this.input.on('pointerup', (pointer) => {
-      //console.log('MAINSCENE EVENT:pointerup', pointer);
-
       handleMouseUp({ pointer, scene: this });
     });
 
-    this.input.on('wheel', (pointer, currentlyOver, dx, dy, dz, event) => {
-      console.log('Main Scene: Wheel event');
-
-      const newSize = (dy < 0) ? this.size + 1 : this.size - 1;
-
-      if (newSize > 15 && newSize < 35) {
-        this.size = newSize;
-        this.gridWidth = this.appConfig.canvasWidth / this.size;
-        this.gridHeight = this.appConfig.canvasHeight / this.size;
-
-        this.clearVisiblePixel();
-        this.createVisiblePixels();
-      }
-    });
+    /*this.input.on('wheel', (pointer, currentlyOver, dx, dy, dz, event) => {
+      handleMouseWheel({ scene: this, dx, dy, dz })
+    });*/
 
     /** 
      * Keyboard events
@@ -123,11 +106,11 @@ export class MainScene extends ApplicationScene {
   }
 
   update() {
-    console.log("Main Scene: update")
+    if (DEBUG) console.log("Main Scene: update")
   }
 
   updateLand() {
-    console.log("Main Scene: updateLand");
+    if (DEBUG) console.log("Main Scene: updateLand");
     
     for (let y = 0; y < this.gridHeight; y++)
       for (let x = 0; x < this.gridWidth; x++)
@@ -137,7 +120,7 @@ export class MainScene extends ApplicationScene {
   }
 
   createVisiblePixels() {
-    console.log("Main Scene: createVisiblePixels");
+    if (DEBUG) console.log("Main Scene: createVisiblePixels");
 
     for (let y = 0; y < this.gridHeight; y++) {
       if (!this.land[y])
@@ -153,7 +136,7 @@ export class MainScene extends ApplicationScene {
   }
 
   clearVisiblePixel() {
-    console.log("Main Scene: clearVisiblePixel");
+    if (DEBUG) console.log("Main Scene: clearVisiblePixel");
 
     this.land.forEach(y => {
       y.forEach(x => {

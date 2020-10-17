@@ -1,9 +1,13 @@
 const path = require('path');
-const CopyPlugin = require('copy-webpack-plugin');
+const webpack = require('webpack');
 
-module.exports = {
+const CopyPlugin = require('copy-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+const PROD = process.env.NODE_ENV == 'production';
+
+const config = {
   target: 'web',
-  mode: 'development',
   entry: {
     app: './src/index.js',
     vendors: ['phaser']
@@ -24,25 +28,22 @@ module.exports = {
     }
   },
 
-  devtool: 'inline-source-map',
-
-  devServer: {
-    contentBase: path.join(__dirname, 'dist'),
-    port: 8000
-  },
-
   plugins: [
     new CopyPlugin({
-      patterns: [
-        {
-          from: path.resolve(__dirname, 'index.html'),
-          to: path.resolve(__dirname, 'dist/index.html')
-        },
-        {
-          from: path.resolve(__dirname, 'assets'),
-          to: path.resolve(__dirname, 'dist/assets')
-        }
-      ]
+      patterns: [{
+        from: path.resolve(__dirname, 'assets'),
+        to: path.resolve(__dirname, 'dist/assets')
+      }]
+    }),
+    new webpack.DefinePlugin({
+      PRODUCTION: PROD,
+      VERSION: "0.0.1",
+      DEBUG: false // !PROD
+    }),
+    new HtmlWebpackPlugin({
+      title: 'PixelWorld',
+      template: path.resolve(__dirname, 'index.html'),
+      inject: 'head'
     })
   ],
 
@@ -60,8 +61,18 @@ module.exports = {
 
   output: {
     path: path.resolve('dist'),
-    filename: 'app.js',
+    filename: '[name].[contenthash].bundle.js',
     library: 'PixelWorld',
-    libraryTarget: 'var' //'commonjs2'
+    libraryTarget: 'var' // 'commonjs2'
   }
 }
+
+if (!PROD) { // DEV config
+  config.devtool = 'inline-source-map';
+  config.devServer = {
+    contentBase: path.join(__dirname, 'dist'),
+    port: 8000
+  }
+}
+
+module.exports = config;
