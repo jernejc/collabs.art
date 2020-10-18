@@ -8,10 +8,13 @@ import {
   handleMouseMove,
   handleMouseDown,
   handleMouseUp,
-  handleMouseWheel,
+  //handleMouseWheel,
+  handleSpaceDown,
+  handleSpaceUp,
   handleShiftDown,
   handleShiftUp,
-  setGameMode
+  setGameMode,
+  moveToPosition
 } from '@actions/user_interactions';
 
 export class MainScene extends ApplicationScene {
@@ -30,15 +33,10 @@ export class MainScene extends ApplicationScene {
 
     this.size = this.appConfig.gridSize;
     this.strokeSize = this.appConfig.strokeSize;
-    this.pixelSize = this.size + this.strokeSize;
     this.strokeColor = Phaser.Display.Color.HexStringToColor(this.appConfig.strokeColor);
     this.gridWidth = this.appConfig.canvasWidth / this.size;
     this.gridHeight = this.appConfig.canvasHeight / this.size;
-
-    this.cameraX = 700;
-    this.cameraY = 600;
     this.pMax = 1000;
-    this.land = [];
 
     const src = this.textures.get('worldmap').getSourceImage();
 
@@ -48,21 +46,15 @@ export class MainScene extends ApplicationScene {
     this.worldmap = this.textures.createCanvas('map', this.imageWidth, this.imageHeight);
     this.worldmap.draw(0, 0, src);
 
-    this.minimap = new MinimapScene({
-      appConfig: this.appConfig,
-      sceneConfig: {
-        gridWidth: this.gridWidth,
-        gridHeight: this.gridHeight,
-        size: this.size
-      }
-    });
+    this.minimap = this.createMinimap();
 
-    this.scene.add('MinimapScene', this.minimap, true);
     this.createVisiblePixels();
 
     setGameMode({ scene: this, mode: "select" });
 
     this.input.mouse.disableContextMenu(); // prevent right click context menu
+
+    moveToPosition({ x: 500, y: 500, scene: this })
 
     /** 
      * Mouse Events
@@ -96,6 +88,14 @@ export class MainScene extends ApplicationScene {
       handleShiftUp({ scene: _self })
     })
 
+    this.input.keyboard.on('keydown_SPACE', (event) => {
+      handleSpaceDown({ scene: _self })
+    });
+
+    this.input.keyboard.on('keyup_SPACE', (event) => {
+      handleSpaceUp({ scene: _self })
+    })
+
     /**
      * Game mode events
      */
@@ -115,7 +115,7 @@ export class MainScene extends ApplicationScene {
 
   updateLand() {
     if (DEBUG) console.log("Main Scene: updateLand");
-    
+
     for (let y = 0; y < this.gridHeight; y++)
       for (let x = 0; x < this.gridWidth; x++)
         colorPixel({ x, y, scene: this });
@@ -125,6 +125,8 @@ export class MainScene extends ApplicationScene {
 
   createVisiblePixels() {
     if (DEBUG) console.log("Main Scene: createVisiblePixels");
+
+    this.land = [];
 
     for (let y = 0; y < this.gridHeight; y++) {
       if (!this.land[y])
@@ -151,5 +153,33 @@ export class MainScene extends ApplicationScene {
     this.land = [];
 
     return;
+  }
+
+  createMinimap() {
+
+    const sizeRatio = 5;
+    const width = 1000 / sizeRatio;
+    const height = 1000 / sizeRatio;
+    const margin = 10;
+    const x = margin;
+    const y = this.appConfig.canvasHeight - (height + margin);
+
+    this.minimapWrapper = this.add.zone(x, y, width, height).setInteractive().setOrigin(0);
+    this.minimap = new MinimapScene({
+      appConfig: this.appConfig,
+      sceneConfig: {
+        gridWidth: this.gridWidth,
+        gridHeight: this.gridHeight,
+        size: this.size,
+        sizeRatio,
+        margin,
+        width,
+        height,
+        x,
+        y
+      }
+    }, this.minimapWrapper);
+
+    this.scene.add('MinimapScene', this.minimap, true);
   }
 }

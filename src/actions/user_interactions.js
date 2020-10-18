@@ -55,7 +55,7 @@ export function handleMouseDown({ pointer, scene }) {
 export function handleMouseUp({ pointer, scene }) {
   if (DEBUG) console.log('User interactions: handleMouseUp');
 
-  if (scene.game.selectionManager.rectangleSelection) 
+  if (scene.game.selectionManager.rectangleSelection)
     scene.game.selectionManager.displayInfoBox({ scene });
 }
 
@@ -80,7 +80,7 @@ export function handleShiftDown({ scene }) {
   if (scene.game.mode === 'select')
     setGameMode({ scene, mode: 'drag' });
 
-  scene.input.keyboard.off('keydown_SHIFT'); // Events repeats as longs as the button is pressed, we only want it to trigger once.
+  scene.input.keyboard.off('keydown_SHIFT'); // Event repeats as longs as the button is pressed, we only want it to trigger once.
 }
 
 export function handleShiftUp({ scene }) {
@@ -94,31 +94,62 @@ export function handleShiftUp({ scene }) {
   });
 }
 
+export function handleSpaceDown({ scene }) {
+  if (DEBUG) console.log('User interactions: handleSpaceDown');
+
+  if (scene.game.mode === 'select')
+    setGameMode({ scene, mode: 'move' });
+
+  scene.input.keyboard.off('keydown_SPACE'); // Event repeats as longs as the button is pressed, we only want it to trigger once.
+}
+
+export function handleSpaceUp({ scene }) {
+  if (DEBUG) console.log('User interactions: handleSpaceUp');
+
+  if (scene.game.mode === 'move')
+    setGameMode({ scene, mode: 'select' });
+
+  scene.input.keyboard.on('keydown_SPACE', (event) => {
+    handleSpaceDown({ scene });
+  });
+}
+
 export function panDragMap({ pointer, scene }) {
   if (DEBUG) console.log('User interactions: panDragMap');
 
   if (scene.game.origDragPoint) {
     // move the camera by the amount the mouse has moved since last update
-    scene.cameraX += scene.game.origDragPoint.x - pointer.position.x;
-    scene.cameraY += scene.game.origDragPoint.y - pointer.position.y;
+    const newX = scene.cameraX + (scene.game.origDragPoint.x - pointer.position.x);
+    const newY = scene.cameraY + (scene.game.origDragPoint.y - pointer.position.y);
 
-    const maxX = scene.pMax - scene.gridWidth + 1;
-    if (scene.cameraX === maxX || scene.cameraX > maxX)
-      scene.cameraX = maxX;
-    else if (scene.cameraX < 0)
-      scene.cameraX = 0;
-
-    const maxY = scene.pMax - scene.gridHeight + 1;
-    if (scene.cameraY === maxY || scene.cameraY > maxY)
-      scene.cameraY = maxY;
-    else if (scene.cameraY < 0)
-      scene.cameraY = 0;
+    moveToPosition({ scene, x: newX, y: newY });
   }
 
   // set new drag origin to current position
   scene.game.origDragPoint = pointer.position.clone();
   scene.updateLand();
 }
+
+export function moveToPosition({ scene, x, y }) {
+
+  scene.cameraX = x;
+  scene.cameraY = y;
+
+  const maxX = scene.pMax - scene.gridWidth + 1;
+  if (scene.cameraX === maxX || scene.cameraX > maxX)
+    scene.cameraX = maxX;
+  else if (scene.cameraX < 0)
+    scene.cameraX = 0;
+
+  const maxY = scene.pMax - scene.gridHeight + 1;
+  if (scene.cameraY === maxY || scene.cameraY > maxY)
+    scene.cameraY = maxY;
+  else if (scene.cameraY < 0)
+    scene.cameraY = 0;
+
+  scene.updateLand();
+}
+
 
 // Set the Position of the Selection Block
 export function positionSelectionBlock({ pointer, scene }) {
@@ -155,6 +186,12 @@ export function setGameMode({ scene, mode }) {
       resetActiveSelection({ scene });
       //generalResetStrokeStyle({ scene });
       break;
+    case 'mininav':
+      scene.input.setDefaultCursor('crosshair');
+      scene.game.mode = 'mininav';
+      break;
+    default:
+      throw new Error('Trying to set unknown game mode: ' + mode);
   }
   //scene.game.emitter.emit('scene/mode', mode);
 }
@@ -169,9 +206,9 @@ export function generalResetStrokeStyle({ scene, size }) {
   for (let y = 0; y < scene.gridHeight; y++) {
     for (let x = 0; x < scene.gridWidth; x++) {
       const tile = scene.land[y][x];
-      
-      if (tile) 
-          resetStrokeStyle({ tile, scene, size });
+
+      if (tile)
+        resetStrokeStyle({ tile, scene, size });
     }
   }
 }
