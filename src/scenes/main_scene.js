@@ -96,6 +96,10 @@ export class MainScene extends ApplicationScene {
       handleShiftUp({ scene: _self })
     })
 
+    /**
+     * Game mode events
+     */
+
     this.game.emitter.on('scene/mode', (mode) => {
       if (_self.game.mode !== mode)
         setGameMode({ scene: _self, mode: mode });

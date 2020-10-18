@@ -35,7 +35,7 @@ export class MinimapScene extends ApplicationScene {
       this.fieldWidth,
       this.fieldHeight,
       Phaser.Display.Color.HexStringToColor('#ffffff').color, 0 // background color
-    ).setStrokeStyle(0.5, Phaser.Display.Color.HexStringToColor('#ffffff').color, 0.8)
+    ).setStrokeStyle(0.5, Phaser.Display.Color.HexStringToColor('#ffffff').color, 1)
 
     // Setup alpha mask
     this.mapoverlay = this.add.rectangle(
@@ -45,13 +45,14 @@ export class MinimapScene extends ApplicationScene {
       this.height,
       Phaser.Display.Color.HexStringToColor('#000000').color
     )
-    this.mapoverlay.setAlpha(0.82)
+    this.mapoverlay.setAlpha(0.75)
     this.mapoverlay.mask = new Phaser.Display.Masks.GeometryMask(this, this.visibleField)
     this.mapoverlay.mask.invertAlpha = true
 
     this.input.on('pointermove', (pointer) => {
-      if (pointer.camera)
-        if (DEBUG) console.log('MINIMAP pointerover', pointer)
+      if (pointer.camera) {
+        console.log('MINIMAP pointerover', pointer)
+      }
     })
 	}
 
