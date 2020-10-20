@@ -2,24 +2,20 @@ import Phaser from 'phaser'
 
 export class ApplicationScene extends Phaser.Scene {
   constructor(options = undefined) {
-    super(options)
+    super(options);
   }
 
-  create(params = {}) {
-    this.currentScene = this
-    this.appConfig = this.game.appConfig
+  create(data) {
+    if (DEBUG) console.log('ApplicationScene', data);
 
-    this.sceneEssentials = {
-      appConfig: this.appConfig,
-      scene: this.scene
-    }
+    this.appConfig = this.game.appConfig;
   }
 
   exportToBase64() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       this.renderer.snapshot((data) => {
-        resolve(data.src)
-      })
-    })
+        resolve(data.src);
+      });
+    });
   }
 }

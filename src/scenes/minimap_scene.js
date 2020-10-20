@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { ApplicationScene } from '@scenes/application_scene';
-import { setGameMode, moveToPosition } from '@actions/user_interactions';
+import { setGameMode, 
+         moveToPosition, 
+         navigateMinimap } from '@actions/user_interactions';
 
 export class MinimapScene extends ApplicationScene {
   constructor(config, wrapper) {
@@ -13,8 +15,8 @@ export class MinimapScene extends ApplicationScene {
 
   create() {
     this.mainscene = this.game.scene.keys["MainScene"];
-    
-    this.appConfig.canvasWidth / this.sceneConfig.size
+
+    this.appConfig.canvasWidth / this.sceneConfig.size;
     this.minimap = this.add.image(this.sceneConfig.width / 2, this.sceneConfig.height / 2, 'worldmap');
     this.minimap.setDisplaySize(this.sceneConfig.width, this.sceneConfig.height);
 
@@ -49,35 +51,20 @@ export class MinimapScene extends ApplicationScene {
 
     let prevMode; // TO-DO: needs a more general solution
 
-    this.wrapper.on('pointerover', (pointer) => {
-      if (DEBUG) console.log('Minimap Scene: pointerover', pointer);
-
+    this.wrapper.on('pointerover', () => {
       prevMode = this.game.mode;
       setGameMode({ scene: this, mode: 'mininav' });
     });
 
-    this.wrapper.on('pointerout', (pointer) => {
-      if (DEBUG) console.log('Minimap Scene: pointerout', pointer);
-
+    this.wrapper.on('pointerout', () => {
       setGameMode({ scene: this, mode: prevMode });
     });
+  }
 
-    this.wrapper.on('pointerdown', (pointer) => {
-      if (DEBUG) console.log('Minimap Scene: pointerdown', pointer);
-
-      const newX = ((pointer.downX * this.sceneConfig.sizeRatio) - this.sceneConfig.margin) - (this.fieldWidth * this.sceneConfig.sizeRatio);
-      const newY = ((pointer.downY - (this.appConfig.canvasHeight - this.sceneConfig.height)) * this.sceneConfig.sizeRatio - this.sceneConfig.margin) + ((this.fieldHeight / 2) * this.sceneConfig.sizeRatio);
-
-      moveToPosition({ scene: this.mainscene, x: newX, y: newY });
-    });
-
-    this.scene.bringToTop();
-	}
-
-	update() {
+  update() {
     this.visibleField.setPosition(
-      (this.mainscene.cameraX / this.sceneConfig.sizeRatio) + (this.fieldWidth / 2), 
+      (this.mainscene.cameraX / this.sceneConfig.sizeRatio) + (this.fieldWidth / 2),
       (this.mainscene.cameraY / this.sceneConfig.sizeRatio) + (this.fieldHeight / 2)
-    )
-	}
+    );
+  }
 }

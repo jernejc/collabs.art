@@ -23,6 +23,10 @@ export function handleMouseMove({ pointer, scene }) {
         scene.game.selectionManager.resizeRectangleSelection({ pointer, scene });
 
       break;
+    case 'mininav':
+      if (pointer.isDown)
+        navigateMinimap({ pointer, scene: scene.minimap })
+      break;
   }
 }
 
@@ -48,6 +52,9 @@ export function handleMouseDown({ pointer, scene }) {
         return;
 
       scene.game.selectionManager.createRectangleSelection({ pointer, scene });
+      break;
+    case 'mininav':
+      navigateMinimap({ pointer, scene: scene.minimap })
       break;
   }
 }
@@ -112,6 +119,19 @@ export function handleSpaceUp({ scene }) {
   scene.input.keyboard.on('keydown_SPACE', (event) => {
     handleSpaceDown({ scene });
   });
+}
+
+export function navigateMinimap({ pointer, scene }) {
+  if (DEBUG) console.log('User interactions: navigateMinimap');
+
+  const newX = ((pointer.position.x * scene.sceneConfig.sizeRatio) - scene.sceneConfig.margin) -
+    (scene.fieldWidth * scene.sceneConfig.sizeRatio);
+  const newY = ((pointer.position.y - (scene.appConfig.canvasHeight - scene.sceneConfig.height)) *
+    scene.sceneConfig.sizeRatio - scene.sceneConfig.margin) +
+    ((scene.fieldHeight / 2) * scene.sceneConfig.sizeRatio);
+
+  resetActiveSelection({ scene });
+  moveToPosition({ scene: scene.mainscene, x: newX, y: newY });
 }
 
 export function panDragMap({ pointer, scene }) {
@@ -180,7 +200,7 @@ export function setGameMode({ scene, mode }) {
       generalResetStrokeStyle({ scene });
       break;
     case 'drag':
-      scene.input.setDefaultCursor('copy');
+      scene.input.setDefaultCursor('cell');
       scene.game.mode = 'drag';
 
       resetActiveSelection({ scene });
