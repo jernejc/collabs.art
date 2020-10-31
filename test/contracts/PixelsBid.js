@@ -1,9 +1,9 @@
 const expect = require('chai').expect;
 
-const PixelsPurchase = artifacts.require("PixelsPurchase");
+const PixelsBid = artifacts.require("PixelsBid");
 const Pixels = artifacts.require("Pixels");
 
-contract("PixelsPurchase tests", async accounts => {
+contract("PixelsBid tests", async accounts => {
 
   const _color = web3.utils.stringToHex('FFFFFF');
   const _position = '10010';
@@ -12,7 +12,7 @@ contract("PixelsPurchase tests", async accounts => {
   let instance, PixelsContractInstance;
 
   beforeEach(async () => {
-    instance = await PixelsPurchase.deployed();
+    instance = await PixelsBid.deployed();
 
     const PixelsContractAddress = await instance.PixelsContract();
     PixelsContractInstance = await Pixels.at(PixelsContractAddress);

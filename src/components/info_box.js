@@ -37,8 +37,8 @@ export default class InfoBox {
 
     this.wrapper.appendChild(this.arrow);
 
-    this.setColorSelectionUI(this.selection);
-    //this.setOwnershipUI();
+    //this.setColorSelectionUI(this.selection);
+    this.setOwnershipUI();
 
     try {
       this.parent.appendChild(this.wrapper);

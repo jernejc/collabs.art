@@ -54,7 +54,7 @@ export class MainScene extends ApplicationScene {
 
     this.input.mouse.disableContextMenu(); // prevent right click context menu
 
-    moveToPosition({ x: 500, y: 500, scene: this })
+    moveToPosition({ x: 300, y: 400, scene: this })
 
     /** 
      * Mouse Events
@@ -158,16 +158,32 @@ export class MainScene extends ApplicationScene {
   createMinimap() {
 
     const sizeRatio = 5;
+    const margin = 10;
+    const margin2X = margin * 2;
+
+    // Minimap size
     const width = 1000 / sizeRatio;
     const height = 1000 / sizeRatio;
-    const margin = 10;
-    const x = margin;
-    const y = this.appConfig.canvasHeight - (height + margin);
 
-    this.minimapWrapper = this.add.zone(x, y, width, height).setInteractive().setOrigin(0);
+    // Minimap position
+    const x = margin2X;
+    const y = this.appConfig.canvasHeight - (height + margin2X);
+
+    this.minimapWrapper = this.add.zone(x, y, width, height)
+                                  .setInteractive()
+                                  .setOrigin(0)
+                                  .setDepth(3)
+
+    this.minimapBackground = this.add.rectangle(x - margin,
+                                                y - margin, 
+                                                width + margin2X, 
+                                                height + margin2X, Phaser.Display.Color.HexStringToColor('#181a1b').color, 1)
+                                                .setOrigin(0)
+                                                .setDepth(2)
+
     this.minimap = new MinimapScene({
       appConfig: this.appConfig,
-      sceneConfig: {
+      sceneConfig: { 
         gridWidth: this.gridWidth,
         gridHeight: this.gridHeight,
         size: this.size,

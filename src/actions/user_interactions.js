@@ -43,7 +43,10 @@ export function handleMouseDown({ pointer, scene }) {
 
       if (scene.game.selectionManager.rectangleSelection)
         scene.game.selectionManager.clearRectangleSelection();
+      if (scene.game.selectionManager.singleSelection)
+        scene.game.selectionManager.clearSingleSelection()
 
+      scene.game.selectionManager.createSingleSelection({ pointer, scene })
       scene.game.selectionManager.displayInfoBox({ scene });
       break;
     case 'drag':
@@ -175,10 +178,10 @@ export function moveToPosition({ scene, x, y }) {
 export function positionSelectionBlock({ pointer, scene }) {
   if (DEBUG) console.log('User interactions: positionSelectionBlock');
 
-  if (scene.game.selectionManager.singleSelection)
-    scene.game.selectionManager.repositionSingleSelection({ pointer, scene });
+  if (scene.game.selectionManager.highlightSelection)
+    scene.game.selectionManager.repositionHighlightSelection({ pointer, scene });
   else
-    scene.game.selectionManager.createSingleSelection({ pointer, scene });
+    scene.game.selectionManager.createHighlightSelection({ pointer, scene });
 }
 
 // Set scene mode
@@ -187,7 +190,7 @@ export function setGameMode({ scene, mode }) {
 
   switch (mode) {
     case 'move':
-      scene.input.setDefaultCursor('grab');
+      scene.input.setDefaultCursor('grabbing');
       scene.game.mode = 'move';
 
       resetActiveSelection({ scene });

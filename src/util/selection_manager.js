@@ -32,6 +32,36 @@ export default class SelectionManager {
     this.infobox = new InfoBox({ selection: new Selection(selection, this.parent), parent: this.parent, scene });
   }
 
+  createHighlightSelection({ pointer, scene }) {
+    if (DEBUG) console.log('SelectionManager: createHighlightSelection');
+
+    const pixel = getPixelForPointer({ pointer, scene, color: true });
+
+    const X = pixel.tile.x;
+    const Y = pixel.tile.y;
+
+    const invertedColor = invertColor(pixel.color.color, true);
+
+    this.highlightSelection = scene.add.rectangle(X, Y, scene.size, scene.size);
+    this.highlightSelection.setFillStyle(invertedColor.color, 0.15);
+    this.highlightSelection.setDisplayOrigin(0, 0);
+    this.highlightSelection.setDepth(1);
+  }
+
+  repositionHighlightSelection({ pointer, scene }) {
+    if (DEBUG) console.log('SelectionManager: repositionHighlightSelection');
+
+    const pixel = getPixelForPointer({ pointer, scene, color: true });
+
+    const X = pixel.tile.x;
+    const Y = pixel.tile.y;
+
+    const invertedColor = invertColor(pixel.color.color, true);
+
+    this.highlightSelection.setPosition(X, Y);
+    this.highlightSelection.setFillStyle(invertedColor.color, 0.15);
+  }
+
   createSingleSelection({ pointer, scene }) {
     if (DEBUG) console.log('SelectionManager: createSingleSelection');
 
@@ -43,25 +73,9 @@ export default class SelectionManager {
     const invertedColor = invertColor(pixel.color.color, true);
 
     this.singleSelection = scene.add.rectangle(X, Y, scene.size, scene.size);
-    this.singleSelection.setFillStyle(invertedColor.color, 0.15);
     this.singleSelection.setStrokeStyle(1, invertedColor.color, 0.9);
     this.singleSelection.setDisplayOrigin(0, 0);
-    this.singleSelection.setDepth(100);
-  }
-
-  repositionSingleSelection({ pointer, scene }) {
-    if (DEBUG) console.log('SelectionManager: repositionSingleSelection');
-
-    const pixel = getPixelForPointer({ pointer, scene, color: true });
-
-    const X = pixel.tile.x;
-    const Y = pixel.tile.y;
-
-    const invertedColor = invertColor(pixel.color.color, true);
-
-    this.singleSelection.setPosition(X, Y);
-    this.singleSelection.setFillStyle(invertedColor.color, 0.15);
-    this.singleSelection.setStrokeStyle(1, invertedColor.color, 0.9);
+    this.singleSelection.setDepth(1);
   }
 
   createRectangleSelection({ pointer, scene }) {
@@ -106,6 +120,11 @@ export default class SelectionManager {
     this.rectangleSelectionEndPixel = null;
   }
 
+  clearHighlightSelection() {
+    this.highlightSelection.destroy();
+    this.highlightSelection = null;
+  }
+
   clearSingleSelection() {
     this.singleSelection.destroy();
     this.singleSelection = null;
@@ -118,6 +137,9 @@ export default class SelectionManager {
 
   reset() {
     if (DEBUG) console.log('SelectionManager: Reset');
+
+    if (this.highlightSelection)
+      this.clearHighlightSelection();
 
     if (this.singleSelection)
       this.clearSingleSelection();

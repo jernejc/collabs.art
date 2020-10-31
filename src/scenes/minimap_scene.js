@@ -22,7 +22,7 @@ export class MinimapScene extends ApplicationScene {
 
     // Main camera for scene
     this.cameras.main.setViewport(this.sceneConfig.x, this.sceneConfig.y, this.sceneConfig.width, this.sceneConfig.height);
-    this.cameras.main.setBackgroundColor(0x000000);
+    //this.cameras.main.setBackgroundColor(0x000000);
 
     // Visible field box / mask
     this.fieldWidth = (this.appConfig.canvasWidth / this.sceneConfig.size) / this.sceneConfig.sizeRatio // viewport width
@@ -45,7 +45,7 @@ export class MinimapScene extends ApplicationScene {
       Phaser.Display.Color.HexStringToColor('#000000').color
     );
 
-    this.mapoverlay.setAlpha(0.75);
+    this.mapoverlay.setAlpha(0.7);
     this.mapoverlay.mask = new Phaser.Display.Masks.GeometryMask(this, this.visibleField);
     this.mapoverlay.mask.invertAlpha = true;
 
