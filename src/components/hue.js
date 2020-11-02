@@ -87,7 +87,7 @@ export default class Hue extends Controller {
   }
 
   updateDisplay() {
-    /*if (DEBUG)*/ console.log('Hue: updateDisplay', this.object);
+    if (DEBUG) console.log('Hue: updateDisplay', this.object);
 
     const pct = (this.getValue() - this.min) / (this.max - this.min);
 
