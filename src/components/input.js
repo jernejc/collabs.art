@@ -13,8 +13,6 @@ export default class Input extends Controller {
 
     const self = this;
 
-    let prevY;
-
     this.input = document.createElement('input');
 
     if (params.type)
@@ -30,56 +28,21 @@ export default class Input extends Controller {
     this.domElement.classList.add('text-input');
 
     this.input.addEventListener('change', onChange);
-    this.input.addEventListener('blur', onBlur);
     this.input.addEventListener('keydown', e => {
-      if (e.keyCode === 13)
-        onFinish();
+      onChange();
     });
-
-    if (params.mouseevents)
-      this.input.addEventListener('mousedown', onMouseDown);
-
-    this.updateDisplay();
 
     return this.domElement;
 
     // Helpers
 
-    function onChange(value) {
-      if (DEBUG) console.log('onChange', value, self.input.value)
+    function onChange() {
+      /*if (DEBUG)*/ console.log('onChange', self.input.value)
 
-      const attempted = value || parseFloat(self.input.value);
+      const format = self.input.value.replace('#', '')
 
-      if (!isNaN(attempted))
-        self.setValue(attempted);
-    }
-
-    function onFinish() {
-      if (self.onFinishChange)
-        self.onFinishChange.call(self, self.getValue());
-    }
-
-    function onBlur() {
-      onFinish();
-    }
-
-    function onMouseDrag(e) {
-      const diff = prevY - e.clientY;
-      self.setValue(self.getValue() + diff * self.step);
-
-      prevY = e.clientY;
-    }
-
-    function onMouseUp() {
-      window.removeEventListener('mousemove', onMouseDrag);
-      window.removeEventListener('mouseup', onMouseUp);
-      onFinish();
-    }
-
-    function onMouseDown(e) {
-      window.addEventListener('mousemove', onMouseDrag);
-      window.addEventListener('mouseup', onMouseUp);
-      prevY = e.clientY;
+      if (!isNaN(format) && format.length === 6)
+        self.setValue(format);
     }
   }
 

@@ -1,7 +1,7 @@
 
-import ColorPicker from '@components/color_picker';
+import Hue from '@components/hue';
+import Saturation from '@components/saturation';
 import Input from '@components/input';
-import Radio from '@components/radio';
 
 /**
  * InfoBox Class
@@ -37,11 +37,12 @@ export default class InfoBox {
 
     this.wrapper.appendChild(this.arrow);
 
-    //this.setColorSelectionUI(this.selection);
     this.setOwnershipUI();
 
     try {
       this.parent.appendChild(this.wrapper);
+      
+      this.scene.game.emitter.emit('controller/update'); // Update components once everything is in the dom
     } catch (e) {
       return e;
     }
@@ -68,20 +69,6 @@ export default class InfoBox {
     this.ownershipUI = document.createElement('div');
     this.ownershipUI.classList.add('ownership');
 
-    this.ownershipUI.appendChild(new Radio(this.selection.pixel, 'buyoption', {
-      scene: this.scene,
-      options: [{
-        text: 'Buy',
-        value: 'buy',
-        name: 'buyoption'
-      }, {
-        text: 'Rent',
-        value: 'rent',
-        name: 'buyoption'
-      }]
-    }));
-
-    // Hex Input
     this.ownershipUI.appendChild(new Input(this.selection.pixel, 'price', {
       min: 0,
       max: 1,
@@ -100,17 +87,13 @@ export default class InfoBox {
 
     }));
 
-    this.bidnow = document.createElement('button');
+    /*this.bidnow = document.createElement('button');
     this.bidnow.classList.add('bidnow');
     this.bidnow.textContent = 'Bid now!';
 
-    this.ownershipUI.appendChild(this.bidnow);
+    this.ownershipUI.appendChild(this.bidnow);*/
 
     this.wrapper.appendChild(this.ownershipUI);
-  }
-
-  setColorSelectionUI() {
-    if (DEBUG) console.log('Info Box: setColorSelectionUI', this.selection);
 
     this.colorSelectionUI = document.createElement('div');
     this.colorSelectionUI.classList.add('color-selection');
@@ -126,34 +109,16 @@ export default class InfoBox {
       format: (value) => '#' + value.toString(16)
     }))
 
-    // RGB Inputs
-    this.colorSelectionUI.appendChild(new Input(this.selection.pixel, 'color.color.red', {
+    // Hue slider
+    this.colorSelectionUI.appendChild(new Hue(this.selection.pixel, 'color.color.h', {
       min: 0,
-      max: 255,
-      step: 2,
-      label: 'r',
-      width: '33%',
-      scene: this.scene
-    }))
-    this.colorSelectionUI.appendChild(new Input(this.selection.pixel, 'color.color.green', {
-      min: 0,
-      max: 255,
-      step: 2,
-      label: 'g',
-      width: '33%',
-      scene: this.scene
-    }))
-    this.colorSelectionUI.appendChild(new Input(this.selection.pixel, 'color.color.blue', {
-      min: 0,
-      max: 255,
-      step: 2,
-      label: 'b',
-      width: '33%',
+      max: 1,
+      step: 0.001,
       scene: this.scene
     }))
 
-    // Hue slider
-    this.colorSelectionUI.appendChild(new ColorPicker(this.selection.pixel, 'color.color.h', {
+    // Saturation selector
+    this.colorSelectionUI.appendChild(new Saturation(this.selection.pixel, 'color.color.s', {
       min: 0,
       max: 1,
       step: 0.001,

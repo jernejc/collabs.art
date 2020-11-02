@@ -17,8 +17,6 @@ export default class Controller {
 		this.format = params.format;
 
 		this.domElement = document.createElement('div');
-		this.domElement.classList.add('controller');
-		this.domElement.classList.add(this.property.replace(/[^a-zA-Z]/g, ""));
 
 		if (this.width)
 			this.domElement.style.width = this.width;
@@ -43,8 +41,9 @@ export default class Controller {
 		return _.get(this.object, this.property);
 	}
 
-	setValue(v) {
+	setValue(v, property, skip) {
 		let _v = v;
+		let _property = property || this.property;
 
 		if (this.min !== undefined && _v <= this.min)
 			_v = this.min;
@@ -54,12 +53,13 @@ export default class Controller {
 		if (this.step !== undefined && _v % this.step !== 0)
 			_v = Math.round(_v / this.step) * this.step;
 
-		_.set(this.object, this.property, _v);
+		_.set(this.object, _property, _v);
 
-		this.updateDisplay();
+		if (!skip)
+			this.updateDisplay();
 
 		if (this.scene)
-			this.scene.game.emitter.emit('controller/update', this.property);
+			this.scene.game.emitter.emit('controller/update', _property);
 
 		return;
 	}

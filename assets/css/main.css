@@ -211,7 +211,7 @@ Info Box
   margin: 4px auto 0px;
 }
 
-.color-picker {
+.hue {
   cursor: auto;
   height: 15px;
   padding: 0;
@@ -244,10 +244,23 @@ Info Box
   height: 14px;
   border: 2px solid;
   border-radius: 2px;
-  border-top-color: rgb(220, 220, 220);
-  border-right-color: rgb(220, 220, 220);
-  border-bottom-color: rgb(220, 220, 220);
-  border-left-color: rgb(220, 220, 220);
+  border-color: rgb(220, 220, 220);
+}
+
+.palette {
+  margin-top: 5px;
+  width: 100%;
+  min-height: 65px;
+  position: relative;
+}
+
+.paletteshape {
+  position: absolute;
+  height: 6px;
+  width: 6px;
+  border: 2px solid;
+  border-radius: 50%;
+  border-color: rgb(220, 220, 220);
 }
 
 .color-wrap.red .slider-fg {

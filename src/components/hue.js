@@ -1,14 +1,15 @@
 
 import Controller from '@components/controller';
+import { normalize } from '@util/helpers'
 
 /**
- * ColorPicker Class
+ * Hue Class
  */
 
-export default class ColorPicker extends Controller {
+export default class Hue extends Controller {
 
   constructor(object, property, params) {
-    if (DEBUG) console.log('Color Picker: constructor')
+    if (DEBUG) console.log('Hue: constructor')
 
     super(object, property, params);
 
@@ -25,13 +26,11 @@ export default class ColorPicker extends Controller {
     this.rangepointer.classList.add('pointer');
     this.rangeshape.classList.add('shape');
 
-    this.domElement.classList.add('color-picker');
+    this.domElement.classList.add('hue');
 
     this.rangepointer.appendChild(this.rangeshape);
     this.rangetrack.appendChild(this.rangepointer);
     this.domElement.appendChild(this.rangetrack);
-
-    this.updateDisplay();
 
     return this.domElement;
 
@@ -52,7 +51,7 @@ export default class ColorPicker extends Controller {
       const bgRect = self.rangetrack.getBoundingClientRect();
 
       self.setValue(
-        map(e.clientX, bgRect.left, bgRect.right, self.min, self.max)
+        normalize(e.clientX, bgRect.left, bgRect.right, self.min, self.max)
       );
 
       return false;
@@ -77,7 +76,7 @@ export default class ColorPicker extends Controller {
       const bgRect = self.rangetrack.getBoundingClientRect();
 
       self.setValue(
-        map(clientX, bgRect.left, bgRect.right, self.min, self.max)
+        normalize(clientX, bgRect.left, bgRect.right, self.min, self.max)
       );
     }
 
@@ -88,7 +87,7 @@ export default class ColorPicker extends Controller {
   }
 
   updateDisplay() {
-    if (DEBUG) console.log('Color Picker: updateDisplay', this.object);
+    /*if (DEBUG)*/ console.log('Hue: updateDisplay', this.object);
 
     const pct = (this.getValue() - this.min) / (this.max - this.min);
 
@@ -99,8 +98,4 @@ export default class ColorPicker extends Controller {
 
     return super.updateDisplay();
   }
-}
-
-function map(v, i1, i2, o1, o2) {
-  return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
 }

@@ -41,8 +41,6 @@ export default class Radio extends Controller {
 
     this.radioinput.addEventListener('change', onChange);
 
-    this.updateDisplay();
-
     return this.domElement;
 
     function onChange(e) {
