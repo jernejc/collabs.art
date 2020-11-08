@@ -15,6 +15,7 @@ export default class Controller {
 		this.width = params.width;
 		this.scene = params.scene;
 		this.format = params.format;
+		this.onUpdate = params.onUpdate;
 
 		this.domElement = document.createElement('div');
 
@@ -33,6 +34,9 @@ export default class Controller {
 
 				if (this.property !== property)
 					this.updateDisplay();
+
+				if (this.onUpdate)
+					this.onUpdate();
       });
     }
 	}

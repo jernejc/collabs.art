@@ -1,8 +1,6 @@
 import Phaser from 'phaser';
 import { ApplicationScene } from '@scenes/application_scene';
-import { setGameMode, 
-         moveToPosition, 
-         navigateMinimap } from '@actions/user_interactions';
+import { setGameMode } from '@actions/user_interactions';
 
 export class MinimapScene extends ApplicationScene {
   constructor(config, wrapper) {
@@ -17,8 +15,8 @@ export class MinimapScene extends ApplicationScene {
     this.mainscene = this.game.scene.keys["MainScene"];
 
     this.appConfig.canvasWidth / this.sceneConfig.size;
-    this.minimap = this.add.image(this.sceneConfig.width / 2, this.sceneConfig.height / 2, 'worldmap');
-    this.minimap.setDisplaySize(this.sceneConfig.width, this.sceneConfig.height);
+    this.worldmap = this.add.image(this.sceneConfig.width / 2, this.sceneConfig.height / 2, 'worldmap');
+    this.worldmap.setDisplaySize(this.sceneConfig.width, this.sceneConfig.height);
 
     // Main camera for scene
     this.cameras.main.setViewport(this.sceneConfig.x, this.sceneConfig.y, this.sceneConfig.width, this.sceneConfig.height);

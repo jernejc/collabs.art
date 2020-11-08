@@ -22,7 +22,7 @@ export default class Selection {
 
 	get title() {
 		if (this.pixel)
-			return `${numberToLetterColumn(this.pixel.tile.cy)}${this.pixel.tile.cx}`;
+			return `<i class="gg-path-crop"></i>${numberToLetterColumn(this.pixel.tile.cy)}${this.pixel.tile.cx}`;
 		else if (this.start && this.end) 
 			return `<span class="smaller">
 								${numberToLetterColumn(this.start.tile.cy)}${this.start.tile.cx}

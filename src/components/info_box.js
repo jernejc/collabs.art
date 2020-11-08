@@ -2,6 +2,7 @@
 import Hue from '@components/hue';
 import Saturation from '@components/saturation';
 import Input from '@components/input';
+import { setPixel } from '@actions/pixel'
 
 /**
  * InfoBox Class
@@ -15,6 +16,7 @@ export default class InfoBox {
     this.scene = scene;
     this.parent = parent;
     this.selection = selection;
+    this.updateTimeout = null;
 
     this.setupTemplate();
     this.setPosition();
@@ -33,7 +35,7 @@ export default class InfoBox {
     this.wrapper.appendChild(this.position);
 
     this.arrow = document.createElement('i');
-    this.arrow.classList.add('arrow')
+    this.arrow.classList.add('arrow');
 
     this.wrapper.appendChild(this.arrow);
 
@@ -69,7 +71,7 @@ export default class InfoBox {
     this.ownershipUI = document.createElement('div');
     this.ownershipUI.classList.add('ownership');
 
-    this.ownershipUI.appendChild(new Input(this.selection.pixel, 'price', {
+    this.ownershipUI.appendChild(new Input(this.selection.pixel, 'tile.price', {
       min: 0,
       max: 1,
       step: 0.001,
@@ -106,7 +108,15 @@ export default class InfoBox {
       label: 'hex',
       width: '100%',
       scene: this.scene,
-      format: (value) => '#' + value.toString(16)
+      format: (value) => '#' + value.toString(16),
+      onUpdate: () => {
+        if (this.updateTimeout !== null)
+          this.cancelUpdate();
+
+        this.updateTimeout = setTimeout(() => {
+          setPixel({ pixel: this.selection.pixel, scene: this.scene })
+        }, 500);
+      }
     }))
 
     // Hue slider
@@ -133,5 +143,10 @@ export default class InfoBox {
 
     this.scene.game.emitter.off('controller/update');
     this.parent.removeChild(this.wrapper);
+  }
+
+  cancelUpdate() {
+    clearTimeout(this.updateTimeout);
+    this.updateTimeout = null;
   }
 }

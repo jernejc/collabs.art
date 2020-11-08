@@ -23,7 +23,7 @@ export class MainScene extends ApplicationScene {
   }
 
   preload() {
-    this.load.image('worldmap', 'assets/images/place.png');
+    this.load.image('worldimage', 'assets/images/place.png');
   }
 
   create(data) {
@@ -38,13 +38,15 @@ export class MainScene extends ApplicationScene {
     this.gridHeight = this.appConfig.canvasHeight / this.size;
     this.pMax = 1000;
 
-    const src = this.textures.get('worldmap').getSourceImage();
+    const src = this.textures.get('worldimage').getSourceImage();
 
     this.imageWidth = src.width;
     this.imageHeight = src.height;
 
-    this.worldmap = this.textures.createCanvas('map', this.imageWidth, this.imageHeight);
+    this.worldmap = this.textures.createCanvas('worldmap', this.imageWidth, this.imageHeight);
     this.worldmap.draw(0, 0, src);
+
+    console.log('this.worldmap', this.worldmap)
 
     this.createMinimap();
 

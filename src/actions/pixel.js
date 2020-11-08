@@ -15,22 +15,40 @@ export function createPixel({ x, y, scene }) {
 }
 
 export function colorPixel({ x, y, scene }) {
-  //if (DEBUG) console.log('colorPixel')
+  /*if (DEBUG) console.log('colorPixel')*/
   const mapPixel = getColor({ x, y, color: scene.color, scene });
   const tile = scene.land[y][x];
 
   tile.cx = mapPixel.cx;
   tile.cy = mapPixel.cy;
   tile.id = `${mapPixel.cx}x${mapPixel.cy}`;
+  tile.price = Math.random().toFixed(3);
 
   tile.setFillStyle(mapPixel.color.color);
 }
 
+export function setPixel({ pixel, scene }) {
+  console.log("SET pixel", pixel.tile.cx, pixel.tile.cy, pixel.color.color.color);
+
+  scene.worldmap.setPixel(
+    pixel.tile.cx,
+    pixel.tile.cy,
+    pixel.color.color.r,
+    pixel.color.color.g,
+    pixel.color.color.b
+  )
+
+  scene.worldmap.update();
+}
+
 export function getColor({ x, y, color, scene }) {
+  if (DEBUG) console.log('getColor', x, y, color, scene);
+
   color = color || new Phaser.Display.Color();
 
   const { cx, cy } = getRelativePosition({ x, y, scene });
   scene.worldmap.getPixel(cx, cy, color);
+  //console.log('GET pixel', cx, cy, color.color);
 
   return { cx, cy, color };
 }

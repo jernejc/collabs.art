@@ -103,7 +103,7 @@ Info Box
 .info-box {
   position: absolute;
   min-height: 100px;
-  width: 120px;
+  width: 130px;
   background-color: rgb(24, 26, 27);
   color: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -118,6 +118,13 @@ Info Box
   margin: 0 0 7.5px 0;
 }
 
+.info-box .position i {
+  display: inline-block;
+  --ggs: 0.65;
+  top: 1.2px;
+  right: 2px;
+}
+
 .info-box .arrow {
   position: absolute;
 }
@@ -128,7 +135,7 @@ Info Box
 
   width: 0;
   height: 0;
-  border-top: 10px solid red;
+  border-top: 10px solid white;
   border-right: 10px solid transparent;
 }
 
@@ -136,7 +143,7 @@ Info Box
   top: -1px;
   right: -1px;
 
-  border-top: 10px solid red;
+  border-top: 10px solid white;
   border-left: 10px solid transparent;
 }
 
@@ -144,7 +151,7 @@ Info Box
   bottom: -1px;
   left: -1px;
 
-  border-bottom: 10px solid red;
+  border-bottom: 10px solid white;
   border-right: 10px solid transparent;
 }
 
@@ -152,7 +159,7 @@ Info Box
   bottom: -1px;
   right: -1px;
 
-  border-bottom: 10px solid red;
+  border-bottom: 10px solid white;
   border-left: 10px solid transparent;
 }
 
