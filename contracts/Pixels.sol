@@ -10,6 +10,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract Pixels is ERC721, AccessControl {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+
     uint48 public maxPixels;
 
     struct Pixel {
@@ -22,7 +23,9 @@ contract Pixels is ERC721, AccessControl {
     /**
      * @dev Contract Constructor, calls ERC721 constructor and sets name and symbol
      */
-    constructor(uint48 _maxPixels) public ERC721("PixelWorld", "PW") {
+    constructor(uint48 _maxPixels) 
+        public ERC721("PixelWorld", "PW") 
+    {
         require(_maxPixels > 0, "Pixels: Max pixels must be greater than 0");
 
         maxPixels = _maxPixels;
@@ -52,9 +55,7 @@ contract Pixels is ERC721, AccessControl {
             "Pixels: Must be a valid HEX color value"
         );
 
-        Pixel memory p = Pixel({createTime: uint48(now), color: _color});
-
-        pixels[_position] = p;
+        pixels[_position] = Pixel({createTime: uint48(now), color: _color});
 
         _safeMint(_owner, _position);
     }
@@ -63,7 +64,11 @@ contract Pixels is ERC721, AccessControl {
      * @dev Get pixel color
      * @param _position pixel position in the world / id
      */
-    function getColor(uint32 _position) public view returns (bytes6) {
+    function getColor(uint32 _position) 
+        public 
+        view 
+        returns (bytes6) 
+    {
         require(
             exists(_position),
             "Pixels: Make sure position exists before returning color"
@@ -77,7 +82,9 @@ contract Pixels is ERC721, AccessControl {
      * @param _position pixel position in the world / id
      * @param _color pixel HEX color
      */
-    function setColor(uint32 _position, bytes6 _color) public {
+    function setColor(uint32 _position, bytes6 _color) 
+        public 
+    {
         require(
             exists(_position),
             "Pixels: Make sure position exists before setting color"
@@ -98,7 +105,11 @@ contract Pixels is ERC721, AccessControl {
      * @dev expose _exists to the public
      * @param _position pixel position in the world / id
      */
-    function exists(uint32 _position) public view returns (bool) {
+    function exists(uint32 _position) 
+        public 
+        view 
+        returns (bool) 
+    {
         return _exists(_position);
     }
 
@@ -106,7 +117,10 @@ contract Pixels is ERC721, AccessControl {
      * @dev set maxPixels
      * @param _maxPixels new maximum number of pixels
      */
-    function setMaxPixels(uint48 _maxPixels) public onlyAdmin {
+    function setMaxPixels(uint48 _maxPixels) 
+        public 
+        onlyAdmin 
+    {
         require(
             _maxPixels > 0 && _maxPixels > totalSupply(),
             "Pixels: Max pixels must be greater than 0 and total current supply"
@@ -119,7 +133,11 @@ contract Pixels is ERC721, AccessControl {
      * @dev validate hex color - https://ethereum.stackexchange.com/questions/50369/string-validation-solidity-alpha-numeric-and-length
      * @param _color color value to validate
      */
-    function validateColor(bytes6 _color) private pure returns (bool) {
+    function validateColor(bytes6 _color) 
+        private 
+        pure 
+        returns (bool) 
+    {
         for (uint8 i; i < _color.length; i++) {
             bytes1 char = _color[i];
 
@@ -141,7 +159,11 @@ contract Pixels is ERC721, AccessControl {
      * @dev add minter
      * @param _account address to add as the new minter
      */
-    function addMinter(address _account) public virtual onlyAdmin {
+    function addMinter(address _account) 
+        public 
+        virtual 
+        onlyAdmin 
+    {
         grantRole(MINTER_ROLE, _account);
     }
 
@@ -149,7 +171,11 @@ contract Pixels is ERC721, AccessControl {
      * @dev remove minter
      * @param _account address to remove as minter
      */
-    function removeMinter(address _account) public virtual onlyAdmin {
+    function removeMinter(address _account) 
+        public 
+        virtual 
+        onlyAdmin 
+    {
         revokeRole(MINTER_ROLE, _account);
     }
 

@@ -46,8 +46,6 @@ export class MainScene extends ApplicationScene {
     this.worldmap = this.textures.createCanvas('worldmap', this.imageWidth, this.imageHeight);
     this.worldmap.draw(0, 0, src);
 
-    console.log('this.worldmap', this.worldmap)
-
     this.createMinimap();
 
     this.createVisiblePixels();

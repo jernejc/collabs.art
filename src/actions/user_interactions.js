@@ -1,3 +1,4 @@
+import { getRelativePosition } from "./pixel";
 
 // Fired when user moves pointer through the grid
 export function handleMouseMove({ pointer, scene }) {
@@ -74,7 +75,7 @@ export function handleMouseWheel({ scene, dx, dy, dz }) {
 
   const newSize = (dy < 0) ? scene.size + 1 : scene.size - 1;
 
-  if (newSize > 15 && newSize < 35) {
+  if (newSize > 15 && newSize < 35) { // min, max zoom needs to be moved to config
     scene.size = newSize;
     scene.gridWidth = scene.appConfig.canvasWidth / scene.size;
     scene.gridHeight = scene.appConfig.canvasHeight / scene.size;
@@ -125,16 +126,22 @@ export function handleSpaceUp({ scene }) {
 }
 
 export function navigateMinimap({ pointer, scene }) {
-  if (DEBUG) console.log('User interactions: navigateMinimap');
+  if (DEBUG) console.log('User interactions: navigateMinimap', pointer, scene);
 
-  const newX = ((pointer.position.x * scene.sceneConfig.sizeRatio) - scene.sceneConfig.margin) -
-    (scene.fieldWidth * scene.sceneConfig.sizeRatio);
-  const newY = ((pointer.position.y - (scene.appConfig.canvasHeight - scene.sceneConfig.height)) *
-    scene.sceneConfig.sizeRatio - scene.sceneConfig.margin) +
-    ((scene.fieldHeight / 2) * scene.sceneConfig.sizeRatio);
+  const margin = scene.sceneConfig.margin * 2; // we have to use double margin due to black border
+  const fieldWidth = scene.fieldWidth * scene.sceneConfig.sizeRatio;
+  const fieldHeight = scene.fieldHeight * scene.sceneConfig.sizeRatio;
+
+  // Relative X,Y to the minimap
+  const x = pointer.position.x - margin;
+  const y = pointer.position.y - (scene.appConfig.canvasHeight - (scene.sceneConfig.height + margin));
+
+  // Actual X,Y based on the size ratio
+  const cx = (x * scene.sceneConfig.sizeRatio) - (fieldWidth / 2);
+  const cy = (y * scene.sceneConfig.sizeRatio) - (fieldHeight / 2);
 
   resetActiveSelection({ scene });
-  moveToPosition({ scene: scene.mainscene, x: newX, y: newY });
+  moveToPosition({ scene: scene.mainscene, x: cx, y: cy });
 }
 
 export function panDragMap({ pointer, scene }) {
@@ -158,13 +165,13 @@ export function moveToPosition({ scene, x, y }) {
   scene.cameraX = x;
   scene.cameraY = y;
 
-  const maxX = scene.pMax - scene.gridWidth + 1;
+  const maxX = scene.pMax - scene.gridWidth;
   if (scene.cameraX === maxX || scene.cameraX > maxX)
     scene.cameraX = maxX;
   else if (scene.cameraX < 0)
     scene.cameraX = 0;
 
-  const maxY = scene.pMax - scene.gridHeight + 1;
+  const maxY = scene.pMax - scene.gridHeight;
   if (scene.cameraY === maxY || scene.cameraY > maxY)
     scene.cameraY = maxY;
   else if (scene.cameraY < 0)
