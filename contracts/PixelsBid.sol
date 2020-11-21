@@ -28,7 +28,7 @@ contract PixelsBid is Ownable, Pausable {
     uint256 public contractFee;
 
     struct Bid {
-        address bidder;
+        address payable bidder;
         uint32 position;
         uint256 price;
         uint256 expiresAt;
@@ -54,7 +54,8 @@ contract PixelsBid is Ownable, Pausable {
         address _bidder,
         address indexed _seller,
         uint256 _price,
-        uint256 _fee
+        uint256 _fee,
+        uint256 _contractFee
     );
 
     event BidCancelled(
@@ -67,7 +68,7 @@ contract PixelsBid is Ownable, Pausable {
      * @param _pixelsAddress address for Pixels non-fungible token contract
      * @param _defaultPrice initial sales price
      */
-    constructor(address _pixelsAddress, uint256 _defaultPrice, uint8 _contractFee) 
+    constructor(address _pixelsAddress, uint256 _defaultPrice, uint256 _contractFee) 
         public 
     {
         require(
@@ -78,8 +79,14 @@ contract PixelsBid is Ownable, Pausable {
             _pixelsAddress.isContract(),
             "PixelsContract should be a contract"
         );
-        require(_defaultPrice > 0, "PixelsBid: Default price must be greater than 0");
-        require(_contractFee > 0, "PixelsBid: Contract fee must be greater than 0");
+        require(
+            _defaultPrice > 0, 
+            "PixelsBid: Default price must be greater than 0"
+        );
+        require(
+            _contractFee > 0, 
+            "PixelsBid: Contract fee must be greater than 0"
+        );
 
         PixelsContract = Pixels(_pixelsAddress);
         defaultPrice = _defaultPrice;
@@ -142,6 +149,10 @@ contract PixelsBid is Ownable, Pausable {
             "The bid can not last longer than 7 days"
         );
 
+        if (bids[_position].price > 0) { // The pixel has an existing bid, refund it
+            _refundBid(_position);
+        }
+
         uint256 expiresAt = block.timestamp.add(_duration);
 
         bids[_position] = Bid({
@@ -199,10 +210,10 @@ contract PixelsBid is Ownable, Pausable {
             bidder,
             msg.sender,
             tokenOwnerAmout,
+            feeAmount,
             contractFee
         );
     }
-
 
     /**
     * @dev Get current active bid for pixel
@@ -214,7 +225,7 @@ contract PixelsBid is Ownable, Pausable {
     function getBidForPixel(uint32 _position) 
         public 
         view
-        returns (address, uint256, uint256) 
+        returns (address payable, uint256, uint256) 
     {
         require(
             bids[_position].price > 0, // Solidity will return 0 if there is no existing bid
@@ -283,6 +294,23 @@ contract PixelsBid is Ownable, Pausable {
         );
 
         contractFee = _contractFee;
+    }
+
+    /**
+    * @dev Refund bid for pixel
+    * @param _position pixel position
+    */
+    function _refundBid(uint32 _position) 
+        internal
+    {
+        Bid memory existingBid = _getBid(_position);
+
+        address payable bidder = existingBid.bidder;
+        uint256 price = existingBid.price;
+        
+        delete bids[_position];
+
+        bidder.sendValue(price);
     }
 
     /**
