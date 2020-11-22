@@ -46,8 +46,9 @@ contract("PixelsBid tests", async accounts => {
       const contractBalance = await web3.eth.getBalance(instance.address);
       expect(parseInt(contractBalance)).to.equal(_amount);
 
+      // Make sure the default account is the owner
       const owner = await PixelsContractInstance.ownerOf(_position);
-      expect(owner).to.equal(accounts[0]); // make sure the default account is the owner
+      expect(owner).to.equal(accounts[0]);
 
       // Check contract balance
       const afterPurchaseContractBalance = await web3.eth.getBalance(instance.address);

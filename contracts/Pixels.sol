@@ -26,7 +26,10 @@ contract Pixels is ERC721, AccessControl {
     constructor(uint48 _maxPixels) 
         public ERC721("PixelWorld", "PW") 
     {
-        require(_maxPixels > 0, "Pixels: Max pixels must be greater than 0");
+        require(
+            _maxPixels > 0, 
+            "Pixels: Max pixels must be greater than 0"
+        );
 
         maxPixels = _maxPixels;
 
@@ -45,7 +48,10 @@ contract Pixels is ERC721, AccessControl {
         bytes6 _color,
         address _owner
     ) public onlyMinter {
-        require(_position > 0, "Pixels: Position must be provided");
+        require(
+            _position > 0, 
+            "Pixels: Position must be provided"
+        );
         require(
             totalSupply() + 1 <= maxPixels,
             "Pixels: Cannot create more than max amount of pixels"
