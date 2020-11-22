@@ -55,7 +55,10 @@ contract Pixels is ERC721, AccessControl {
             "Pixels: Must be a valid HEX color value"
         );
 
-        pixels[_position] = Pixel({createTime: uint48(now), color: _color});
+        pixels[_position] = Pixel({
+            createTime: uint48(now), 
+            color: _color
+        });
 
         _safeMint(_owner, _position);
     }

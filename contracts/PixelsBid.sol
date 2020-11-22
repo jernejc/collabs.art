@@ -30,7 +30,7 @@ contract PixelsBid is Ownable, Pausable {
     struct Bid {
         address payable bidder;
         uint32 position;
-        uint256 price;
+        uint256 amount;
         uint256 expiresAt;
     }
 
@@ -45,7 +45,7 @@ contract PixelsBid is Ownable, Pausable {
     event BidCreated(
         uint256 indexed _position,
         address indexed _bidder,
-        uint256 _price,
+        uint256 _amount,
         uint256 _expiresAt
     );
 
@@ -53,9 +53,8 @@ contract PixelsBid is Ownable, Pausable {
         uint256 indexed _position,
         address _bidder,
         address indexed _seller,
-        uint256 _price,
-        uint256 _fee,
-        uint256 _contractFee
+        uint256 _amount,
+        uint256 _fee
     );
 
     event BidCancelled(
@@ -119,12 +118,16 @@ contract PixelsBid is Ownable, Pausable {
 
         PixelsContract.createPixel(_position, _color, msg.sender);
 
-        emit Purchase(msg.sender, _position, msg.value);
+        emit Purchase(
+            msg.sender, 
+            _position, 
+            msg.value
+        );
     }
 
     /**
      * @dev Place bid for pixel position
-     * @param _position position for price update
+     * @param _position position the bid is for
      * @param _duration bid duration
      */
     function placeBid(uint32 _position, uint256 _duration) 
@@ -133,7 +136,7 @@ contract PixelsBid is Ownable, Pausable {
         whenNotPaused 
     {
         require(
-            msg.value > bids[_position].price, // Solidity will return 0 if there is no existing bid
+            msg.value > bids[_position].amount, // Solidity will return 0 if there is no existing bid
             "PixelsBid: Bid amount should be greater than 0 or currently highest bid"
         );
         require(
@@ -149,7 +152,7 @@ contract PixelsBid is Ownable, Pausable {
             "The bid can not last longer than 7 days"
         );
 
-        if (bids[_position].price > 0) { // The pixel has an existing bid, refund it
+        if (bids[_position].amount > 0) { // The pixel has an existing bid, refund it
             _refundBid(_position);
         }
 
@@ -158,7 +161,7 @@ contract PixelsBid is Ownable, Pausable {
         bids[_position] = Bid({
             bidder: msg.sender,
             position: _position,
-            price: msg.value,
+            amount: msg.value,
             expiresAt: expiresAt
         });
 
@@ -179,7 +182,7 @@ contract PixelsBid is Ownable, Pausable {
         whenNotPaused
     {
         require(
-            bids[_position].price > 0, // Solidity will return 0 if there is no existing bid
+            bids[_position].amount > 0, // Solidity will return 0 if there is no existing bid
             "PixelsBid: No active bid for given pixel"
         );
 
@@ -195,9 +198,9 @@ contract PixelsBid is Ownable, Pausable {
         );
 
         address bidder = bid.bidder;
-        uint256 price = bid.price;
-        uint256 feeAmount = price.mul(contractFee).div(ONE_MILLION);
-        uint256 tokenOwnerAmout = price.sub(feeAmount);
+        uint256 amount = bid.amount;
+        uint256 feeAmount = amount.mul(contractFee).div(ONE_MILLION);
+        uint256 tokenOwnerAmout = amount.sub(feeAmount);
 
         delete bids[_position];
         
@@ -210,8 +213,7 @@ contract PixelsBid is Ownable, Pausable {
             bidder,
             msg.sender,
             tokenOwnerAmout,
-            feeAmount,
-            contractFee
+            feeAmount
         );
     }
 
@@ -219,7 +221,7 @@ contract PixelsBid is Ownable, Pausable {
     * @dev Get current active bid for pixel
     * @param _position pixel position
     * @return address of the bidder address
-    * @return uint256 of the bid price
+    * @return uint256 of the bid amount
     * @return uint256 of the expiration time
     */
     function getBidForPixel(uint32 _position) 
@@ -228,7 +230,7 @@ contract PixelsBid is Ownable, Pausable {
         returns (address payable, uint256, uint256) 
     {
         require(
-            bids[_position].price > 0, // Solidity will return 0 if there is no existing bid
+            bids[_position].amount > 0, // Solidity will return 0 if there is no existing bid
             "PixelsBid: No active bid for given pixel"
         );
         
@@ -236,7 +238,7 @@ contract PixelsBid is Ownable, Pausable {
 
         return (
             bid.bidder,
-            bid.price,
+            bid.amount,
             bid.expiresAt
         );
     }
@@ -306,11 +308,11 @@ contract PixelsBid is Ownable, Pausable {
         Bid memory existingBid = _getBid(_position);
 
         address payable bidder = existingBid.bidder;
-        uint256 price = existingBid.price;
+        uint256 amount = existingBid.amount;
         
         delete bids[_position];
 
-        bidder.sendValue(price);
+        bidder.sendValue(amount);
     }
 
     /**
