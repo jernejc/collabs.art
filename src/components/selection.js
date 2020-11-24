@@ -20,9 +20,13 @@ export default class Selection {
 		this.buyoption = 'buy';
 	}
 
+	get position() {
+		return numberToLetterColumn(this.pixel.tile.cy) + this.pixel.tile.cx;
+	}
+
 	get title() {
 		if (this.pixel)
-			return `<i class="gg-path-crop"></i>${numberToLetterColumn(this.pixel.tile.cy)}${this.pixel.tile.cx}`;
+			return `<i class="gg-path-crop"></i>${this.position}`;
 		else if (this.start && this.end) 
 			return `<span class="smaller">
 								${numberToLetterColumn(this.start.tile.cy)}${this.start.tile.cx}

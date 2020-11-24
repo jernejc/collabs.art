@@ -2,7 +2,7 @@
 import Hue from '@components/hue';
 import Saturation from '@components/saturation';
 import Input from '@components/input';
-import { setPixel } from '@actions/pixel'
+import { setPixel, buyPixel } from '@actions/pixel'
 
 /**
  * InfoBox Class
@@ -89,11 +89,21 @@ export default class InfoBox {
 
     }));
 
-    /*this.bidnow = document.createElement('button');
-    this.bidnow.classList.add('bidnow');
-    this.bidnow.textContent = 'Bid now!';
+    /*this.freeText = document.createElement('div');
+    this.freeText.classList.add('text');
+    this.freeText.textContent = 'Pixel is free';
 
-    this.ownershipUI.appendChild(this.bidnow);*/
+    this.ownershipUI.appendChild(this.freeText);*/
+
+    this.buy = document.createElement('button');
+    this.buy.classList.add('bidnow');
+    this.buy.textContent = 'Create';
+
+    this.buy.addEventListener('click', async e => {
+      await buyPixel({  scene: this.scene, position: this.selection.position, color: 'ffffff' });
+    });
+
+    this.ownershipUI.appendChild(this.buy);
 
     this.wrapper.appendChild(this.ownershipUI);
 
@@ -101,7 +111,7 @@ export default class InfoBox {
     this.colorSelectionUI.classList.add('color-selection');
 
     // Hex Input
-    this.colorSelectionUI.appendChild(new Input(this.selection.pixel, 'color.color.color', {
+    /*this.colorSelectionUI.appendChild(new Input(this.selection.pixel, 'color.color.color', {
       min: 0,
       max: 255,
       step: 2,
@@ -135,7 +145,7 @@ export default class InfoBox {
       scene: this.scene
     }))
 
-    this.wrapper.appendChild(this.colorSelectionUI);
+    this.wrapper.appendChild(this.colorSelectionUI);*/
   }
 
   destroy() {

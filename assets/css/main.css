@@ -102,8 +102,8 @@ Info Box
 
 .info-box {
   position: absolute;
-  min-height: 100px;
-  width: 130px;
+  min-height: 60px;
+  width: 100px;
   background-color: rgb(24, 26, 27);
   color: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -338,6 +338,6 @@ Info Box
   line-height: 25px;
   font-family: inherit;
   width: 100%;
-  background: rgb(0, 235, 0);
+  background:rgba(255, 255, 255, 0.9);
   cursor: pointer;
 }

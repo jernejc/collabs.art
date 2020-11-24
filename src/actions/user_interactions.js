@@ -20,8 +20,8 @@ export function handleMouseMove({ pointer, scene }) {
       if (pointer.button === 2) // Ignore right click
         return;
 
-      if (pointer.isDown && scene.game.selectionManager.rectangleSelection)
-        scene.game.selectionManager.resizeRectangleSelection({ pointer, scene });
+      if (pointer.isDown && scene.game.selection.rectangleSelection)
+        scene.game.selection.resizeRectangleSelection({ pointer, scene });
 
       break;
     case 'mininav':
@@ -42,20 +42,20 @@ export function handleMouseDown({ pointer, scene }) {
         return;
       }
 
-      if (scene.game.selectionManager.rectangleSelection)
-        scene.game.selectionManager.clearRectangleSelection();
-      if (scene.game.selectionManager.singleSelection)
-        scene.game.selectionManager.clearSingleSelection()
+      if (scene.game.selection.rectangleSelection)
+        scene.game.selection.clearRectangleSelection();
+      if (scene.game.selection.singleSelection)
+        scene.game.selection.clearSingleSelection()
 
-      scene.game.selectionManager.createSingleSelection({ pointer, scene })
-      scene.game.selectionManager.displayInfoBox({ scene });
+      scene.game.selection.createSingleSelection({ pointer, scene })
+      scene.game.selection.displayInfoBox({ scene });
       break;
     case 'drag':
 
       if (pointer.button === 2) // Ignore right click
         return;
 
-      scene.game.selectionManager.createRectangleSelection({ pointer, scene });
+      scene.game.selection.createRectangleSelection({ pointer, scene });
       break;
     case 'mininav':
       navigateMinimap({ pointer, scene: scene.minimap })
@@ -66,8 +66,8 @@ export function handleMouseDown({ pointer, scene }) {
 export function handleMouseUp({ pointer, scene }) {
   if (DEBUG) console.log('User interactions: handleMouseUp');
 
-  if (scene.game.selectionManager.rectangleSelection)
-    scene.game.selectionManager.displayInfoBox({ scene });
+  if (scene.game.selection.rectangleSelection)
+    scene.game.selection.displayInfoBox({ scene });
 }
 
 export function handleMouseWheel({ scene, dx, dy, dz }) {
@@ -185,10 +185,10 @@ export function moveToPosition({ scene, x, y }) {
 export function positionSelectionBlock({ pointer, scene }) {
   if (DEBUG) console.log('User interactions: positionSelectionBlock');
 
-  if (scene.game.selectionManager.highlightSelection)
-    scene.game.selectionManager.repositionHighlightSelection({ pointer, scene });
+  if (scene.game.selection.highlightSelection)
+    scene.game.selection.repositionHighlightSelection({ pointer, scene });
   else
-    scene.game.selectionManager.createHighlightSelection({ pointer, scene });
+    scene.game.selection.createHighlightSelection({ pointer, scene });
 }
 
 // Set scene mode
@@ -227,7 +227,7 @@ export function setGameMode({ scene, mode }) {
 }
 
 export function resetActiveSelection({ scene }) {
-  scene.game.selectionManager.reset();
+  scene.game.selection.reset();
 }
 
 export function generalResetStrokeStyle({ scene, size }) {

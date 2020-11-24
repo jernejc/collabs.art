@@ -14,6 +14,14 @@ export function createPixel({ x, y, scene }) {
   return tile;
 }
 
+export async function buyPixel({ scene, position, color }) {
+  console.log('buyPixel position, color', position, color, scene.game.web3);
+  const accounts = await scene.game.web3.instance.eth.getAccounts();
+  console.log('ETH Accounts', accounts);
+  await scene.game.web3.bidContract.methods.purchase(position, color).send();
+}
+
+
 export function colorPixel({ x, y, scene }) {
   /*if (DEBUG) console.log('colorPixel')*/
   const mapPixel = getColor({ x, y, color: scene.color, scene });

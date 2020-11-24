@@ -2,8 +2,8 @@
 import Phaser from 'phaser';
 
 import { createPixel, colorPixel } from '@actions/pixel';
-import { ApplicationScene } from '@scenes/application_scene';
-import { MinimapScene } from '@scenes/minimap_scene';
+import ApplicationScene from '@scenes/application_scene';
+import MinimapScene from '@scenes/minimap_scene';
 import {
   handleMouseMove,
   handleMouseDown,
@@ -17,7 +17,7 @@ import {
   moveToPosition
 } from '@actions/user_interactions';
 
-export class MainScene extends ApplicationScene {
+export default class MainScene extends ApplicationScene {
   constructor() {
     super({ key: 'MainScene', active: true });
   }

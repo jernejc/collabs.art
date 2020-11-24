@@ -1,5 +1,8 @@
 import { Events, Game, WEBGL } from 'phaser';
-import { MainScene } from '@scenes/main_scene';
+
+import MainScene from '@scenes/main_scene';
+import Web3Manager from '@util/web3_manager';
+import SelectionManager from '@util/selection_manager';
 
 export function AppInitializer({
   canvasElement,
@@ -29,8 +32,13 @@ export function AppInitializer({
     strokeColor,
     strokeSize
   }
+
   GameInstance.scene.add('MainScene', MainScene, true, {});
-  //Game.scene.add('MinimapScene', MinimapScene, true, {});
+
+  // Init Web3 Manager
+  GameInstance.web3 = new Web3Manager();
+  // Init Selection Manager
+  GameInstance.selection = new SelectionManager(GameInstance);
 
   return { GameInstance, Emitter };
 }

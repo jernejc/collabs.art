@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
 
-export class ApplicationScene extends Phaser.Scene {
+export default class ApplicationScene extends Phaser.Scene {
   constructor(options = undefined) {
     super(options);
   }
