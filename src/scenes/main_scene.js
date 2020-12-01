@@ -64,8 +64,8 @@ export default class MainScene extends ApplicationScene {
       handleMouseMove({ pointer, scene: this });
     });
 
-    this.input.on('pointerdown', (pointer) => {
-      handleMouseDown({ pointer, scene: this });
+    this.input.on('pointerdown', async (pointer) => {
+      await handleMouseDown({ pointer, scene: this });
     });
 
     this.input.on('pointerup', (pointer) => {

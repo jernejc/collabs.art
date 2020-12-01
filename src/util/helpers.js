@@ -1,4 +1,6 @@
 
+import web3 from 'web3';
+
 // https://stackoverflow.com/questions/9905533/convert-excel-column-alphabet-e-g-aa-to-number-e-g-25
 export function letterToNumberColumn(columnLetter) {
   let base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', i, j, columnNumber = 0;
@@ -25,4 +27,9 @@ export function numberToLetterColumn(columnNumber){
 // Normalize beetwen min, max
 export function normalize(v, i1, i2, o1, o2) {
   return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
+}
+
+// Convert string to BigNumber, should be fine for short strings
+export function stringToBN(string) {
+  return web3.utils.toBN(web3.utils.stringToHex(string)).toNumber(); // There has to be another way of doing this
 }

@@ -5,7 +5,7 @@ export default class Selection {
 
 	constructor(pixels, parent) {
 
-		this.pixels = pixels;
+		this.pixels = pixels; // Might have to support multiple pixels in the future
 		
 		this.start = this.pixels[0]
 		this.end = this.pixels[1] || null;

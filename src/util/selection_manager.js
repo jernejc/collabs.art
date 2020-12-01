@@ -13,7 +13,7 @@ export default class SelectionManager {
     this.parent = document.body.querySelector('#game');
   }
 
-  displayInfoBox({ scene }) {
+  async displayInfoBox({ scene }) {
     if (DEBUG) console.log('SelectionManager: displayInfoBox');
 
     let selection;
@@ -30,6 +30,7 @@ export default class SelectionManager {
       this.clearInfoBox();
 
     this.infobox = new InfoBox({ selection: new Selection(selection, this.parent), parent: this.parent, scene });
+    await this.infobox.init();
   }
 
   createHighlightSelection({ pointer, scene }) {

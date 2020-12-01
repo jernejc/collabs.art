@@ -1,4 +1,6 @@
 build
 node_modules
 dist
+src/dapp-config.json
 .vscode
+.secret

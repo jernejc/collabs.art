@@ -18,11 +18,11 @@
  *
  */
 
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
-// const infuraKey = "fj4jll3k.....";
-//
-// const fs = require('fs');
-// const mnemonic = fs.readFileSync(".secret").toString().trim();
+const HDWalletProvider = require('@truffle/hdwallet-provider');
+
+const fs = require('fs');
+const mnemonic = fs.readFileSync('.secret').toString().trim();
+const mumbaiURL = 'https://rpc-mumbai.matic.today';
 
 module.exports = {
   /**
@@ -42,11 +42,24 @@ module.exports = {
     // tab if you use this network and you must also set the `host`, `port` and `network_id`
     // options below to some value.
     //
+
     development: {
-     host: "127.0.0.1",     // Localhost (default: none)
-     port: 8545,            // Standard Ethereum port (default: none)
-     network_id: "*",       // Any network (default: none)
+      url: 'http://127.0.0.1:8545',
+      host: '127.0.0.1',     // Localhost (default: none)
+      port: 8545,            // Standard Ethereum port (default: none)
+      network_id: '*',       // Any network (default: none)
     },
+
+    maticTestnet: {
+      url: mumbaiURL,
+      provider: () => new HDWalletProvider(mnemonic, mumbaiURL),
+      network_id: 80001,
+      addressIndex: 1,
+      confirmations: 2,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    }
+
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port
@@ -83,14 +96,14 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      version: "0.6.2",    // Fetch exact version from solc-bin (default: truffle's version)
-      // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
+      version: '0.6.2',    // Fetch exact version from solc-bin (default: truffle's version)
+      // docker: true,        // Use '0.5.1' you've installed locally with docker (default: false)
       // settings: {          // See the solidity docs for advice about optimization and evmVersion
       //  optimizer: {
       //    enabled: false,
       //    runs: 200
       //  },
-      //  evmVersion: "byzantium"
+      //  evmVersion: 'byzantium'
       // }
     },
   },

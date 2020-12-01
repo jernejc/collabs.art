@@ -102,7 +102,7 @@ Info Box
 
 .info-box {
   position: absolute;
-  min-height: 60px;
+  min-height: 80px;
   width: 100px;
   background-color: rgb(24, 26, 27);
   color: rgba(255, 255, 255, 0.9);
@@ -161,6 +161,10 @@ Info Box
 
   border-bottom: 10px solid white;
   border-left: 10px solid transparent;
+}
+
+.info-box .loadingbar {
+  margin: 30px auto;
 }
 
 .info-box .smaller {
@@ -257,7 +261,7 @@ Info Box
 .palette {
   margin-top: 5px;
   width: 100%;
-  min-height: 65px;
+  min-height: 45px;
   position: relative;
 }
 

@@ -1,6 +1,9 @@
 
+import { stringToBN } from '@util/helpers';
+
 export function createPixel({ x, y, scene }) {
-  //if (DEBUG) console.log('createPixel',x,y)
+  if (DEBUG) console.log('createPixel', x, y);
+
   const tx = scene.size * x;
   const ty = scene.size * y;
   //if (DEBUG) console.log('tx ty', tx, ty)
@@ -15,15 +18,27 @@ export function createPixel({ x, y, scene }) {
 }
 
 export async function buyPixel({ scene, position, color }) {
-  console.log('buyPixel position, color', position, color, scene.game.web3);
-  const accounts = await scene.game.web3.instance.eth.getAccounts();
-  console.log('ETH Accounts', accounts);
-  await scene.game.web3.bidContract.methods.purchase(position, color).send();
+  console.log('buyPixel', position, color);
+
+  try {
+    const accounts = await scene.game.web3.getAccounts();
+
+    await scene.game.web3.bidContract.methods.purchase(
+      stringToBN(position), // pixel position
+      scene.game.web3.instance.utils.stringToHex("FFFFFF") // pixel color
+    ).send({ 
+      from: accounts[0], 
+      gas: 300000, 
+      value: web3.toWei(0.01, "ether") 
+    });
+  } catch (error) {
+    console.error('Purchase pixel error', error)
+  }
 }
 
-
 export function colorPixel({ x, y, scene }) {
-  /*if (DEBUG) console.log('colorPixel')*/
+  if (DEBUG) console.log('colorPixel')
+
   const mapPixel = getColor({ x, y, color: scene.color, scene });
   const tile = scene.land[y][x];
 

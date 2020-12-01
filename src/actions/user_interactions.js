@@ -31,7 +31,7 @@ export function handleMouseMove({ pointer, scene }) {
   }
 }
 
-export function handleMouseDown({ pointer, scene }) {
+export async function handleMouseDown({ pointer, scene }) {
   if (DEBUG) console.log('User interactions: handleMouseDown')
 
   switch (scene.game.mode) {
@@ -48,7 +48,7 @@ export function handleMouseDown({ pointer, scene }) {
         scene.game.selection.clearSingleSelection()
 
       scene.game.selection.createSingleSelection({ pointer, scene })
-      scene.game.selection.displayInfoBox({ scene });
+      await scene.game.selection.displayInfoBox({ scene });
       break;
     case 'drag':
 

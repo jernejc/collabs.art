@@ -18,7 +18,7 @@ contract Pixels is ERC721, AccessControl {
         bytes6 color;
     }
 
-    mapping(uint32 => Pixel) public pixels;
+    mapping(uint128 => Pixel) public pixels;
 
     /**
      * @dev Contract Constructor, calls ERC721 constructor and sets name and symbol
@@ -44,7 +44,7 @@ contract Pixels is ERC721, AccessControl {
      * @param _owner owner of the newly created pixel
      */
     function createPixel(
-        uint32 _position,
+        uint128 _position,
         bytes6 _color,
         address _owner
     ) public onlyMinter {
@@ -73,7 +73,7 @@ contract Pixels is ERC721, AccessControl {
      * @dev Get pixel color
      * @param _position pixel position in the world / id
      */
-    function getColor(uint32 _position) 
+    function getColor(uint128 _position) 
         public 
         view 
         returns (bytes6) 
@@ -91,7 +91,7 @@ contract Pixels is ERC721, AccessControl {
      * @param _position pixel position in the world / id
      * @param _color pixel HEX color
      */
-    function setColor(uint32 _position, bytes6 _color) 
+    function setColor(uint128 _position, bytes6 _color) 
         public 
     {
         require(
@@ -114,7 +114,7 @@ contract Pixels is ERC721, AccessControl {
      * @dev expose _exists to the public
      * @param _position pixel position in the world / id
      */
-    function exists(uint32 _position) 
+    function exists(uint128 _position) 
         public 
         view 
         returns (bool) 

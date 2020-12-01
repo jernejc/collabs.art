@@ -29,28 +29,28 @@ contract PixelsBid is Ownable, Pausable {
 
     struct Bid {
         address payable bidder;
-        uint32 position;
+        uint128 position;
         uint256 amount;
         uint256 expiresAt;
     }
 
-    mapping(uint32 => Bid) public bids;
+    mapping(uint128 => Bid) public bids;
 
     event Purchase(
         address indexed _payer, 
-        uint32 _position, 
+        uint128 _position, 
         uint256 _amount
     );
 
     event BidCreated(
-        uint256 indexed _position,
+        uint128 indexed _position,
         address indexed _bidder,
         uint256 _amount,
         uint256 _expiresAt
     );
 
     event BidAccepted(
-        uint256 indexed _position,
+        uint128 indexed _position,
         address _bidder,
         address indexed _seller,
         uint256 _amount,
@@ -58,7 +58,7 @@ contract PixelsBid is Ownable, Pausable {
     );
 
     event BidCancelled(
-        uint256 indexed _position, 
+        uint128 indexed _position, 
         address indexed _bidder
     );
 
@@ -98,7 +98,7 @@ contract PixelsBid is Ownable, Pausable {
      * @param _position string pixel position
      * @param _color pixel HEX color
      */
-    function purchase(uint32 _position, bytes6 _color)
+    function purchase(uint128 _position, bytes6 _color)
         public
         payable
         whenNotPaused
@@ -130,7 +130,7 @@ contract PixelsBid is Ownable, Pausable {
      * @param _position position the bid is for
      * @param _duration bid duration
      */
-    function placeBid(uint32 _position, uint256 _duration) 
+    function placeBid(uint128 _position, uint256 _duration) 
         public 
         payable 
         whenNotPaused 
@@ -177,7 +177,7 @@ contract PixelsBid is Ownable, Pausable {
     * @dev Used as the only way to accept a bid.
     * @param _position pixel position
     */
-    function acceptBid(uint32 _position)
+    function acceptBid(uint128 _position)
         public
         whenNotPaused
     {
@@ -224,7 +224,7 @@ contract PixelsBid is Ownable, Pausable {
     * @return uint256 of the bid amount
     * @return uint256 of the expiration time
     */
-    function getBidForPixel(uint32 _position) 
+    function getBidForPixel(uint128 _position) 
         public 
         view
         returns (address payable, uint256, uint256) 
@@ -302,7 +302,7 @@ contract PixelsBid is Ownable, Pausable {
     * @dev Refund bid for pixel
     * @param _position pixel position
     */
-    function _refundBid(uint32 _position) 
+    function _refundBid(uint128 _position) 
         internal
     {
         Bid memory existingBid = _getBid(_position);
@@ -320,7 +320,7 @@ contract PixelsBid is Ownable, Pausable {
     * @param _position - pixel position
     * @return Bid
     */
-    function _getBid(uint32 _position) 
+    function _getBid(uint128 _position) 
         internal 
         view 
         returns (Bid memory)

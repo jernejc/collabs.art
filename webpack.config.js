@@ -10,7 +10,7 @@ const config = {
   target: 'web',
   entry: {
     app: './src/index.js',
-    vendors: ['phaser']
+    vendors: ['phaser','web3']
   },
 
   module: {

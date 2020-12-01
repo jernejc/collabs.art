@@ -2,7 +2,7 @@
 import Hue from '@components/hue';
 import Saturation from '@components/saturation';
 import Input from '@components/input';
-import { setPixel, buyPixel } from '@actions/pixel'
+import { setPixel, buyPixel } from '@actions/pixel';
 
 /**
  * InfoBox Class
@@ -22,8 +22,14 @@ export default class InfoBox {
     this.setPosition();
   }
 
+  async init() {
+    this.owner = await this.scene.game.web3.ownerOf(this.selection.position);
+    this.defaultAddress = await this.scene.game.web3.currentDefaultAddress();
+    this.setUI();
+  }
+
   setupTemplate() {
-    if (DEBUG) console.log('Info Box:  Setup template');
+    if (DEBUG) console.log('Info Box: Setup template');
 
     this.wrapper = document.createElement('div');
     this.wrapper.classList.add('info-box');
@@ -39,39 +45,49 @@ export default class InfoBox {
 
     this.wrapper.appendChild(this.arrow);
 
-    this.setOwnershipUI();
+    this.loadingIcon = document.createElement('i');
+    this.loadingIcon.classList.add('gg-loadbar-alt', 'loadingbar');
 
-    try {
-      this.parent.appendChild(this.wrapper);
-      
-      this.scene.game.emitter.emit('controller/update'); // Update components once everything is in the dom
-    } catch (e) {
-      return e;
-    }
+    this.wrapper.appendChild(this.loadingIcon);
+
+    this.parent.appendChild(this.wrapper);
+  }
+
+  setUI() {
+    if (DEBUG) console.log('Info Box: setUI');
+
+    this.wrapper.removeChild(this.loadingIcon);
+
+    if (this.defaultAddress === this.owner)
+      this.createColorUI();
+    else
+      this.createPurchaseUI();
+
+    this.scene.game.emitter.emit('controller/update'); // Update components once everything is in the dom
+    this.setPosition();
   }
 
   setPosition() {
     if (DEBUG) console.log('Info Box: setPosition')
 
     const padding = 2;
-    const vertical = (this.selection.y > (this.parent.offsetHeight / 2)) ?  'bottom' : 'top'
-    const horizontal = (this.selection.x > (this.parent.offsetWidth / 2)) ?  'right': 'left'
+    const vertical = (this.selection.y > (this.parent.offsetHeight / 2)) ? 'bottom' : 'top'
+    const horizontal = (this.selection.x > (this.parent.offsetWidth / 2)) ? 'right' : 'left'
     //const animationClass = (vertical === 'up') ? 'fadeInUp' : 'fadeInDown'
     const top = (vertical === 'bottom') ? this.selection.y - this.wrapper.offsetHeight - padding : this.selection.y + this.scene.size + padding
     const left = (horizontal === 'right') ? this.selection.x - this.wrapper.offsetWidth - padding : this.selection.x + this.scene.size + padding
 
     Object.assign(this.wrapper.style, { top: top + 'px', left: left + 'px' });
     this.wrapper.classList.add(vertical, horizontal);
-
   }
 
-  setOwnershipUI() {
-    if (DEBUG) console.log('Info Box: setOwnershipUI', this.selection);
+  createPurchaseUI() {
+    if (DEBUG) console.log('Info Box: createPurchaseUI');
 
-    this.ownershipUI = document.createElement('div');
-    this.ownershipUI.classList.add('ownership');
+    this.purchaseUI = document.createElement('div');
+    this.purchaseUI.classList.add('ownership');
 
-    this.ownershipUI.appendChild(new Input(this.selection.pixel, 'tile.price', {
+    this.priceinput = new Input(this.selection.pixel, 'tile.price', {
       min: 0,
       max: 1,
       step: 0.001,
@@ -87,31 +103,31 @@ export default class InfoBox {
           return _v + ' ETH'
       }
 
-    }));
+    });
 
-    /*this.freeText = document.createElement('div');
-    this.freeText.classList.add('text');
-    this.freeText.textContent = 'Pixel is free';
-
-    this.ownershipUI.appendChild(this.freeText);*/
+    this.purchaseUI.appendChild(this.priceinput);
 
     this.buy = document.createElement('button');
     this.buy.classList.add('bidnow');
     this.buy.textContent = 'Create';
 
     this.buy.addEventListener('click', async e => {
-      await buyPixel({  scene: this.scene, position: this.selection.position, color: 'ffffff' });
+      await buyPixel({ scene: this.scene, position: this.selection.position, color: 'ffffff' });
     });
 
-    this.ownershipUI.appendChild(this.buy);
+    this.purchaseUI.appendChild(this.buy);
 
-    this.wrapper.appendChild(this.ownershipUI);
+    this.wrapper.appendChild(this.purchaseUI);
+  }
+
+  createColorUI() {
+    if (DEBUG) console.log('Info Box: createColorUI', this.selection);
 
     this.colorSelectionUI = document.createElement('div');
     this.colorSelectionUI.classList.add('color-selection');
 
     // Hex Input
-    /*this.colorSelectionUI.appendChild(new Input(this.selection.pixel, 'color.color.color', {
+    this.hexInput = new Input(this.selection.pixel, 'color.color.color', {
       min: 0,
       max: 255,
       step: 2,
@@ -127,29 +143,32 @@ export default class InfoBox {
           setPixel({ pixel: this.selection.pixel, scene: this.scene })
         }, 500);
       }
-    }))
+    })
+    this.colorSelectionUI.appendChild(this.hexInput);
 
     // Hue slider
-    this.colorSelectionUI.appendChild(new Hue(this.selection.pixel, 'color.color.h', {
+    this.hueInput = new Hue(this.selection.pixel, 'color.color.h', {
       min: 0,
       max: 1,
       step: 0.001,
       scene: this.scene
-    }))
+    })
+    this.colorSelectionUI.appendChild(this.hueInput);
 
     // Saturation selector
-    this.colorSelectionUI.appendChild(new Saturation(this.selection.pixel, 'color.color.s', {
+    this.saturationInput = new Saturation(this.selection.pixel, 'color.color.s', {
       min: 0,
       max: 1,
       step: 0.001,
       scene: this.scene
-    }))
+    });
+    this.colorSelectionUI.appendChild(this.saturationInput);
 
-    this.wrapper.appendChild(this.colorSelectionUI);*/
+    this.wrapper.appendChild(this.colorSelectionUI);
   }
 
   destroy() {
-    if (DEBUG) console.log('Info box destroy');
+    if (DEBUG) console.log('Info box: destroy');
 
     this.scene.game.emitter.off('controller/update');
     this.parent.removeChild(this.wrapper);
