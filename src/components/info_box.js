@@ -3,6 +3,7 @@ import Hue from '@components/hue';
 import Saturation from '@components/saturation';
 import Input from '@components/input';
 import { setPixel, buyPixel } from '@actions/pixel';
+import Button from './button';
 
 /**
  * InfoBox Class
@@ -23,9 +24,8 @@ export default class InfoBox {
   }
 
   async init() {
-    this.owner = await this.scene.game.web3.ownerOf(this.selection.position);
     this.defaultAddress = await this.scene.game.web3.currentDefaultAddress();
-    this.setUI();
+    await this.setUI();
   }
 
   setupTemplate() {
@@ -53,8 +53,10 @@ export default class InfoBox {
     this.parent.appendChild(this.wrapper);
   }
 
-  setUI() {
+  async setUI() {
     if (DEBUG) console.log('Info Box: setUI');
+
+    this.owner = await this.scene.game.web3.ownerOf(this.selection.position);
 
     this.wrapper.removeChild(this.loadingIcon);
 
@@ -107,16 +109,25 @@ export default class InfoBox {
 
     this.purchaseUI.appendChild(this.priceinput);
 
-    this.buy = document.createElement('button');
-    this.buy.classList.add('bidnow');
-    this.buy.textContent = 'Create';
-
-    this.buy.addEventListener('click', async e => {
-      await buyPixel({ scene: this.scene, position: this.selection.position, color: 'ffffff' });
+    this.buy = new Button({
+      elClass: 'create', 
+      text: 'Create', 
+      clickAction: async e => {
+        console.log('clickAction');
+        
+        try {
+          await buyPixel({ scene: this.scene, position: this.selection.position, color: 'ffffff' });
+          this.wrapper.removeChild(this.purchaseUI);
+          this.wrapper.appendChild(this.loadingIcon);
+          await this.setUI();
+        } catch (error) {
+          console.error('Buy pixel failed: ' + error);
+        }
+        
+      }
     });
 
     this.purchaseUI.appendChild(this.buy);
-
     this.wrapper.appendChild(this.purchaseUI);
   }
 

@@ -22,8 +22,6 @@ export default class Web3Manager {
       new Web3.providers.HttpProvider(config.provider.http)
     );
 
-    console.log('http provider', config.provider.http)
-
     this.initContracts();
   }
 
