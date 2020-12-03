@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-import ApplicationScene from '@scenes/application_scene';
+import ApplicationScene from '@scenes/application';
 import { setGameMode } from '@actions/user_interactions';
 
 export default class MinimapScene extends ApplicationScene {

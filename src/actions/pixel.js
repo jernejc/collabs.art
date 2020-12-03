@@ -1,4 +1,6 @@
 
+import Web3 from 'web3';
+
 import { stringToBN } from '@util/helpers';
 
 export function createPixel({ x, y, scene }) {
@@ -17,19 +19,19 @@ export function createPixel({ x, y, scene }) {
   return tile;
 }
 
-export async function buyPixel({ scene, position, color }) {
-  console.log('buyPixel', position, color);
+export async function buyPixel({ scene, selection, color }) {
+  console.log('buyPixel', selection, color);
 
   try {
-    const accounts = await scene.game.web3.getAccounts();
+    const defaultAccount = await this.scene.game.web3.currentDefaultAddress();
 
     await scene.game.web3.bidContract.methods.purchase(
-      stringToBN(position), // pixel position
-      scene.game.web3.instance.utils.stringToHex("FFFFFF") // pixel color
+      stringToBN(selection.position), // pixel position
+      Web3.utils.stringToHex("FFFFFF") // pixel color
     ).send({ 
-      from: accounts[0], 
-      gas: 300000, 
-      value: web3.toWei(0.01, "ether") 
+      from: defaultAccount, 
+      gas: 200000, 
+      value: Web3.utils.toWei(selection.price, "ether") 
     });
   } catch (error) {
     console.error('Purchase pixel error', error)

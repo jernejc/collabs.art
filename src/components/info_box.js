@@ -57,6 +57,7 @@ export default class InfoBox {
     if (DEBUG) console.log('Info Box: setUI');
 
     this.owner = await this.scene.game.web3.ownerOf(this.selection.position);
+    this.selection.price = await this.scene.game.web3.getDefaultPrice(); // Check for latest bid also
 
     this.wrapper.removeChild(this.loadingIcon);
 
@@ -89,22 +90,14 @@ export default class InfoBox {
     this.purchaseUI = document.createElement('div');
     this.purchaseUI.classList.add('ownership');
 
-    this.priceinput = new Input(this.selection.pixel, 'tile.price', {
+    this.priceinput = new Input(this.selection, 'price', {
       min: 0,
       max: 1,
       step: 0.001,
       label: 'price',
       width: '100%',
       scene: this.scene,
-      format: (value) => {
-        let _v = value;
-
-        if (this.selection.buyoption === 'rent')
-          return (_v / 50).toFixed(3) + ' ETH / day'
-        else
-          return _v + ' ETH'
-      }
-
+      format: (value) => value + ' ETH'
     });
 
     this.purchaseUI.appendChild(this.priceinput);
@@ -116,7 +109,7 @@ export default class InfoBox {
         console.log('clickAction');
         
         try {
-          await buyPixel({ scene: this.scene, position: this.selection.position, color: 'ffffff' });
+          await buyPixel({ scene: this.scene, selection: this.selection, color: 'ffffff' });
           this.wrapper.removeChild(this.purchaseUI);
           this.wrapper.appendChild(this.loadingIcon);
           await this.setUI();

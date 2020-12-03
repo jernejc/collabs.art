@@ -2,8 +2,8 @@
 import Phaser from 'phaser';
 
 import { createPixel, colorPixel } from '@actions/pixel';
-import ApplicationScene from '@scenes/application_scene';
-import MinimapScene from '@scenes/minimap_scene';
+import ApplicationScene from '@scenes/application';
+import MinimapScene from '@scenes/minimap';
 import {
   handleMouseMove,
   handleMouseDown,

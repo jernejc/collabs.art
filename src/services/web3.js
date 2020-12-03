@@ -1,7 +1,8 @@
 
 import Web3 from 'web3';
-import config from './config';
-import { stringToBN } from './helpers';
+
+import config from '@util/config';
+import { stringToBN } from '@util/helpers';
 
 export default class Web3Manager {
 
@@ -11,6 +12,7 @@ export default class Web3Manager {
     this.instance = null;
     this.bidContract = null;
     this.pixelContract = null;
+    this.defaultPrice = null;
 
     this.initProvider();
   }
@@ -76,4 +78,10 @@ export default class Web3Manager {
     return accounts[0];
   }
 
+  async getDefaultPrice() {
+    if (!this.defaultPrice)
+      this.defaultPrice = await this.bidContract.methods.defaultPrice().call();
+
+    return Web3.utils.fromWei(this.defaultPrice);
+  }
 }

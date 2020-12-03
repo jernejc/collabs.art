@@ -1,8 +1,8 @@
 import { Events, Game, WEBGL } from 'phaser';
 
-import MainScene from '@scenes/main_scene';
-import Web3Manager from '@util/web3_manager';
-import SelectionManager from '@util/selection_manager';
+import MainScene from '@scenes/main';
+import Web3Manager from '@services/web3';
+import SelectionManager from '@services/selection';
 
 export function AppInitializer({
   canvasElement,

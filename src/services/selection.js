@@ -30,6 +30,8 @@ export default class SelectionManager {
       this.clearInfoBox();
 
     this.infobox = new InfoBox({ selection: new Selection(selection, this.parent), parent: this.parent, scene });
+
+    // Init is async, not sure if this is best approach
     await this.infobox.init();
   }
 

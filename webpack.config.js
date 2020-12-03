@@ -24,6 +24,7 @@ const config = {
       '@components': path.resolve(__dirname, 'src/components/'),
       '@initializers': path.resolve(__dirname, 'src/initializers/'),
       '@scenes': path.resolve(__dirname, 'src/scenes/'),
+      '@services': path.resolve(__dirname, 'src/services/'),
       '@util': path.resolve(__dirname, 'src/util/')
     }
   },

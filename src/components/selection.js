@@ -16,7 +16,6 @@ export default class Selection {
 		if (this.pixels.length === 1)
 			this.pixel = this.pixels[0];
 
-		this.price = Math.random().toFixed(3);
 		this.buyoption = 'buy';
 	}
 
@@ -26,7 +25,7 @@ export default class Selection {
 
 	get title() {
 		if (this.pixel)
-			return `<i class="gg-path-crop"></i>${this.position}`;
+			return `${this.position}`; // <i class="gg-path-crop"></i>
 		else if (this.start && this.end) 
 			return `<span class="smaller">
 								${numberToLetterColumn(this.start.tile.cy)}${this.start.tile.cx}
