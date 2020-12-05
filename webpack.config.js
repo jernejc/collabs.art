@@ -2,14 +2,14 @@ const path = require('path');
 const webpack = require('webpack');
 
 const CopyPlugin = require('copy-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const PROD = process.env.NODE_ENV == 'production';
 
 const config = {
   target: 'web',
   entry: {
-    app: './src/index.js',
+    app: './client/index.js',
     vendors: ['phaser','web3']
   },
 
@@ -20,12 +20,12 @@ const config = {
   resolve: {
     extensions: ['.js'],
     alias: {
-      '@actions': path.resolve(__dirname, 'src/actions/'),
-      '@components': path.resolve(__dirname, 'src/components/'),
-      '@initializers': path.resolve(__dirname, 'src/initializers/'),
-      '@scenes': path.resolve(__dirname, 'src/scenes/'),
-      '@services': path.resolve(__dirname, 'src/services/'),
-      '@util': path.resolve(__dirname, 'src/util/')
+      '@actions': path.resolve(__dirname, 'client/actions/'),
+      '@components': path.resolve(__dirname, 'client/components/'),
+      '@initializers': path.resolve(__dirname, 'client/initializers/'),
+      '@scenes': path.resolve(__dirname, 'client/scenes/'),
+      '@services': path.resolve(__dirname, 'client/services/'),
+      '@util': path.resolve(__dirname, 'client/util/')
     }
   },
 
@@ -72,7 +72,8 @@ if (!PROD) { // DEV config
   config.devtool = 'inline-source-map';
   config.devServer = {
     contentBase: path.join(__dirname, 'dist'),
-    port: 8000
+    compress: true,
+    port: 9000
   }
 }
 
