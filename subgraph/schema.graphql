@@ -1,0 +1,5 @@
+type Pixel @entity {
+  id: ID!
+  owner: Bytes!
+  amount: BigInt!
+}
