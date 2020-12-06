@@ -20,6 +20,11 @@ contract Pixels is ERC721, AccessControl {
 
     mapping(uint128 => Pixel) public pixels;
 
+    event ColorPixel(
+        uint128 indexed _position,
+        bytes6 _color
+    );
+
     /**
      * @dev Contract Constructor, calls ERC721 constructor and sets name and symbol
      */
@@ -108,6 +113,11 @@ contract Pixels is ERC721, AccessControl {
         );
 
         pixels[_position].color = _color;
+
+        emit ColorPixel(
+            _position, 
+            _color
+        );
     }
 
     /**

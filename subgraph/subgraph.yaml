@@ -5,11 +5,11 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: PixelsBid
+    name: Pixels
     network: mainnet
     source:
-      address: '0x786BeFB895eFDD13ed52Fb2246F5C2EE00043a48'
-      abi: PixelsBid
+      address: '0x6A86FDCCeD3Fc6bf8ba6865A49E3a2cde606Ed7C'
+      abi: Pixels
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -17,9 +17,32 @@ dataSources:
       entities:
         - Pixel
       abis:
+        - name: Pixels
+          file: ../build/contracts/Pixels.json
+      eventHandlers:
+        - event: ColorPixel(indexed uint128,bytes6)
+          handler: handleColorPixel
+      file: ./mappings/pixels.ts
+
+  - kind: ethereum/contract
+    name: PixelsBid
+    network: mainnet
+    source:
+      address: '0xE1b2c808CBc46F1c35b5fc496e7fFf9d0E3EEB6c'
+      abi: PixelsBid
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Pixel
+        - Bid
+      abis:
         - name: PixelsBid
           file: ../build/contracts/PixelsBid.json
       eventHandlers:
         - event: Purchase(indexed address,uint128,uint256)
           handler: handlePixelPurchase
-      file: ./mapping.ts
+        - event: BidCreated(indexed uint128,indexed address,uint256,uint256)
+          handler: handleBidCreated
+      file: ./mappings/bids.ts

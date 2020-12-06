@@ -145,7 +145,7 @@ contract PixelsBid is Ownable, Pausable {
         );
         require(
             _duration >= MIN_BID_DURATION,
-            "The bid should be last longer than 3 minutes"
+            "The bid should last longer than 3 minutes"
         );
         require(
             _duration <= MAX_BID_DURATION,
