@@ -225,8 +225,7 @@ contract PixelsBid is Ownable, Pausable {
     * @return uint256 of the expiration time
     */
     function getBidForPixel(uint128 _position) 
-        public 
-        view
+        external
         returns (address payable, uint256, uint256) 
     {
         require(

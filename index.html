@@ -18,21 +18,11 @@
     <!--<div id="header">
       <h1>PixelWorld</h1>
     </div>-->
-    <div id="tools">
-      <span class="tool move" data-game-mode="move">
-        <i class="gg-controller"></i>
-      </span>
-      <span class="tool select active" data-game-mode="select">
-        <i class="gg-tap-single"></i>
-      </span>
-    </div>
     <div id="game"></div>
   </div>
 
   <script>
-    const {
-      Emitter
-    } = new PixelWorld.Main({
+    new PixelWorld.Main({
       canvasElement: 'game',
       canvasWidth: window.innerWidth,
       canvasHeight: window.innerHeight,
@@ -40,32 +30,6 @@
       strokeSize: 0.2,
       strokeColor: '#4c4c4c'
     });
-
-    document.querySelector('#tools').addEventListener('click', (e) => {
-      const gameMode = e.target.dataset.gameMode || e.target.parentNode.dataset.gameMode;
-
-      if (gameMode)
-        Emitter.emit('scene/mode', gameMode)
-    });
-
-    Emitter.on('scene/mode', mode => {
-      setActiveTool(mode)
-    });
-
-    function setActiveTool(mode) {
-      const tools = document.querySelectorAll('.tool');
-
-      for (let index = 0; index < tools.length; index++) {
-        const tool = tools[index];
-        if (tool.classList.contains(mode)) {
-          if (!tool.classList.contains('active'))
-            tool.classList.add('active')
-        } else {
-          if (tool.classList.contains('active'))
-            tool.classList.remove('active')
-        }
-      }
-    }
   </script>
 </body>
 

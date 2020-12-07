@@ -27,9 +27,11 @@ export default class MainScene extends ApplicationScene {
   }
 
   create(data) {
-    super.create(data)
+    super.create(data);
 
     const _self = this;
+
+    console.log('create MainScene');
 
     this.size = this.appConfig.gridSize;
     this.strokeSize = this.appConfig.strokeSize;
@@ -50,6 +52,7 @@ export default class MainScene extends ApplicationScene {
 
     this.createVisiblePixels();
 
+    console.log('setGameMode');
     setGameMode({ scene: this, mode: "select" });
 
     this.input.mouse.disableContextMenu(); // prevent right click context menu
