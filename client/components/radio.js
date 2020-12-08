@@ -53,7 +53,7 @@ export default class Radio extends Controller {
     let value = this.getValue();
     let currentValue = this.radioinput[this.property].value;
 
-    if (value !== currentValue) 
+    if (value !== currentValue)
       this.radioinput[this.property].value = value;
 
     return super.updateDisplay();

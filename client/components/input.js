@@ -53,7 +53,7 @@ export default class Input extends Controller {
       value = this.format(value);
 
     this.input.value = value;
-    
+
     return super.updateDisplay();
   }
 }

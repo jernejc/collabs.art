@@ -103,11 +103,11 @@ export default class InfoBox {
     this.purchaseUI.appendChild(this.priceinput);
 
     this.buy = new Button({
-      elClass: 'create', 
-      text: 'Create', 
+      elClass: 'create',
+      text: 'Create',
       clickAction: async e => {
         console.log('clickAction');
-        
+
         try {
           await buyPixel({ scene: this.scene, selection: this.selection, color: 'ffffff' });
           this.wrapper.removeChild(this.purchaseUI);
@@ -116,7 +116,7 @@ export default class InfoBox {
         } catch (error) {
           console.error('Buy pixel failed: ' + error);
         }
-        
+
       }
     });
 

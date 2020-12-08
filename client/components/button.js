@@ -1,8 +1,6 @@
 
 export default class Button {
   constructor({ elClass, text, clickAction }) {
-    console.log('Button constructor');
-
     this.text = text;
     this.loadingIcon = document.createElement('i');
     this.loadingIcon.classList.add('gg-loadbar-alt');

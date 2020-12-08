@@ -50,14 +50,14 @@ export default class Saturation extends Controller {
       let X = e.clientX;
       let Y = e.clientY;
 
-      if (X < bgRect.left) 
+      if (X < bgRect.left)
         X = bgRect.left;
-      else if (X > bgRect.left + bgRect.width) 
+      else if (X > bgRect.left + bgRect.width)
         X = bgRect.left + bgRect.width;
 
-      if (Y < bgRect.top) 
+      if (Y < bgRect.top)
         Y = bgRect.top;
-      else if (Y > bgRect.top + bgRect.height) 
+      else if (Y > bgRect.top + bgRect.height)
         Y = bgRect.top + bgRect.height;
 
       X -= bgRect.left;
@@ -108,7 +108,7 @@ export default class Saturation extends Controller {
     this.paletteshape.style.top = `calc(${Ypos}% - ${this.paletteshape.offsetHeight / 2}px)`;
 
     this.paletteshape.style.background = this.object.color.color.rgba;
-    
+
     this.palette.style.background = `
       linear-gradient(to top, rgba(0, 0, 0, 1), transparent),
       linear-gradient(to left, hsla(${parseInt(this.object.color.color.h * 360)}, 100%, 50%, 1), rgba(255, 255, 255, 1))

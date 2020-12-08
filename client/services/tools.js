@@ -5,8 +5,6 @@ export default class ToolsManager {
     this.game = game;
     this.emitter = emitter;
 
-    console.log('this.game', this.game)
-
     this.gameCanvas = document.querySelector('#' + game.appConfig.canvasElement);
     this.parent = this.gameCanvas.parentNode;
     this.domElement = document.createElement('div');
@@ -14,15 +12,14 @@ export default class ToolsManager {
 
     this.parent.appendChild(this.domElement);
 
-    this.addTools();
+    this.addModeButtons();
     this.addEvents();
   }
 
   addEvents() {
     this.emitter.on('scene/mode', mode => {
-      console.log('Tools scene/mode', mode);
       if (this.game.mode !== mode)
-        this.setActiveTool(mode);
+        this.setActiveMode(mode);
     });
 
     this.domElement.addEventListener('click', (e) => {
@@ -33,13 +30,13 @@ export default class ToolsManager {
     });
   }
 
-  setActiveTool(mode) {
+  setActiveMode(mode) {
     const tools = this.domElement.querySelectorAll('.tool');
 
     for (let index = 0; index < tools.length; index++) {
       const tool = tools[index];
 
-      if (tool.classList.contains(mode)) {
+      if (tool.dataset.gameMode === mode) {
         if (!tool.classList.contains('active'))
           tool.classList.add('active')
       } else {
@@ -49,9 +46,9 @@ export default class ToolsManager {
     }
   }
 
-  addTools() {
+  addModeButtons() {
     this.tools = [{
-      name:'move',
+      name: 'move',
       icon: 'gg-controller'
     }, {
       name: 'select',
@@ -59,19 +56,16 @@ export default class ToolsManager {
     }];
 
     this.tools.forEach(tool => {
-      const button = this.buttonTemplate(tool);
+      const button = this.modeButtonTemplate(tool);
 
-      console.log('this.game.mode', this.game.mode)
-      console.log('tool.name', tool.name)
-
-      if (this.game.mode === tool.name)
+      if (this.game.appConfig.defaultMode === tool.name)
         button.classList.add('active');
 
       this.domElement.appendChild(button);
     })
   }
-  
-  buttonTemplate(tool) {
+
+  modeButtonTemplate(tool) {
     const button = document.createElement('span');
     button.classList.add('tool', tool.name);
     button.dataset.gameMode = tool.name;
@@ -82,5 +76,4 @@ export default class ToolsManager {
     button.appendChild(icon);
     return button;
   }
-
 }

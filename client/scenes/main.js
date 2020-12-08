@@ -30,8 +30,7 @@ export default class MainScene extends ApplicationScene {
     super.create(data);
 
     const _self = this;
-
-    console.log('create MainScene');
+    const sourceImage = this.textures.get('worldimage').getSourceImage();
 
     this.size = this.appConfig.gridSize;
     this.strokeSize = this.appConfig.strokeSize;
@@ -40,23 +39,18 @@ export default class MainScene extends ApplicationScene {
     this.gridHeight = this.appConfig.canvasHeight / this.size;
     this.pMax = 1000;
 
-    const src = this.textures.get('worldimage').getSourceImage();
-
-    this.imageWidth = src.width;
-    this.imageHeight = src.height;
+    this.imageWidth = sourceImage.width;
+    this.imageHeight = sourceImage.height;
 
     this.worldmap = this.textures.createCanvas('worldmap', this.imageWidth, this.imageHeight);
-    this.worldmap.draw(0, 0, src);
-
-    this.createMinimap();
-
-    this.createVisiblePixels();
-
-    console.log('setGameMode');
-    setGameMode({ scene: this, mode: "select" });
+    this.worldmap.draw(0, 0, sourceImage);
 
     this.input.mouse.disableContextMenu(); // prevent right click context menu
 
+    this.createMinimap();
+    this.createVisiblePixels();
+
+    setGameMode({ scene: this, mode: this.appConfig.defaultMode });
     moveToPosition({ x: 300, y: 400, scene: this })
 
     /** 
@@ -89,7 +83,7 @@ export default class MainScene extends ApplicationScene {
 
     this.input.keyboard.on('keyup_SHIFT', (event) => {
       handleShiftUp({ scene: _self })
-    })
+    });
 
     this.input.keyboard.on('keydown_SPACE', (event) => {
       handleSpaceDown({ scene: _self })
@@ -97,7 +91,7 @@ export default class MainScene extends ApplicationScene {
 
     this.input.keyboard.on('keyup_SPACE', (event) => {
       handleSpaceUp({ scene: _self })
-    })
+    });
 
     /**
      * Game mode events
@@ -159,6 +153,7 @@ export default class MainScene extends ApplicationScene {
   }
 
   createMinimap() {
+    if (DEBUG) console.log("Main Scene: createMinimap");
 
     const sizeRatio = 5;
     const margin = 10;
@@ -172,21 +167,28 @@ export default class MainScene extends ApplicationScene {
     const x = margin2X;
     const y = this.appConfig.canvasHeight - (height + margin2X);
 
-    this.minimapWrapper = this.add.zone(x, y, width, height)
-                                  .setInteractive()
-                                  .setOrigin(0)
-                                  .setDepth(3)
+    this.minimapWrapper = this.add.zone(
+      x,
+      y,
+      width,
+      height
+    )
+      .setInteractive()
+      .setOrigin(0)
+      .setDepth(3)
 
-    this.minimapBackground = this.add.rectangle(x - margin,
-                                                y - margin, 
-                                                width + margin2X, 
-                                                height + margin2X, Phaser.Display.Color.HexStringToColor('#181a1b').color, 1)
-                                                .setOrigin(0)
-                                                .setDepth(2)
+    this.minimapBackground = this.add.rectangle(
+      x - margin,
+      y - margin,
+      width + margin2X,
+      height + margin2X, Phaser.Display.Color.HexStringToColor('#181a1b').color, 1
+    )
+      .setOrigin(0)
+      .setDepth(2)
 
     this.minimap = new MinimapScene({
       appConfig: this.appConfig,
-      sceneConfig: { 
+      sceneConfig: {
         gridWidth: this.gridWidth,
         gridHeight: this.gridHeight,
         size: this.size,

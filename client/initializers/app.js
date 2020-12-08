@@ -9,6 +9,7 @@ export function AppInitializer({
   canvasElement,
   canvasWidth,
   canvasHeight,
+  defaultMode,
   gridSize,
   strokeColor,
   strokeSize
@@ -28,6 +29,7 @@ export function AppInitializer({
   GameInstance.appConfig = {
     canvasWidth,
     canvasHeight,
+    defaultMode,
     gridSize,
     canvasElement,
     strokeColor,
@@ -41,6 +43,7 @@ export function AppInitializer({
   // Init Tools Manager
   GameInstance.tools = new ToolsManager(GameInstance, Emitter);
 
+  // Add MainScene
   GameInstance.scene.add('MainScene', MainScene, true, {});
 
   return { GameInstance, Emitter };

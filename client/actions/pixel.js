@@ -28,10 +28,10 @@ export async function buyPixel({ scene, selection, color }) {
     await scene.game.web3.bidContract.methods.purchase(
       stringToBN(selection.position), // pixel position
       Web3.utils.stringToHex("FFFFFF") // pixel color
-    ).send({ 
-      from: defaultAccount, 
-      gas: 300000, 
-      value: Web3.utils.toWei(selection.price, "ether") 
+    ).send({
+      from: defaultAccount,
+      gas: 300000,
+      value: Web3.utils.toWei(selection.price, "ether")
     });
   } catch (error) {
     console.error('Purchase pixel error', error)

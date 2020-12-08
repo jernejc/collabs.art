@@ -1,6 +1,6 @@
 specVersion: 0.0.2
 description: Pixels for Ethereum
-repository: https://github.com/graphprotocol/example-subgraph
+repository: 'https://github.com/graphprotocol/example-subgraph'
 schema:
   file: ./schema.graphql
 dataSources:
@@ -8,7 +8,7 @@ dataSources:
     name: Pixels
     network: mainnet
     source:
-      address: '0xc8077297b781B7927278230C7BC171c8a29c25F5'
+      address: '0xd790648Af21397DA4132a67bc5B0b633bc00F027'
       abi: Pixels
     mapping:
       kind: ethereum/events
@@ -20,15 +20,14 @@ dataSources:
         - name: Pixels
           file: ../build/contracts/Pixels.json
       eventHandlers:
-        - event: ColorPixel(indexed uint128,bytes6)
+        - event: 'ColorPixel(indexed uint128,bytes6)'
           handler: handleColorPixel
       file: ./mappings/pixels.ts
-
   - kind: ethereum/contract
     name: PixelsBid
     network: mainnet
     source:
-      address: '0xC289939198527d87579C6FF359c4fa8Ef3d17373'
+      address: '0xDB4661dFfF2AD65C00368dBbFfa7Ac7a1B397B01'
       abi: PixelsBid
     mapping:
       kind: ethereum/events
@@ -41,8 +40,8 @@ dataSources:
         - name: PixelsBid
           file: ../build/contracts/PixelsBid.json
       eventHandlers:
-        - event: Purchase(indexed address,uint128,uint256)
+        - event: 'Purchase(indexed address,uint128,uint256)'
           handler: handlePixelPurchase
-        - event: BidCreated(indexed uint128,indexed address,uint256,uint256)
+        - event: 'BidCreated(indexed uint128,indexed address,uint256,uint256)'
           handler: handleBidCreated
       file: ./mappings/bids.ts
