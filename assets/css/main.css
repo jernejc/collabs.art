@@ -9,19 +9,20 @@ h1 {
   overflow: hidden;
 }
 
-.app {
-  background-color: rgb(24, 26, 27);
+#app {
+  /*background-color: rgb(24, 26, 27);
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
-  right: 0;
+  right: 0;*/
   padding: 0;
   margin: 0;
 }
 
-#tools,
-#header {
+#mode-buttons,
+#header,
+#menus {
   font-size: 30px;
   color: #FFF;
   position: absolute;
@@ -39,12 +40,56 @@ h1 {
   padding: 0 10px;
 }
 
-#tools {
+#menus {
+  bottom: 10px;
+  top: auto;
   left: auto;
   right: 10px;
+  display: flex;
+  flex-direction: row;
+  padding: 0;
 }
 
-.tool {
+.menu {
+  flex-grow: 4;
+  background: rgb(24, 26, 27);
+  height: 50px;
+  width: 50px;
+  margin: 1px;
+  position: relative;
+  cursor: pointer;
+}
+
+.menu:after {
+  content: " ";
+  border: 2px solid #FFF;
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 5px;
+  right: 5px;
+}
+
+.menu i {
+  margin: 20px auto;
+}
+
+.menu:hover {
+  background: rgb(255,255,255);
+  color: rgb(24, 26, 27);
+}
+
+.menu:hover:after {
+  border-color: rgb(24, 26, 27);
+}
+
+#mode-buttons {
+  left: auto;
+  right: 10px;
+  top: 5px;
+}
+
+.mode {
   cursor: pointer;
   background: rgb(24, 26, 27);
   padding: 10px;
@@ -55,30 +100,30 @@ h1 {
   display: block;
 }
 
-.tool.active {
-  background: rgba(255, 255, 255, 0.7);
+.mode.active {
+  background: rgba(255, 255, 255, 1);
   color: rgb(24, 26, 27);
 }
 
-.tool i {
+.mode i {
   margin: 5px auto;
 }
 
-.tool.account {
+.mode.account {
   width: 45px;
   height: 45px;
 }
 
-.tool.account i {
+.mode.account i {
   margin-top: 11px;
   transform: scale(var(--ggs, 1.5));
 }
 
-.tool.move i {
+.mode.move i {
   margin: 11px 0px 0px 11px;
 }
 
-.tool.select i {
+.mode.select i {
   --ggs: 1.2;
 }
 

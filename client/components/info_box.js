@@ -106,17 +106,16 @@ export default class InfoBox {
       elClass: 'create',
       text: 'Create',
       clickAction: async e => {
-        console.log('clickAction');
-
         try {
           await buyPixel({ scene: this.scene, selection: this.selection, color: 'ffffff' });
+
           this.wrapper.removeChild(this.purchaseUI);
           this.wrapper.appendChild(this.loadingIcon);
+          
           await this.setUI();
         } catch (error) {
           console.error('Buy pixel failed: ' + error);
         }
-
       }
     });
 

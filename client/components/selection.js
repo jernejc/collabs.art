@@ -25,7 +25,7 @@ export default class Selection {
 
   get title() {
     if (this.pixel)
-      return `${this.position}`; // <i class="gg-path-crop"></i>
+      return `<i class="gg-path-crop"></i>${this.position}`;
     else if (this.start && this.end)
       return `<span class="smaller">
 								${numberToLetterColumn(this.start.tile.cy)}${this.start.tile.cx}

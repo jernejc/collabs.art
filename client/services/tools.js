@@ -7,13 +7,30 @@ export default class ToolsManager {
 
     this.gameCanvas = document.querySelector('#' + game.appConfig.canvasElement);
     this.parent = this.gameCanvas.parentNode;
-    this.domElement = document.createElement('div');
-    this.domElement.setAttribute('id', 'tools');
-
-    this.parent.appendChild(this.domElement);
 
     this.addModeButtons();
+    this.addMenus();
     this.addEvents();
+  }
+
+  addMenus() {
+    this.domMenus = document.createElement('div');
+    this.domMenus.setAttribute('id', 'menus');
+
+    this.menus = [{
+      name: 'pixels',
+      icon: 'gg-row-last'
+    }, {
+      name: 'bids',
+      icon: 'gg-align-bottom'
+    }];
+
+    this.menus.forEach(tool => {
+      const button = this.buttonTemplate(tool, 'menu');
+      this.domMenus.appendChild(button);
+    })
+
+    this.parent.appendChild(this.domMenus);
   }
 
   addEvents() {
@@ -22,19 +39,19 @@ export default class ToolsManager {
         this.setActiveMode(mode);
     });
 
-    this.domElement.addEventListener('click', (e) => {
+    this.domModeButtons.addEventListener('click', (e) => {
       const gameMode = e.target.dataset.gameMode || e.target.parentNode.dataset.gameMode;
 
-      if (gameMode)
+      if (this.game.mode !== gameMode)
         this.emitter.emit('scene/mode', gameMode);
     });
   }
 
   setActiveMode(mode) {
-    const tools = this.domElement.querySelectorAll('.tool');
+    const modes = this.domModeButtons.querySelectorAll('.mode');
 
-    for (let index = 0; index < tools.length; index++) {
-      const tool = tools[index];
+    for (let index = 0; index < modes.length; index++) {
+      const tool = modes[index];
 
       if (tool.dataset.gameMode === mode) {
         if (!tool.classList.contains('active'))
@@ -47,7 +64,12 @@ export default class ToolsManager {
   }
 
   addModeButtons() {
-    this.tools = [{
+    this.domModeButtons = document.createElement('div');
+    this.domModeButtons.setAttribute('id', 'mode-buttons');
+
+    this.parent.appendChild(this.domModeButtons);
+
+    this.modes = [{
       name: 'move',
       icon: 'gg-controller'
     }, {
@@ -55,19 +77,20 @@ export default class ToolsManager {
       icon: 'gg-tap-single'
     }];
 
-    this.tools.forEach(tool => {
-      const button = this.modeButtonTemplate(tool);
+    this.modes.forEach(tool => {
+      const button = this.buttonTemplate(tool, 'mode');
 
       if (this.game.appConfig.defaultMode === tool.name)
         button.classList.add('active');
 
-      this.domElement.appendChild(button);
+      this.domModeButtons.appendChild(button);
     })
   }
 
-  modeButtonTemplate(tool) {
+  buttonTemplate(tool, type) {
     const button = document.createElement('span');
-    button.classList.add('tool', tool.name);
+
+    button.classList.add(type, tool.name);
     button.dataset.gameMode = tool.name;
 
     const icon = document.createElement('i');
