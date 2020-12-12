@@ -50,37 +50,101 @@ h1 {
   padding: 0;
 }
 
-.menu {
+.menu-btn {
   flex-grow: 4;
   background: rgb(24, 26, 27);
   height: 50px;
   width: 50px;
-  margin: 1px;
+  margin: 0px 0px 0px 2px;
   position: relative;
   cursor: pointer;
 }
 
-.menu:after {
+.menu-btn:after {
   content: " ";
   border: 2px solid #FFF;
   position: absolute;
-  top: 5px;
-  bottom: 5px;
-  left: 5px;
-  right: 5px;
+  top: 10px;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
 }
 
-.menu i {
+.menu-btn i {
   margin: 20px auto;
 }
 
-.menu:hover {
+.menu-btn:hover {
   background: rgb(255,255,255);
   color: rgb(24, 26, 27);
 }
 
-.menu:hover:after {
+.menu-btn:hover:after {
   border-color: rgb(24, 26, 27);
+}
+
+#menu-item {
+  background: rgb(24, 26, 27);
+  height: 200px;
+  width: 200px;
+  content: " ";
+  position: absolute;
+  right: 10px;
+  bottom: 62px;
+  overflow: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+#menu-item::-webkit-scrollbar {
+  display: none;
+}
+
+#menu-item ul {
+  margin: 0;
+  padding: 0;
+}
+
+#menu-item ul li {
+  list-style: none;
+  color: #FFF;
+  line-height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 10px;
+  border-bottom: 1px solid rgba(255,255,255,.125);
+  cursor: pointer;
+}
+
+#menu-item ul li:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+#menu-item ul li .color {
+  width: 15px;
+  height: 15px;
+}
+
+#menu-item ul li .text {
+  width: 80%;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+#menu-item ul li .location {
+  --ggs: 0.72;
+  color: rgba(255, 255, 255, 0.2);
+
+  transition: linear 300ms color;
+}
+
+#menu-item ul li:hover .text,
+#menu-item ul li:hover .location {
+  color: rgba(255, 255, 255, 1);
+}
+
+#menu-item ul li:last-child {
+  /*border-width: 0;*/
 }
 
 #mode-buttons {

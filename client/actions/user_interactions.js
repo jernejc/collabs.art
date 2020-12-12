@@ -1,4 +1,4 @@
-import { getRelativePosition } from "./pixel";
+import { getPixelForPointer } from "./pixel";
 
 // Fired when user moves pointer through the grid
 export function handleMouseMove({ pointer, scene }) {
@@ -42,13 +42,8 @@ export async function handleMouseDown({ pointer, scene }) {
         return;
       }
 
-      if (scene.game.selection.rectangleSelection)
-        scene.game.selection.clearRectangleSelection();
-      if (scene.game.selection.singleSelection)
-        scene.game.selection.clearSingleSelection()
-
-      scene.game.selection.createSingleSelection({ pointer, scene })
-      await scene.game.selection.displayInfoBox({ scene });
+      const pixel = getPixelForPointer({ pointer, scene, color: true })
+      await scene.game.selection.createSingleSelection({ pixel, scene });
       break;
     case 'drag':
 

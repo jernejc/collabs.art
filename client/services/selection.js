@@ -65,10 +65,13 @@ export default class SelectionManager {
     this.highlightSelection.setFillStyle(invertedColor.color, 0.15);
   }
 
-  createSingleSelection({ pointer, scene }) {
+  async createSingleSelection({ pixel, scene }) {
     if (DEBUG) console.log('SelectionManager: createSingleSelection');
 
-    const pixel = getPixelForPointer({ pointer, scene, color: true });
+    if (this.rectangleSelection)
+      this.clearRectangleSelection();
+    if (this.singleSelection)
+      this.clearSingleSelection();
 
     const X = pixel.tile.x;
     const Y = pixel.tile.y;
@@ -79,6 +82,8 @@ export default class SelectionManager {
     this.singleSelection.setStrokeStyle(1, invertedColor.color, 0.9);
     this.singleSelection.setDisplayOrigin(0, 0);
     this.singleSelection.setDepth(1);
+
+    await this.displayInfoBox({ scene });
   }
 
   createRectangleSelection({ pointer, scene }) {

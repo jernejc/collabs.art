@@ -42,14 +42,13 @@ export function colorPixel({ x, y, scene }) {
   if (DEBUG) console.log('colorPixel')
 
   const mapPixel = getColor({ x, y, color: scene.color, scene });
-  const tile = scene.land[y][x];
 
-  tile.cx = mapPixel.cx;
-  tile.cy = mapPixel.cy;
-  tile.id = `${mapPixel.cx}x${mapPixel.cy}`;
-  tile.price = Math.random().toFixed(3);
+  scene.land[y][x].cx = mapPixel.cx;
+  scene.land[y][x].cy = mapPixel.cy;
+  scene.land[y][x].id = `${mapPixel.cx}x${mapPixel.cy}`;
+  scene.land[y][x].price = Math.random().toFixed(3);
 
-  tile.setFillStyle(mapPixel.color.color);
+  scene.land[y][x].setFillStyle(mapPixel.color.color);
 }
 
 export function setPixel({ pixel, scene }) {
@@ -83,6 +82,29 @@ export function getRelativePosition({ x, y, scene }) {
   const cy = parseInt(Phaser.Math.Wrap(scene.cameraY + y, 0, scene.imageHeight));
 
   return { cx, cy };
+}
+
+export function getRelativePixel({ cx, cy, scene, color }) {
+
+  let rx, ry, tile;
+
+  for (let y = 0; y < scene.gridHeight; y++) {
+    for (let x = 0; x < scene.gridWidth; x++) {
+      if (scene.land[y][x].cx === cx && scene.land[y][x].cy === cy) {
+        tile = scene.land[y][x];
+        rx = x;
+        ry = y
+      }
+    }
+  }
+
+  if (color) {
+    return {
+      tile: tile,
+      color: getColor({ x: rx, y: ry, scene })
+    }
+  } else
+    return tile;
 }
 
 export function getPixelForPointer({ pointer, scene, color }) {

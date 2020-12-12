@@ -1,4 +1,6 @@
 
+import Menu from '@components/menu';
+
 export default class ToolsManager {
 
   constructor(game, emitter) {
@@ -8,14 +10,15 @@ export default class ToolsManager {
     this.gameCanvas = document.querySelector('#' + game.appConfig.canvasElement);
     this.parent = this.gameCanvas.parentNode;
 
-    this.addModeButtons();
-    this.addMenus();
+    //this.addModeButtons();
+    this.addMenuButtons();
+
     this.addEvents();
   }
 
-  addMenus() {
-    this.domMenus = document.createElement('div');
-    this.domMenus.setAttribute('id', 'menus');
+  addMenuButtons() {
+    this.domMenuButtons = document.createElement('div');
+    this.domMenuButtons.setAttribute('id', 'menus');
 
     this.menus = [{
       name: 'pixels',
@@ -26,15 +29,15 @@ export default class ToolsManager {
     }];
 
     this.menus.forEach(tool => {
-      const button = this.buttonTemplate(tool, 'menu');
-      this.domMenus.appendChild(button);
+      const button = this.buttonTemplate(tool, 'menu-btn');
+      this.domMenuButtons.appendChild(button);
     })
 
-    this.parent.appendChild(this.domMenus);
+    this.parent.appendChild(this.domMenuButtons);
   }
 
   addEvents() {
-    this.emitter.on('scene/mode', mode => {
+    /*this.emitter.on('scene/mode', mode => {
       if (this.game.mode !== mode)
         this.setActiveMode(mode);
     });
@@ -44,7 +47,20 @@ export default class ToolsManager {
 
       if (this.game.mode !== gameMode)
         this.emitter.emit('scene/mode', gameMode);
+    });*/
+
+    this.domMenuButtons.addEventListener('click', async (e) => {
+      const menu = e.target.dataset.gameMode || e.target.parentNode.dataset.gameMode;
+
+      console.log('menu CLICK', menu, this);
+      if (!this.domMenuItem)
+        await this.openMenu()
     });
+  }
+
+  async openMenu() {
+    this.menu = new Menu({ parent: this.parent, game: this.game });
+    await this.menu.init();
   }
 
   setActiveMode(mode) {

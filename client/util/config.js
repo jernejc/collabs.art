@@ -16,6 +16,9 @@ const config = {
       address: dappConfig.PixelsBidAddress,
       abi: PixelsBidContract.abi
     }
+  },
+  subgraph: {
+    local: 'http://127.0.0.1:8000/subgraphs/name/jernejc/pixelworld'
   }
 }
 
