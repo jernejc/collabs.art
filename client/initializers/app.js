@@ -9,16 +9,16 @@ import SelectionManager from '@services/selection';
 import ToolsManager from '@services/tools';
 import GraphManager from '@services/subgraph';
 
-export function AppInitializer({
+// Game init
+export async function AppInitializer({
   canvasElement,
-  canvasWidth,
-  canvasHeight,
   defaultMode,
   gridSize,
   strokeColor,
   strokeSize
 }) {
-  if (DEBUG) console.log('Init Phaser', canvasElement, canvasWidth, canvasHeight)
+  if (DEBUG) console.log('Init Phaser', canvasElement, defaultMode, gridSize, strokeColor, strokeSize)
+
 
   const canvas = document.querySelector('#' + canvasElement)
   const Emitter = new Events.EventEmitter();
@@ -31,8 +31,8 @@ export function AppInitializer({
 
   GameInstance.emitter = Emitter;
   GameInstance.appConfig = {
-    canvasWidth,
-    canvasHeight,
+    canvasWidth: canvas.clientWidth,
+    canvasHeight: canvas.clientHeight,
     defaultMode,
     gridSize,
     canvasElement,
@@ -41,13 +41,16 @@ export function AppInitializer({
   }
 
   // Init Web3 Manager
-  GameInstance.web3 = new Web3Manager();
+  GameInstance.web3 = new Web3Manager(GameInstance, Emitter);
+  // Web3Provider init is async
+  await GameInstance.web3.initProvider();
+
   // Init Selection Manager
   GameInstance.selection = new SelectionManager(GameInstance);
-  // Init Tools Manager
-  GameInstance.tools = new ToolsManager(GameInstance, Emitter);
   // Init Graph Manager
   GameInstance.graph = new GraphManager();
+  // Init Tools Manager
+  GameInstance.tools = new ToolsManager(GameInstance, Emitter);
 
   // Add MainScene
   GameInstance.scene.add('MainScene', MainScene, true, {});

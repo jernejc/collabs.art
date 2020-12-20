@@ -8,7 +8,7 @@ dataSources:
     name: Pixels
     network: mainnet
     source:
-      address: '0x9B7816eE8aD0cdb8a13c352272a6a0eE3E328c17'
+      address: '0x579cB4C1620F98841d9EaE433fF053f4Aff6bCDB'
       abi: Pixels
     mapping:
       kind: ethereum/events
@@ -27,7 +27,7 @@ dataSources:
     name: PixelsBid
     network: mainnet
     source:
-      address: '0x90d25B7fEb6806791917c47d8Dd681eD2712e1B6'
+      address: '0x49fd4F66b7932c148f8b4a38547659f235daA422'
       abi: PixelsBid
     mapping:
       kind: ethereum/events
@@ -40,7 +40,7 @@ dataSources:
         - name: PixelsBid
           file: ../build/contracts/PixelsBid.json
       eventHandlers:
-        - event: 'Purchase(indexed address,uint128,uint256)'
+        - event: 'Purchase(indexed address,uint128,uint256,bytes6)'
           handler: handlePixelPurchase
         - event: 'BidCreated(indexed uint128,indexed address,uint256,uint256)'
           handler: handleBidCreated

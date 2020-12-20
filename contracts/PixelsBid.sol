@@ -15,6 +15,7 @@ import "./Pixels.sol";
 
 contract PixelsBid is Ownable, Pausable {
     using SafeMath for uint256;
+    
     using Address for address;
     using Address for address payable;
 
@@ -39,7 +40,8 @@ contract PixelsBid is Ownable, Pausable {
     event Purchase(
         address indexed _payer, 
         uint128 _position, 
-        uint256 _amount
+        uint256 _amount,
+        bytes6 _color
     );
 
     event BidCreated(
@@ -121,7 +123,8 @@ contract PixelsBid is Ownable, Pausable {
         emit Purchase(
             msg.sender, 
             _position, 
-            msg.value
+            msg.value,
+            _color
         );
     }
 

@@ -30,13 +30,15 @@ export default class Controller {
 
     if (this.scene) {
       this.scene.game.emitter.on('controller/update', property => {
-        //if (DEBUG) console.log('controller/update', this.property, property);
+        if (DEBUG) console.log('controller/update', this.property, property); 
 
-        if (this.property !== property)
+        if (this.property !== property) // Update UI if emit not comming from the same property -- Components stay in sync
           this.updateDisplay();
-
-        if (this.onUpdate)
-          this.onUpdate();
+        
+        if (property) { // Not Init
+          if (this.onUpdate) // User provided callback
+            this.onUpdate();
+        }
       });
     }
   }
@@ -45,7 +47,7 @@ export default class Controller {
     return _.get(this.object, this.property);
   }
 
-  setValue(v, property, skip) {
+  setValue(v, property) {
     let _v = v;
     let _property = property || this.property;
 
@@ -58,9 +60,8 @@ export default class Controller {
       _v = Math.round(_v / this.step) * this.step;
 
     _.set(this.object, _property, _v);
-
-    if (!skip)
-      this.updateDisplay();
+    
+    this.updateDisplay();
 
     if (this.scene)
       this.scene.game.emitter.emit('controller/update', _property);

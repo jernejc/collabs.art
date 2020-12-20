@@ -1,5 +1,5 @@
 
-import { numberToLetterColumn } from '@util/helpers';
+import { numberToLetterColumn, formatColorNumber } from '@util/helpers';
 
 export default class Selection {
 
@@ -11,7 +11,6 @@ export default class Selection {
     this.end = this.pixels[1] || null;
 
     this.parent = parent;
-    this.color = new Phaser.Display.Color();
 
     if (this.pixels.length === 1)
       this.pixel = this.pixels[0];
@@ -20,7 +19,23 @@ export default class Selection {
   }
 
   get position() {
-    return numberToLetterColumn(this.pixel.tile.cy) + this.pixel.tile.cx;
+    return numberToLetterColumn(this.cy) + this.cx;
+  }
+
+  get cx() {
+    return this.pixel.tile.cx;
+  }
+
+  get cy() {
+    return this.pixel.tile.cy;
+  }
+
+  get color() {
+    return this.pixel.color.color;
+  }
+
+  get HEXcolor() {
+    return formatColorNumber(this.pixel.color.color.color);
   }
 
   get title() {

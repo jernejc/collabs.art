@@ -3,13 +3,13 @@ import { formatPositionHex } from '@util/helpers';
 import { moveToPosition } from '@actions/user_interactions';
 import { getRelativePixel } from '@actions/pixel';
 
+import { hexToString } from '@util/helpers'
+
 export default class Menu {
   constructor({ parent, game }) {
     this.parent = parent;
     this.game = game;
     this.scene = game.scene.keys['MainScene'];
-
-    console.log('Menu comp scene', this.scene)
 
     this.domElement = document.createElement('div');
     this.domElement.setAttribute('id', 'menu-item');
@@ -26,8 +26,8 @@ export default class Menu {
 
       target = (e.target.dataset.id) ? e.target : e.target.parentNode;
 
-      cx = parseInt(target.dataset.x);
-      cy = parseInt(target.dataset.y);
+      cx = parseInt(target.dataset.cx);
+      cy = parseInt(target.dataset.cy);
 
       const cameraX = parseInt(cx - (this.scene.gridWidth / 2));
       const cameraY = parseInt(cy - (this.scene.gridHeight / 2));
@@ -43,28 +43,26 @@ export default class Menu {
     this.menuList = document.createElement('ul');
     this.domElement.appendChild(this.menuList);
 
-    pixels.forEach(pixel => {
-      const item = this.listItemTemplate(pixel);
-      this.menuList.appendChild(item);
-    });
+    pixels.forEach(pixel => this.menuList.appendChild(this.listItemTemplate(pixel)));
   }
 
   listItemTemplate(data) {
     
     if (!data.color)
-      data.color = '#FFFFFF';
+      data.color = 'FFFFFF';
+    else
+      data.color = hexToString(data.color);
 
     const position = formatPositionHex(data.id);
-    console.log('position', position);
 
     const item = document.createElement('li');
 
     item.dataset.id = position.string;
-    item.dataset.x = position.x;
-    item.dataset.y = position.y;
+    item.dataset.cx = position.x;
+    item.dataset.cy = position.y;
 
     item.innerHTML = `
-      <span class="color" style="background: ${data.color}"></span>
+      <span class="color" style="background: #${data.color}"></span>
       <span class="text">${position.string}</span>
       <i class="gg-track location" />
     `;

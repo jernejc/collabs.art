@@ -2,7 +2,11 @@
 import Hue from '@components/hue';
 import Saturation from '@components/saturation';
 import Input from '@components/input';
+
 import { setPixel, buyPixel } from '@actions/pixel';
+
+import { formatColorNumber } from '@util/helpers';
+
 import Button from './button';
 
 /**
@@ -24,7 +28,7 @@ export default class InfoBox {
   }
 
   async init() {
-    this.defaultAddress = await this.scene.game.web3.currentDefaultAddress();
+    this.defaultAddress = this.scene.game.web3.activeAddress;
     await this.setUI();
   }
 
@@ -53,18 +57,24 @@ export default class InfoBox {
     this.parent.appendChild(this.wrapper);
   }
 
-  async setUI() {
+  async setUI(pixelData) {
     if (DEBUG) console.log('Info Box: setUI');
 
-    this.owner = await this.scene.game.web3.ownerOf(this.selection.position);
+    pixelData = pixelData || await this.scene.game.graph.loadPixel({
+      id: this.selection.position
+    });
+
+    this.owner = (pixelData) ? pixelData.owner.toLowerCase() : null;
     this.selection.price = await this.scene.game.web3.getDefaultPrice(); // Check for latest bid also
 
     this.wrapper.removeChild(this.loadingIcon);
 
-    if (this.defaultAddress === this.owner)
+    if (!this.owner || !this.defaultAddress)
+      this.createPurchaseUI();
+    else if (this.defaultAddress === this.owner)
       this.createColorUI();
     else
-      this.createPurchaseUI();
+      this.createBidUI();
 
     this.scene.game.emitter.emit('controller/update'); // Update components once everything is in the dom
     this.setPosition();
@@ -107,14 +117,22 @@ export default class InfoBox {
       text: 'Create',
       clickAction: async e => {
         try {
-          await buyPixel({ scene: this.scene, selection: this.selection, color: 'ffffff' });
+          if (!this.defaultAddress)
+            this.defaultAddress = await this.scene.game.web3.getActiveAddress();
+
+          if (!this.defaultAddress)
+            return;
+
+          await buyPixel({ scene: this.scene, selection: this.selection });
 
           this.wrapper.removeChild(this.purchaseUI);
           this.wrapper.appendChild(this.loadingIcon);
-          
-          await this.setUI();
+
+          await this.setUI({
+            owner: this.defaultAddress
+          });
         } catch (error) {
-          console.error('Buy pixel failed: ' + error);
+          console.error('Failed to buy pixel', error);
         }
       }
     });
@@ -137,13 +155,13 @@ export default class InfoBox {
       label: 'hex',
       width: '100%',
       scene: this.scene,
-      format: (value) => '#' + value.toString(16),
+      format: (value) => '#' + formatColorNumber(value),
       onUpdate: () => {
         if (this.updateTimeout !== null)
           this.cancelUpdate();
 
-        this.updateTimeout = setTimeout(() => {
-          setPixel({ pixel: this.selection.pixel, scene: this.scene })
+        this.updateTimeout = setTimeout(async () => {
+          await setPixel({ selection: this.selection, scene: this.scene })
         }, 500);
       }
     })
@@ -168,6 +186,10 @@ export default class InfoBox {
     this.colorSelectionUI.appendChild(this.saturationInput);
 
     this.wrapper.appendChild(this.colorSelectionUI);
+  }
+
+  createBidUI() {
+    console.log('Create BID UI');
   }
 
   destroy() {

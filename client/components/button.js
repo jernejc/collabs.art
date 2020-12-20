@@ -12,6 +12,7 @@ export default class Button {
     this.button.addEventListener('click', async e => {
       this.loading();
       await clickAction();
+      this.reset();
     });
 
     return this.button;
@@ -24,6 +25,8 @@ export default class Button {
   }
 
   reset() {
+    this.button.removeChild(this.loadingIcon);
+    this.button.disabled = false;
     this.button.textContent = this.text;
   }
 }

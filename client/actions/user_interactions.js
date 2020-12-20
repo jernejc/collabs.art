@@ -1,5 +1,7 @@
 import { getPixelForPointer } from "./pixel";
 
+import { formatColorNumber } from '@util/helpers';
+
 // Fired when user moves pointer through the grid
 export function handleMouseMove({ pointer, scene }) {
   if (DEBUG) console.log('User interactions: handleMove');
@@ -247,7 +249,7 @@ export function resetStrokeStyle({ tile, scene, size = 0.9 }) {
 }
 
 export function setInvertedStroke({ tile, scene }) {
-  const color = Phaser.Display.Color.HexStringToColor('#' + tile.fillColor.toString(16));
+  const color = Phaser.Display.Color.HexStringToColor('#' + formatColorNumber(tile.fillColor));
   const invertedColor = invertColor(color, true);
 
   tile.setStrokeStyle(scene.strokeSize + 1, invertedColor.color, 1);

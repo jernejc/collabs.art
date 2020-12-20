@@ -19,15 +19,15 @@ export function createPixel({ x, y, scene }) {
   return tile;
 }
 
-export async function buyPixel({ scene, selection, color }) {
-  console.log('buyPixel', selection, color);
+export async function buyPixel({ scene, selection }) {
+  if (DEBUG) console.log('BUY Pixel', selection);
 
   try {
-    const defaultAccount = await scene.game.web3.currentDefaultAddress();
+    const defaultAccount = await scene.game.web3.getActiveAddress();
 
     await scene.game.web3.bidContract.methods.purchase(
       stringToBN(selection.position), // pixel position
-      Web3.utils.stringToHex("FFFFFF") // pixel color
+      Web3.utils.stringToHex(selection.HEXcolor) // pixel color
     ).send({
       from: defaultAccount,
       gas: 300000,
@@ -39,7 +39,7 @@ export async function buyPixel({ scene, selection, color }) {
 }
 
 export function colorPixel({ x, y, scene }) {
-  if (DEBUG) console.log('colorPixel')
+  if (DEBUG) console.log('COLOR Pixel', x, y)
 
   const mapPixel = getColor({ x, y, color: scene.color, scene });
 
@@ -51,18 +51,32 @@ export function colorPixel({ x, y, scene }) {
   scene.land[y][x].setFillStyle(mapPixel.color.color);
 }
 
-export function setPixel({ pixel, scene }) {
-  console.log("SET pixel", pixel.tile.cx, pixel.tile.cy, pixel.color.color.color);
+export async function setPixel({ selection, scene }) {
+  if (DEBUG) console.log("SET pixel", selection.cx, selection.cy, selection.color, selection.HEXcolor);
 
   scene.worldmap.setPixel(
-    pixel.tile.cx,
-    pixel.tile.cy,
-    pixel.color.color.r,
-    pixel.color.color.g,
-    pixel.color.color.b
+    selection.cx,
+    selection.cy,
+    selection.color.r,
+    selection.color.g,
+    selection.color.b
   )
 
   scene.worldmap.update();
+
+  try {
+    const defaultAccount = await scene.game.web3.getActiveAddress();
+    await scene.game.web3.pixelContract.methods.setColor(
+      stringToBN(selection.position), // pixel position
+      Web3.utils.stringToHex(selection.HEXcolor) // pixel color
+    ).send({
+      from: defaultAccount,
+      gas: 200000
+    });
+  } catch (error) {
+    console.error('setColor pixel error', error)
+  }
+
 }
 
 export function getColor({ x, y, color, scene }) {

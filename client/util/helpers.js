@@ -62,3 +62,16 @@ export function stringToBN(string) {
 export function hexToString(hex) {
   return web3.utils.hexToString(hex);
 }
+
+export function stringToHex(string) {
+  return web3.utils.stringToHex(string);
+}
+
+export function formatColorNumber(number) {
+  let string = number.toString(16);
+
+  if (string.length < 6) 
+    string = string.padStart(6, "0");
+
+  return string;
+}

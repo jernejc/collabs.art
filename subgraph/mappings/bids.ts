@@ -6,6 +6,7 @@ export function handlePixelPurchase(event: Purchase): void {
 
   pixel.owner = event.params._payer
   pixel.price = event.params._amount
+  pixel.color = event.params._color
 
   pixel.save()
 }

@@ -10,7 +10,7 @@ export default class ToolsManager {
     this.gameCanvas = document.querySelector('#' + game.appConfig.canvasElement);
     this.parent = this.gameCanvas.parentNode;
 
-    //this.addModeButtons();
+    this.addConnectionStatus();
     this.addMenuButtons();
 
     this.addEvents();
@@ -37,22 +37,20 @@ export default class ToolsManager {
   }
 
   addEvents() {
-    /*this.emitter.on('scene/mode', mode => {
-      if (this.game.mode !== mode)
-        this.setActiveMode(mode);
+    this.emitter.on('web3/address', address => {
+      this.setActiveConnection(address);
+    }); 
+
+    this.domConnectionStatus.addEventListener('click', async () => {
+      if (!this.game.web3.activeAddress)
+        await this.game.web3.getActiveAddress();
     });
-
-    this.domModeButtons.addEventListener('click', (e) => {
-      const gameMode = e.target.dataset.gameMode || e.target.parentNode.dataset.gameMode;
-
-      if (this.game.mode !== gameMode)
-        this.emitter.emit('scene/mode', gameMode);
-    });*/
 
     this.domMenuButtons.addEventListener('click', async (e) => {
       const menu = e.target.dataset.gameMode || e.target.parentNode.dataset.gameMode;
 
-      console.log('menu CLICK', menu, this);
+      if (DEBUG) console.log('menu CLICK', menu, this);
+
       if (!this.domMenuItem)
         await this.openMenu()
     });
@@ -63,8 +61,8 @@ export default class ToolsManager {
     await this.menu.init();
   }
 
-  setActiveMode(mode) {
-    const modes = this.domModeButtons.querySelectorAll('.mode');
+  /*setActiveMode(mode) {
+    const modes = this.domConnectionStatus.querySelectorAll('.mode');
 
     for (let index = 0; index < modes.length; index++) {
       const tool = modes[index];
@@ -77,29 +75,49 @@ export default class ToolsManager {
           tool.classList.remove('active')
       }
     }
+  }*/
+
+  setActiveConnection(address) {
+    const connections = this.domConnectionStatus.querySelectorAll('.connection');
+
+    for (let index = 0; index < connections.length; index++) {
+      const connection = connections[index];
+
+      if (connection.dataset.connection === 'account') {
+        const icon = connection.querySelector('i');
+        
+        if (icon.classList.contains('gg-block')) {
+          icon.classList.remove('gg-block');
+          icon.classList.add('gg-data');
+        } else if (icon.classList.contains('gg-data')) {
+          if (!address) {
+            icon.classList.remove('gg-data');
+            icon.classList.add('gg-block');
+          } else
+            console.log('blink');
+        }
+      }
+    }
   }
 
-  addModeButtons() {
-    this.domModeButtons = document.createElement('div');
-    this.domModeButtons.setAttribute('id', 'mode-buttons');
+  addConnectionStatus() {
+    this.domConnectionStatus = document.createElement('div');
+    this.domConnectionStatus.setAttribute('id', 'user-buttons');
 
-    this.parent.appendChild(this.domModeButtons);
+    this.parent.appendChild(this.domConnectionStatus);
 
-    this.modes = [{
-      name: 'move',
-      icon: 'gg-controller'
-    }, {
-      name: 'select',
-      icon: 'gg-tap-single'
+    this.connections = [{
+      name: 'account',
+      icon: this.game.web3.isProviderConnected() ? 'gg-data' : 'gg-block'
     }];
 
-    this.modes.forEach(tool => {
-      const button = this.buttonTemplate(tool, 'mode');
+    this.connections.forEach(tool => {
+      const button = this.buttonTemplate(tool, 'connection');
 
       if (this.game.appConfig.defaultMode === tool.name)
         button.classList.add('active');
 
-      this.domModeButtons.appendChild(button);
+      this.domConnectionStatus.appendChild(button);
     })
   }
 
@@ -107,7 +125,7 @@ export default class ToolsManager {
     const button = document.createElement('span');
 
     button.classList.add(type, tool.name);
-    button.dataset.gameMode = tool.name;
+    button.dataset.connection = tool.name;
 
     const icon = document.createElement('i');
     icon.classList.add(tool.icon);
