@@ -7,10 +7,15 @@ import { invertColor } from '@actions/user_interactions';
 
 export default class SelectionManager {
 
-  constructor() {
+  constructor(game, emitter) {
+    this.game = game;
+    this.emitter = emitter;
+
     this.selection = [];
     this.infobox = null;
     this.parent = document.body.querySelector('#game');
+    
+    this.enableEvents();
   }
 
   async displayInfoBox({ scene }) {
@@ -33,6 +38,16 @@ export default class SelectionManager {
 
     // Init is async, not sure if this is best approach
     await this.infobox.init();
+  }
+
+  enableEvents() {
+    this.emitter.on('web3/address', async address => {
+      if (DEBUG) console.log('SelectionManager: on web3/address emitter', address);
+      
+      // Update infobox UI if user address changes
+      if (this.infobox && !this.infobox.preventRefresh)
+        await this.infobox.setUI();
+    });
   }
 
   createHighlightSelection({ pointer, scene }) {

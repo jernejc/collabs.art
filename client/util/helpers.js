@@ -75,3 +75,7 @@ export function formatColorNumber(number) {
 
   return string;
 }
+
+export function fromWei(number) {
+  return web3.utils.fromWei(number);
+}

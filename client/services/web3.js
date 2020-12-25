@@ -60,11 +60,12 @@ export default class Web3Manager {
   enableEvents() {
     if (DEBUG) console.log('Web3Manager: enableEvents');
 
-    // Had to wrap them in anonymous function to handle 'this'
-    window.ethereum.on('chainChanged', () => this.handleNewChain);
-    window.ethereum.on('networkChanged', () => this.handleNewNetwork);
-    window.ethereum.on('accountsChanged', () => this.handleAccountsChanged);
-    window.ethereum.on('message', (msg) => this.handleProviderMessage);
+    const _self = this; // Had to wrap them in anonymous functions to handle 'this'
+
+    this.instance.currentProvider.on('chainChanged', chainId => _self.handleNewChain(chainId));
+    this.instance.currentProvider.on('networkChanged', networkId => _self.handleNewNetwork(networkId));
+    this.instance.currentProvider.on('accountsChanged', accounts => _self.handleAccountsChanged(accounts));
+    this.instance.currentProvider.on('message', msg => _self.handleProviderMessage(msg));
   }
 
   handleNewChain(chainId) {
@@ -78,7 +79,7 @@ export default class Web3Manager {
   }
 
   handleAccountsChanged(accounts) {
-    /*if (DEBUG)*/ console.log('Web3Manager: handleAccountsChanged', this, accounts);
+    if (DEBUG) console.log('Web3Manager: handleAccountsChanged', this, accounts);
 
     if (accounts.length > 0) {
       this.accounts = accounts;
@@ -174,13 +175,11 @@ export default class Web3Manager {
   async getAccounts() {
     if (DEBUG) console.log('Web3Manager: getAccounts');
 
-    if (this.accounts.length === 0) {
-      const accounts = await this.instance.currentProvider.request({
-        method: 'eth_accounts',
-      });
+    const accounts = await this.instance.currentProvider.request({
+      method: 'eth_accounts',
+    });
 
-      this.handleAccountsChanged(accounts);
-    }
+    this.handleAccountsChanged(accounts);
 
     return this.accounts;
   }
@@ -195,10 +194,10 @@ export default class Web3Manager {
   }
 
   async getActiveAddress() {
-    /*if (DEBUG)*/ console.log('Web3Manager: getActiveAddress');
+    if (DEBUG) console.log('Web3Manager: getActiveAddress');
 
     if (this.activeAddress)
-      return this.activeAddress
+      return this.activeAddress;
 
     // Request account connection
     await this.requestAccounts();

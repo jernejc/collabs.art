@@ -40,7 +40,7 @@ export default class Selection {
 
   get title() {
     if (this.pixel)
-      return `<i class="gg-path-crop"></i>${this.position}`;
+      return this.position;
     else if (this.start && this.end)
       return `<span class="smaller">
 								${numberToLetterColumn(this.start.tile.cy)}${this.start.tile.cx}

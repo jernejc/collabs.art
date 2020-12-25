@@ -37,8 +37,11 @@ export default class ToolsManager {
   }
 
   addEvents() {
-    this.emitter.on('web3/address', address => {
+    this.emitter.on('web3/address', async address => {
       this.setActiveConnection(address);
+
+      if (this.menu)
+        await this.menu.loadPixels();
     }); 
 
     this.domConnectionStatus.addEventListener('click', async () => {
@@ -58,6 +61,8 @@ export default class ToolsManager {
 
   async openMenu() {
     this.menu = new Menu({ parent: this.parent, game: this.game });
+
+    // Init is async 
     await this.menu.init();
   }
 

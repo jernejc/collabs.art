@@ -22,20 +22,69 @@ export function createPixel({ x, y, scene }) {
 export async function buyPixel({ scene, selection }) {
   if (DEBUG) console.log('BUY Pixel', selection);
 
+  let success = false;
+
   try {
-    const defaultAccount = await scene.game.web3.getActiveAddress();
+    if (!scene.game.web3.activeAddress)
+      await scene.game.web3.getActiveAddress();
+
+    if (!scene.game.web3.activeAddress)
+      return success;
+
+    let price = selection.price;
+    
+    if (typeof price === 'number') 
+      price = price.toString(); // web3.toWei needs strings or BN
 
     await scene.game.web3.bidContract.methods.purchase(
       stringToBN(selection.position), // pixel position
       Web3.utils.stringToHex(selection.HEXcolor) // pixel color
     ).send({
-      from: defaultAccount,
+      from: scene.game.web3.activeAddress,
       gas: 300000,
-      value: Web3.utils.toWei(selection.price, "ether")
+      value: Web3.utils.toWei(price, "ether")
     });
+
+    success = true;
   } catch (error) {
-    console.error('Purchase pixel error', error)
+    console.error('Purchase pixel error', error);
   }
+
+  return success;
+}
+
+export async function bidPixel({ scene, selection }) {
+  if (DEBUG) console.log('BID Pixel', selection);
+
+  let success = false;
+
+  try {
+    if (!scene.game.web3.activeAddress)
+      await scene.game.web3.getActiveAddress();
+
+    if (!scene.game.web3.activeAddress)
+      return success;
+
+    let price = selection.price;
+    
+    if (typeof price === 'number') 
+      price = price.toString(); // web3.toWei needs strings or BN
+
+    await scene.game.web3.bidContract.methods.placeBid(
+      stringToBN(selection.position), // pixel position
+      3600 * 7 // duration in seconds: 7h
+    ).send({
+      from: scene.game.web3.activeAddress,
+      gas: 300000,
+      value: Web3.utils.toWei(price, "ether")
+    });
+
+    success = true;
+  } catch (error) {
+    console.error('Purchase pixel error', error);
+  }
+
+  return success;
 }
 
 export function colorPixel({ x, y, scene }) {

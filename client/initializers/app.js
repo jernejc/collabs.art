@@ -46,7 +46,7 @@ export async function AppInitializer({
   await GameInstance.web3.initProvider();
 
   // Init Selection Manager
-  GameInstance.selection = new SelectionManager(GameInstance);
+  GameInstance.selection = new SelectionManager(GameInstance, Emitter);
   // Init Graph Manager
   GameInstance.graph = new GraphManager();
   // Init Tools Manager

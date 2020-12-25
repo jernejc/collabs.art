@@ -18,8 +18,7 @@ export default class Menu {
   }
 
   async init() {
-    const pixels = await this.game.graph.loadPixels();
-    this.createList(pixels);
+    await this.loadPixels();
 
     this.domElement.addEventListener('click', async (e) => {
       let cx, cy, target;
@@ -37,6 +36,16 @@ export default class Menu {
       const pixel = getRelativePixel({ cx, cy, scene: this.scene, color: true });
       await this.game.selection.createSingleSelection({ pixel, scene: this.scene });
     });
+  }
+
+  async loadPixels() {
+    this.resetList();
+
+    const pixels = await this.game.graph.loadPixels({
+      owner: this.game.web3.activeAddress
+    });
+
+    this.createList(pixels);
   }
 
   createList(pixels) {
@@ -68,5 +77,12 @@ export default class Menu {
     `;
 
     return item;
+  }
+
+  resetList() {
+    if (this.menuList) {
+      this.domElement.removeChild(this.menuList);
+      this.menuList = null;
+    }
   }
 }

@@ -2,8 +2,8 @@
 export default class Button {
   constructor({ elClass, text, clickAction }) {
     this.text = text;
-    this.loadingIcon = document.createElement('i');
-    this.loadingIcon.classList.add('gg-loadbar-alt');
+    this.loadingI = document.createElement('i');
+    this.loadingI.classList.add('gg-loadbar-alt');
 
     this.button = document.createElement('button');
     this.button.classList.add(elClass, 'action-button');
@@ -21,11 +21,11 @@ export default class Button {
   loading() {
     this.button.disabled = true;
     this.button.textContent = '';
-    this.button.appendChild(this.loadingIcon);
+    this.button.appendChild(this.loadingI);
   }
 
   reset() {
-    this.button.removeChild(this.loadingIcon);
+    this.button.removeChild(this.loadingI);
     this.button.disabled = false;
     this.button.textContent = this.text;
   }

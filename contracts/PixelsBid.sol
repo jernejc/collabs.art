@@ -97,7 +97,7 @@ contract PixelsBid is Ownable, Pausable {
     /**
      * @dev Purchase _position
      * You can only purchase non-existing pixels within the given range of positions
-     * @param _position string pixel position
+     * @param _position pixel position
      * @param _color pixel HEX color
      */
     function purchase(uint128 _position, bytes6 _color)
@@ -130,8 +130,8 @@ contract PixelsBid is Ownable, Pausable {
 
     /**
      * @dev Place bid for pixel position
-     * @param _position position the bid is for
-     * @param _duration bid duration
+     * @param _position pixel position
+     * @param _duration bid duration in seconds
      */
     function placeBid(uint128 _position, uint256 _duration) 
         public 
@@ -139,7 +139,7 @@ contract PixelsBid is Ownable, Pausable {
         whenNotPaused 
     {
         require(
-            msg.value > bids[_position].amount, // Solidity will return 0 if there is no existing bid
+            msg.value > bids[_position].amount && msg.value >= defaultPrice,
             "PixelsBid: Bid amount should be greater than 0 or currently highest bid"
         );
         require(
@@ -319,7 +319,7 @@ contract PixelsBid is Ownable, Pausable {
 
     /**
     * @dev Get bid for pixel 
-    * @param _position - pixel position
+    * @param _position pixel position
     * @return Bid
     */
     function _getBid(uint128 _position) 

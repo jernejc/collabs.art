@@ -9,6 +9,14 @@ h1 {
   overflow: hidden;
 }
 
+input[type=number]::-webkit-inner-spin-button {
+  opacity: 1;
+}
+
+.disabled {
+  cursor: not-allowed;
+}
+
 #app {
   /*background-color: rgb(24, 26, 27);
   position: absolute;
@@ -143,9 +151,9 @@ h1 {
   color: rgba(255, 255, 255, 1);
 }
 
-#menu-item ul li:last-child {
-  /*border-width: 0;*/
-}
+/*#menu-item ul li:last-child {
+  border-width: 0;
+}*/
 
 #user-buttons {
   left: auto;
@@ -200,7 +208,7 @@ Info Box
 .info-box {
   position: absolute;
   min-height: 80px;
-  width: 100px;
+  width: 110px;
   background-color: rgb(24, 26, 27);
   color: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -212,7 +220,9 @@ Info Box
 
 .info-box .position {
   text-align: center;
-  margin: 0 0 7.5px 0;
+  background: rgba(255, 255, 255, 0.9);
+  color: rgb(24, 26, 27);
+  line-height: 25px;
 }
 
 .info-box .position i {
@@ -274,6 +284,58 @@ Info Box
   top: -2px;
 }
 
+.text-info {
+  text-align: center;
+  padding: 0px;
+  margin: 3.5px 0 10px;
+  font-size: 0.88em;
+}
+
+.info-box.purchaseUI .text-info {
+  color: #02be01;
+}
+
+.info-box.bidUI .text-info {
+  color: #0083c7;
+}
+
+.info-box.activeBidUI .text-info {
+  color: #e5d900;
+}
+
+.text-info i {
+  display: inline-block;
+  --ggs: 0.73;
+  top: 5px;
+  cursor: pointer;
+}
+
+.action-button {
+  border: 0;
+  font-size: 14px;
+  line-height: 25px;
+  min-height: 25px;
+  font-family: inherit;
+  width: 100%;
+  background:rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+}
+
+.action-button i {
+  margin: 0 auto;
+}
+
+.info-box.purchaseUI .action-button {
+  background: #02be01;
+}
+
+.info-box.bidUI .action-button {
+  background: #0083c7;
+}
+
+.info-box.activeBidUI .action-button {
+  background: #e5d900;
+}
 
 .text-input {
   position: relative;
@@ -287,13 +349,13 @@ Info Box
   position: absolute;
   padding: 0px 2px;
   background: rgb(24, 26, 27);
-  font-size: 12px;
+  font-size: 11px;
   text-align: center;
   left: 50%;
-  transform: translate(-50%, -25%);
+  transform: translate(-50%, -15%);
 }
 
-.text-input input[type="text"] {
+.text-input input {
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.9);
@@ -302,13 +364,13 @@ Info Box
   top: 59%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 78%;
+  width: 55%;
   border: none;
   font-size: 12px;
   letter-spacing: 0.15px;
 }
 
-.text-input input[type="text"]:focus {
+.text-input input:focus {
   outline: none;
 }
 
@@ -431,19 +493,4 @@ Info Box
   background-color: rgba(255, 255, 255, 0.9);
   box-shadow: rgba(255, 255, 255, 0.1);
   color: rgb(24, 26, 27);
-}
-
-.action-button {
-  border: 0;
-  font-size: 14px;
-  line-height: 25px;
-  min-height: 25px;
-  font-family: inherit;
-  width: 100%;
-  background:rgba(255, 255, 255, 0.9);
-  cursor: pointer;
-}
-
-.action-button i {
-  margin: 0 auto;
 }
