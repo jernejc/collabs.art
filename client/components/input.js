@@ -27,6 +27,8 @@ export default class Input extends Controller {
     this.domElement.appendChild(this.border);
     this.domElement.classList.add('text-input');
 
+    if (params.className)
+      this.domElement.classList.add(params.className);
     if (params.step)
       this.input.setAttribute('step', params.step);
     if (params.max)

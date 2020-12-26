@@ -5,7 +5,7 @@ import Input from '@components/input';
 
 import { setPixel, buyPixel, bidPixel } from '@actions/pixel';
 
-import { formatColorNumber, fromWei } from '@util/helpers';
+import { formatColorNumber, fromWei, formatExpireDate } from '@util/helpers';
 
 import Button from './button';
 
@@ -65,7 +65,7 @@ export default class InfoBox {
 
     this.wrapper.appendChild(this.loadingIcon);
 
-    let highestBid;
+    this.highestBid = null;
 
     pixelData = pixelData || await this.scene.game.graph.loadPixel({
       id: this.selection.position
@@ -75,8 +75,9 @@ export default class InfoBox {
       this.owner = pixelData.owner.toLowerCase();
 
       if (pixelData.highestBid && pixelData.highestBid.amount) { // Check for latest bid also
-        this.selection.price = parseFloat(fromWei(pixelData.highestBid.amount)) + 0.001;
-        highestBid = true;
+        this.highestBid = pixelData.highestBid;
+        this.highestBid.amount =  parseFloat(fromWei(this.highestBid.amount)) // Conver from Wei
+        this.selection.price = this.highestBid.amount + 0.001;
       } 
     }
     
@@ -89,7 +90,7 @@ export default class InfoBox {
       this.createPurchaseUI();
     else if (this.scene.game.web3.activeAddress === this.owner)
       this.createColorUI();
-    else if (highestBid && pixelData.highestBid.bidder === this.scene.game.web3.activeAddress)
+    else if (this.highestBid && this.highestBid.bidder === this.scene.game.web3.activeAddress)
       this.createActiveBidUI();
     else
       this.createBidUI();
@@ -118,12 +119,9 @@ export default class InfoBox {
     this.purchaseUI = document.createElement('div');
     this.purchaseUI.appendChild(this.createInfoText('Available', 'purchase'));
     this.purchaseUI.appendChild(new Input(this.selection, 'price', {
-      min: this.selection.price,
-      max: 100,
-      step: 0.001,
-      type: 'number',
       label: 'ETH',
       width: '100%',
+      disabled: true,
       scene: this.scene
     }));
 
@@ -160,9 +158,6 @@ export default class InfoBox {
 
     this.colorSelectionUI = document.createElement('div');
     this.colorSelectionUI.appendChild(new Input(this.selection.pixel, 'color.color.color', {
-      min: 0,
-      max: 255,
-      step: 2,
       label: 'hex',
       width: '100%',
       scene: this.scene,
@@ -244,15 +239,19 @@ export default class InfoBox {
 
     this.activeBidUI = document.createElement('div');
     this.activeBidUI.appendChild(this.createInfoText('Bid placed', 'placed'));
-    this.activeBidUI.appendChild(new Input(this.selection, 'price', {
-      min: this.selection.price,
-      max: 100,
-      step: 0.001,
-      type: 'number',
+    this.activeBidUI.appendChild(new Input(this.highestBid, 'amount', {
       label: 'ETH',
-      width: '100%',
+      width: '49%',
       disabled: true,
       scene: this.scene
+    }));
+    this.activeBidUI.appendChild(new Input(this.highestBid, 'expiresAt', {
+      label: 'Time',
+      width: '49%',
+      disabled: true,
+      scene: this.scene,
+      className: 'right',
+      format: (value) => formatExpireDate(value)
     }));
 
     this.activeBidUI.appendChild(new Button({

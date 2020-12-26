@@ -49,6 +49,48 @@ export function formatPositionHex(hex) {
   }
 }
 
+export function formatExpireDate(endTime) { // end time in seconds
+  const _second = 1000,
+    _minute = _second * 60,
+    _hour = _minute * 60,
+    _day = _hour * 24,
+    end = new Date(endTime * 1000),
+    now = new Date(),
+    distance = end - now;
+
+  if (distance < 0)
+    return '-';
+
+  const days = Math.floor(distance / _day),
+    hours = Math.floor((distance % _day) / _hour),
+    minutes = Math.floor((distance % _hour) / _minute),
+    seconds = Math.floor((distance % _minute) / _second);
+
+  let string = '';
+
+  // This needs better logic
+  if (days > 0) { 
+    string = `${days}d`;
+    
+    if (hours > 0)
+      string += ` ${hours}h`;
+  } else if (hours > 0) {
+    string = `${hours}h`;
+
+    if (minutes > 0)
+      string += ` ${minutes}m`;
+  } else if (minutes > 0) {
+    string = `${minutes}m`;
+
+    if (seconds > 0)
+      string += ` ${seconds}s`;
+  } else {
+    string = `${seconds}s`;
+  }
+
+  return string;
+}
+
 // Normalize beetwen min, max
 export function normalize(v, i1, i2, o1, o2) {
   return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
@@ -70,7 +112,7 @@ export function stringToHex(string) {
 export function formatColorNumber(number) {
   let string = number.toString(16);
 
-  if (string.length < 6) 
+  if (string.length < 6)
     string = string.padStart(6, "0");
 
   return string;

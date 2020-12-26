@@ -9,14 +9,6 @@ h1 {
   overflow: hidden;
 }
 
-input[type=number]::-webkit-inner-spin-button {
-  opacity: 1;
-}
-
-.disabled {
-  cursor: not-allowed;
-}
-
 #app {
   /*background-color: rgb(24, 26, 27);
   position: absolute;
@@ -220,7 +212,7 @@ Info Box
 
 .info-box .position {
   text-align: center;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.801);
   color: rgb(24, 26, 27);
   line-height: 25px;
 }
@@ -345,6 +337,10 @@ Info Box
   display: inline-block;
 }
 
+.text-input.right {
+  margin-left: 2%;
+}
+
 .text-input label {
   position: absolute;
   padding: 0px 2px;
@@ -364,10 +360,18 @@ Info Box
   top: 59%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 55%;
+  width: 70%;
   border: none;
   font-size: 12px;
   letter-spacing: 0.15px;
+}
+
+.text-input input[type=number] {
+  width: 50%;
+}
+
+.text-input input[type=number]::-webkit-inner-spin-button {
+  opacity: 1;
 }
 
 .text-input input:focus {
