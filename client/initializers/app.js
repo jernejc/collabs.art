@@ -29,10 +29,16 @@ export async function AppInitializer({
     parent: canvasElement
   });
 
+  // GridSize calc
+  gridSize = parseInt(gridSize - (gridSize * 0.5) / window.devicePixelRatio);
+  // Stroke size calc
+  strokeSize = strokeSize + (window.devicePixelRatio * (strokeSize * 0.5));
+
   GameInstance.emitter = Emitter;
   GameInstance.appConfig = {
     canvasWidth: canvas.clientWidth,
     canvasHeight: canvas.clientHeight,
+    pixelRatio: window.devicePixelRatio,
     defaultMode,
     gridSize,
     canvasElement,

@@ -44,7 +44,7 @@ export default class MinimapScene extends ApplicationScene {
       Phaser.Display.Color.HexStringToColor('#000000').color
     );
 
-    this.mapoverlay.setAlpha(0.7);
+    this.mapoverlay.setAlpha(0.6);
     this.mapoverlay.mask = new Phaser.Display.Masks.GeometryMask(this, this.visibleField);
     this.mapoverlay.mask.invertAlpha = true;
 

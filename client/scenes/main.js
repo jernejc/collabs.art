@@ -104,6 +104,11 @@ export default class MainScene extends ApplicationScene {
 
     // Main scene is ready.
     this.game.emitter.emit('scene/ready');
+
+    // Pause the update function
+    //this.scene.pause();
+
+    //console.log('MainScene this', this);
   }
 
   update() {
@@ -155,7 +160,7 @@ export default class MainScene extends ApplicationScene {
   createMinimap() {
     if (DEBUG) console.log("Main Scene: createMinimap");
 
-    const sizeRatio = 5;
+    const sizeRatio = 5 + (5 * 0.5 / window.devicePixelRatio);
     const margin = 10;
     const margin2X = margin * 2;
 
