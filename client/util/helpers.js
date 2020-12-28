@@ -69,21 +69,18 @@ export function formatExpireDate(endTime) { // end time in seconds
   let string = '';
 
   // This needs better logic
-  if (days > 0) { 
-    string = `${days}d`;
-    
-    if (hours > 0)
-      string += ` ${hours}h`;
+  if (days > 0) {
+    string = `${(hours > 0 && hours > 13) ? days + 1 : days}d`;
   } else if (hours > 0) {
-    string = `${hours}h`;
+    string = `${(minutes > 0 && minutes > 30) ? hours + 1 : hours}h`;
 
-    if (minutes > 0)
-      string += ` ${minutes}m`;
+    /*if (minutes > 0)
+      string += ` ${minutes}m`;*/
   } else if (minutes > 0) {
-    string = `${minutes}m`;
+    string = `${(seconds && seconds > 30) ? minutes + 1 : minutes}m`;
 
-    if (seconds > 0)
-      string += ` ${seconds}s`;
+    /*if (seconds > 0)
+      string += ` ${seconds}s`;*/
   } else {
     string = `${seconds}s`;
   }
@@ -120,4 +117,8 @@ export function formatColorNumber(number) {
 
 export function fromWei(number) {
   return web3.utils.fromWei(number);
+}
+
+export async function delay(seconds) {
+  return new Promise((resolve) => setTimeout(resolve, seconds * 1000))
 }

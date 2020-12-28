@@ -264,6 +264,13 @@ Info Box
 
 .info-box .loadingbar {
   margin: 30px auto;
+  text-align: center;
+  font-size: 9px;
+  font-weight: 200;
+}
+
+.info-box .loadingbar i {
+  margin: 0 auto;    
 }
 
 .info-box .smaller {
@@ -383,6 +390,14 @@ Info Box
   border-radius: 5px;
   height: 30px;
   margin: 4px auto 0px;
+}
+
+.text-input .color {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  left: 9px;
+  top: 13px;
 }
 
 .hue {

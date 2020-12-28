@@ -16,7 +16,7 @@ export default class MinimapScene extends ApplicationScene {
     this.mainscene = this.game.scene.keys["MainScene"];
 
     this.appConfig.canvasWidth / this.sceneConfig.size;
-    this.worldmap = this.add.image(this.sceneConfig.width / 2, this.sceneConfig.height / 2, 'worldmap');
+    this.worldmap = this.add.image(parseInt(this.sceneConfig.width / 2), parseInt(this.sceneConfig.height / 2), 'worldmap');
     this.worldmap.setDisplaySize(this.sceneConfig.width, this.sceneConfig.height);
 
     // Main camera for scene

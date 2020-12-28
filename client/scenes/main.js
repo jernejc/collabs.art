@@ -16,6 +16,7 @@ import {
   setGameMode,
   moveToPosition
 } from '@actions/user_interactions';
+import { pad } from 'lodash';
 
 export default class MainScene extends ApplicationScene {
   constructor() {
@@ -160,9 +161,10 @@ export default class MainScene extends ApplicationScene {
   createMinimap() {
     if (DEBUG) console.log("Main Scene: createMinimap");
 
-    const sizeRatio = 5 + (5 * 0.5 / window.devicePixelRatio);
+    const sizeRatio = (window.devicePixelRatio > 1) ? 5 + (5 * 0.5 / window.devicePixelRatio) : 5;
     const margin = 10;
-    const margin2X = margin * 2;
+    const padding = 5;
+    const margin2X = margin + padding;
 
     // Minimap size
     const width = 1000 / sizeRatio;
@@ -183,10 +185,10 @@ export default class MainScene extends ApplicationScene {
       .setDepth(3)
 
     this.minimapBackground = this.add.rectangle(
-      x - margin,
-      y - margin,
-      width + margin2X,
-      height + margin2X, Phaser.Display.Color.HexStringToColor('#181a1b').color, 1
+      x - padding,
+      y - padding,
+      width + margin,
+      height + margin, Phaser.Display.Color.HexStringToColor('#181a1b').color, 1
     )
       .setOrigin(0)
       .setDepth(2)

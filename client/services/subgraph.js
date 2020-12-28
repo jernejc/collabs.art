@@ -1,22 +1,26 @@
 
 import config from '@util/config';
-import { stringToHex } from '@util/helpers';
+import { stringToHex, delay } from '@util/helpers';
 
 export default class GraphManager {
 
   async loadPixels(params) {
     if (DEBUG) console.log('GraphManager: initContracts');
-    const response = await this.postQueryToGraph('pixels', params);      
+    const response = await this.postQueryToGraph('pixels', params);
     return response.pixels;
   }
 
-  async loadPixel(params) {
-    if (DEBUG) console.log('GraphManager: initContracts');
+  async loadPixel(params, refresh) {
+    /*if (DEBUG)*/ console.log('GraphManager: initContracts');
+
+    if (refresh) // delay for 3s so the graph is up to date, need better solution here
+      await delay(1);
+
     const response = await this.postQueryToGraph('pixel', params);
     return response.pixel;
   }
 
-  getPixelsQuery(params) { 
+  getPixelsQuery(params) {
 
     if (!params.first || params.first > 100)
       params.first = 50;
@@ -50,10 +54,10 @@ export default class GraphManager {
     if (DEBUG) console.log('GraphManager: postQueryToGraph');
 
     let query;
-    
+
     params = params || {};
 
-    switch(queryName) {
+    switch (queryName) {
       case 'pixels':
         query = this.getPixelsQuery(params);
         break;
@@ -80,12 +84,12 @@ export default class GraphManager {
     const response = await fetch(config.subgraph.local, options)
       .then(res => res.json());
 
-    if (response.errors) 
+    if (response.errors)
       throw new Error(JSON.stringify(response.errors));
 
     if (!response.data)
       throw new Error('No query data found.');
-    
+
     return response.data;
   }
 }

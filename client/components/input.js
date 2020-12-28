@@ -1,5 +1,6 @@
 
 import Controller from '@components/controller';
+import { formatColorNumber } from '@util/helpers';
 
 /**
  * Input Class
@@ -14,16 +15,23 @@ export default class Input extends Controller {
     const self = this;
 
     this.input = document.createElement('input');
+    this.domElement.appendChild(this.input);
 
-    if (params.type)
-      this.input.setAttribute('type', params.type);
-    else
-      this.input.setAttribute('type', 'text');
+    switch (params.type) {
+      case 'color':
+          this.color = document.createElement('span');
+          this.color.classList.add('color');
+          this.color.style = `background: #${formatColorNumber(this.getValue())};`
+          this.domElement.appendChild(this.color);
+          this.input.setAttribute('type', 'text');
+        break;
+      default:
+        this.input.setAttribute('type', params.type);
+    }
 
     this.border = document.createElement('div');
     this.border.classList.add('input-border');
 
-    this.domElement.appendChild(this.input);
     this.domElement.appendChild(this.border);
     this.domElement.classList.add('text-input');
 
@@ -35,10 +43,12 @@ export default class Input extends Controller {
       this.input.setAttribute('max', params.max);
     if (params.min)
       this.input.setAttribute('min', params.min);
-    if (params.disabled) {
+    if (params.disabled) 
       this.input.disabled = true;
-      this.domElement.classList.add('disabled');
-    }
+    if (params.blur)
+      this.input.addEventListener('blur', params.blur)
+    if (params.focus)
+      this.input.addEventListener('focus', params.focus);
 
     this.input.addEventListener('change', onChange);
     this.input.addEventListener('keydown', e => {
