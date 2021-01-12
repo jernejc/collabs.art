@@ -1,6 +1,6 @@
 
 import Web3 from 'web3';
-import MetaMaskOnboarding from '@metamask/onboarding'
+//import MetaMaskOnboarding from '@metamask/onboarding'
 
 import config from '@util/config';
 import { stringToBN } from '@util/helpers';
@@ -23,8 +23,8 @@ export default class Web3Manager {
   async initProvider() {
     if (DEBUG) console.log('Web3Manager: initProvider');
 
-    if (!MetaMaskOnboarding.isMetaMaskInstalled())
-      this.startOnboarding();
+    if (!window.ethereum)
+      console.error('No Metamask'); //this.startOnboarding(); 
     else {
       this.instance = new Web3(window.ethereum);
 
@@ -111,7 +111,7 @@ export default class Web3Manager {
     return this.chainId && this.networkId;
   }
 
-  startOnboarding() {
+  /*startOnboarding() {
     if (DEBUG) console.log('Web3Manager: startOnboarding');
 
     const currentUrl = new URL(window.location.href)
@@ -121,7 +121,7 @@ export default class Web3Manager {
 
     this.onboarding = new MetaMaskOnboarding({ forwarderOrigin })
     this.onboarding.startOnboarding();
-  }
+  }*/
 
   async ownerOf(_position) {
     if (DEBUG) console.log('Web3Manager: ownerOf');

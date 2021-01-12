@@ -21,6 +21,8 @@ export default class Controller {
 
     if (this.width)
       this.domElement.style.width = this.width;
+    if (params.elClasses)
+      this.domElement.classList.add(...params.elClasses);
 
     if (this.label) {
       this.labelElement = document.createElement('label');

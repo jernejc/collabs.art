@@ -1,7 +1,7 @@
 
 import Phaser from 'phaser';
 
-import { createPixel, colorPixel } from '@actions/pixel';
+import { getColorForXY } from '@actions/pixel';
 import ApplicationScene from '@scenes/application';
 import MinimapScene from '@scenes/minimap';
 import {
@@ -16,7 +16,6 @@ import {
   setGameMode,
   moveToPosition
 } from '@actions/user_interactions';
-import { pad } from 'lodash';
 
 export default class MainScene extends ApplicationScene {
   constructor() {
@@ -49,7 +48,7 @@ export default class MainScene extends ApplicationScene {
     this.input.mouse.disableContextMenu(); // prevent right click context menu
 
     this.createMinimap();
-    this.createVisiblePixels();
+    this.createVisibleTiles();
 
     setGameMode({ scene: this, mode: this.appConfig.defaultMode });
     moveToPosition({ x: 300, y: 400, scene: this })
@@ -78,19 +77,19 @@ export default class MainScene extends ApplicationScene {
      * Keyboard events
      */
 
-    this.input.keyboard.on('keydown_SHIFT', (event) => {
+    this.input.keyboard.on('keydown-SHIFT', (event) => {
       handleShiftDown({ scene: _self })
     });
 
-    this.input.keyboard.on('keyup_SHIFT', (event) => {
+    this.input.keyboard.on('keyup-SHIFT', (event) => {
       handleShiftUp({ scene: _self })
     });
 
-    this.input.keyboard.on('keydown_SPACE', (event) => {
+    this.input.keyboard.on('keydown-SPACE', (event) => {
       handleSpaceDown({ scene: _self })
     });
 
-    this.input.keyboard.on('keyup_SPACE', (event) => {
+    this.input.keyboard.on('keyup-SPACE', (event) => {
       handleSpaceUp({ scene: _self })
     });
 
@@ -112,22 +111,22 @@ export default class MainScene extends ApplicationScene {
     //console.log('MainScene this', this);
   }
 
-  update() {
-    if (DEBUG) console.log("Main Scene: update")
-  }
+  //update() {
+  //if (DEBUG) console.log("Main Scene: update")
+  //}
 
-  updateLand() {
-    if (DEBUG) console.log("Main Scene: updateLand");
+  updateTiles() {
+    if (DEBUG) console.log("Main Scene: updateTiles");
 
     for (let y = 0; y < this.gridHeight; y++)
       for (let x = 0; x < this.gridWidth; x++)
-        colorPixel({ x, y, scene: this });
+        this.updateTile(x, y);
 
     return;
   }
 
-  createVisiblePixels() {
-    if (DEBUG) console.log("Main Scene: createVisiblePixels");
+  createVisibleTiles() {
+    if (DEBUG) console.log("Main Scene: createVisibleTiles");
 
     this.land = [];
 
@@ -136,16 +135,34 @@ export default class MainScene extends ApplicationScene {
         this.land[y] = [];
 
       for (let x = 0; x < this.gridWidth; x++) {
-        this.land[y][x] = createPixel({ x, y, scene: this });
-        colorPixel({ x, y, scene: this });
+        const tx = this.size * x;
+        const ty = this.size * y;
+        //if (DEBUG) console.log('tx ty', tx, ty)
+
+        this.land[y][x] = this.add.rectangle(tx, ty, this.size, this.size);
+        this.land[y][x].setDisplayOrigin(0, 0);
+
+        this.updateTile(x, y);
       }
     }
 
     return;
   }
 
-  clearVisiblePixel() {
-    if (DEBUG) console.log("Main Scene: clearVisiblePixel");
+  updateTile(x, y) {
+
+    const mapPixel = getColorForXY({ x, y, color: this.color, scene: this });
+
+    this.land[y][x].cx = mapPixel.cx;
+    this.land[y][x].cy = mapPixel.cy;
+    this.land[y][x].id = `${mapPixel.cx}x${mapPixel.cy}`;
+    this.land[y][x].price = Math.random().toFixed(3);
+
+    this.land[y][x].setFillStyle(mapPixel.color.color);
+  }
+
+  clearVisibleTiles() {
+    if (DEBUG) console.log("Main Scene: clearVisibleTiles");
 
     this.land.forEach(y => {
       y.forEach(x => {
@@ -162,9 +179,8 @@ export default class MainScene extends ApplicationScene {
     if (DEBUG) console.log("Main Scene: createMinimap");
 
     const sizeRatio = (window.devicePixelRatio > 1) ? 5 + (5 * 0.5 / window.devicePixelRatio) : 5;
-    const margin = 10;
-    const padding = 5;
-    const margin2X = margin + padding;
+    const margin = 7;
+    const margin2X = margin + margin;
 
     // Minimap size
     const width = 1000 / sizeRatio;
@@ -185,10 +201,10 @@ export default class MainScene extends ApplicationScene {
       .setDepth(3)
 
     this.minimapBackground = this.add.rectangle(
-      x - padding,
-      y - padding,
-      width + margin,
-      height + margin, Phaser.Display.Color.HexStringToColor('#181a1b').color, 1
+      x - margin,
+      y - margin,
+      width + margin2X,
+      height + margin2X, Phaser.Display.Color.HexStringToColor('#181a1b').color, 1
     )
       .setOrigin(0)
       .setDepth(2)

@@ -1,8 +1,8 @@
 
-import Selection from '@components/selection';
+import Pixel from '@models/pixel';
 import InfoBox from '@components/info_box';
 
-import { getPixelForXY, getPixelForPointer } from '@actions/pixel';
+import { getTileForXY, getTileForPointer } from '@actions/pixel';
 import { invertColor } from '@actions/user_interactions';
 
 export default class SelectionManager {
@@ -21,20 +21,20 @@ export default class SelectionManager {
   async displayInfoBox({ scene }) {
     if (DEBUG) console.log('SelectionManager: displayInfoBox');
 
-    let selection;
+    let tile; 
 
-    if (this.singleSelection)
-      selection = [getPixelForXY({ x: this.singleSelection.x, y: this.singleSelection.y, scene, color: true })]
-    else if (this.rectangleSelection)
+    if (this.activeTile) // Active tile is used to highlight the current selection, we need the underlying tile, to get the pixel reference
+      tile = getTileForXY({ x: this.activeTile.x, y: this.activeTile.y, scene, color: true });
+    /*else if (this.rectangleSelection)
       selection = [
-        getPixelForXY({ x: this.rectangleSelectionBeginPixel.x, y: this.rectangleSelectionBeginPixel.y, scene, color: true }),
-        getPixelForXY({ x: this.rectangleSelectionEndPixel.x, y: this.rectangleSelectionEndPixel.y, scene, color: true })
-      ]
+        getTileForXY({ x: this.rectangleSelectionBeginPixel.x, y: this.rectangleSelectionBeginPixel.y, scene, color: true }),
+        getTileForXY({ x: this.rectangleSelectionEndPixel.x, y: this.rectangleSelectionEndPixel.y, scene, color: true })
+      ]*/
 
     if (this.infobox)
       this.clearInfoBox();
 
-    this.infobox = new InfoBox({ selection: new Selection(selection, this.parent), parent: this.parent, scene });
+    this.infobox = new InfoBox({ pixel: new Pixel(tile), parent: this.parent, scene });
 
     // Init is async, not sure if this is best approach
     await this.infobox.init();
@@ -50,61 +50,52 @@ export default class SelectionManager {
     });
   }
 
-  createHighlightSelection({ pointer, scene }) {
-    if (DEBUG) console.log('SelectionManager: createHighlightSelection');
+  highlightTile({ pointer, scene }) {
+    if (DEBUG) console.log('SelectionManager: highlightTile');
 
-    const pixel = getPixelForPointer({ pointer, scene, color: true });
+    const tile = getTileForPointer({ pointer, scene });
+    const invertedColor = invertColor(tile.fillColor, true);
 
-    const X = pixel.tile.x;
-    const Y = pixel.tile.y;
-
-    const invertedColor = invertColor(pixel.color.color, true);
-
-    this.highlightSelection = scene.add.rectangle(X, Y, scene.size, scene.size);
-    this.highlightSelection.setFillStyle(invertedColor.color, 0.15);
-    this.highlightSelection.setDisplayOrigin(0, 0);
-    this.highlightSelection.setDepth(1);
+    this.highlight = scene.add.rectangle(tile.x, tile.y, scene.size, scene.size);
+    this.highlight.setFillStyle(invertedColor.color, 0.15);
+    this.highlight.setDisplayOrigin(0, 0);
+    this.highlight.setDepth(1);
   }
 
-  repositionHighlightSelection({ pointer, scene }) {
-    if (DEBUG) console.log('SelectionManager: repositionHighlightSelection');
+  repositionHighlight({ pointer, scene }) {
+    if (DEBUG) console.log('SelectionManager: repositionHighlight');
 
-    const pixel = getPixelForPointer({ pointer, scene, color: true });
+    const tile = getTileForPointer({ pointer, scene });
+    const invertedColor = invertColor(tile.fillColor, true);
 
-    const X = pixel.tile.x;
-    const Y = pixel.tile.y;
-
-    const invertedColor = invertColor(pixel.color.color, true);
-
-    this.highlightSelection.setPosition(X, Y);
-    this.highlightSelection.setFillStyle(invertedColor.color, 0.15);
+    this.highlight.setPosition(tile.x, tile.y);
+    this.highlight.setFillStyle(invertedColor.color, 0.15);
   }
 
-  async createSingleSelection({ pixel, scene }) {
-    if (DEBUG) console.log('SelectionManager: createSingleSelection');
+  async setActiveTile({ tile, scene }) {
+    /*if (DEBUG)*/ console.log('SelectionManager: setActiveTile');
 
-    if (this.rectangleSelection)
-      this.clearRectangleSelection();
-    if (this.singleSelection)
-      this.clearSingleSelection();
+    console.log('SelectionManager: setActiveTile tile', tile);
 
-    const X = pixel.tile.x;
-    const Y = pixel.tile.y;
+    /*if (this.rectangleSelection)
+      this.clearRectangleSelection();*/
+    if (this.activeTile)
+      this.clearActiveTile();
 
-    const invertedColor = invertColor(pixel.color.color, true);
+    const invertedColor = invertColor(tile.fillColor, true);
 
-    this.singleSelection = scene.add.rectangle(X, Y, scene.size, scene.size);
-    this.singleSelection.setStrokeStyle(1, invertedColor.color, 0.9);
-    this.singleSelection.setDisplayOrigin(0, 0);
-    this.singleSelection.setDepth(1);
+    this.activeTile = scene.add.rectangle(tile.x, tile.y, scene.size, scene.size);
+    this.activeTile.setStrokeStyle(1, invertedColor.color, 0.9);
+    this.activeTile.setDisplayOrigin(0, 0);
+    this.activeTile.setDepth(1);
 
     await this.displayInfoBox({ scene });
   }
 
-  createRectangleSelection({ pointer, scene }) {
+  /*createRectangleSelection({ pointer, scene }) {
     if (DEBUG) console.log('SelectionManager: createRectangleSelection');
 
-    const pixel = getPixelForPointer({ pointer, scene, color: true });
+    const pixel = getTileForPointer({ pointer, scene, color: true });
 
     this.rectangleSelectionBeginPixel = pixel.tile
 
@@ -125,7 +116,7 @@ export default class SelectionManager {
   resizeRectangleSelection({ pointer, scene }) {
     if (DEBUG) console.log('SelectionManager: resizeRectangleSelection');
 
-    this.rectangleSelectionEndPixel = getPixelForPointer({ pointer, scene });
+    this.rectangleSelectionEndPixel = getTileForPointer({ pointer, scene });
 
     const W = this.rectangleSelectionEndPixel.x - this.rectangleSelectionBeginPixel.x;
     const H = this.rectangleSelectionEndPixel.y - this.rectangleSelectionBeginPixel.y;
@@ -141,16 +132,16 @@ export default class SelectionManager {
     this.rectangleSelection = null;
     this.rectangleSelectionBeginPixel = null;
     this.rectangleSelectionEndPixel = null;
+  }*/
+
+  clearHighlight() {
+    this.highlight.destroy();
+    this.highlight = null;
   }
 
-  clearHighlightSelection() {
-    this.highlightSelection.destroy();
-    this.highlightSelection = null;
-  }
-
-  clearSingleSelection() {
-    this.singleSelection.destroy();
-    this.singleSelection = null;
+  clearActiveTile() {
+    this.activeTile.destroy();
+    this.activeTile = null;
   }
 
   clearInfoBox() {
@@ -161,26 +152,26 @@ export default class SelectionManager {
   reset() {
     if (DEBUG) console.log('SelectionManager: Reset');
 
-    if (this.highlightSelection)
-      this.clearHighlightSelection();
+    if (this.highlight)
+      this.clearHighlight();
 
-    if (this.singleSelection)
-      this.clearSingleSelection();
+    if (this.activeTile)
+      this.clearActiveTile();
 
-    if (this.rectangleSelection)
-      this.clearRectangleSelection();
+    /*if (this.rectangleSelection)
+      this.clearRectangleSelection();*/
 
     if (this.infobox)
       this.clearInfoBox();
   }
 
-  isSelected(tile) {
+  /*isSelected(tile) {
     //if (DEBUG) console.log('isSelected', tile)
     return this.ids.includes(tile.id);
   }
 
   get ids() {
     return this.selection.map(pixel => pixel.tile.id);
-  }
+  }*/
 
 }

@@ -19,31 +19,35 @@ export default class Input extends Controller {
 
     switch (params.type) {
       case 'color':
-          this.color = document.createElement('span');
-          this.color.classList.add('color');
-          this.color.style = `background: #${formatColorNumber(this.getValue())};`
-          this.domElement.appendChild(this.color);
-          this.input.setAttribute('type', 'text');
+        this.color = document.createElement('span');
+        this.color.classList.add('color');
+        this.color.style = `background: #${formatColorNumber(this.getValue())};`
+        this.domElement.appendChild(this.color);
+        this.input.setAttribute('type', 'text');
         break;
       default:
         this.input.setAttribute('type', params.type);
     }
 
-    this.border = document.createElement('div');
-    this.border.classList.add('input-border');
+    if (params.border) {
+      this.border = document.createElement('div');
+      this.border.classList.add('input-border');
+      this.domElement.appendChild(this.border);
+    }
 
-    this.domElement.appendChild(this.border);
-    this.domElement.classList.add('text-input');
-
-    if (params.className)
-      this.domElement.classList.add(params.className);
     if (params.step)
       this.input.setAttribute('step', params.step);
-    if (params.max)
-      this.input.setAttribute('max', params.max);
-    if (params.min)
+    if (params.max) {
+      if (params.type === 'text')
+        this.input.setAttribute('maxlength', params.max);
+      else
+        this.input.setAttribute('max', params.max);
+    } if (params.min)
       this.input.setAttribute('min', params.min);
-    if (params.disabled) 
+    if (params.placeholder)
+      this.input.setAttribute('placeholder', params.placeholder)
+
+    if (params.disabled)
       this.input.disabled = true;
     if (params.blur)
       this.input.addEventListener('blur', params.blur)
@@ -51,8 +55,11 @@ export default class Input extends Controller {
       this.input.addEventListener('focus', params.focus);
 
     this.input.addEventListener('change', onChange);
-    this.input.addEventListener('keydown', e => {
+    this.input.addEventListener('keydown', async e => {
       onChange();
+
+      if (params.onChange)
+        await params.onChange()
     });
 
     return this.domElement;
@@ -80,6 +87,9 @@ export default class Input extends Controller {
       value = this.format(value);
 
     this.input.value = value;
+
+    if (this.color)
+      this.color.style = `background: #${formatColorNumber(this.getValue())};`
 
     return super.updateDisplay();
   }

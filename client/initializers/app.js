@@ -19,7 +19,6 @@ export async function AppInitializer({
 }) {
   if (DEBUG) console.log('Init Phaser', canvasElement, defaultMode, gridSize, strokeColor, strokeSize)
 
-
   const canvas = document.querySelector('#' + canvasElement)
   const Emitter = new Events.EventEmitter();
   const GameInstance = new Game({

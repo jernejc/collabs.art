@@ -15,14 +15,14 @@ import Button from './button';
 
 export default class InfoBox {
 
-  constructor({ selection, parent, scene }) {
-    if (DEBUG) console.log('Info Box: constructor');
+  constructor({ pixel, parent, scene }) {
+    /*if (DEBUG)*/ console.log('Info Box: constructor',  pixel, parent, scene);
 
     this.scene = scene;
     this.parent = parent;
-    this.selection = selection;
+    this.pixel = pixel;
     this.updateTimeout = null;
-    this.UIs = ['purchaseUI', 'colorSelectionUI', 'bidUI', 'activeBidUI'];
+    this.UIs = ['purchaseUI', 'ownerUI', 'bidUI', 'activeBidUI'];
 
     this.setupTemplate();
   }
@@ -42,7 +42,7 @@ export default class InfoBox {
 
     this.position = document.createElement('div');
     this.position.classList.add('position');
-    this.position.innerHTML = this.selection.title;
+    this.position.innerHTML = this.pixel.title;
 
     this.wrapper.appendChild(this.position);
 
@@ -70,7 +70,7 @@ export default class InfoBox {
     this.highestBid = null;
 
     const pixelData = await this.scene.game.graph.loadPixel({
-      id: this.selection.position
+      id: this.pixel.position
     }, refresh);
 
     if (pixelData) {
@@ -80,19 +80,19 @@ export default class InfoBox {
         this.highestBid = pixelData.highestBid;
         this.highestBid.amount = parseFloat(fromWei(this.highestBid.amount)) // Conver from Wei
         this.highestBid.expired = (new Date(this.highestBid.expiresAt * 1000) - new Date() < 0);
-        this.selection.price = this.highestBid.amount + 0.001;
+        this.pixel.price = this.highestBid.amount + 0.001;
       }
     }
 
-    if (!this.selection.price)
-      this.selection.price = await this.scene.game.web3.getDefaultPrice();
+    if (!this.pixel.price)
+      this.pixel.price = await this.scene.game.web3.getDefaultPrice();
 
     this.wrapper.removeChild(this.loadingIcon);
 
     if (!this.owner)
       this.createPurchaseUI();
     else if (this.scene.game.web3.activeAddress === this.owner)
-      this.createColorUI();
+      this.createOwnerUI();
     else if (this.highestBid && this.highestBid.bidder === this.scene.game.web3.activeAddress)
       this.createActiveBidUI();
     else
@@ -106,11 +106,11 @@ export default class InfoBox {
     if (DEBUG) console.log('Info Box: setPosition')
 
     const padding = 2;
-    const vertical = (this.selection.y > (this.parent.offsetHeight / 2)) ? 'bottom' : 'top';
-    const horizontal = (this.selection.x > (this.parent.offsetWidth / 2)) ? 'right' : 'left';
+    const vertical = (this.pixel.y > (this.parent.offsetHeight / 2)) ? 'bottom' : 'top';
+    const horizontal = (this.pixel.x > (this.parent.offsetWidth / 2)) ? 'right' : 'left';
     //const animationClass = (vertical === 'up') ? 'fadeInUp' : 'fadeInDown';
-    const top = (vertical === 'bottom') ? this.selection.y - this.wrapper.offsetHeight - padding : this.selection.y + this.scene.size + padding;
-    const left = (horizontal === 'right') ? this.selection.x - this.wrapper.offsetWidth - padding : this.selection.x + this.scene.size + padding;
+    const top = (vertical === 'bottom') ? this.pixel.y - this.wrapper.offsetHeight - padding : this.pixel.y + this.scene.size + padding;
+    const left = (horizontal === 'right') ? this.pixel.x - this.wrapper.offsetWidth - padding : this.pixel.x + this.scene.size + padding;
 
     Object.assign(this.wrapper.style, { top: top + 'px', left: left + 'px' });
     this.wrapper.classList.add(vertical, horizontal);
@@ -121,22 +121,24 @@ export default class InfoBox {
 
     this.purchaseUI = document.createElement('div');
     this.purchaseUI.appendChild(this.createInfoText('Available', 'purchase'));
-    this.purchaseUI.appendChild(new Input(this.selection, 'price', {
+    this.purchaseUI.appendChild(new Input(this.pixel, 'price', {
       label: 'ETH',
       width: '100%',
       disabled: true,
-      scene: this.scene
+      border: true,
+      scene: this.scene,
+      elClasses: ['label-border-input']
     }));
 
     this.purchaseUI.appendChild(new Button({
-      elClass: 'create',
+      elClasses: ['create', 'action-button'],
       text: 'Create',
       clickAction: async e => {
         try {
           this.preventRefresh = true; // Address event refreshes UI while buying with new account, it's nasty, but it works.
 
           // Handle Purchase
-          const success = await buyPixel({ scene: this.scene, selection: this.selection });
+          const success = await buyPixel({ scene: this.scene, pixel: this.pixel });
 
           this.preventRefresh = false;
 
@@ -154,51 +156,85 @@ export default class InfoBox {
     this.wrapper.appendChild(this.purchaseUI);
   }
 
-  createColorUI() {
-    if (DEBUG) console.log('Info Box: createColorUI', this.selection);
+  createOwnerUI() {
+    if (DEBUG) console.log('Info Box: createOwnerUI', this.pixel);
 
-    this.colorSelectionUI = document.createElement('div');
-    this.colorSelectionUI.appendChild(this.createInfoText('Owned', 'owned'));
-    this.colorSelectionUI.appendChild(new Input(this.selection.pixel, 'color.color.color', {
+    const _self = this; // this is not always this
+
+    let preventClose = null;
+
+    this.ownerUI = document.createElement('div');
+
+    if (this.highestBid && !this.highestBid.expired) {
+      this.ownerUI.appendChild(this.createInfoText('Pending bid', 'active-bid'));
+      this.ownerUI.appendChild(this.createBidsInfo(this.highestBid));
+    } else
+      this.ownerUI.appendChild(this.createInfoText('Owned', 'owned'));
+
+    this.ownerUI.appendChild(new Input(this.pixel.color, 'color', {
       label: 'hex',
       width: '100%',
       scene: this.scene,
       type: 'color',
-      focus: () => { console.log('focus'); this.colorAdvancedUI.style.display = 'block' },
-      blur: () => { console.log('blur'); this.colorAdvancedUI.style.display = 'none' },
+      border: true,
+      elClasses: ['label-border-input'],
       format: (value) => '#' + formatColorNumber(value),
       validate: (value) => !isNaN(value) && value.length === 6,
-      onUpdate: () => {
+      focus: () => {
+        this.colorAdvancedUI.style.display = 'block';
+        _self.setPosition();
+      },
+      blur: (e) => {
+        //console.log('e', e);
+        if (!preventClose) {
+          this.colorAdvancedUI.style.display = 'none';
+          _self.setPosition();
+        }
+      },
+      /*onUpdate: () => {
         if (this.updateTimeout !== null)
           this.cancelUpdate();
 
         this.updateTimeout = setTimeout(async () => {
-          await setPixel({ selection: this.selection, scene: this.scene })
+          await setPixel({ pixel: this.pixel, scene: this.scene })
         }, 1000);
-      }
+      }*/
     }));
 
     this.colorAdvancedUI = document.createElement('div');
-    this.colorAdvancedUI.style.display = 'none';
+    this.colorAdvancedUI.classList.add('advanced-color');
+    this.colorAdvancedUI.style.display = 'none'; // Hide by default
 
-    this.colorAdvancedUI.appendChild(new Hue(this.selection.pixel, 'color.color.h', {
+    this.colorAdvancedUI.addEventListener('mouseenter', (e) => {
+      //console.log('mouse enter');
+      if (!preventClose)
+        preventClose = true
+    });
+
+    this.colorAdvancedUI.addEventListener('mouseleave', (e) => {
+      //console.log('mouse leave');
+      if (preventClose)
+        preventClose = false
+    });
+
+    this.colorAdvancedUI.appendChild(new Hue(this.pixel.color, 'h', {
       min: 0,
       max: 1,
       step: 0.001,
       scene: this.scene
     }));
 
-    this.colorAdvancedUI.appendChild(new Saturation(this.selection.pixel, 'color.color.s', {
+    this.colorAdvancedUI.appendChild(new Saturation(this.pixel.color, 's', {
       min: 0,
       max: 1,
       step: 0.001,
       scene: this.scene
     }));
 
-    this.colorSelectionUI.appendChild(this.colorAdvancedUI);
+    this.ownerUI.appendChild(this.colorAdvancedUI);
 
-    this.wrapper.classList.add('colorSelectionUI');
-    this.wrapper.appendChild(this.colorSelectionUI);
+    this.wrapper.classList.add('ownerUI');
+    this.wrapper.appendChild(this.ownerUI);
   }
 
   createBidUI() {
@@ -206,25 +242,28 @@ export default class InfoBox {
 
     this.bidUI = document.createElement('div');
     this.bidUI.appendChild(this.createInfoText('Taken', 'taken'));
-    this.bidUI.appendChild(new Input(this.selection, 'price', {
-      min: this.selection.price,
+    this.bidUI.appendChild(new Input(this.pixel, 'price', {
+      min: this.pixel.price,
       max: 100,
       step: 0.001,
       type: 'number',
       label: 'ETH',
       width: '100%',
-      scene: this.scene
+      scene: this.scene,
+      border: true,
+      elClasses: ['label-border-input'],
+      lang: 'en'
     }));
 
     this.bidUI.appendChild(new Button({
-      elClass: 'bid',
+      elClasses: ['bid', 'action-button'],
       text: 'Place Bid',
       clickAction: async e => {
         try {
           this.preventRefresh = true; // Address event refreshes UI while buying with new account, it's nasty, but it works.
 
           // Handle Purchase
-          const success = await bidPixel({ scene: this.scene, selection: this.selection });
+          const success = await bidPixel({ scene: this.scene, pixel: this.pixel });
 
           this.preventRefresh = false;
 
@@ -249,25 +288,28 @@ export default class InfoBox {
     this.activeBidUI.appendChild(this.createInfoText(this.highestBid.expired ? 'Bid expired' : 'Bid placed', 'placed'));
 
     if (this.highestBid.expired) { // UI for Raising expired bid
-      this.activeBidUI.appendChild(new Input(this.selection, 'price', {
-        min: this.selection.price,
+      this.activeBidUI.appendChild(new Input(this.pixel, 'price', {
+        //min: this.pixel.price,
         max: 100,
         step: 0.001,
         type: 'number',
         label: 'ETH',
         width: '100%',
-        scene: this.scene
+        border: true,
+        elClasses: ['label-border-input'],
+        scene: this.scene,
+        format: (value) => (value) ? value.toFixed(3) : 0
       }));
 
       this.activeBidUI.appendChild(new Button({
-        elClass: 'bid',
+        elClasses: ['bid', 'action-button'],
         text: 'Raise Bid',
         clickAction: async e => {
           try {
             this.preventRefresh = true; // Address event refreshes UI while buying with new account, it's nasty, but it works.
 
             // Handle New bid
-            const success = await bidPixel({ scene: this.scene, selection: this.selection });
+            const success = await bidPixel({ scene: this.scene, pixel: this.pixel });
 
             this.preventRefresh = false;
 
@@ -286,7 +328,10 @@ export default class InfoBox {
         width: '49%',
         disabled: true,
         scene: this.scene,
-        type: 'text'
+        border: true,
+        elClasses: ['label-border-input'],
+        type: 'text',
+        format: (value) => value.toFixed(3)
       }));
 
       this.activeBidUI.appendChild(new Input(this.highestBid, 'expiresAt', {
@@ -294,13 +339,14 @@ export default class InfoBox {
         width: '49%',
         disabled: true,
         scene: this.scene,
-        className: 'right',
+        border: true,
+        elClasses: ['right', 'label-border-input'],
         type: 'text',
         format: (value) => formatExpireDate(value)
       }));
 
       this.activeBidUI.appendChild(new Button({
-        elClass: 'cancel',
+        elClasses: ['cancel', 'action-button'],
         text: 'Cancel Bid',
         clickAction: async e => {
           try {
@@ -330,6 +376,14 @@ export default class InfoBox {
     return infotext;
   }
 
+  createBidsInfo(bid) {
+    const bidsinfo = document.createElement('div');
+    bidsinfo.classList.add('bids-info');
+    bidsinfo.innerHTML = `${bid.amount.toFixed(3)} ETH`;
+
+    return bidsinfo;
+  }
+
   destroy() {
     if (DEBUG) console.log('Info box: destroy');
 
@@ -353,13 +407,9 @@ export default class InfoBox {
     for (let ui of this.UIs) {
       if (this[ui]) {
         this.wrapper.removeChild(this[ui]);
+        this.wrapper.classList.remove(ui);
         this[ui] = null;
       }
     }
-  }
-
-  cancelUpdate() {
-    clearTimeout(this.updateTimeout);
-    this.updateTimeout = null;
   }
 }

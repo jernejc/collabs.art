@@ -3,22 +3,6 @@ import Web3 from 'web3';
 
 import { stringToBN } from '@util/helpers';
 
-export function createPixel({ x, y, scene }) {
-  if (DEBUG) console.log('createPixel', x, y);
-
-  const tx = scene.size * x;
-  const ty = scene.size * y;
-  //if (DEBUG) console.log('tx ty', tx, ty)
-
-  const tile = scene.add.rectangle(tx, ty, scene.size, scene.size);
-  tile.setDisplayOrigin(0, 0);
-
-  //if (this.strokeSize > 0)
-  //  tile.setStrokeStyle(this.strokeSize, this.strokeColor.color, 0.2);
-
-  return tile;
-}
-
 export async function buyPixel({ scene, selection }) {
   if (DEBUG) console.log('BUY Pixel', selection);
 
@@ -87,19 +71,6 @@ export async function bidPixel({ scene, selection }) {
   return success;
 }
 
-export function colorPixel({ x, y, scene }) {
-  if (DEBUG) console.log('COLOR Pixel', x, y)
-
-  const mapPixel = getColor({ x, y, color: scene.color, scene });
-
-  scene.land[y][x].cx = mapPixel.cx;
-  scene.land[y][x].cy = mapPixel.cy;
-  scene.land[y][x].id = `${mapPixel.cx}x${mapPixel.cy}`;
-  scene.land[y][x].price = Math.random().toFixed(3);
-
-  scene.land[y][x].setFillStyle(mapPixel.color.color);
-}
-
 export async function setPixel({ selection, scene }) {
   if (DEBUG) console.log("SET pixel", selection.cx, selection.cy, selection.color, selection.HEXcolor);
 
@@ -128,8 +99,8 @@ export async function setPixel({ selection, scene }) {
 
 }
 
-export function getColor({ x, y, color, scene }) {
-  if (DEBUG) console.log('getColor', x, y, color, scene);
+export function getColorForXY({ x, y, color, scene }) {
+  if (DEBUG) console.log('getColorForXY', x, y, color, scene);
 
   color = color || new Phaser.Display.Color();
 
@@ -147,7 +118,7 @@ export function getRelativePosition({ x, y, scene }) {
   return { cx, cy };
 }
 
-export function getRelativePixel({ cx, cy, scene, color }) {
+export function getRelativeTile({ cx, cy, scene }) {
 
   let rx, ry, tile;
 
@@ -161,34 +132,14 @@ export function getRelativePixel({ cx, cy, scene, color }) {
     }
   }
 
-  if (color) {
-    return {
-      tile: tile,
-      color: getColor({ x: rx, y: ry, scene })
-    }
-  } else
-    return tile;
+  return tile;
 }
 
-export function getPixelForPointer({ pointer, scene, color }) {
-  const xPixel = parseInt(pointer.x / scene.size);
-  const yPixel = parseInt(pointer.y / scene.size);
-
-  let tile;
-
-  if (scene.land[yPixel])
-    tile = scene.land[yPixel][xPixel];
-
-  if (color) {
-    return {
-      tile: tile,
-      color: getColor({ x: xPixel, y: yPixel, scene })
-    }
-  } else
-    return tile;
+export function getTileForPointer({ pointer, scene }) {
+  return getTileForXY({ x: pointer.x, y: pointer.y, scene })
 }
 
-export function getPixelForXY({ x, y, scene, color }) {
+export function getTileForXY({ x, y, scene }) {
   const xPixel = parseInt(x / scene.size);
   const yPixel = parseInt(y / scene.size);
 
@@ -197,13 +148,7 @@ export function getPixelForXY({ x, y, scene, color }) {
   if (scene.land[yPixel])
     tile = scene.land[yPixel][xPixel];
 
-  if (color) {
-    return {
-      tile: tile,
-      color: getColor({ x: xPixel, y: yPixel, scene })
-    };
-  } else
-    return tile;
+  return tile;
 }
 
 /*resizePixel(x, y) {

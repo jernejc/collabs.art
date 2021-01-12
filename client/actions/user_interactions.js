@@ -1,5 +1,5 @@
-import { getPixelForPointer } from "./pixel";
 
+import { getTileForPointer } from '@actions/pixel';
 import { formatColorNumber } from '@util/helpers';
 
 // Fired when user moves pointer through the grid
@@ -44,15 +44,15 @@ export async function handleMouseDown({ pointer, scene }) {
         return;
       }
 
-      const pixel = getPixelForPointer({ pointer, scene, color: true })
-      await scene.game.selection.createSingleSelection({ pixel, scene });
+      const tile = getTileForPointer({ pointer, scene })
+      await scene.game.selection.setActiveTile({ tile, scene });
       break;
     case 'drag':
 
       if (pointer.button === 2) // Ignore right click
         return;
 
-      scene.game.selection.createRectangleSelection({ pointer, scene });
+      //scene.game.selection.createRectangleSelection({ pointer, scene });
       break;
     case 'mininav':
       navigateMinimap({ pointer, scene: scene.minimap })
@@ -63,8 +63,8 @@ export async function handleMouseDown({ pointer, scene }) {
 export function handleMouseUp({ pointer, scene }) {
   if (DEBUG) console.log('User interactions: handleMouseUp');
 
-  if (scene.game.selection.rectangleSelection)
-    scene.game.selection.displayInfoBox({ scene });
+  /*if (scene.game.selection.rectangleSelection)
+    scene.game.selection.displayInfoBox({ scene });*/
 }
 
 export function handleMouseWheel({ scene, dx, dy, dz }) {
@@ -77,8 +77,8 @@ export function handleMouseWheel({ scene, dx, dy, dz }) {
     scene.gridWidth = scene.appConfig.canvasWidth / scene.size;
     scene.gridHeight = scene.appConfig.canvasHeight / scene.size;
 
-    scene.clearVisiblePixel();
-    scene.createVisiblePixels();
+    scene.clearVisibleTiles();
+    scene.createVisibleTiles();
   }
 }
 
@@ -154,7 +154,7 @@ export function panDragMap({ pointer, scene }) {
 
   // set new drag origin to current position
   scene.game.origDragPoint = pointer.position.clone();
-  scene.updateLand();
+  scene.updateTiles();
 }
 
 export function moveToPosition({ scene, x, y }) {
@@ -174,7 +174,7 @@ export function moveToPosition({ scene, x, y }) {
   else if (scene.cameraY < 0)
     scene.cameraY = 0;
 
-  scene.updateLand();
+  scene.updateTiles();
 }
 
 
@@ -182,10 +182,10 @@ export function moveToPosition({ scene, x, y }) {
 export function positionSelectionBlock({ pointer, scene }) {
   if (DEBUG) console.log('User interactions: positionSelectionBlock');
 
-  if (scene.game.selection.highlightSelection)
-    scene.game.selection.repositionHighlightSelection({ pointer, scene });
+  if (scene.game.selection.highlight)
+    scene.game.selection.repositionHighlight({ pointer, scene });
   else
-    scene.game.selection.createHighlightSelection({ pointer, scene });
+    scene.game.selection.highlightTile({ pointer, scene });
 }
 
 // Set scene mode
@@ -249,16 +249,16 @@ export function resetStrokeStyle({ tile, scene, size = 0.9 }) {
 }
 
 export function setInvertedStroke({ tile, scene }) {
-  const color = Phaser.Display.Color.HexStringToColor('#' + formatColorNumber(tile.fillColor));
-  const invertedColor = invertColor(color, true);
+  const invertedColor = invertColor(tile.fillColor, true);
 
   tile.setStrokeStyle(scene.strokeSize + 1, invertedColor.color, 1);
   tile.setDepth(10);
 }
 
-export function invertColor(color, bw) {
+export function invertColor(fillColor, bw) {
   if (DEBUG) console.log('User interactions: invertColor');
 
+  const color = Phaser.Display.Color.HexStringToColor('#' + formatColorNumber(fillColor));
   let { r, g, b } = color;
 
   if (bw) {

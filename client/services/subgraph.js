@@ -5,19 +5,38 @@ import { stringToHex, delay } from '@util/helpers';
 export default class GraphManager {
 
   async loadPixels(params) {
-    if (DEBUG) console.log('GraphManager: initContracts');
-    const response = await this.postQueryToGraph('pixels', params);
-    return response.pixels;
+    if (DEBUG) console.log('GraphManager: loadPixels');
+
+    try {
+      const response = await this.postQueryToGraph('pixels', params);
+
+      if (!response.pixels)
+        throw new Error('No pixels found.');
+
+      return response.pixels;
+    } catch (error) {
+      console.error('Error while loading pixels: ' + error);
+      return [];
+    }
   }
 
   async loadPixel(params, refresh) {
-    /*if (DEBUG)*/ console.log('GraphManager: initContracts');
+    if (DEBUG) console.log('GraphManager: loadPixel');
 
     if (refresh) // delay for 3s so the graph is up to date, need better solution here
       await delay(1);
 
-    const response = await this.postQueryToGraph('pixel', params);
-    return response.pixel;
+    try {
+      const response = await this.postQueryToGraph('pixel', params);
+
+      if (!response.pixel)
+        return null;
+        
+      return response.pixel;
+    } catch (error) {
+      console.error('Error while loading pixel: ' + error);
+      return null;
+    }
   }
 
   getPixelsQuery(params) {

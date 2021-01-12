@@ -93,9 +93,6 @@ export default class Hue extends Controller {
 
     this.rangepointer.style.left = pct * 100 + '%';
 
-    if (this.object.tile && this.object.color)
-      this.object.tile.setFillStyle(this.object.color.color.color);
-
     return super.updateDisplay();
   }
 }

@@ -27,6 +27,13 @@ export function numberToLetterColumn(columnNumber) {
 export function formatPositionHex(hex) {
   const string = hexToString(hex);
 
+  return {
+    hex,
+    ...formatPosition(string)
+  }
+}
+
+export function formatPosition(string) {
   let y = string.match(/[A-Z]/g);
 
   if (!y)
@@ -42,7 +49,6 @@ export function formatPositionHex(hex) {
     x = parseInt(x.join(''));
 
   return {
-    hex,
     string,
     x,
     y
@@ -121,4 +127,9 @@ export function fromWei(number) {
 
 export async function delay(seconds) {
   return new Promise((resolve) => setTimeout(resolve, seconds * 1000))
+}
+
+// Insert after html node
+export function insertAfter(newNode, referenceNode) {
+  referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }
