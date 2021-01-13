@@ -112,6 +112,10 @@ export function stringToHex(string) {
   return web3.utils.stringToHex(string);
 }
 
+export function toWei(price, currency) {
+  return web3.utils.toWei(price, currency || "ether");
+}
+
 export function formatColorNumber(number) {
   let string = number.toString(16);
 

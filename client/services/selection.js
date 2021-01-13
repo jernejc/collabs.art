@@ -23,18 +23,13 @@ export default class SelectionManager {
 
     let tile; 
 
-    if (this.activeTile) // Active tile is used to highlight the current selection, we need the underlying tile, to get the pixel reference
+    if (this.activeTile) // activeTile is used to highlight the current selection, we need the underlying tile, to get the pixel reference
       tile = getTileForXY({ x: this.activeTile.x, y: this.activeTile.y, scene, color: true });
-    /*else if (this.rectangleSelection)
-      selection = [
-        getTileForXY({ x: this.rectangleSelectionBeginPixel.x, y: this.rectangleSelectionBeginPixel.y, scene, color: true }),
-        getTileForXY({ x: this.rectangleSelectionEndPixel.x, y: this.rectangleSelectionEndPixel.y, scene, color: true })
-      ]*/
 
     if (this.infobox)
       this.clearInfoBox();
 
-    this.infobox = new InfoBox({ pixel: new Pixel(tile), parent: this.parent, scene });
+    this.infobox = new InfoBox({ pixel: new Pixel({ tile, scene }), parent: this.parent, scene });
 
     // Init is async, not sure if this is best approach
     await this.infobox.init();
@@ -73,12 +68,8 @@ export default class SelectionManager {
   }
 
   async setActiveTile({ tile, scene }) {
-    /*if (DEBUG)*/ console.log('SelectionManager: setActiveTile');
+    if (DEBUG) console.log('SelectionManager: setActiveTile');
 
-    console.log('SelectionManager: setActiveTile tile', tile);
-
-    /*if (this.rectangleSelection)
-      this.clearRectangleSelection();*/
     if (this.activeTile)
       this.clearActiveTile();
 
@@ -91,48 +82,6 @@ export default class SelectionManager {
 
     await this.displayInfoBox({ scene });
   }
-
-  /*createRectangleSelection({ pointer, scene }) {
-    if (DEBUG) console.log('SelectionManager: createRectangleSelection');
-
-    const pixel = getTileForPointer({ pointer, scene, color: true });
-
-    this.rectangleSelectionBeginPixel = pixel.tile
-
-    const X = this.rectangleSelectionBeginPixel.x;
-    const Y = this.rectangleSelectionBeginPixel.y;
-    const W = pointer.x - this.rectangleSelectionBeginPixel.x;
-    const H = pointer.y - this.rectangleSelectionBeginPixel.y;
-
-    const invertedColor = invertColor(pixel.color.color, true);
-
-    this.rectangleSelection = scene.add.rectangle(X, Y, W, H);
-    this.rectangleSelection.setFillStyle(invertedColor.color, 0.15);
-    this.rectangleSelection.setStrokeStyle(1, invertedColor.color, 0.9);
-    this.rectangleSelection.setDisplayOrigin(0, 0);
-    this.rectangleSelection.setDepth(100);
-  }
-
-  resizeRectangleSelection({ pointer, scene }) {
-    if (DEBUG) console.log('SelectionManager: resizeRectangleSelection');
-
-    this.rectangleSelectionEndPixel = getTileForPointer({ pointer, scene });
-
-    const W = this.rectangleSelectionEndPixel.x - this.rectangleSelectionBeginPixel.x;
-    const H = this.rectangleSelectionEndPixel.y - this.rectangleSelectionBeginPixel.y;
-
-    // Bug when changing rect size: https://phaser.discourse.group/t/how-to-resize-gameobjects-rectangle-without-changing-scale/4777
-    this.rectangleSelection.geom.setSize(W, H);
-    this.rectangleSelection.setSize(W, H);
-    this.rectangleSelection.updateData();
-  }
-
-  clearRectangleSelection() {
-    this.rectangleSelection.destroy();
-    this.rectangleSelection = null;
-    this.rectangleSelectionBeginPixel = null;
-    this.rectangleSelectionEndPixel = null;
-  }*/
 
   clearHighlight() {
     this.highlight.destroy();
@@ -158,20 +107,7 @@ export default class SelectionManager {
     if (this.activeTile)
       this.clearActiveTile();
 
-    /*if (this.rectangleSelection)
-      this.clearRectangleSelection();*/
-
     if (this.infobox)
       this.clearInfoBox();
   }
-
-  /*isSelected(tile) {
-    //if (DEBUG) console.log('isSelected', tile)
-    return this.ids.includes(tile.id);
-  }
-
-  get ids() {
-    return this.selection.map(pixel => pixel.tile.id);
-  }*/
-
 }

@@ -3,8 +3,6 @@ import Hue from '@components/hue';
 import Saturation from '@components/saturation';
 import Input from '@components/input';
 
-import { setPixel, buyPixel, bidPixel } from '@actions/pixel';
-
 import { formatColorNumber, fromWei, formatExpireDate } from '@util/helpers';
 
 import Button from './button';
@@ -16,7 +14,7 @@ import Button from './button';
 export default class InfoBox {
 
   constructor({ pixel, parent, scene }) {
-    /*if (DEBUG)*/ console.log('Info Box: constructor',  pixel, parent, scene);
+    if (DEBUG) console.log('Info Box: constructor',  pixel, parent, scene);
 
     this.scene = scene;
     this.parent = parent;
@@ -138,7 +136,7 @@ export default class InfoBox {
           this.preventRefresh = true; // Address event refreshes UI while buying with new account, it's nasty, but it works.
 
           // Handle Purchase
-          const success = await buyPixel({ scene: this.scene, pixel: this.pixel });
+          const success = await this.pixel.buy();
 
           this.preventRefresh = false;
 
@@ -263,7 +261,7 @@ export default class InfoBox {
           this.preventRefresh = true; // Address event refreshes UI while buying with new account, it's nasty, but it works.
 
           // Handle Purchase
-          const success = await bidPixel({ scene: this.scene, pixel: this.pixel });
+          const success = await this.pixel.bid();
 
           this.preventRefresh = false;
 
@@ -309,7 +307,7 @@ export default class InfoBox {
             this.preventRefresh = true; // Address event refreshes UI while buying with new account, it's nasty, but it works.
 
             // Handle New bid
-            const success = await bidPixel({ scene: this.scene, pixel: this.pixel });
+            const success = await this.pixel.bid();
 
             this.preventRefresh = false;
 

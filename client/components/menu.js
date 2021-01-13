@@ -69,7 +69,7 @@ export default class Menu {
 
         moveToPosition({ scene: this.scene, x: cameraX, y: cameraY });
 
-        console.log('clickHandler this.scene', this.scene)
+        /*console.log('clickHandler this.scene', this.scene)*/
         const tile = getRelativeTile({ cx, cy, scene: this.scene, color: true });
         await this.game.selection.setActiveTile({ tile, scene: this.scene });
       }

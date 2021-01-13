@@ -22,9 +22,6 @@ export function handleMouseMove({ pointer, scene }) {
       if (pointer.button === 2) // Ignore right click
         return;
 
-      if (pointer.isDown && scene.game.selection.rectangleSelection)
-        scene.game.selection.resizeRectangleSelection({ pointer, scene });
-
       break;
     case 'mininav':
       if (pointer.isDown)
@@ -34,7 +31,7 @@ export function handleMouseMove({ pointer, scene }) {
 }
 
 export async function handleMouseDown({ pointer, scene }) {
-  if (DEBUG) console.log('User interactions: handleMouseDown')
+  if (DEBUG) console.log('User interactions: handleMouseDown');
 
   switch (scene.game.mode) {
     case 'select':
@@ -44,7 +41,7 @@ export async function handleMouseDown({ pointer, scene }) {
         return;
       }
 
-      const tile = getTileForPointer({ pointer, scene })
+      const tile = getTileForPointer({ pointer, scene });
       await scene.game.selection.setActiveTile({ tile, scene });
       break;
     case 'drag':
@@ -52,7 +49,6 @@ export async function handleMouseDown({ pointer, scene }) {
       if (pointer.button === 2) // Ignore right click
         return;
 
-      //scene.game.selection.createRectangleSelection({ pointer, scene });
       break;
     case 'mininav':
       navigateMinimap({ pointer, scene: scene.minimap })
@@ -62,9 +58,6 @@ export async function handleMouseDown({ pointer, scene }) {
 
 export function handleMouseUp({ pointer, scene }) {
   if (DEBUG) console.log('User interactions: handleMouseUp');
-
-  /*if (scene.game.selection.rectangleSelection)
-    scene.game.selection.displayInfoBox({ scene });*/
 }
 
 export function handleMouseWheel({ scene, dx, dy, dz }) {
