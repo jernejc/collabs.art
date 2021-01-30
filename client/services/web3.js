@@ -35,8 +35,10 @@ export default class Web3Manager {
       await this.getNetworkAndChainId();
 
       // Init contracts if network received
-      if (this.isNetworkConnected)
+      if (this.isNetworkConnected) {
         this.initContracts();
+        this.getDefaultPrice();
+      }
 
       // Get connected accounts
       await this.getAccounts();
@@ -188,9 +190,9 @@ export default class Web3Manager {
     if (DEBUG) console.log('Web3Manager: getDefaultPrice');
 
     if (!this.defaultPrice)
-      this.defaultPrice = await this.bidContract.methods.defaultPrice().call();
+      this.defaultPrice = Web3.utils.fromWei(await this.bidContract.methods.defaultPrice().call());
 
-    return Web3.utils.fromWei(this.defaultPrice);
+    return this.defaultPrice;
   }
 
   async getActiveAddress() {

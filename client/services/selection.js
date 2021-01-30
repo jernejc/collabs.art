@@ -2,7 +2,7 @@
 import Pixel from '@models/pixel';
 import InfoBox from '@components/info_box';
 
-import { getTileForXY, getTileForPointer } from '@actions/pixel';
+import { getTileForPointer } from '@actions/pixel';
 import { invertColor } from '@actions/user_interactions';
 
 export default class SelectionManager {
@@ -11,34 +11,17 @@ export default class SelectionManager {
     this.game = game;
     this.emitter = emitter;
 
-    this.selection = [];
+    this.pixels = [];
     this.infobox = null;
     this.parent = document.body.querySelector('#game');
-    
+
     this.enableEvents();
-  }
-
-  async displayInfoBox({ scene }) {
-    if (DEBUG) console.log('SelectionManager: displayInfoBox');
-
-    let tile; 
-
-    if (this.activeTile) // activeTile is used to highlight the current selection, we need the underlying tile, to get the pixel reference
-      tile = getTileForXY({ x: this.activeTile.x, y: this.activeTile.y, scene, color: true });
-
-    if (this.infobox)
-      this.clearInfoBox();
-
-    this.infobox = new InfoBox({ pixel: new Pixel({ tile, scene }), parent: this.parent, scene });
-
-    // Init is async, not sure if this is best approach
-    await this.infobox.init();
   }
 
   enableEvents() {
     this.emitter.on('web3/address', async address => {
       if (DEBUG) console.log('SelectionManager: on web3/address emitter', address);
-      
+
       // Update infobox UI if user address changes
       if (this.infobox && !this.infobox.preventRefresh)
         await this.infobox.setUI();
@@ -67,20 +50,61 @@ export default class SelectionManager {
     this.highlight.setFillStyle(invertedColor.color, 0.15);
   }
 
-  async setActiveTile({ tile, scene }) {
-    if (DEBUG) console.log('SelectionManager: setActiveTile');
+  async setActivePixel({ tile, scene }) {
+    if (DEBUG) console.log('SelectionManager: setActivePixel');
 
-    if (this.activeTile)
-      this.clearActiveTile();
+    if (this.isSelected(tile.cx, tile.cy))
+      return;
 
-    const invertedColor = invertColor(tile.fillColor, true);
+    const pixel = Pixel.fromTile({ tile, scene });
 
-    this.activeTile = scene.add.rectangle(tile.x, tile.y, scene.size, scene.size);
-    this.activeTile.setStrokeStyle(1, invertedColor.color, 0.9);
-    this.activeTile.setDisplayOrigin(0, 0);
-    this.activeTile.setDepth(1);
+    if (this.game.mode === 'multiselect')
+      this.pixels.unshift(pixel);
+    else {
+      if (this.pixels.length > 0)
+        this.clearActivePixels();
 
-    await this.displayInfoBox({ scene });
+      this.pixels = [pixel];
+    }
+
+    pixel.setActivePixel();
+
+    this.game.emitter.emit('selection/update', this.pixels);
+
+    if (this.infobox)
+      this.clearInfoBox();
+
+    if (this.pixels.length === 1) {
+      this.infobox = new InfoBox({ pixel: pixel, parent: this.parent, scene });
+
+      // Init is async, not sure if this is best approach
+      await this.infobox.init();
+    } else if (this.pixels.length > 1) {
+      if (!scene.game.tools.menu || !scene.game.tools.menu.loaded)
+        await scene.game.tools.openMenu('selection');
+      else
+        scene.game.tools.menu.switchToTab('selection');
+    }
+  }
+
+  removeSelected({ tile, scene }) {
+    const pixel = Pixel.fromTile({ tile, scene });
+    
+    this.pixels = this.pixels.filter(p => {
+      return !(p.cx === tile.cx && p.cy === tile.cy);
+    });
+
+    pixel.clearActivePixel();
+
+    this.game.emitter.emit('selection/update', this.pixels);
+  }
+
+  isSelected(cx, cy) {
+    const selected = this.pixels.find(pixel => {
+      return pixel.cx === cx && pixel.cy === cy;
+    });
+
+    return (selected);
   }
 
   clearHighlight() {
@@ -88,14 +112,15 @@ export default class SelectionManager {
     this.highlight = null;
   }
 
-  clearActiveTile() {
-    this.activeTile.destroy();
-    this.activeTile = null;
-  }
-
   clearInfoBox() {
     this.infobox.destroy();
     this.infobox = null;
+  }
+
+  clearActivePixels() {
+    this.pixels.forEach(pixel => {
+      pixel.clearActivePixel();
+    });
   }
 
   reset() {
@@ -104,10 +129,10 @@ export default class SelectionManager {
     if (this.highlight)
       this.clearHighlight();
 
-    if (this.activeTile)
-      this.clearActiveTile();
-
     if (this.infobox)
       this.clearInfoBox();
+
+    if (this.pixels.length > 0)
+      this.clearActivePixels();
   }
 }

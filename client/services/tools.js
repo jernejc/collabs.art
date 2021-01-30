@@ -17,7 +17,6 @@ export default class ToolsManager {
 
     this.addConnectionStatus();
     this.addBottomNav();
-
     this.addEvents();
   }
 
@@ -28,10 +27,19 @@ export default class ToolsManager {
       if (this.menu && this.menu.loaded)
         await this.menu.loadPixels();
     });
+
+    this.emitter.on('selection/update', async () => {
+      if (this.menu && this.menu.loaded && this.menu.activeTab === 'selection')
+        await this.menu.loadPixels();
+    })
   }
 
-  async openMenu() {
-    this.menu = new Menu({ parent: this.parent, game: this.game });
+  async openMenu(activeTab) {
+
+    if (this.menu && this.menu.loaded)
+      this.menu.close();
+
+    this.menu = new Menu({ parent: this.parent, game: this.game, activeTab });
 
     // Init is async 
     await this.menu.init();

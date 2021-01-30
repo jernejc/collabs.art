@@ -1,6 +1,6 @@
 pragma solidity >=0.6.0 <0.7.3;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "./ERC721Batch.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /**
@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
  * Pixels - non-fungible ERC721 pixels
  */
 
-contract Pixels is ERC721, AccessControl {
+contract Pixels is ERC721Batch, AccessControl {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     uint48 public maxPixels;
@@ -18,23 +18,15 @@ contract Pixels is ERC721, AccessControl {
         bytes6 color;
     }
 
-    mapping(uint128 => Pixel) public pixels;
+    mapping(uint256 => Pixel) public pixels;
 
-    event ColorPixel(
-        uint128 indexed _position,
-        bytes6 _color
-    );
+    event ColorPixel(uint256 indexed _position, bytes6 _color);
 
     /**
-     * @dev Contract Constructor, calls ERC721 constructor and sets name and symbol
+     * @dev Contract Constructor, calls ERC721Batch constructor and sets name and symbol
      */
-    constructor(uint48 _maxPixels) 
-        public ERC721("PixelWorld", "PW") 
-    {
-        require(
-            _maxPixels > 0, 
-            "Pixels: Max pixels must be greater than 0"
-        );
+    constructor(uint48 _maxPixels) public ERC721Batch("PixelWorld", "PW") {
+        require(_maxPixels > 0, "Pixels: Max pixels must be greater than 0");
 
         maxPixels = _maxPixels;
 
@@ -45,44 +37,37 @@ contract Pixels is ERC721, AccessControl {
     /**
      * @dev Create new pixel
      * @param _position pixel position in the world / id
-     * @param _color pixel HEX color
      * @param _owner owner of the newly created pixel
      */
-    function createPixel(
-        uint128 _position,
-        bytes6 _color,
-        address _owner
-    ) public onlyMinter {
-        require(
-            _position > 0, 
-            "Pixels: Position must be provided"
-        );
+    function createPixel(address _owner, uint256 _position) public virtual onlyMinter {
+        require(_position > 0, "Pixels: Position must be provided");
         require(
             totalSupply() + 1 <= maxPixels,
             "Pixels: Cannot create more than max amount of pixels"
         );
-        require(
-            validateColor(_color),
-            "Pixels: Must be a valid HEX color value"
-        );
-
-        pixels[_position] = Pixel({
-            createTime: uint48(now), 
-            color: _color
-        });
 
         _safeMint(_owner, _position);
+    }
+
+    /**
+     * @dev Create multiple pixel positions
+     * @param _positions array of pixel positions
+     * @param _owner owner of the newly created pixel
+     */
+    function createPixels(address _owner, uint256[] memory _positions) public virtual onlyMinter {
+        require(
+            totalSupply() + _positions.length <= maxPixels,
+            "Pixels: Cannot create more than max amount of pixels"
+        );
+
+        _safeMintBatch(_owner, _positions, "");
     }
 
     /**
      * @dev Get pixel color
      * @param _position pixel position in the world / id
      */
-    function getColor(uint128 _position) 
-        public 
-        view 
-        returns (bytes6) 
-    {
+    function getColor(uint256 _position) public view returns (bytes6) {
         require(
             exists(_position),
             "Pixels: Make sure position exists before returning color"
@@ -96,9 +81,7 @@ contract Pixels is ERC721, AccessControl {
      * @param _position pixel position in the world / id
      * @param _color pixel HEX color
      */
-    function setColor(uint128 _position, bytes6 _color) 
-        public 
-    {
+    function setColor(uint256 _position, bytes6 _color) public {
         require(
             exists(_position),
             "Pixels: Make sure position exists before setting color"
@@ -114,21 +97,14 @@ contract Pixels is ERC721, AccessControl {
 
         pixels[_position].color = _color;
 
-        emit ColorPixel(
-            _position, 
-            _color
-        );
+        emit ColorPixel(_position, _color);
     }
 
     /**
      * @dev expose _exists to the public
      * @param _position pixel position in the world / id
      */
-    function exists(uint128 _position) 
-        public 
-        view 
-        returns (bool) 
-    {
+    function exists(uint256 _position) public view returns (bool) {
         return _exists(_position);
     }
 
@@ -136,10 +112,7 @@ contract Pixels is ERC721, AccessControl {
      * @dev set maxPixels
      * @param _maxPixels new maximum number of pixels
      */
-    function setMaxPixels(uint48 _maxPixels) 
-        public 
-        onlyAdmin 
-    {
+    function setMaxPixels(uint48 _maxPixels) public onlyAdmin {
         require(
             _maxPixels > 0 && _maxPixels > totalSupply(),
             "Pixels: Max pixels must be greater than 0 and total current supply"
@@ -152,11 +125,7 @@ contract Pixels is ERC721, AccessControl {
      * @dev validate hex color - https://ethereum.stackexchange.com/questions/50369/string-validation-solidity-alpha-numeric-and-length
      * @param _color color value to validate
      */
-    function validateColor(bytes6 _color) 
-        private 
-        pure 
-        returns (bool) 
-    {
+    function validateColor(bytes6 _color) private pure returns (bool) {
         for (uint8 i; i < _color.length; i++) {
             bytes1 char = _color[i];
 
@@ -178,11 +147,7 @@ contract Pixels is ERC721, AccessControl {
      * @dev add minter
      * @param _account address to add as the new minter
      */
-    function addMinter(address _account) 
-        public 
-        virtual 
-        onlyAdmin 
-    {
+    function addMinter(address _account) public virtual onlyAdmin {
         grantRole(MINTER_ROLE, _account);
     }
 
@@ -190,11 +155,7 @@ contract Pixels is ERC721, AccessControl {
      * @dev remove minter
      * @param _account address to remove as minter
      */
-    function removeMinter(address _account) 
-        public 
-        virtual 
-        onlyAdmin 
-    {
+    function removeMinter(address _account) public virtual onlyAdmin {
         revokeRole(MINTER_ROLE, _account);
     }
 

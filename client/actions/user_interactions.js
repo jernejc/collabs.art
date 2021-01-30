@@ -13,15 +13,19 @@ export function handleMouseMove({ pointer, scene }) {
       } else
         scene.game.origDragPoint = null;
       break;
+    case 'multiselect':
+      const tile = getTileForPointer({ pointer, scene });
+
+      if (scene.game.selection.isSelected(tile.cx, tile.cy))
+        scene.input.setDefaultCursor('alias');
+      else
+        scene.input.setDefaultCursor('copy');
+
+      positionSelectionBlock({ pointer, scene });
+      break;
     case 'select':
       //generalResetStrokeStyle({ scene });
       positionSelectionBlock({ pointer, scene });
-      break;
-    case 'drag':
-
-      if (pointer.button === 2) // Ignore right click
-        return;
-
       break;
     case 'mininav':
       if (pointer.isDown)
@@ -34,6 +38,7 @@ export async function handleMouseDown({ pointer, scene }) {
   if (DEBUG) console.log('User interactions: handleMouseDown');
 
   switch (scene.game.mode) {
+    case 'multiselect':
     case 'select':
 
       if (pointer.button === 2) { // Detect right click
@@ -42,13 +47,16 @@ export async function handleMouseDown({ pointer, scene }) {
       }
 
       const tile = getTileForPointer({ pointer, scene });
-      await scene.game.selection.setActiveTile({ tile, scene });
-      break;
-    case 'drag':
 
-      if (pointer.button === 2) // Ignore right click
-        return;
+      console.log('handleMouseDown', tile);
 
+      if (scene.game.selection.isSelected(tile.cx, tile.cy)) {
+        console.log('Pixel is selected')
+        scene.game.selection.removeSelected({ tile, scene });
+      } else {
+        console.log('Pixel is not selected')
+        await scene.game.selection.setActivePixel({ tile, scene });
+      }
       break;
     case 'mininav':
       navigateMinimap({ pointer, scene: scene.minimap })
@@ -79,7 +87,7 @@ export function handleShiftDown({ scene }) {
   if (DEBUG) console.log('User interactions: handleShiftDown');
 
   if (scene.game.mode === 'select')
-    setGameMode({ scene, mode: 'drag' });
+    setGameMode({ scene, mode: 'multiselect' });
 
   scene.input.keyboard.off('keydown_SHIFT'); // Event repeats as longs as the button is pressed, we only want it to trigger once.
 }
@@ -87,7 +95,7 @@ export function handleShiftDown({ scene }) {
 export function handleShiftUp({ scene }) {
   if (DEBUG) console.log('User interactions: handleShiftUp');
 
-  if (scene.game.mode === 'drag')
+  if (scene.game.mode === 'multiselect')
     setGameMode({ scene, mode: 'select' });
 
   scene.input.keyboard.on('keydown_SHIFT', (event) => {
@@ -170,7 +178,6 @@ export function moveToPosition({ scene, x, y }) {
   scene.updateTiles();
 }
 
-
 // Set the Position of the Selection Block
 export function positionSelectionBlock({ pointer, scene }) {
   if (DEBUG) console.log('User interactions: positionSelectionBlock');
@@ -197,14 +204,14 @@ export function setGameMode({ scene, mode }) {
       scene.input.setDefaultCursor('default');
       scene.game.mode = 'select';
 
-      generalResetStrokeStyle({ scene });
+      generalResetStrokeStyle({ scene, selection: true });
       break;
-    case 'drag':
-      scene.input.setDefaultCursor('cell');
-      scene.game.mode = 'drag';
+    case 'multiselect':
+      scene.input.setDefaultCursor('copy');
+      scene.game.mode = 'multiselect';
 
-      resetActiveSelection({ scene });
-      //generalResetStrokeStyle({ scene });
+      //resetActiveSelection({ scene });
+      generalResetStrokeStyle({ scene, selection: true });
       break;
     case 'mininav':
       scene.input.setDefaultCursor('crosshair');
@@ -220,15 +227,19 @@ export function resetActiveSelection({ scene }) {
   scene.game.selection.reset();
 }
 
-export function generalResetStrokeStyle({ scene, size }) {
+export function generalResetStrokeStyle({ scene, size, selection }) {
   if (DEBUG) console.log('generalStrokeReset', scene, size);
 
   for (let y = 0; y < scene.gridHeight; y++) {
     for (let x = 0; x < scene.gridWidth; x++) {
       const tile = scene.land[y][x];
 
-      if (tile)
-        resetStrokeStyle({ tile, scene, size });
+      if (tile) {
+        if (selection && scene.game.selection.isSelected(tile.cx, tile.cy))
+          setInvertedStroke({ scene, tile });
+        else
+          resetStrokeStyle({ tile, scene, size });
+      }
     }
   }
 }

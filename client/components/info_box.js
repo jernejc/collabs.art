@@ -14,7 +14,7 @@ import Button from './button';
 export default class InfoBox {
 
   constructor({ pixel, parent, scene }) {
-    if (DEBUG) console.log('Info Box: constructor',  pixel, parent, scene);
+    if (DEBUG) console.log('Info Box: constructor',  pixel);
 
     this.scene = scene;
     this.parent = parent;
@@ -40,7 +40,7 @@ export default class InfoBox {
 
     this.position = document.createElement('div');
     this.position.classList.add('position');
-    this.position.innerHTML = this.pixel.title;
+    this.position.innerHTML = this.pixel.position;
 
     this.wrapper.appendChild(this.position);
 
@@ -65,33 +65,15 @@ export default class InfoBox {
     this.wrapper.appendChild(this.loadingIcon);
     this.setPosition();
 
-    this.highestBid = null;
-
-    const pixelData = await this.scene.game.graph.loadPixel({
-      id: this.pixel.position
-    }, refresh);
-
-    if (pixelData) {
-      this.owner = pixelData.owner.toLowerCase();
-
-      if (pixelData.highestBid && pixelData.highestBid.amount) { // Check for latest bid also
-        this.highestBid = pixelData.highestBid;
-        this.highestBid.amount = parseFloat(fromWei(this.highestBid.amount)) // Conver from Wei
-        this.highestBid.expired = (new Date(this.highestBid.expiresAt * 1000) - new Date() < 0);
-        this.pixel.price = this.highestBid.amount + 0.001;
-      }
-    }
-
-    if (!this.pixel.price)
-      this.pixel.price = await this.scene.game.web3.getDefaultPrice();
+    await this.pixel.loadGraphData(refresh);
 
     this.wrapper.removeChild(this.loadingIcon);
 
-    if (!this.owner)
+    if (!this.pixel.owner)
       this.createPurchaseUI();
-    else if (this.scene.game.web3.activeAddress === this.owner)
+    else if (this.scene.game.web3.activeAddress === this.pixel.owner)
       this.createOwnerUI();
-    else if (this.highestBid && this.highestBid.bidder === this.scene.game.web3.activeAddress)
+    else if (this.pixel.highestBid && this.pixel.highestBid.bidder === this.scene.game.web3.activeAddress)
       this.createActiveBidUI();
     else
       this.createBidUI();
@@ -101,7 +83,7 @@ export default class InfoBox {
   }
 
   setPosition() {
-    if (DEBUG) console.log('Info Box: setPosition')
+    if (DEBUG) console.log('Info Box: setPosition');
 
     const padding = 2;
     const vertical = (this.pixel.y > (this.parent.offsetHeight / 2)) ? 'bottom' : 'top';
@@ -163,9 +145,9 @@ export default class InfoBox {
 
     this.ownerUI = document.createElement('div');
 
-    if (this.highestBid && !this.highestBid.expired) {
+    if (this.pixel.highestBid && !this.pixel.highestBid.expired) {
       this.ownerUI.appendChild(this.createInfoText('Pending bid', 'active-bid'));
-      this.ownerUI.appendChild(this.createBidsInfo(this.highestBid));
+      this.ownerUI.appendChild(this.createBidsInfo(this.pixel.highestBid));
     } else
       this.ownerUI.appendChild(this.createInfoText('Owned', 'owned'));
 
@@ -283,9 +265,9 @@ export default class InfoBox {
     if (DEBUG) console.log('Info box: activeBidUI');
 
     this.activeBidUI = document.createElement('div');
-    this.activeBidUI.appendChild(this.createInfoText(this.highestBid.expired ? 'Bid expired' : 'Bid placed', 'placed'));
+    this.activeBidUI.appendChild(this.createInfoText(this.pixel.highestBid.expired ? 'Bid expired' : 'Bid placed', 'placed'));
 
-    if (this.highestBid.expired) { // UI for Raising expired bid
+    if (this.pixel.highestBid.expired) { // UI for Raising expired bid
       this.activeBidUI.appendChild(new Input(this.pixel, 'price', {
         //min: this.pixel.price,
         max: 100,
@@ -321,7 +303,7 @@ export default class InfoBox {
         }
       }))
     } else { // Display existing bid
-      this.activeBidUI.appendChild(new Input(this.highestBid, 'amount', {
+      this.activeBidUI.appendChild(new Input(this.pixel.highestBid, 'amount', {
         label: 'ETH',
         width: '49%',
         disabled: true,
@@ -332,7 +314,7 @@ export default class InfoBox {
         format: (value) => value.toFixed(3)
       }));
 
-      this.activeBidUI.appendChild(new Input(this.highestBid, 'expiresAt', {
+      this.activeBidUI.appendChild(new Input(this.pixel.highestBid, 'expiresAt', {
         label: 'Expires',
         width: '49%',
         disabled: true,
@@ -360,7 +342,6 @@ export default class InfoBox {
         }
       }));
     }
-
 
     this.wrapper.classList.add('activeBidUI');
     this.wrapper.appendChild(this.activeBidUI);

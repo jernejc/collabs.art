@@ -20,6 +20,12 @@ body, h1 {
   overflow: hidden;
 }
 
+input {
+  background: transparent;
+  border: none;
+  color: #FFF;
+}
+
 #app {
   /*background-color:var(--active-black);
   position: absolute;
@@ -62,10 +68,7 @@ body, h1 {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-#bottom-nav input[type=text] {
-  background: transparent;
-  border: none;
-  color: #FFF;
+#bottom-nav input {
   line-height: 25px;
   font-size: 15px;
   margin-top: 10px;
@@ -201,24 +204,51 @@ body, h1 {
   height: var(--bottom-bar-settings-height);
 }
 
-#menu-item .settings.filters span {
+#menu-item .settings .setting {
   display: inline-flex;
   padding: 13px 9px;
   cursor: pointer;
+  position: relative;
 }
 
-#menu-item .settings.filters span:hover {
+#menu-item .settings .setting:hover {
   color: var(--header-white);
 }
 
-#menu-item .settings.filters span i {
+#menu-item .settings .setting i {
   --ggs: 0.8;
   top: 5px;
   right: 5px;
 }
 
-#menu-item .settings.filters span i.gg-sort-za {
+#menu-item .settings .setting i.gg-sort-za {
   top: 6px;
+}
+
+#menu-item .settings .setting input {
+  width: 100%;
+  text-align: center;
+  padding: 0;
+  font-size: 12px;
+}
+
+#menu-item .settings .setting input:focus {
+  outline: none;
+}
+
+#menu-item .settings.batch .setting {
+  padding: 12px 0px;
+}
+
+#menu-item .settings.batch .setting .color {
+  left: 0px;
+  top: 11px;
+}
+
+#menu-item .settings.batch .action-button {
+  width: 20%;
+  display: inline-flex;
+  margin-left: 2%;
 }
 
 #menu-item ul.list {
@@ -524,6 +554,7 @@ Info Box
   margin: 4px auto 0px;
 }
 
+.setting .color,
 .label-border-input .color {
   position: absolute;
   width: 15px;

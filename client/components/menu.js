@@ -1,18 +1,26 @@
 
-import { formatPositionHex } from '@util/helpers';
+import Pixel from '@models/pixel';
+
+import Input from '@components/input';
+import Button from '@components/button';
+
 import { moveToPosition } from '@actions/user_interactions';
 import { getRelativeTile } from '@actions/pixel';
-import Input from '@components/input';
 
-import { hexToString, insertAfter, formatColorNumber } from '@util/helpers';
+import { insertAfter, formatColorNumber } from '@util/helpers';
 
 export default class Menu {
-  constructor({ parent, game }) {
+  constructor({ parent, game, activeTab }) {
+    if (DEBUG) console.log('Menu: constructor', parent, game, activeTab)
+
     this.parent = parent;
     this.game = game;
     this.scene = game.scene.keys['MainScene'];
     this.lists = ['pixels', 'selection'];
     this.loaded = false;
+
+    if (activeTab && this.lists.includes(activeTab))
+      this.activeTab = activeTab;
 
     this.domElement = document.createElement('div');
     this.domElement.setAttribute('id', 'menu-item');
@@ -41,7 +49,7 @@ export default class Menu {
       */
 
     if (e.target.classList.contains('close')) { // Handle close button
-      this.closeMenu();
+      this.close();
       return;
     }
     else if (e.target.classList.contains('tab')) { // Handle tab click
@@ -71,7 +79,7 @@ export default class Menu {
 
         /*console.log('clickHandler this.scene', this.scene)*/
         const tile = getRelativeTile({ cx, cy, scene: this.scene, color: true });
-        await this.game.selection.setActiveTile({ tile, scene: this.scene });
+        await this.game.selection.setActivePixel({ tile, scene: this.scene });
       }
     }
 
@@ -79,6 +87,8 @@ export default class Menu {
   }
 
   createTabs() {
+    if (DEBUG) console.log('createTabs', this.activeTab);
+
     this.tabs = document.createElement('ul');
     this.tabs.classList.add('tabs');
 
@@ -88,7 +98,11 @@ export default class Menu {
       listItem.dataset.list = list;
       listItem.textContent = list;
 
-      if (l === 0) {
+      if (!this.activeTab && l === 0) {
+        listItem.classList.add('active');
+        this.activeTab = list;
+      } else if (this.activeTab === list) {
+        console.log('Found default activeTab value')
         listItem.classList.add('active');
         this.activeTab = list;
       }
@@ -131,10 +145,12 @@ export default class Menu {
   }
 
   createFiltersSetting() {
-    const activeBids = document.createElement('span');
+    const activeBids = document.createElement('div');
+    activeBids.classList.add('setting');
     activeBids.innerHTML = '<i class="gg-sort-az"></i> Active bids';
 
-    const pendingBids = document.createElement('span');
+    const pendingBids = document.createElement('div');
+    pendingBids.classList.add('setting');
     pendingBids.innerHTML = '<i class="gg-sort-za"></i> Pending bids';
 
     this.setting.appendChild(activeBids);
@@ -142,19 +158,20 @@ export default class Menu {
   }
 
   createBatchSetting() {
-    const batch = document.createElement('div');
+    if (DEBUG) console.log('createBatchSetting this.game.selection', this.game.selection.pixels);
 
-    console.log('createBatchSetting this.game.selection', this.game.selection);
-    const activeTile = this.game.selection.activeTile || {};
-    console.log('activeTile', activeTile);
+    const pixels = this.game.selection.pixels || null;
+    const activePixel = (pixels.length > 0) ? pixels[pixels.length - 1] : null;
+    const batchSettings = {
+      color: activePixel.color || Phaser.Display.Color.HexStringToColor('#ffffff'),
+      price: activePixel.price || this.game.web3.defaultPrice
+    }
 
-    batch.appendChild(new Input(activeTile, 'color.color.color', {
-      label: 'hex',
-      width: '100%',
+    this.setting.appendChild(new Input(batchSettings, 'color.color', {
+      width: '35%',
       scene: this.scene,
       type: 'color',
-      border: true,
-      elClasses: ['label-border-input'],
+      elClasses: ['setting'],
       format: (value) => '#' + formatColorNumber(value),
       validate: (value) => !isNaN(value) && value.length === 6,
       focus: () => {
@@ -170,27 +187,35 @@ export default class Menu {
       }
     }));
 
-    batch.appendChild(new Input(activeTile, 'price', {
+    this.setting.appendChild(new Input(batchSettings, 'price', {
       //min: this.selection.price,
       max: 100,
       step: 0.001,
       type: 'number',
-      label: 'ETH',
-      width: '100%',
-      border: true,
-      elClasses: ['label-border-input'],
+      placeholder: '0.001',
+      width: '32%',
+      elClasses: ['setting'],
       scene: this.scene,
+      label: 'ETH',
       format: (value) => (value) ? value.toFixed(3) : 0
     }));
 
-    this.setting.appendChild(batch);
+    this.setting.appendChild(new Button({
+      elClasses: ['action-button'],
+      width: '22%',
+      text: 'Apply',
+      clickAction: async e => {
+        console.log('Click apply')
+      }
+    }));
   }
 
   async loadPixels() {
+    if (DEBUG) console.log('Menu loadPixels', this.game.selection, this.activeTab);
+
     if (this.menuList)
       this.resetList();
 
-    console.log('loadPixels', this.game.selection, this.activeTab);
     let pixels;
 
     switch (this.activeTab) {
@@ -198,9 +223,14 @@ export default class Menu {
         pixels = await this.game.graph.loadPixels({
           owner: this.game.web3.activeAddress
         });
+
+        if (pixels && pixels.length > 0)
+          pixels = pixels.map(data => {
+            return Pixel.fromGraphData({ scene: this.scene, data })
+          })
         break;
       case 'selection':
-        pixels = [];
+        pixels = this.game.selection.pixels;
         break;
     }
 
@@ -221,11 +251,11 @@ export default class Menu {
     this.setting = null;
   }
 
-  switchToTab(tab, node) {
+  switchToTab(tab) {
     console.log('switchToTab', tab);
 
     this.tabs.querySelector('.active').classList.remove('active');
-    node.classList.add('active');
+    this.tabs.querySelector(`li[data-list="${tab}"]`).classList.add('active');
 
     this.activeTab = tab;
     this.createSettings();
@@ -233,24 +263,16 @@ export default class Menu {
     this.loadPixels();
   }
 
-  listItemTemplate(data) {
-
-    if (!data.color)
-      data.color = 'FFFFFF';
-    else
-      data.color = hexToString(data.color);
-
-    const position = formatPositionHex(data.id);
-
+  listItemTemplate(pixel) {
     const item = document.createElement('li');
 
-    item.dataset.id = position.string;
-    item.dataset.cx = position.x;
-    item.dataset.cy = position.y;
+    item.dataset.id = pixel.position;
+    item.dataset.cx = pixel.cx;
+    item.dataset.cy = pixel.cy;
 
     item.innerHTML = `
-      <span class="color" style="background: #${data.color}"></span>
-      <span class="text">${position.string}</span>
+      <span class="color" style="background: #${pixel.HEXcolor}"></span>
+      <span class="text">${pixel.position}</span>
       <i class="gg-track location" />
     `;
 
@@ -262,7 +284,7 @@ export default class Menu {
     this.menuList = null;
   }
 
-  closeMenu() {
+  close() {
     this.domElement.removeEventListener('click', this.clickHandler);
     this.domElement.removeChild(this.tabs);
     this.tabs = null;

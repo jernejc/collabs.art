@@ -50,8 +50,8 @@ export function formatPosition(string) {
 
   return {
     string,
-    x,
-    y
+    cx: x,
+    cy: y
   }
 }
 

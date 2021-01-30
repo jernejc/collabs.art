@@ -7,13 +7,11 @@ const duration = require("../helpers/duration");
 const PixelsBid = artifacts.require("PixelsBid");
 const Pixels = artifacts.require("Pixels");
 
-
 contract("PixelsBid tests", async accounts => {
 
-  const _color = web3.utils.stringToHex("FFFFFF");
-  const _position = "10010";
-  const _amount = 2000000;
-  const _defaultPrice = 1000000;
+  const _position = web3.utils.utf8ToHex("PT404");
+  const _amount = web3.utils.toWei("0.01");
+  const _defaultPrice = web3.utils.toWei("0.005");
   const _contractFee = 10000;
   const _million = 1000000;
 
@@ -28,41 +26,47 @@ contract("PixelsBid tests", async accounts => {
 
   it("check defaultPrice", async () => {
     const defaultPrice = await instance.defaultPrice();
-    expect(defaultPrice.toNumber()).to.equal(_defaultPrice, "Default buy price should be 100");
+    expect(defaultPrice.toString()).to.equal(_defaultPrice, "Default buy price should be " + _defaultPrice + " WEI");
   });
 
   it("create and purchase a non existing pixel", async () => {
+
     try {
-      const prePurchaseContractBalance = await web3.eth.getBalance(instance.address);
-
-      const NonExistingPixel = await PixelsContractInstance.exists(_position);
-      expect(NonExistingPixel).to.equal(false, "NonExistingPixel pixel should not exist");
-
-      const purchaseTransaction = await instance.purchase(_position, _color, { value: _amount });
+      await instance.purchase([_position], { value: _amount });
 
       const NewPixelExists = await PixelsContractInstance.exists(_position);
       expect(NewPixelExists).to.equal(true, "Newly created pixel should exist");
 
       const contractBalance = await web3.eth.getBalance(instance.address);
-      expect(parseInt(contractBalance)).to.equal(_amount);
+      expect(contractBalance).to.equal(_amount);
 
-      // Make sure the default account is the owner
       const owner = await PixelsContractInstance.ownerOf(_position);
       expect(owner).to.equal(accounts[0]);
 
-      // Check contract balance
-      const afterPurchaseContractBalance = await web3.eth.getBalance(instance.address);
-      const expectedAfterPurchaseContractBalance = parseInt(prePurchaseContractBalance) + _amount;
+    } catch (error) {
+      console.error(error);
+      assert.fail("One or more errors occured.");
+    }
+  });
 
-      expect(expectedAfterPurchaseContractBalance).to.equal(parseInt(afterPurchaseContractBalance));
+  it("create and purchase multiple pixel positions", async () => {
 
-      // Check for Purchase event
-      truffleAssert.eventEmitted(purchaseTransaction, 'Purchase', ev => {
-        // Types are a mess here, needs a better approach than ==
-        return ev._position == _position &&
-          ev._payer === accounts[0] &&
-          ev._amount == _amount
-      });
+    const _positions = [web3.utils.utf8ToHex("PT504"), web3.utils.utf8ToHex("PT604"), web3.utils.utf8ToHex("PT704"), web3.utils.utf8ToHex("PT804")];
+    const _positions_value = web3.utils.toBN(_amount).mul(web3.utils.toBN(_positions.length));
+
+    try {
+      const prePurchaseContractBalance = await web3.eth.getBalance(instance.address);
+
+      await instance.purchase(_positions, { value: _positions_value.toString() });
+
+      const contractBalance = await web3.eth.getBalance(instance.address);
+      expect(contractBalance).to.equal(web3.utils.toBN(prePurchaseContractBalance).add(_positions_value).toString());
+
+      for (let index = 0; index < _positions.length; index++) {
+        const position = _positions[index];
+        const owner = await PixelsContractInstance.ownerOf(position);
+        expect(owner).to.equal(accounts[0]);
+      }
 
     } catch (error) {
       console.error(error);
@@ -76,9 +80,9 @@ contract("PixelsBid tests", async accounts => {
       expect(ExistingPixel).to.equal(true, "ExistingPixel pixel should exist");
 
       try {
-        await instance.purchase(_position, _color, { from: accounts[1], value: _amount });
+        await instance.purchase([_position], { from: accounts[1], value: _amount });
       } catch (error) {
-        expect(error.reason).to.equal("PixelsBid: You can only purchase a non-existing pixel");
+        expect(error.reason).to.equal("ERC721Batch: _mintBatch token already minted");
       }
 
     } catch (error) {
@@ -86,33 +90,27 @@ contract("PixelsBid tests", async accounts => {
       assert.fail("One or more errors occured.");
     }
   });
-
+  
   it("place bid on existing pixel", async () => {
     try {
       const preBidContractBalance = await web3.eth.getBalance(instance.address);
-
-      const ExistingPixel = await PixelsContractInstance.exists(_position);
-      expect(ExistingPixel).to.equal(true, "ExistingPixel pixel should exist");
-
       const bidTransaction = await instance.placeBid(_position, duration.days(1), { from: accounts[1], value: _amount });
-
       const pixelBid = await instance.getBidForPixel(_position);
 
-      expect(pixelBid[1].toNumber()).to.equal(_amount);
+      expect(pixelBid[1].toString()).to.equal(_amount);
       expect(pixelBid[0]).to.equal(accounts[1]);
 
       // Check contract balance
       const afterBidContractBalance = await web3.eth.getBalance(instance.address);
-      const expectedAfterBidContractBalance = parseInt(preBidContractBalance) + _amount;
+      const expectedAfterBidContractBalance = web3.utils.toBN(preBidContractBalance).add(web3.utils.toBN(_amount));
 
-      expect(expectedAfterBidContractBalance).to.equal(parseInt(afterBidContractBalance));
+      expect(expectedAfterBidContractBalance.toString()).to.equal(afterBidContractBalance);
 
       // Check for BidCreated event
       truffleAssert.eventEmitted(bidTransaction, 'BidCreated', ev => {
-        // Types are a mess here, needs a better approach than ==
-        return ev._position == _position &&
+        return web3.utils.hexToUtf8(web3.utils.toHex(ev._position)) === web3.utils.hexToUtf8(_position) &&
           ev._bidder === accounts[1] &&
-          ev._amount == _amount
+          ev._amount.toString() === _amount
       });
 
     } catch (error) {
@@ -136,6 +134,7 @@ contract("PixelsBid tests", async accounts => {
     }
   });
 
+  
   it("fail to place bid with price lower than existing bid", async () => {
     try {
 
@@ -155,7 +154,7 @@ contract("PixelsBid tests", async accounts => {
     try {
 
       try {
-        await instance.placeBid("03434", duration.days(1), { from: accounts[1], value: _amount });
+        await instance.placeBid(web3.utils.toBN("03434"), duration.days(1), { from: accounts[1], value: _amount });
       } catch (error) {
         expect(error.reason).to.equal("PixelsBid: Pixel position must exist");
       }
@@ -165,38 +164,35 @@ contract("PixelsBid tests", async accounts => {
       assert.fail("One or more errors occured.");
     }
   });
-
+  
   it("place higher bid on pixel with existing bid", async () => {
     try {
-      const newBidPrice = _amount + _amount;
+      const newBidPrice = web3.utils.toBN(_amount).add(web3.utils.toBN(_amount));
       const preRefundBalance = await web3.eth.getBalance(accounts[1]); // save balance before refund
       const preRefundContractBalance = await web3.eth.getBalance(instance.address); // save balance before refund
+      const bidTransaction = await instance.placeBid(_position, duration.days(1), { from: accounts[2], value: newBidPrice.toString() }); // place new bid for pixel
+      const pixelBid = await instance.getBidForPixel(_position); // get new bid
 
-      const bidTransaction = await instance.placeBid(_position, duration.days(1), { from: accounts[2], value: newBidPrice });
-
-      const pixelBid = await instance.getBidForPixel(_position);
-
-      expect(pixelBid[1].toNumber()).to.equal(_amount + _amount);
+      expect(pixelBid[1].toString()).to.equal(newBidPrice.toString());
       expect(pixelBid[0]).to.equal(accounts[2]);
 
       // Make sure the existing bid was refunded
-      const afterRefundBalance = await web3.eth.getBalance(accounts[1]);
-      const expectedAfterRefundBalance = parseInt(preRefundBalance) + _amount;
+      const afterRefundBalance = await web3.eth.getBalance(accounts[1]); // get account balance after bid is placed
+      const expectedAfterRefundBalance = web3.utils.toBN(preRefundBalance).add(web3.utils.toBN(_amount));
 
-      expect(expectedAfterRefundBalance).to.equal(parseInt(afterRefundBalance));
+      expect(expectedAfterRefundBalance.toString()).to.equal(afterRefundBalance);
 
       // Check contract balance
-      const afterRefundContractBalance = await web3.eth.getBalance(instance.address);
-      const expectedAfterRefundContractBalance = parseInt(preRefundContractBalance) + _amount; // event tho the new bid is 2x amount, we have to refund the original bid
+      const afterRefundContractBalance = await web3.eth.getBalance(instance.address); // get contract address after bid
+      const expectedAfterRefundContractBalance = web3.utils.toBN(preRefundContractBalance).add(web3.utils.toBN(_amount)); // event tho the new bid is 2x amount, we have to refund the original bid
 
-      expect(expectedAfterRefundContractBalance).to.equal(parseInt(afterRefundContractBalance));
+      expect(expectedAfterRefundContractBalance.toString()).to.equal(afterRefundContractBalance);
 
       // Check for BidCreated event
       truffleAssert.eventEmitted(bidTransaction, 'BidCreated', ev => {
-        // Types are a mess here, needs a better approach than ==
-        return ev._position == _position &&
+        return web3.utils.hexToUtf8(web3.utils.toHex(ev._position)) === web3.utils.hexToUtf8(_position) &&
           ev._bidder === accounts[2] &&
-          ev._amount == newBidPrice
+          ev._amount.toString() === newBidPrice.toString()
       });
 
     } catch (error) {
@@ -211,9 +207,8 @@ contract("PixelsBid tests", async accounts => {
       expect(oldOwner).to.equal(accounts[0]); // make sure the default account is the current owner
 
       const pixelBid = await instance.getBidForPixel(_position);
-      const bidAmount = pixelBid[1].toNumber();
+      const bidAmount = pixelBid[1].toString();
 
-      //const preAcceptanceBalance = await web3.eth.getBalance(oldOwner); // save balance of owner before bid is accepted
       const preAcceptanceContractBalance = await web3.eth.getBalance(instance.address); // save balance of contract before bid is accepted
 
       await PixelsContractInstance.setApprovalForAll(instance.address, true); // contract needs to be approved for transfer
@@ -222,32 +217,24 @@ contract("PixelsBid tests", async accounts => {
       const newOwner = await PixelsContractInstance.ownerOf(_position);
       expect(newOwner).to.equal(pixelBid[0]);
 
-      const contractFee = bidAmount * _contractFee / _million;
-      const ownerFee = bidAmount - contractFee;
+      const contractFee = web3.utils.toBN(bidAmount).mul(web3.utils.toBN(_contractFee)).div(web3.utils.toBN(_million));
+      const ownerFee = web3.utils.toBN(bidAmount).sub(contractFee);
 
       // Check for BidAccepted event
       truffleAssert.eventEmitted(acceptTransaction, 'BidAccepted', ev => {
-        // Types are a mess here, needs a better approach than ==
-        return ev._position == _position &&
+        return web3.utils.hexToUtf8(web3.utils.toHex(ev._position)) === web3.utils.hexToUtf8(_position) &&
           ev._bidder === newOwner &&
           ev._seller === oldOwner &&
-          ev._amount == ownerFee &&
-          ev._fee == contractFee
+          ev._amount.toString() === ownerFee.toString() &&
+          ev._fee.toString() === contractFee.toString()
       });
 
-      // Check contract balance
       const afterAcceptanceContractBalance = await web3.eth.getBalance(instance.address);
-      expect(parseInt(afterAcceptanceContractBalance)).to.equal(parseInt(preAcceptanceContractBalance) - ownerFee);
-
-      /* Not accounting for gas prices at the moment, needs a new approach
-      const afterAcceptanceBalance = await web3.eth.getBalance(oldOwner);
-      expect(afterAcceptanceBalance).to.equal(parseInt(preAcceptanceBalance) + ownerFee);
-      */
+      expect(afterAcceptanceContractBalance).to.equal(web3.utils.toBN(preAcceptanceContractBalance).sub(ownerFee).toString());
 
     } catch (error) {
       console.error(error);
       assert.fail("One or more errors occured.");
     }
   });
-
 });

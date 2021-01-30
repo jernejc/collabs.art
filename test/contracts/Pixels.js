@@ -1,7 +1,6 @@
 const expect = require("chai").expect;
-const Pixels = artifacts.require("Pixels");
 
-const _color = web3.utils.stringToHex("FFFFFF"); 
+const Pixels = artifacts.require("Pixels");
 
 contract("Pixels tests", async accounts => {
   let instance;
@@ -11,10 +10,10 @@ contract("Pixels tests", async accounts => {
   });
 
   it("create a new pixel", async () => {
-    const _position = stringToBN("999x999");
+    const _position = web3.utils.utf8ToHex("PT230");
 
     try {
-      await instance.createPixel(_position, _color, accounts[0]);
+      await instance.createPixel(accounts[0], _position);
 
       NewPixelExists = await instance.exists(_position);
       expect(NewPixelExists).to.equal(true, "Newly created pixel should exist");
@@ -24,27 +23,14 @@ contract("Pixels tests", async accounts => {
     }
   });
 
-  it("exists fails on non existing pixel", async () => {
-    const _position = stringToBN("222x222");
-
-    try {
-      NonExistingPixel = await instance.exists(_position);
-
-      expect(NonExistingPixel).to.equal(false, "Non existing pixel should not exist");
-    } catch (error) {
-      console.error(error);
-      assert.fail("One or more errors occured.");
-    }
-  });
-
   it("get pixel color", async () => {
-    const _position = stringToBN("333x333");
+    const _position = web3.utils.utf8ToHex("PT232");
 
     try {
-      await instance.createPixel(_position, _color, accounts[0]);
+      await instance.createPixel(accounts[0], _position);
 
       PixelColor = await instance.getColor(_position);
-      expect(PixelColor.toString()).to.equal(_color.toString(), "Color should match");
+      expect(PixelColor.toString()).to.equal("0x000000000000", "Color should match");
     } catch (error) {
       console.error(error);
       assert.fail("One or more errors occured.");
@@ -52,11 +38,11 @@ contract("Pixels tests", async accounts => {
   });
 
   it("set pixel color", async () => {
-    const _position = stringToBN("444x444");
+    const _position = web3.utils.utf8ToHex("PT233");
     const _new_color = web3.utils.stringToHex("FFFAAA");
 
     try {
-      await instance.createPixel(_position, _color, accounts[0]);
+      await instance.createPixel(accounts[0], _position);
 
       await instance.setColor(_position, _new_color);
 
@@ -69,18 +55,21 @@ contract("Pixels tests", async accounts => {
   });
 
   it("fail to set color on invalid HEX", async () => {
-    const _position = stringToBN("555x555");
-    const _new_color = web3.utils.stringToHex("#!00000");
+    const _position = web3.utils.utf8ToHex("PT234");
+    const _new_color = web3.utils.stringToHex("#!0000");
 
-    await instance.createPixel(_position, _color, accounts[0]);
+    await instance.createPixel(accounts[0], _position);
 
     try {
       await instance.setColor(_position, _new_color);
+      console.log('Set worked ?')
+      NewPixelColor = await instance.getColor(_position);
+      console.log('NewPixelColor', NewPixelColor)
     } catch (error) {
       expect(error.reason).to.equal("Pixels: Must be a valid HEX color value");
     }
 
-    const _new_color2 = web3.utils.stringToHex("#00000!");
+    const _new_color2 = web3.utils.stringToHex("#0000!");
 
     try {
       await instance.setColor(_position, _new_color2);
@@ -90,17 +79,17 @@ contract("Pixels tests", async accounts => {
   });
 
   it("fail to mint with non minter account", async () => {
-    const _position = stringToBN("666x666");
+    const _position = web3.utils.utf8ToHex("PT235");
 
     try {
-      await instance.createPixel(_position, _color, accounts[1], { from: accounts[2] });
+      await instance.createPixel(accounts[1], _position, { from: accounts[2] });
     } catch (error) {
       expect(error.reason).to.equal("Pixels: Restricted to minters.");
     }
   });
 
   it("mint with new minter account", async () => {
-    const _position = stringToBN("777x777");
+    const _position = web3.utils.utf8ToHex("PT236");
 
     try {
       try {
@@ -110,7 +99,7 @@ contract("Pixels tests", async accounts => {
       }
 
       await instance.addMinter(accounts[2]);
-      await instance.createPixel(_position, _color, accounts[1], { from: accounts[2] });
+      await instance.createPixel(accounts[1], _position, { from: accounts[2] });
     } catch (error) {
       console.error(error);
       assert.fail("One or more errors occured.");
@@ -139,8 +128,8 @@ contract("Pixels tests", async accounts => {
   });
 
   it("fail to create pixel over max limit", async () => {
-    const _position = stringToBN("888x888");
-    const _position2 = stringToBN("999x999");
+    const _position = web3.utils.utf8ToHex("PT237");
+    const _position2 = web3.utils.utf8ToHex("PT238");
 
     try {
       const maxPixels = await instance.maxPixels();
@@ -157,10 +146,10 @@ contract("Pixels tests", async accounts => {
 
       await instance.setMaxPixels(totalSupply.toNumber() + 1, { from: accounts[0] }); // Set max supply just over total current supply
 
-      await instance.createPixel(_position, _color, accounts[0]); // Max supply reached.
+      await instance.createPixel(accounts[0], _position); // Max supply reached.
 
       try {
-        await instance.createPixel(_position2, _color, accounts[0]);
+        await instance.createPixel(accounts[0], _position2);
       } catch (error) {
         expect(error.reason).to.equal("Pixels: Cannot create more than max amount of pixels");
       }
@@ -172,7 +161,3 @@ contract("Pixels tests", async accounts => {
   });
 
 });
-
-function stringToBN(string) {
-  return web3.utils.toBN(web3.utils.stringToHex(string)); // There has to be another way of doing this
-}

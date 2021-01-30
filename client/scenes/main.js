@@ -14,7 +14,9 @@ import {
   handleShiftDown,
   handleShiftUp,
   setGameMode,
-  moveToPosition
+  moveToPosition,
+  setInvertedStroke,
+  resetStrokeStyle
 } from '@actions/user_interactions';
 
 export default class MainScene extends ApplicationScene {
@@ -155,10 +157,13 @@ export default class MainScene extends ApplicationScene {
 
     this.land[y][x].cx = mapPixel.cx;
     this.land[y][x].cy = mapPixel.cy;
-    this.land[y][x].id = `${mapPixel.cx}x${mapPixel.cy}`;
-    this.land[y][x].price = Math.random().toFixed(3);
 
     this.land[y][x].setFillStyle(mapPixel.color.color);
+    
+    if (this.game.selection.isSelected(mapPixel.cx, mapPixel.cy)) 
+      setInvertedStroke({ scene: this, tile: this.land[y][x] });
+    else
+      resetStrokeStyle({ scene: this, tile: this.land[y][x] });
   }
 
   clearVisibleTiles() {
