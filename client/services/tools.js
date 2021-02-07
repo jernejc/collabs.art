@@ -29,8 +29,15 @@ export default class ToolsManager {
     });
 
     this.emitter.on('selection/update', async () => {
-      if (this.menu && this.menu.loaded && this.menu.activeTab === 'selection')
-        await this.menu.loadPixels();
+      if (this.menu && this.menu.loaded) {
+        if (this.menu.activeTab === 'selection');
+          await this.menu.loadPixels();
+
+        if (this.setting)
+          this.resetSettings();
+
+        this.menu.createSettings();
+      }
     })
   }
 
@@ -69,8 +76,8 @@ export default class ToolsManager {
       elClasses: ['pixels', 'menu-btn'],
       iconClass: 'gg-row-last',
       clickAction: async () => {
-        if (!this.menu || !this.menu.loaded)
-          await this.openMenu();
+        if (!this.menu || !this.menu.loaded) 
+          await this.openMenu(this.game.selection.pixels.length > 0 ? 'selection' : null);
         else
           await this.menu.loadPixels();
       }

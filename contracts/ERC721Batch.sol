@@ -16,7 +16,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 /**
  * @title ERC721 Non-Fungible Token Standard basic implementation
- * @dev Additional batch functions included:
+ * @dev Additional batch functions included: _mintBatch, _transferBatch, _burnBatch
  * @dev see https://eips.ethereum.org/EIPS/eip-721
  */
 contract ERC721Batch is
@@ -95,9 +95,9 @@ contract ERC721Batch is
     bytes4 private constant _INTERFACE_ID_ERC721_ENUMERABLE = 0x780e9d63;
 
     /**
-     * @dev Emitted when `positions` are transferred from `_from` to `_to`.
+     * @dev Emitted when `tokenIds` are transferred from `_from` to `_to`.
      */
-    event TransferBatch(address indexed _from, address indexed _to, uint256[] _positions);
+    event TransferBatch(address indexed _from, address indexed _to, uint256[] _tokenIds);
 
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
@@ -524,7 +524,7 @@ contract ERC721Batch is
         require(to != address(0), "ERC721Batch: _mint to the zero address");
         require(!_exists(tokenId), "ERC721Batch: _mint token already minted");
 
-        _beforeTokenTransfer(address(0), to, _asSingletonArray(tokenId));
+        _beforeTokenTransfer(address(0), to, tokenId);
 
         _holderTokens[to].add(tokenId);
         _tokenOwners.set(tokenId, to);
@@ -543,7 +543,7 @@ contract ERC721Batch is
     {
         require(to != address(0), "Pixels: _mintBatch to zero address");
 
-        _beforeTokenTransfer(address(0), to, tokenIds);
+        _beforeBatchTokenTransfer(address(0), to, tokenIds);
 
         for (uint256 i = 0; i < tokenIds.length; i++) {
             uint256 tokenId = tokenIds[i];
@@ -572,7 +572,7 @@ contract ERC721Batch is
     function _burn(uint256 tokenId) internal virtual {
         address owner = ownerOf(tokenId);
 
-        _beforeTokenTransfer(owner, address(0), _asSingletonArray(tokenId));
+        _beforeTokenTransfer(owner, address(0), tokenId);
 
         // Clear approvals
         _approve(address(0), tokenId);
@@ -598,7 +598,7 @@ contract ERC721Batch is
     function _burnBatch(address account, uint256[] memory tokenIds) internal virtual {
         require(account != address(0), "ERC1155: burn from the zero address");
 
-        _beforeTokenTransfer(account, address(0), tokenIds);
+        _beforeBatchTokenTransfer(account, address(0), tokenIds);
 
         for (uint i = 0; i < tokenIds.length; i++) {
           uint256 tokenId = tokenIds[i];
@@ -639,7 +639,7 @@ contract ERC721Batch is
         );
         require(to != address(0), "ERC721Batch: transfer to the zero address");
 
-        _beforeTokenTransfer(from, to, _asSingletonArray(tokenId));
+        _beforeTokenTransfer(from, to, tokenId);
 
         // Clear approvals from the previous owner
         _approve(address(0), tokenId);
@@ -670,7 +670,7 @@ contract ERC721Batch is
     ) internal virtual {
         require(to != address(0), "ERC721Batch: _transferBatch to zero address");
 
-        _beforeTokenTransfer(from, to, tokenIds);
+        _beforeBatchTokenTransfer(from, to, tokenIds);
 
         for (uint256 i = 0; i < tokenIds.length; ++i) {
             uint256 tokenId = tokenIds[i];
@@ -802,16 +802,27 @@ contract ERC721Batch is
     function _beforeTokenTransfer(
         address from,
         address to,
-        uint256[] memory tokenIds
+        uint256 tokenId
     ) internal virtual {}
 
     /**
-    *
-    */
-    function _asSingletonArray(uint256 element) private pure returns (uint256[] memory) {
-      uint256[] memory array = new uint256[](1);
-      array[0] = element;
-
-      return array;
-    }
+     * @dev Hook that is called before any token transfer. This includes minting
+     * and burning.
+     *
+     * Calling conditions:
+     *
+     * - When `from` and `to` are both non-zero, ``from``'s `tokenId` will be
+     * transferred to `to`.
+     * - When `from` is zero, `tokenId` will be minted for `to`.
+     * - When `to` is zero, ``from``'s `tokenId` will be burned.
+     * - `from` cannot be the zero address.
+     * - `to` cannot be the zero address.
+     *
+     * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
+     */
+    function _beforeBatchTokenTransfer(
+        address from,
+        address to,
+        uint256[] memory tokenIds
+    ) internal virtual {}
 }

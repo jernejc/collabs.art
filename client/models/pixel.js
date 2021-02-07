@@ -10,7 +10,7 @@ import {
   formatPositionHex
 } from '@util/helpers';
 
-import { setInvertedStroke, resetStrokeStyle } from '@actions/user_interactions';
+import { setInvertedStroke, resetStrokeStyle, purchasePixels } from '@actions/user_interactions';
 
 export default class Pixel {
 
@@ -29,7 +29,10 @@ export default class Pixel {
   }
 
   get HEXcolor() {
-    return formatColorNumber(this.color.color);
+    if (this.color)
+      return formatColorNumber(this.color.color);
+    else
+      return 'FFFFFF';
   }
 
   get y() {
@@ -46,26 +49,7 @@ export default class Pixel {
     let success = false;
 
     try {
-      if (!this.scene.game.web3.activeAddress)
-        await this.scene.game.web3.getActiveAddress();
-
-      if (!this.scene.game.web3.activeAddress)
-        return success;
-
-      let price = this.price;
-
-      if (typeof price === 'number')
-        price = price.toString(); // web3.toWei needs strings or BN
-
-      await this.scene.game.web3.bidContract.methods.purchase(
-        stringToBN(this.position), // pixel position
-        stringToHex(this.HEXcolor) // pixel color
-      ).send({
-        from: this.scene.game.web3.activeAddress,
-        gas: 300000,
-        value: toWei(price)
-      });
-
+      await purchasePixels({ scene: this.scene, selection: [this] })
       success = true;
     } catch (error) {
       console.error('Purchase pixel error', error);
@@ -109,7 +93,7 @@ export default class Pixel {
   }
 
   async setColor() {
-    if (DEBUG) console.log("SET pixel", this.cx, this.cy, this.color, this.HEXcolor);
+    /*if (DEBUG)*/ console.log("SET pixel", this.cx, this.cy, this.color, this.HEXcolor);
 
     this.scene.worldmap.setPixel(
       this.cx,
@@ -157,7 +141,9 @@ export default class Pixel {
     if (!this.price)
       this.price = this.scene.game.web3.defaultPrice;
 
-    this.color = Phaser.Display.Color.HexStringToColor('#' + hexToString(data.color));
+    if (data.color)
+      this.color = Phaser.Display.Color.HexStringToColor('#' + hexToString(data.color));
+
     this.owner = data.owner.toLowerCase();
   }
 

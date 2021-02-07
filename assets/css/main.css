@@ -185,8 +185,8 @@ input {
 }
 
 #menu-item ul.tabs li.active {
-  color: var(--active-black);
-  background-color: var(--header-white);
+  background: rgba(0,0,0,0.9);
+  color: var(--header-white);
 }
 
 #menu-item ul.tabs li .badge {
@@ -204,9 +204,19 @@ input {
   height: var(--bottom-bar-settings-height);
 }
 
+#menu-item .settings.purchaseUI i.gg-info {
+  color: var(--available-color);
+}
+#menu-item .settings.bidUI i.gg-info {
+  color: var(--taken-color);
+}
+#menu-item .settings.activeBidUI i.gg-info {
+  color: var(--activebid-color);
+}
+
 #menu-item .settings .setting {
   display: inline-flex;
-  padding: 13px 9px;
+  padding: 12px 9px;
   cursor: pointer;
   position: relative;
 }
@@ -226,7 +236,7 @@ input {
 }
 
 #menu-item .settings .setting input {
-  width: 100%;
+  width: 47px;
   text-align: center;
   padding: 0;
   font-size: 12px;
@@ -236,19 +246,21 @@ input {
   outline: none;
 }
 
+#menu-item .settings.batch i.gg-info {
+  display: inline-flex;
+  --ggs: 0.73;
+  top: 5px;
+  cursor: pointer;
+}
+
 #menu-item .settings.batch .setting {
   padding: 12px 0px;
+  margin-left: 5px;
 }
 
 #menu-item .settings.batch .setting .color {
   left: 0px;
   top: 11px;
-}
-
-#menu-item .settings.batch .action-button {
-  width: 20%;
-  display: inline-flex;
-  margin-left: 2%;
 }
 
 #menu-item ul.list {
@@ -486,15 +498,21 @@ Info Box
   margin: 0 auto;
 }
 
-.info-box.purchaseUI .action-button {
+.action-settings {
+  width: 25%;
+  background-color: rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.purchaseUI .action-button {
   background: var(--available-color);
 }
 
-.info-box.bidUI .action-button {
+.bidUI .action-button {
   background: var(--taken-color);
 }
 
-.info-box.activeBidUI .action-button {
+.activeBidUI .action-button {
   background: var(--activebid-color);
 }
 

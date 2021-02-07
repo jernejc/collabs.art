@@ -9,12 +9,15 @@ import { formatColorNumber } from '@util/helpers';
 export default class Input extends Controller {
 
   constructor(object, property, params) {
+    /*if (DEBUG)*/ console.log('Input: constructor', object, property, params);
 
     super(object, property, params);
 
     const self = this;
 
     this.input = document.createElement('input');
+    this.input.value = (this.format) ? this.format(this.getValue()) : this.getValue();
+    
     this.domElement.appendChild(this.input);
 
     switch (params.type) {

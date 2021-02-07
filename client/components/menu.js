@@ -4,10 +4,11 @@ import Pixel from '@models/pixel';
 import Input from '@components/input';
 import Button from '@components/button';
 
-import { moveToPosition } from '@actions/user_interactions';
+import { moveToPosition, purchasePixels } from '@actions/user_interactions';
 import { getRelativeTile } from '@actions/pixel';
 
 import { insertAfter, formatColorNumber } from '@util/helpers';
+import { relative } from 'path';
 
 export default class Menu {
   constructor({ parent, game, activeTab }) {
@@ -56,9 +57,8 @@ export default class Menu {
       this.switchToTab(e.target.dataset.list, e.target);
       return;
     }
-    else if (e.target.classList.contains('settings')) {
+    else if (e.target.classList.contains('settings')) 
       console.log('settings btn click')
-    }
     else {
 
       let target;
@@ -121,27 +121,28 @@ export default class Menu {
   }
 
   createSettings() {
+    console.log('createSettings', this.activeTab)
     if (!this.activeTab || !this.tabs)
       return;
 
-    if (this.setting)
+    if (this.settings)
       this.resetSettings();
 
-    this.setting = document.createElement('div');
-    this.setting.classList.add('settings');
+    this.settings = document.createElement('div');
+    this.settings.classList.add('settings');
 
     switch (this.activeTab) {
       case 'pixels':
-        this.setting.classList.add('filters');
+        this.settings.classList.add('filters');
         this.createFiltersSetting();
         break;
       case 'selection':
-        this.setting.classList.add('batch');
+        this.settings.classList.add('batch');
         this.createBatchSetting();
         break;
     }
 
-    insertAfter(this.setting, this.tabs);
+    insertAfter(this.settings, this.tabs);
   }
 
   createFiltersSetting() {
@@ -153,21 +154,40 @@ export default class Menu {
     pendingBids.classList.add('setting');
     pendingBids.innerHTML = '<i class="gg-sort-za"></i> Pending bids';
 
-    this.setting.appendChild(activeBids);
-    this.setting.appendChild(pendingBids);
+    this.settings.appendChild(activeBids);
+    this.settings.appendChild(pendingBids);
   }
 
   createBatchSetting() {
-    if (DEBUG) console.log('createBatchSetting this.game.selection', this.game.selection.pixels);
+    /*if (DEBUG)*/ console.log('createBatchSetting this.game.selection', this.game.selection.pixels);
 
     const pixels = this.game.selection.pixels || null;
-    const activePixel = (pixels.length > 0) ? pixels[pixels.length - 1] : null;
-    const batchSettings = {
-      color: activePixel.color || Phaser.Display.Color.HexStringToColor('#ffffff'),
-      price: activePixel.price || this.game.web3.defaultPrice
+    const lastPixel = pixels[pixels.length - 1];
+    const fullPrice = pixels.reduce((aggregator, pixel) => {
+      aggregator += Number(pixel.price);
+      return aggregator;
+    }, 0);
+
+    if (lastPixel) {
+      console.log('lastPixel', lastPixel);
+
+      if (!lastPixel.owner)
+        this.settings.classList.add('purchaseUI');
+      else if (lastPixel.owner === this.game.web3.activeAddress) 
+        this.settings.classList.add('activeBidUI');
+      else
+        this.settings.classList.add('bidUI');
+      
     }
 
-    this.setting.appendChild(new Input(batchSettings, 'color.color', {
+    const batchSettings = {
+      color: lastPixel.color || Phaser.Display.Color.HexStringToColor('#ffffff'),
+      price: fullPrice
+    }
+
+    console.log('batchSettings', batchSettings);
+
+    /*this.settings.appendChild(new Input(batchSettings, 'color.color', {
       width: '35%',
       scene: this.scene,
       type: 'color',
@@ -175,37 +195,37 @@ export default class Menu {
       format: (value) => '#' + formatColorNumber(value),
       validate: (value) => !isNaN(value) && value.length === 6,
       focus: () => {
-        /*this.colorAdvancedUI.style.display = 'block';
-        _self.setPosition();*/
+        this.colorAdvancedUI.style.display = 'block';
+        _self.setPosition();
       },
       blur: (e) => {
         //console.log('e', e);
-        /*if (!preventClose) {
+        if (!preventClose) {
           this.colorAdvancedUI.style.display = 'none';
           _self.setPosition();
-        }*/
+        }
       }
-    }));
+    }));*/
 
-    this.setting.appendChild(new Input(batchSettings, 'price', {
-      //min: this.selection.price,
-      max: 100,
-      step: 0.001,
-      type: 'number',
-      placeholder: '0.001',
-      width: '32%',
+    const textIcon = document.createElement('i');
+    textIcon.classList.add('gg-info');
+
+    this.settings.appendChild(textIcon);
+    this.settings.appendChild(new Input(batchSettings, 'price', {
+      width: '30%',
       elClasses: ['setting'],
+      type: 'text',
       scene: this.scene,
       label: 'ETH',
+      disabled: true,
       format: (value) => (value) ? value.toFixed(3) : 0
     }));
 
-    this.setting.appendChild(new Button({
-      elClasses: ['action-button'],
-      width: '22%',
-      text: 'Apply',
+    this.settings.appendChild(new Button({
+      elClasses: ['action-button', 'action-settings'],
+      text: 'Create',
       clickAction: async e => {
-        console.log('Click apply')
+        await purchasePixels({ scene: this.scene, selection: this.game.selection.pixels })
       }
     }));
   }
@@ -247,8 +267,8 @@ export default class Menu {
   }
 
   resetSettings() {
-    this.domElement.removeChild(this.setting);
-    this.setting = null;
+    this.domElement.removeChild(this.settings);
+    this.settings = null;
   }
 
   switchToTab(tab) {

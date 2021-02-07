@@ -1,6 +1,6 @@
 
 import { getTileForPointer } from '@actions/pixel';
-import { formatColorNumber } from '@util/helpers';
+import { formatColorNumber, toWei, stringToBN } from '@util/helpers';
 
 // Fired when user moves pointer through the grid
 export function handleMouseMove({ pointer, scene }) {
@@ -242,6 +242,36 @@ export function generalResetStrokeStyle({ scene, size, selection }) {
       }
     }
   }
+}
+
+export async function purchasePixels({ scene, selection }) {
+  console.log('purchasePixels', selection)
+  let fullPrice = 0, positions = [], gas = 220000;
+
+  if (!scene.game.web3.activeAddress)
+    await scene.game.web3.getActiveAddress();
+
+  if (!scene.game.web3.activeAddress)
+    return false;
+
+  selection.forEach(pixel => {
+    positions.push(stringToBN(pixel.position));
+    fullPrice += Number(pixel.price);
+    gas += 110000;
+  })
+
+  console.log('fullPrice', fullPrice);
+
+  fullPrice = toWei(fullPrice.toString()); // web3.toWei needs strings or BN
+  console.log('buying pixels', positions, fullPrice.toString(), gas);
+
+  await scene.game.web3.bidContract.methods.purchase(
+    positions // pixel position(s)
+  ).send({
+    from: scene.game.web3.activeAddress,
+    gas: gas,
+    value: fullPrice
+  });
 }
 
 export function resetStrokeStyle({ tile, scene, size = 0.9 }) {

@@ -18,7 +18,13 @@ export default class Button {
     if (clickAction) {
       this.button.addEventListener('click', async e => {
         this.loading();
-        await clickAction();
+
+        try {
+          await clickAction();
+        } catch (error) {
+          console.error('Button ClickAction failed', error)
+        }
+        
         this.reset();
       });
     }
