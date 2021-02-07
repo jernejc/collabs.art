@@ -31,7 +31,7 @@ export default class ToolsManager {
     this.emitter.on('selection/update', async () => {
       if (this.menu && this.menu.loaded) {
         if (this.menu.activeTab === 'selection');
-          await this.menu.loadPixels();
+        await this.menu.loadPixels();
 
         if (this.setting)
           this.resetSettings();
@@ -76,7 +76,7 @@ export default class ToolsManager {
       elClasses: ['pixels', 'menu-btn'],
       iconClass: 'gg-row-last',
       clickAction: async () => {
-        if (!this.menu || !this.menu.loaded) 
+        if (!this.menu || !this.menu.loaded)
           await this.openMenu(this.game.selection.pixels.length > 0 ? 'selection' : null);
         else
           await this.menu.loadPixels();
@@ -91,7 +91,7 @@ export default class ToolsManager {
       onChange: async () => {
         console.log('this.search.text onChange', this.search.text)
         if (this.menu && this.menu.loaded) {
-          
+
           //await this.menu.loadPixels();
         }
       }

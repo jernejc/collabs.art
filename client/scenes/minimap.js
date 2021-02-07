@@ -44,7 +44,7 @@ export default class MinimapScene extends ApplicationScene {
       this.mainscene.cameraY / this.sceneConfig.sizeRatio, // initial Y position
       this.fieldWidth,
       this.fieldHeight,
-      0xFFFFFF, 
+      0xFFFFFF,
       1
     );
     this.visibleField.setAlpha(0);

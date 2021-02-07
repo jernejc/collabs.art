@@ -57,7 +57,7 @@ export default class Menu {
       this.switchToTab(e.target.dataset.list, e.target);
       return;
     }
-    else if (e.target.classList.contains('settings')) 
+    else if (e.target.classList.contains('settings'))
       console.log('settings btn click')
     else {
 
@@ -173,11 +173,11 @@ export default class Menu {
 
       if (!lastPixel.owner)
         this.settings.classList.add('purchaseUI');
-      else if (lastPixel.owner === this.game.web3.activeAddress) 
+      else if (lastPixel.owner === this.game.web3.activeAddress)
         this.settings.classList.add('activeBidUI');
       else
         this.settings.classList.add('bidUI');
-      
+
     }
 
     const batchSettings = {

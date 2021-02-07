@@ -159,8 +159,8 @@ export default class MainScene extends ApplicationScene {
     this.land[y][x].cy = mapPixel.cy;
 
     this.land[y][x].setFillStyle(mapPixel.color.color);
-    
-    if (this.game.selection.isSelected(mapPixel.cx, mapPixel.cy)) 
+
+    if (this.game.selection.isSelected(mapPixel.cx, mapPixel.cy))
       setInvertedStroke({ scene: this, tile: this.land[y][x] });
     else
       resetStrokeStyle({ scene: this, tile: this.land[y][x] });

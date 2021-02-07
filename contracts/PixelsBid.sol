@@ -14,274 +14,274 @@ import "./Pixels.sol";
  */
 
 contract PixelsBid is Ownable, Pausable {
-    using SafeMath for uint256;
+  using SafeMath for uint256;
 
-    using Address for address;
-    using Address for address payable;
+  using Address for address;
+  using Address for address payable;
 
-    Pixels public PixelsContract;
+  Pixels public PixelsContract;
 
-    uint256 public constant MAX_BID_DURATION = 7 days;
-    uint256 public constant MIN_BID_DURATION = 5 minutes;
-    uint256 public constant ONE_MILLION = 1000000;
+  uint256 public constant MAX_BID_DURATION = 7 days;
+  uint256 public constant MIN_BID_DURATION = 5 minutes;
+  uint256 public constant ONE_MILLION = 1000000;
 
-    uint256 public defaultPrice;
-    uint256 private contractFee;
+  uint256 public defaultPrice;
+  uint256 private contractFee;
 
-    struct Bid {
-        address payable bidder;
-        uint256 position;
-        uint256 amount;
-        uint256 expiresAt;
-    }
+  struct Bid {
+    address payable bidder;
+    uint256 position;
+    uint256 amount;
+    uint256 expiresAt;
+  }
 
-    mapping(uint256 => Bid) public bids;
+  mapping(uint256 => Bid) public bids;
 
-    event BidCreated(
-        uint256 indexed _position,
-        address indexed _bidder,
-        uint256 _amount,
-        uint256 _expiresAt
+  event BidCreated(
+    uint256 indexed _position,
+    address indexed _bidder,
+    uint256 _amount,
+    uint256 _expiresAt
+  );
+
+  event BidAccepted(
+    uint256 indexed _position,
+    address _bidder,
+    address indexed _seller,
+    uint256 _amount,
+    uint256 _fee
+  );
+
+  event BidCancelled(uint256 indexed _position, address indexed _bidder);
+
+  /**
+    * @dev Contract Constructor
+    * @param _pixelsAddress address for Pixels non-fungible token contract
+    * @param _defaultPrice initial sales price
+    */
+  constructor(
+    address _pixelsAddress,
+    uint256 _defaultPrice,
+    uint256 _contractFee
+  ) public {
+    require(
+      _pixelsAddress != address(0) && _pixelsAddress != address(this),
+      "PixelsBid: Must have a valid contract address"
+    );
+    require(
+      _pixelsAddress.isContract(),
+      "PixelsContract should be a contract"
+    );
+    require(
+      _defaultPrice > 0,
+      "PixelsBid: Default price must be greater than 0"
+    );
+    require(
+      _contractFee > 0,
+      "PixelsBid: Contract fee must be greater than 0"
     );
 
-    event BidAccepted(
-        uint256 indexed _position,
-        address _bidder,
-        address indexed _seller,
-        uint256 _amount,
-        uint256 _fee
+    PixelsContract = Pixels(_pixelsAddress);
+    defaultPrice = _defaultPrice;
+    contractFee = _contractFee;
+  }
+
+  /**
+    * @dev Purchase _position
+    * You can only purchase non-existing pixels within the given range of positions
+    * @param _positions pixel position
+    */
+  function purchase(uint256[] memory _positions)
+    public
+    payable
+    whenNotPaused
+  {
+    require(
+      msg.value >= defaultPrice.mul(_positions.length),
+      "PixelsBid: Purchase price must be greater than current default price"
     );
 
-    event BidCancelled(uint256 indexed _position, address indexed _bidder);
+    PixelsContract.createPixels(msg.sender, _positions);
+  }
 
-    /**
-     * @dev Contract Constructor
-     * @param _pixelsAddress address for Pixels non-fungible token contract
-     * @param _defaultPrice initial sales price
-     */
-    constructor(
-        address _pixelsAddress,
-        uint256 _defaultPrice,
-        uint256 _contractFee
-    ) public {
-        require(
-            _pixelsAddress != address(0) && _pixelsAddress != address(this),
-            "PixelsBid: Must have a valid contract address"
-        );
-        require(
-            _pixelsAddress.isContract(),
-            "PixelsContract should be a contract"
-        );
-        require(
-            _defaultPrice > 0,
-            "PixelsBid: Default price must be greater than 0"
-        );
-        require(
-            _contractFee > 0,
-            "PixelsBid: Contract fee must be greater than 0"
-        );
+  /**
+    * @dev Place bid for pixel position
+    * @param _position pixel position
+    * @param _duration bid duration in seconds
+    */
+  function placeBid(uint256 _position, uint256 _duration)
+    public
+    payable
+    whenNotPaused
+  {
+    require(
+      msg.value > bids[_position].amount && msg.value >= defaultPrice,
+      "PixelsBid: Bid amount should be greater than 0 or currently highest bid"
+    );
+    require(
+      PixelsContract.exists(_position),
+      "PixelsBid: Pixel position must exist"
+    );
+    require(
+      _duration >= MIN_BID_DURATION,
+      "The bid should last longer than 3 minutes"
+    );
+    require(
+      _duration <= MAX_BID_DURATION,
+      "The bid can not last longer than 7 days"
+    );
 
-        PixelsContract = Pixels(_pixelsAddress);
-        defaultPrice = _defaultPrice;
-        contractFee = _contractFee;
+    if (bids[_position].amount > 0) {
+      // The pixel has an existing bid, refund it
+      _refundBid(_position);
     }
 
-    /**
-     * @dev Purchase _position
-     * You can only purchase non-existing pixels within the given range of positions
-     * @param _positions pixel position
-     */
-    function purchase(uint256[] memory _positions)
-        public
-        payable
-        whenNotPaused
-    {
-        require(
-            msg.value >= defaultPrice.mul(_positions.length),
-            "PixelsBid: Purchase price must be greater than current default price"
-        );
+    uint256 expiresAt = block.timestamp.add(_duration);
 
-        PixelsContract.createPixels(msg.sender, _positions);
-    }
+    bids[_position] = Bid({
+      bidder: msg.sender,
+      position: _position,
+      amount: msg.value,
+      expiresAt: expiresAt
+    });
 
-    /**
-     * @dev Place bid for pixel position
-     * @param _position pixel position
-     * @param _duration bid duration in seconds
-     */
-    function placeBid(uint256 _position, uint256 _duration)
-        public
-        payable
-        whenNotPaused
-    {
-        require(
-            msg.value > bids[_position].amount && msg.value >= defaultPrice,
-            "PixelsBid: Bid amount should be greater than 0 or currently highest bid"
-        );
-        require(
-            PixelsContract.exists(_position),
-            "PixelsBid: Pixel position must exist"
-        );
-        require(
-            _duration >= MIN_BID_DURATION,
-            "The bid should last longer than 3 minutes"
-        );
-        require(
-            _duration <= MAX_BID_DURATION,
-            "The bid can not last longer than 7 days"
-        );
+    emit BidCreated(_position, msg.sender, msg.value, expiresAt);
+  }
 
-        if (bids[_position].amount > 0) {
-            // The pixel has an existing bid, refund it
-            _refundBid(_position);
-        }
+  /**
+    * @dev Used as the only way to accept a bid.
+    * @param _position pixel position
+    */
+  function acceptBid(uint256 _position) public whenNotPaused {
+    require(
+      bids[_position].amount > 0, // Solidity will return 0 if there is no existing bid
+      "PixelsBid: No active bid for given pixel"
+    );
 
-        uint256 expiresAt = block.timestamp.add(_duration);
+    Bid memory bid = _getBid(_position);
 
-        bids[_position] = Bid({
-            bidder: msg.sender,
-            position: _position,
-            amount: msg.value,
-            expiresAt: expiresAt
-        });
+    require(bid.expiresAt >= block.timestamp, "PixelsBid: Bid has expired");
+    require(
+      msg.sender == PixelsContract.ownerOf(_position),
+      "PixelsBid: Only the pixel owner can accept a bid"
+    );
 
-        emit BidCreated(_position, msg.sender, msg.value, expiresAt);
-    }
+    address bidder = bid.bidder;
+    uint256 amount = bid.amount;
+    uint256 feeAmount = amount.mul(contractFee).div(ONE_MILLION);
+    uint256 tokenOwnerAmout = amount.sub(feeAmount);
 
-    /**
-     * @dev Used as the only way to accept a bid.
-     * @param _position pixel position
-     */
-    function acceptBid(uint256 _position) public whenNotPaused {
-        require(
-            bids[_position].amount > 0, // Solidity will return 0 if there is no existing bid
-            "PixelsBid: No active bid for given pixel"
-        );
+    delete bids[_position];
 
-        Bid memory bid = _getBid(_position);
+    PixelsContract.safeTransferFrom(msg.sender, bidder, _position);
 
-        require(bid.expiresAt >= block.timestamp, "PixelsBid: Bid has expired");
-        require(
-            msg.sender == PixelsContract.ownerOf(_position),
-            "PixelsBid: Only the pixel owner can accept a bid"
-        );
+    msg.sender.sendValue(tokenOwnerAmout);
 
-        address bidder = bid.bidder;
-        uint256 amount = bid.amount;
-        uint256 feeAmount = amount.mul(contractFee).div(ONE_MILLION);
-        uint256 tokenOwnerAmout = amount.sub(feeAmount);
+    emit BidAccepted(
+      _position,
+      bidder,
+      msg.sender,
+      tokenOwnerAmout,
+      feeAmount
+    );
+  }
 
-        delete bids[_position];
+  /**
+    * @dev Get current active bid for pixel
+    * @param _position pixel position
+    * @return address of the bidder address
+    * @return uint256 of the bid amount
+    * @return uint256 of the expiration time
+    */
+  function getBidForPixel(uint256 _position)
+    external
+    view
+    returns (
+      address payable,
+      uint256,
+      uint256
+    )
+  {
+    require(
+      bids[_position].amount > 0, // Solidity will return 0 if there is no existing bid
+      "PixelsBid: No active bid for given pixel"
+    );
 
-        PixelsContract.safeTransferFrom(msg.sender, bidder, _position);
+    Bid memory bid = _getBid(_position);
 
-        msg.sender.sendValue(tokenOwnerAmout);
+    return (bid.bidder, bid.amount, bid.expiresAt);
+  }
 
-        emit BidAccepted(
-            _position,
-            bidder,
-            msg.sender,
-            tokenOwnerAmout,
-            feeAmount
-        );
-    }
+  /**
+    * @dev send / withdraw _amount to _payee
+    * @param _payee address
+    * @param _amount uint256
+    */
+  function transferFunds(address payable _payee, uint256 _amount)
+    external
+    onlyOwner
+  {
+    require(
+      _payee != address(0) && _payee != address(this),
+      "PixelsBid: _payee address must be valid"
+    );
+    require(
+      _amount > 0 && _amount <= address(this).balance,
+      "PixelsBid: _amount must be available and greater than 0"
+    );
 
-    /**
-     * @dev Get current active bid for pixel
-     * @param _position pixel position
-     * @return address of the bidder address
-     * @return uint256 of the bid amount
-     * @return uint256 of the expiration time
-     */
-    function getBidForPixel(uint256 _position)
-        external
-        view
-        returns (
-            address payable,
-            uint256,
-            uint256
-        )
-    {
-        require(
-            bids[_position].amount > 0, // Solidity will return 0 if there is no existing bid
-            "PixelsBid: No active bid for given pixel"
-        );
+    _payee.sendValue(_amount);
+  }
 
-        Bid memory bid = _getBid(_position);
+  /**
+    * @dev Update default purchase price
+    * @dev Throws if _defaultPrice is zero
+    * @param _defaultPrice uint256
+    */
+  function setDefaultPrice(uint256 _defaultPrice) external onlyOwner {
+    require(
+      _defaultPrice > 0,
+      "PixelsBid: Default set price must be greater than 0"
+    );
 
-        return (bid.bidder, bid.amount, bid.expiresAt);
-    }
+    defaultPrice = _defaultPrice;
+  }
 
-    /**
-     * @dev send / withdraw _amount to _payee
-     * @param _payee address
-     * @param _amount uint256
-     */
-    function transferFunds(address payable _payee, uint256 _amount)
-        external
-        onlyOwner
-    {
-        require(
-            _payee != address(0) && _payee != address(this),
-            "PixelsBid: _payee address must be valid"
-        );
-        require(
-            _amount > 0 && _amount <= address(this).balance,
-            "PixelsBid: _amount must be available and greater than 0"
-        );
+  /**
+    * @dev Sets the fee for contract that's
+    * charged to the seller on a successful sale
+    * @param _contractFee Share amount, from 0 to 999,999
+    */
+  function setContractFee(uint256 _contractFee) external onlyOwner {
+    require(
+      _contractFee < ONE_MILLION,
+      "The owner cut should be between 0 and 999,999"
+    );
 
-        _payee.sendValue(_amount);
-    }
+    contractFee = _contractFee;
+  }
 
-    /**
-     * @dev Update default purchase price
-     * @dev Throws if _defaultPrice is zero
-     * @param _defaultPrice uint256
-     */
-    function setDefaultPrice(uint256 _defaultPrice) external onlyOwner {
-        require(
-            _defaultPrice > 0,
-            "PixelsBid: Default set price must be greater than 0"
-        );
+  /**
+    * @dev Refund bid for pixel
+    * @param _position pixel position
+    */
+  function _refundBid(uint256 _position) internal {
+    Bid memory existingBid = _getBid(_position);
 
-        defaultPrice = _defaultPrice;
-    }
+    address payable bidder = existingBid.bidder;
+    uint256 amount = existingBid.amount;
 
-    /**
-     * @dev Sets the fee for contract that's
-     * charged to the seller on a successful sale
-     * @param _contractFee Share amount, from 0 to 999,999
-     */
-    function setContractFee(uint256 _contractFee) external onlyOwner {
-        require(
-            _contractFee < ONE_MILLION,
-            "The owner cut should be between 0 and 999,999"
-        );
+    delete bids[_position];
 
-        contractFee = _contractFee;
-    }
+    bidder.sendValue(amount);
+  }
 
-    /**
-     * @dev Refund bid for pixel
-     * @param _position pixel position
-     */
-    function _refundBid(uint256 _position) internal {
-        Bid memory existingBid = _getBid(_position);
-
-        address payable bidder = existingBid.bidder;
-        uint256 amount = existingBid.amount;
-
-        delete bids[_position];
-
-        bidder.sendValue(amount);
-    }
-
-    /**
-     * @dev Get bid for pixel
-     * @param _position pixel position
-     * @return Bid
-     */
-    function _getBid(uint256 _position) internal view returns (Bid memory) {
-        return bids[_position];
-    }
+  /**
+    * @dev Get bid for pixel
+    * @param _position pixel position
+    * @return Bid
+    */
+  function _getBid(uint256 _position) internal view returns (Bid memory) {
+    return bids[_position];
+  }
 }

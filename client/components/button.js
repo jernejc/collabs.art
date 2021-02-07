@@ -24,7 +24,7 @@ export default class Button {
         } catch (error) {
           console.error('Button ClickAction failed', error)
         }
-        
+
         this.reset();
       });
     }
@@ -45,10 +45,10 @@ export default class Button {
   reset() {
     this.button.removeChild(this.loadingI);
     this.button.disabled = false;
-    
-    if (this.text) 
+
+    if (this.text)
       this.button.textContent = this.text;
-    if (this.iconClass) 
+    if (this.iconClass)
       this.setIcon();
   }
 

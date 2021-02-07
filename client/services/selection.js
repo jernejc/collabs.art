@@ -89,7 +89,7 @@ export default class SelectionManager {
 
   removeSelected({ tile, scene }) {
     const pixel = Pixel.fromTile({ tile, scene });
-    
+
     this.pixels = this.pixels.filter(p => {
       return !(p.cx === tile.cx && p.cy === tile.cy);
     });

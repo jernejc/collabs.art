@@ -64,7 +64,7 @@ const config = {
       process: 'process/browser'
     }),*/
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, 'index.html'),
+      template: path.resolve(__dirname, 'client/index.html'),
       inject: 'head',
       chunksSortMode: (a, b) => { 
         if (a[0] < b[0]) 

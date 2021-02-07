@@ -31,7 +31,7 @@ export default class GraphManager {
 
       if (!response.pixel)
         return null;
-        
+
       return response.pixel;
     } catch (error) {
       console.error('Error while loading pixel: ' + error);

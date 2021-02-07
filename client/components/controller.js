@@ -32,11 +32,11 @@ export default class Controller {
 
     if (this.scene) {
       this.scene.game.emitter.on('controller/update', property => {
-        if (DEBUG) console.log('controller/update', this.property, property); 
+        if (DEBUG) console.log('controller/update', this.property, property);
 
         if (this.property !== property) // Update UI if emit not comming from the same property -- Components stay in sync
           this.updateDisplay();
-        
+
         if (property) { // Not Init
           if (this.onUpdate) // User provided callback
             this.onUpdate();
@@ -62,7 +62,7 @@ export default class Controller {
       _v = Math.round(_v / this.step) * this.step;
 
     _.set(this.object, _property, _v);
-    
+
     this.updateDisplay();
 
     if (this.scene)

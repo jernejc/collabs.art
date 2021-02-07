@@ -17,7 +17,7 @@ export default class Input extends Controller {
 
     this.input = document.createElement('input');
     this.input.value = (this.format) ? this.format(this.getValue()) : this.getValue();
-    
+
     this.domElement.appendChild(this.input);
 
     switch (params.type) {

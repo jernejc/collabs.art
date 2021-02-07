@@ -14,7 +14,7 @@ import Button from './button';
 export default class InfoBox {
 
   constructor({ pixel, parent, scene }) {
-    if (DEBUG) console.log('Info Box: constructor',  pixel);
+    if (DEBUG) console.log('Info Box: constructor', pixel);
 
     this.scene = scene;
     this.parent = parent;
