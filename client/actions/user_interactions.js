@@ -48,15 +48,11 @@ export async function handleMouseDown({ pointer, scene }) {
 
       const tile = getTileForPointer({ pointer, scene });
 
-      console.log('handleMouseDown', tile);
-
-      if (scene.game.selection.isSelected(tile.cx, tile.cy)) {
-        console.log('Pixel is selected')
+      if (scene.game.selection.isSelected(tile.cx, tile.cy)) 
         scene.game.selection.removeSelected({ tile, scene });
-      } else {
-        console.log('Pixel is not selected')
+      else 
         await scene.game.selection.setActivePixel({ tile, scene });
-      }
+    
       break;
     case 'mininav':
       navigateMinimap({ pointer, scene: scene.minimap })
@@ -245,7 +241,8 @@ export function generalResetStrokeStyle({ scene, size, selection }) {
 }
 
 export async function purchasePixels({ scene, selection }) {
-  console.log('purchasePixels', selection)
+  if (DEBUG) console.log('purchasePixels', selection)
+
   let fullPrice = 0, positions = [], gas = 220000;
 
   if (!scene.game.web3.activeAddress)
@@ -259,8 +256,6 @@ export async function purchasePixels({ scene, selection }) {
     fullPrice += Number(pixel.price);
     gas += 110000;
   })
-
-  console.log('fullPrice', fullPrice);
 
   fullPrice = toWei(fullPrice.toString()); // web3.toWei needs strings or BN
   console.log('buying pixels', positions, fullPrice.toString(), gas);

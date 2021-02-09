@@ -9,7 +9,7 @@ import { formatColorNumber } from '@util/helpers';
 export default class Input extends Controller {
 
   constructor(object, property, params) {
-    /*if (DEBUG)*/ console.log('Input: constructor', object, property, params);
+    if (DEBUG) console.log('Input: constructor', object, property, params);
 
     super(object, property, params);
 

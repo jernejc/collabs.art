@@ -65,7 +65,8 @@ export default class InfoBox {
     this.wrapper.appendChild(this.loadingIcon);
     this.setPosition();
 
-    await this.pixel.loadGraphData(refresh);
+    if (refresh)
+      await this.pixel.loadGraphData(refresh);
 
     this.wrapper.removeChild(this.loadingIcon);
 

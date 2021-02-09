@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Electrolize&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
+
 :root {
   --available-color: #02be01;
   --activebid-color: #e5d900;
@@ -236,31 +237,49 @@ input {
 }
 
 #menu-item .settings .setting input {
-  width: 47px;
   text-align: center;
   padding: 0;
   font-size: 12px;
+  padding-top: 1px;
+}
+
+#menu-item .settings.purchaseUI .setting input {
+  width: 45px;
+}
+
+#menu-item .settings.ownerUI .setting input {
+  width: 60px;
 }
 
 #menu-item .settings .setting input:focus {
   outline: none;
 }
 
+#menu-item .settings.batch {
+  display: flex;
+  align-items: center;
+}
+
 #menu-item .settings.batch i.gg-info {
   display: inline-flex;
   --ggs: 0.73;
-  top: 5px;
   cursor: pointer;
 }
 
 #menu-item .settings.batch .setting {
-  padding: 12px 0px;
-  margin-left: 5px;
+  margin: 0px 5px;
+  padding: 0;
+}
+
+#menu-item .settings.batch .setting label {
+  padding-top: 2px;
 }
 
 #menu-item .settings.batch .setting .color {
-  left: 0px;
-  top: 11px;
+  position: static;
+  top: 0;
+  left: 0;
+  border: 1px solid var(--header-white);
 }
 
 #menu-item ul.list {
@@ -500,8 +519,7 @@ Info Box
 
 .action-settings {
   width: 25%;
-  background-color: rgba(0, 0, 0, 0.3);
-  text-align: center;
+  margin-right: 8px;
 }
 
 .purchaseUI .action-button {

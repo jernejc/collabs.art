@@ -33,8 +33,6 @@ export default class MinimapScene extends ApplicationScene {
       0.7
     )
 
-    console.log('this.mapoverlay', this.mapoverlay)
-
     // Visible field box / mask
     this.fieldWidth = (this.appConfig.canvasWidth / this.sceneConfig.size) / this.sceneConfig.sizeRatio // viewport width
     this.fieldHeight = (this.appConfig.canvasHeight / this.sceneConfig.size) / this.sceneConfig.sizeRatio // viewport height

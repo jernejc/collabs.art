@@ -67,6 +67,7 @@ export default class SelectionManager {
       this.pixels = [pixel];
     }
 
+    await pixel.loadGraphData();
     pixel.setActivePixel();
 
     this.game.emitter.emit('selection/update', this.pixels);
@@ -82,8 +83,6 @@ export default class SelectionManager {
     } else if (this.pixels.length > 1) {
       if (!scene.game.tools.menu || !scene.game.tools.menu.loaded)
         await scene.game.tools.openMenu('selection');
-      else
-        scene.game.tools.menu.switchToTab('selection');
     }
   }
 
