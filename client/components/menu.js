@@ -8,7 +8,6 @@ import { moveToPosition, purchasePixels } from '@actions/user_interactions';
 import { getRelativeTile } from '@actions/pixel';
 
 import { insertAfter, formatColorNumber } from '@util/helpers';
-import { relative } from 'path';
 
 export default class Menu {
   constructor({ parent, game, activeTab }) {

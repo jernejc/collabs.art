@@ -200,7 +200,7 @@ input {
   position: relative;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.4);
-  padding: 0px 10px;
+  padding: 0px 8px;
   font-size: 12px;
   height: var(--bottom-bar-settings-height);
 }

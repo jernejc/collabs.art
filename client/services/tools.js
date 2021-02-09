@@ -30,13 +30,15 @@ export default class ToolsManager {
 
     this.emitter.on('selection/update', async () => {
       if (this.menu && this.menu.loaded) {
-        if (this.menu.activeTab === 'selection');
-        await this.menu.loadPixels();
+        if (this.menu.activeTab === 'selection') {
+          await this.menu.loadPixels();
 
-        if (this.setting)
-          this.resetSettings();
+          if (this.setting)
+            this.resetSettings();
 
-        this.menu.createSettings();
+          this.menu.createSettings();
+        } else
+          this.menu.switchToTab('selection');
       }
     })
   }
