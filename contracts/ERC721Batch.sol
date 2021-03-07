@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: MIT
 
 pragma solidity >=0.6.0 < 0.8.0;
 
@@ -15,7 +14,7 @@ import "@openzeppelin/contracts/utils/EnumerableMap.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 /**
- * @title ERC721 Non-Fungible Token Standard basic implementation
+ * @title ERC721 Non-Fungible Token Standard implementation with batch support
  * @dev Additional batch functions included: _mintBatch, _transferBatch, _burnBatch
  * @dev see https://eips.ethereum.org/EIPS/eip-721
  */

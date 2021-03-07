@@ -17,7 +17,7 @@ import {
   moveToPosition,
   setInvertedStroke,
   resetStrokeStyle
-} from '@actions/user_interactions';
+} from '@actions/general';
 
 export default class MainScene extends ApplicationScene {
   constructor() {

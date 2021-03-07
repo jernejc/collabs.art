@@ -8,7 +8,7 @@ dataSources:
     name: Pixels
     network: mainnet
     source:
-      address: '0xec9152BbB069Dc1FD56bb77492fB296818fF57ac'
+      address: '0x7Bf0d7069Ce68cFe075cfC2e59aAaE262043f266'
       abi: Pixels
     mapping:
       kind: ethereum/events
@@ -20,16 +20,16 @@ dataSources:
         - name: Pixels
           file: ../build/contracts/Pixels.json
       eventHandlers:
-        - event: 'ColorPixel(indexed uint256,bytes6)'
-          handler: handleColorPixel
         - event: 'TransferBatch(indexed address,indexed address,uint256[])'
-          handler: handlePixelTransferBatch
+          handler: handleTransferBatch
+        - event: 'ColorPixels(uint256[],bytes6[])'
+          handler: handleColorPixels
       file: ./mappings/pixels.ts
   - kind: ethereum/contract
     name: PixelsBid
     network: mainnet
     source:
-      address: '0xe9C705B48C1CD2A0d736c79aA62cC01D5492Fbd2'
+      address: '0x9741c78cf20D70D585D81DDe9d6f686C9649CeA1'
       abi: PixelsBid
     mapping:
       kind: ethereum/events

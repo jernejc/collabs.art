@@ -1,3 +1,4 @@
+import { toWei, stringToBN, stringToHex } from '@util/helpers';
 
 export function getColorForXY({ x, y, color, scene }) {
   if (DEBUG) console.log('getColorForXY', x, y, color, scene);
@@ -49,6 +50,83 @@ export function getTileForXY({ x, y, scene }) {
     tile = scene.land[yPixel][xPixel];
 
   return tile;
+}
+
+export async function purchasePixels({ scene, selection }) {
+  if (DEBUG) console.log('purchasePixels', selection)
+
+  let fullPrice = 0, positions = [], gas = 220000;
+
+  if (!scene.game.web3.activeAddress)
+    await scene.game.web3.getActiveAddress();
+
+  if (!scene.game.web3.activeAddress)
+    return false;
+
+  selection.forEach(pixel => {
+    positions.push(stringToBN(pixel.position));
+    fullPrice += Number(pixel.price);
+    gas += 110000;
+    pixel.owner = scene.game.web3.activeAddress;
+  })
+
+  fullPrice = toWei(fullPrice.toString()); // web3.toWei needs strings or BN
+  console.log('buying pixels', positions, fullPrice.toString(), gas);
+
+  await scene.game.web3.bidContract.methods.purchase(
+    positions // pixel position(s)
+  ).send({
+    from: scene.game.web3.activeAddress,
+    gas: gas,
+    value: fullPrice
+  });
+
+  scene.game.emitter.emit('web3/purchase', selection);
+}
+
+export async function colorPixels({ scene, selection }) {
+  if (DEBUG) console.log('colorPixels', selection)
+
+  let positions = [], colors = [], gas = 220000;
+
+  selection.forEach(pixel => {
+    positions.push(stringToBN(pixel.position));
+    colors.push(stringToHex(pixel.HEXcolor));
+    gas += 110000;
+  })
+
+  if (!scene.game.web3.activeAddress)
+    await scene.game.web3.getActiveAddress();
+
+  if (!scene.game.web3.activeAddress)
+    return false;
+
+  console.log("colorPixels", positions, colors);
+
+  try {
+    await scene.game.web3.pixelContract.methods.setColors(
+      positions,
+      colors
+    ).send({
+      from: scene.game.web3.activeAddress,
+      gas: gas
+    });
+  } catch (error) {
+    console.error('setColors error', error)
+  }
+
+  // Set colors on the image
+  selection.forEach(pixel => {
+    scene.worldmap.setPixel(
+      pixel.cx,
+      pixel.cy,
+      pixel.color.r,
+      pixel.color.g,
+      pixel.color.b
+    )
+  })
+
+  scene.worldmap.update();
 }
 
 /*resizePixel(x, y) {

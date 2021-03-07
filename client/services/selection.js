@@ -1,9 +1,8 @@
 
 import Pixel from '@models/pixel';
-import InfoBox from '@components/info_box';
 
 import { getTileForPointer } from '@actions/pixel';
-import { invertColor } from '@actions/user_interactions';
+import { invertColor } from '@actions/general';
 
 export default class SelectionManager {
 
@@ -12,20 +11,6 @@ export default class SelectionManager {
     this.emitter = emitter;
 
     this.pixels = [];
-    this.infobox = null;
-    this.parent = document.body.querySelector('#game');
-
-    this.enableEvents();
-  }
-
-  enableEvents() {
-    this.emitter.on('web3/address', async address => {
-      if (DEBUG) console.log('SelectionManager: on web3/address emitter', address);
-
-      // Update infobox UI if user address changes
-      if (this.infobox && !this.infobox.preventRefresh)
-        await this.infobox.setUI();
-    });
   }
 
   highlightTile({ pointer, scene }) {
@@ -50,14 +35,7 @@ export default class SelectionManager {
     this.highlight.setFillStyle(invertedColor.color, 0.15);
   }
 
-  async setActivePixel({ tile, scene }) {
-    if (DEBUG) console.log('SelectionManager: setActivePixel');
-
-    if (this.isSelected(tile.cx, tile.cy))
-      return;
-
-    const pixel = Pixel.fromTile({ tile, scene });
-
+  async addSelection(pixel) {
     if (this.game.mode === 'multiselect')
       this.pixels.unshift(pixel);
     else {
@@ -71,19 +49,6 @@ export default class SelectionManager {
     pixel.setActivePixel();
 
     this.game.emitter.emit('selection/update', this.pixels);
-
-    if (this.infobox)
-      this.clearInfoBox();
-
-    if (this.pixels.length === 1) {
-      this.infobox = new InfoBox({ pixel: pixel, parent: this.parent, scene });
-
-      // Init is async, not sure if this is best approach
-      await this.infobox.init();
-    } else if (this.pixels.length > 1) {
-      if (!scene.game.tools.menu || !scene.game.tools.menu.loaded)
-        await scene.game.tools.openMenu('selection');
-    }
   }
 
   removeSelected({ tile, scene }) {
@@ -127,9 +92,6 @@ export default class SelectionManager {
 
     if (this.highlight)
       this.clearHighlight();
-
-    if (this.infobox)
-      this.clearInfoBox();
 
     if (this.pixels.length > 0)
       this.clearActivePixels();

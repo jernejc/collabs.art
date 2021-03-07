@@ -1,6 +1,5 @@
 
 import Controller from '@components/controller';
-import { formatColorNumber } from '@util/helpers';
 
 /**
  * Input Class
@@ -17,20 +16,9 @@ export default class Input extends Controller {
 
     this.input = document.createElement('input');
     this.input.value = (this.format) ? this.format(this.getValue()) : this.getValue();
+    this.input.setAttribute('type', params.type || 'text');
 
     this.domElement.appendChild(this.input);
-
-    switch (params.type) {
-      case 'color':
-        this.color = document.createElement('span');
-        this.color.classList.add('color');
-        this.color.style = `background: #${formatColorNumber(this.getValue())};`
-        this.domElement.appendChild(this.color);
-        this.input.setAttribute('type', 'text');
-        break;
-      default:
-        this.input.setAttribute('type', params.type);
-    }
 
     if (params.border) {
       this.border = document.createElement('div');
@@ -90,9 +78,6 @@ export default class Input extends Controller {
       value = this.format(value);
 
     this.input.value = value;
-
-    if (this.color)
-      this.color.style = `background: #${formatColorNumber(this.getValue())};`
 
     return super.updateDisplay();
   }

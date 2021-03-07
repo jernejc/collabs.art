@@ -1,7 +1,11 @@
 
+import Pixel from '@models/pixel';
+
+import InfoBox from '@components/infobox';
 import Menu from '@components/menu';
-import Button from '@components/button';
-import Input from '@components/input';
+
+import Button from '@components/form/button';
+import Input from '@components/form/input';
 
 export default class ToolsManager {
 
@@ -10,11 +14,12 @@ export default class ToolsManager {
     this.emitter = emitter;
 
     this.gameCanvas = document.querySelector('#' + game.appConfig.canvasElement);
-    this.parent = this.gameCanvas.parentNode;
+    this.parent = document.body.querySelector('#game');
+    this.infobox = null;
     this.search = {
       text: ''
     }
-
+    
     this.addConnectionStatus();
     this.addBottomNav();
     this.addEvents();
@@ -26,6 +31,19 @@ export default class ToolsManager {
 
       if (this.menu && this.menu.loaded)
         await this.menu.loadPixels();
+
+      // Update infobox UI if user address changes
+      if (this.infobox && !this.infobox.preventRefresh)
+        await this.infobox.setUI();
+    });
+
+    this.emitter.on('web3/purchase', async address => {
+      if (this.menu && this.menu.activeTab === 'selection')
+        await this.menu.createSettings();
+
+      // Update infobox UI if user address changes
+      if (this.infobox && !this.infobox.preventRefresh)
+        await this.infobox.setUI();
     });
 
     this.emitter.on('selection/update', async () => {
@@ -37,8 +55,8 @@ export default class ToolsManager {
             this.resetSettings();
 
           this.menu.createSettings();
-        } else
-          this.menu.switchToTab('selection');
+        } /*else
+          this.menu.switchToTab('selection');*/
       }
     })
   }
@@ -116,5 +134,35 @@ export default class ToolsManager {
     }));
 
     this.parent.appendChild(this.domConnectionStatus);
+  }
+
+  async setActivePixel({ tile, scene }) {
+    if (DEBUG) console.log('SelectionManager: setActivePixel');
+
+    if (this.game.selection.isSelected(tile.cx, tile.cy))
+      return;
+
+    const pixel = Pixel.fromTile({ tile, scene });
+
+    console.log('setActivePixel selection', this.game.selection)
+    await this.game.selection.addSelection(pixel);
+
+    if (this.infobox)
+      this.clearInfoBox();
+
+    if (this.game.selection.pixels.length === 1) {
+      this.infobox = new InfoBox({ pixel: pixel, parent: this.parent, scene });
+
+      // Init is async, not sure if this is best approach
+      await this.infobox.init();
+    } else if (this.game.selection.pixels.length > 1) {
+      if (!this.menu || !this.menu.loaded)
+        await this.openMenu('selection');
+    }
+  }
+
+  clearInfoBox() {
+    this.infobox.destroy();
+    this.infobox = null;
   }
 }

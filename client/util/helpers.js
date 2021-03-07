@@ -116,8 +116,8 @@ export function toWei(price, currency) {
   return web3.utils.toWei(price, currency || "ether");
 }
 
-export function formatColorNumber(number) {
-  let string = number.toString(16);
+export function formatColorNumber(hex) {
+  let string = hex.toString(16);
 
   if (string.length < 6)
     string = string.padStart(6, "0");

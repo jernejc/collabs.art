@@ -10,7 +10,8 @@ import {
   formatPositionHex
 } from '@util/helpers';
 
-import { setInvertedStroke, resetStrokeStyle, purchasePixels } from '@actions/user_interactions';
+import { setInvertedStroke, resetStrokeStyle } from '@actions/general';
+import { purchasePixels } from '@actions/pixel';
 
 export default class Pixel {
 
@@ -49,7 +50,8 @@ export default class Pixel {
     let success = false;
 
     try {
-      await purchasePixels({ scene: this.scene, selection: [this] })
+      const purchase = await purchasePixels({ scene: this.scene, selection: [this] });
+      console.log('purchase', purchase)
       success = true;
     } catch (error) {
       console.error('Purchase pixel error', error);
@@ -92,18 +94,24 @@ export default class Pixel {
     return success;
   }
 
+  changeToColorHex(hex) {
+    console.log('changeToColorHex', hex)
+    this.color = Phaser.Display.Color.HexStringToColor('#' + hexToString(hex));
+
+    if (this.tile)
+      this.tile.setFillStyle(this.color.color);
+  }
+  
+  changeToColorNumber(number) {
+    console.log('changeToColorHex', number)
+    this.color = Phaser.Display.Color.HexStringToColor('#' + formatColorNumber(number));
+
+    if (this.tile)
+      this.tile.setFillStyle(this.color.color);
+  }
+
   async setColor() {
     /*if (DEBUG)*/ console.log("SET pixel", this.cx, this.cy, this.color, this.HEXcolor);
-
-    this.scene.worldmap.setPixel(
-      this.cx,
-      this.cy,
-      this.color.r,
-      this.color.g,
-      this.color.b
-    )
-
-    this.scene.worldmap.update();
 
     try {
       await this.scene.game.web3.pixelContract.methods.setColor(
@@ -116,6 +124,20 @@ export default class Pixel {
     } catch (error) {
       console.error('setColor pixel error', error)
     }
+
+    this.setWorldCanvasPixel();
+  }
+
+  setWorldCanvasPixel() {
+    this.scene.worldmap.setPixel(
+      this.cx,
+      this.cy,
+      this.color.r,
+      this.color.g,
+      this.color.b
+    )
+
+    this.scene.worldmap.update();
   }
 
   async loadGraphData(refresh) {
@@ -130,6 +152,7 @@ export default class Pixel {
   }
 
   setGraphData(data) {
+    console.log('setGraphData', data)
     if (data.highestBid && data.highestBid.amount) { // Check for highest bid 
       this.highestBid = data.highestBid;
       this.highestBid.amount = parseFloat(fromWei(data.highestBid.amount)) // Conver from Wei
@@ -141,8 +164,10 @@ export default class Pixel {
     if (!this.price)
       this.price = this.scene.game.web3.defaultPrice;
 
-    if (data.color)
-      this.color = Phaser.Display.Color.HexStringToColor('#' + hexToString(data.color));
+    if (data.color) {
+      console.log('data.color', data.color);
+      this.changeToColorHex(data.color);
+    }
 
     this.owner = data.owner.toLowerCase();
   }

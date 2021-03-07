@@ -1,11 +1,9 @@
 
-import Hue from '@components/hue';
-import Saturation from '@components/saturation';
-import Input from '@components/input';
+import Input from '@components/form/input';
+import Button from '@components/form/button';
+import ColorPicker from '@components/color/picker';
 
-import { formatColorNumber, fromWei, formatExpireDate } from '@util/helpers';
-
-import Button from './button';
+import { formatColorNumber, formatExpireDate } from '@util/helpers';
 
 /**
  * InfoBox Class
@@ -142,77 +140,30 @@ export default class InfoBox {
 
     const _self = this; // this is not always this
 
-    let preventClose = null;
-
     this.ownerUI = document.createElement('div');
 
-    if (this.pixel.highestBid && !this.pixel.highestBid.expired) {
+    /*if (this.pixel.highestBid && !this.pixel.highestBid.expired) {
       this.ownerUI.appendChild(this.createInfoText('Pending bid', 'active-bid'));
       this.ownerUI.appendChild(this.createBidsInfo(this.pixel.highestBid));
     } else
-      this.ownerUI.appendChild(this.createInfoText('Owned', 'owned'));
+      this.ownerUI.appendChild(this.createInfoText('Owned', 'owned'));*/
 
-    this.ownerUI.appendChild(new Input(this.pixel.color, 'color', {
-      label: 'hex',
+    this.ownerUI.appendChild(new ColorPicker(this.pixel, 'color', {
+      //label: 'hex',
       width: '100%',
       scene: this.scene,
-      type: 'color',
-      border: true,
-      elClasses: ['label-border-input'],
+      elClasses: ['color-picker'],
       format: (value) => '#' + formatColorNumber(value),
       validate: (value) => !isNaN(value) && value.length === 6,
       focus: () => {
-        this.colorAdvancedUI.style.display = 'block';
         _self.setPosition();
       },
-      blur: (e) => {
-        //console.log('e', e);
-        if (!preventClose) {
-          this.colorAdvancedUI.style.display = 'none';
-          _self.setPosition();
-        }
+      blur: () => {
+        //console.log('e', e)
+        _self.setPosition();
       },
-      /*onUpdate: () => {
-        if (this.updateTimeout !== null)
-          this.cancelUpdate();
-
-        this.updateTimeout = setTimeout(async () => {
-          await setPixel({ pixel: this.pixel, scene: this.scene })
-        }, 1000);
-      }*/
+      update: (value) => this.pixel.changeToColorNumber(value)
     }));
-
-    this.colorAdvancedUI = document.createElement('div');
-    this.colorAdvancedUI.classList.add('advanced-color');
-    this.colorAdvancedUI.style.display = 'none'; // Hide by default
-
-    this.colorAdvancedUI.addEventListener('mouseenter', (e) => {
-      //console.log('mouse enter');
-      if (!preventClose)
-        preventClose = true
-    });
-
-    this.colorAdvancedUI.addEventListener('mouseleave', (e) => {
-      //console.log('mouse leave');
-      if (preventClose)
-        preventClose = false
-    });
-
-    this.colorAdvancedUI.appendChild(new Hue(this.pixel.color, 'h', {
-      min: 0,
-      max: 1,
-      step: 0.001,
-      scene: this.scene
-    }));
-
-    this.colorAdvancedUI.appendChild(new Saturation(this.pixel.color, 's', {
-      min: 0,
-      max: 1,
-      step: 0.001,
-      scene: this.scene
-    }));
-
-    this.ownerUI.appendChild(this.colorAdvancedUI);
 
     this.wrapper.classList.add('ownerUI');
     this.wrapper.appendChild(this.ownerUI);

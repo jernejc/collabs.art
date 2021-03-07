@@ -1,6 +1,7 @@
 
+import { normalize } from '@util/helpers';
+
 import Controller from '@components/controller';
-import { normalize } from '@util/helpers'
 
 /**
  * Hue Class

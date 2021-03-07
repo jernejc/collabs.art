@@ -1,6 +1,10 @@
 
 import _ from 'lodash';
 
+/**
+ * Used to control a JS object property with UI componets
+ */
+
 export default class Controller {
 
   constructor(object, property, params) {
@@ -15,7 +19,7 @@ export default class Controller {
     this.width = params.width;
     this.scene = params.scene;
     this.format = params.format;
-    this.onUpdate = params.onUpdate;
+    this.update = params.update;
 
     this.domElement = document.createElement('div');
 
@@ -38,8 +42,8 @@ export default class Controller {
           this.updateDisplay();
 
         if (property) { // Not Init
-          if (this.onUpdate) // User provided callback
-            this.onUpdate();
+          if (this.update) // User provided callback
+            this.update(this.getValue());
         }
       });
     }

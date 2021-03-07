@@ -1,11 +1,12 @@
 
 import Pixel from '@models/pixel';
 
-import Input from '@components/input';
-import Button from '@components/button';
+import Input from '@components/form/input';
+import Button from '@components/form/button';
+import ColorPicker from '@components/color/picker';
 
-import { moveToPosition, purchasePixels } from '@actions/user_interactions';
-import { getRelativeTile } from '@actions/pixel';
+import { moveToPosition } from '@actions/general';
+import { getRelativeTile, purchasePixels, colorPixels } from '@actions/pixel';
 
 import { insertAfter, formatColorNumber } from '@util/helpers';
 
@@ -78,7 +79,7 @@ export default class Menu {
 
         /*console.log('clickHandler this.scene', this.scene)*/
         const tile = getRelativeTile({ cx, cy, scene: this.scene, color: true });
-        await this.game.selection.setActivePixel({ tile, scene: this.scene });
+        await this.game.tools.setActivePixel({ tile, scene: this.scene });
       }
     }
 
@@ -221,31 +222,22 @@ export default class Menu {
       case 'ownerUI':
         relevantPixels = pixels.filter(pixel => pixel.owner === this.game.web3.activeAddress);
 
-        this.settings.appendChild(new Input(batchSettings, 'color.color', {
-          width: '47%',
+        this.settings.appendChild(new ColorPicker(batchSettings, 'color', {
+          width: '45%',
           scene: this.scene,
           type: 'color',
           label: 'Color',
           elClasses: ['setting'],
           format: (value) => '#' + formatColorNumber(value),
           validate: (value) => !isNaN(value) && value.length === 6,
-          focus: () => {
-            this.colorAdvancedUI.style.display = 'block';
-            _self.setPosition();
-          },
-          blur: (e) => {
-            if (!preventClose) {
-              this.colorAdvancedUI.style.display = 'none';
-              _self.setPosition();
-            }
-          }
+          update: (value) => relevantPixels.forEach(pixel => pixel.changeToColorNumber(value))
         }));
 
         this.settings.appendChild(new Button({
           elClasses: ['action-button', 'action-settings'],
           text: 'Apply',
           clickAction: async e => {
-            /*await purchasePixels({ scene: this.scene, selection: this.game.selection.pixels })*/
+            await colorPixels({ scene: this.scene, selection: this.game.selection.pixels })
           }
         }));
 
