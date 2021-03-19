@@ -48,11 +48,18 @@ export async function handleMouseDown({ pointer, scene }) {
 
       const tile = getTileForPointer({ pointer, scene });
 
-      if (scene.game.selection.isSelected(tile.cx, tile.cy)) 
+      if (scene.game.selection.isSelected(tile.cx, tile.cy)) {
         scene.game.selection.removeSelected({ tile, scene });
-      else 
+
+        if (scene.game.tools.infobox)
+          scene.game.tools.clearInfoBox()
+      } else {
+        if (scene.game.mode === 'select')
+          scene.game.selection.clearActivePixels();
+          
         await scene.game.tools.setActivePixel({ tile, scene });
-    
+      }
+
       break;
     case 'mininav':
       navigateMinimap({ pointer, scene: scene.minimap })
@@ -193,6 +200,9 @@ export function setGameMode({ scene, mode }) {
       scene.input.setDefaultCursor('grabbing');
       scene.game.mode = 'move';
 
+      if (scene.game.tools.infobox)
+        scene.game.tools.clearInfoBox()
+
       resetActiveSelection({ scene });
       generalResetStrokeStyle({ scene, size: 0 });
       break;
@@ -249,7 +259,8 @@ export function resetStrokeStyle({ tile, scene, size = 0.9 }) {
 }
 
 export function setInvertedStroke({ tile, scene }) {
-  console.log('setInvertedStroke', tile)
+  if (DEBUG) console.log('User interactions: setInvertedStroke');
+
   const invertedColor = invertColor(tile.fillColor, true);
 
   tile.setStrokeStyle(scene.strokeSize + 1, invertedColor.color, 1);

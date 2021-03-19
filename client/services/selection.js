@@ -76,11 +76,6 @@ export default class SelectionManager {
     this.highlight = null;
   }
 
-  clearInfoBox() {
-    this.infobox.destroy();
-    this.infobox = null;
-  }
-
   clearActivePixels() {
     this.pixels.forEach(pixel => {
       pixel.clearActivePixel();

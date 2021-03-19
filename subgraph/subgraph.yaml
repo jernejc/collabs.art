@@ -8,7 +8,7 @@ dataSources:
     name: Pixels
     network: mainnet
     source:
-      address: '0x7Bf0d7069Ce68cFe075cfC2e59aAaE262043f266'
+      address: '0x2f1087a40dcc5F064BCbcd00D12f596c08bac859'
       abi: Pixels
     mapping:
       kind: ethereum/events
@@ -29,7 +29,7 @@ dataSources:
     name: PixelsBid
     network: mainnet
     source:
-      address: '0x9741c78cf20D70D585D81DDe9d6f686C9649CeA1'
+      address: '0x81BBD8e32a70931B522800020D1Ac2d97253619f'
       abi: PixelsBid
     mapping:
       kind: ethereum/events

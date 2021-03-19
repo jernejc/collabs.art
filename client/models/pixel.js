@@ -95,7 +95,6 @@ export default class Pixel {
   }
 
   changeToColorHex(hex) {
-    console.log('changeToColorHex', hex)
     this.color = Phaser.Display.Color.HexStringToColor('#' + hexToString(hex));
 
     if (this.tile)
@@ -103,7 +102,6 @@ export default class Pixel {
   }
   
   changeToColorNumber(number) {
-    console.log('changeToColorHex', number)
     this.color = Phaser.Display.Color.HexStringToColor('#' + formatColorNumber(number));
 
     if (this.tile)
@@ -111,7 +109,7 @@ export default class Pixel {
   }
 
   async setColor() {
-    /*if (DEBUG)*/ console.log("SET pixel", this.cx, this.cy, this.color, this.HEXcolor);
+    if (DEBUG) console.log("setColor", this.cx, this.cy, this.color, this.HEXcolor);
 
     try {
       await this.scene.game.web3.pixelContract.methods.setColor(
@@ -152,7 +150,6 @@ export default class Pixel {
   }
 
   setGraphData(data) {
-    console.log('setGraphData', data)
     if (data.highestBid && data.highestBid.amount) { // Check for highest bid 
       this.highestBid = data.highestBid;
       this.highestBid.amount = parseFloat(fromWei(data.highestBid.amount)) // Conver from Wei

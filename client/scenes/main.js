@@ -151,7 +151,7 @@ export default class MainScene extends ApplicationScene {
     return;
   }
 
-  updateTile(x, y) {
+  updateTile(x, y, stroke) {
 
     const mapPixel = getColorForXY({ x, y, color: this.color, scene: this });
 
@@ -160,10 +160,12 @@ export default class MainScene extends ApplicationScene {
 
     this.land[y][x].setFillStyle(mapPixel.color.color);
 
-    if (this.game.selection.isSelected(mapPixel.cx, mapPixel.cy))
-      setInvertedStroke({ scene: this, tile: this.land[y][x] });
-    else
-      resetStrokeStyle({ scene: this, tile: this.land[y][x] });
+    if (this.game.mode !== 'move') { // Add stroke if mode is not move
+      if (this.game.selection.isSelected(mapPixel.cx, mapPixel.cy))
+        setInvertedStroke({ scene: this, tile: this.land[y][x] });
+      else
+        resetStrokeStyle({ scene: this, tile: this.land[y][x] });
+    }
   }
 
   clearVisibleTiles() {
