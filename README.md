@@ -1,6 +1,6 @@
 # PixelWorld
 
-The world is a grid of 1.000.000 pixels, where each pixel is represented by a non-fungible token (NFT) on the Ethereum network. Ownership is stored and transfered based on the <a href="https://eips.ethereum.org/EIPS/eip-721">ERC-721 standard</a> as most digital art and collectibles. It cannot be taken away or destroyed. 
+The world is a grid of 1.000.000 pixels, where each pixel is represented by a non-fungible token (NFT) on the Ethereum network. Ownership is stored and transfered based on the <a href="https://eips.ethereum.org/EIPS/eip-721" target="_blank">ERC-721 standard</a> as most digital art and collectibles. It cannot be taken away or destroyed. 
 
 Each position has unique identifier within the grid:
 
@@ -16,4 +16,4 @@ Each position has unique identifier within the grid:
 ALK └──────────────────┘ 
 </pre>
 
-Within the same <a href="https://en.wikipedia.org/wiki/Smart_contract">smart contract</a> owners can set colors to their pixels and thus contribute to the final outlook of the world.
+Within the same <a href="https://en.wikipedia.org/wiki/Smart_contract" target="_blank">smart contract</a> owners can set colors to their pixels and thus contribute to the final outlook of the world.
