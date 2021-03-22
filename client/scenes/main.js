@@ -2,6 +2,7 @@
 import Phaser from 'phaser';
 
 import { getColorForXY } from '@actions/pixel';
+import { randomIntFromInterval } from '@util/helpers';
 import ApplicationScene from '@scenes/application';
 import MinimapScene from '@scenes/minimap';
 import {
@@ -25,7 +26,7 @@ export default class MainScene extends ApplicationScene {
   }
 
   preload() {
-    this.load.image('worldimage', 'assets/images/place.png');
+    this.load.image('worldimage', 'assets/images/blank.png');
   }
 
   create(data) {
@@ -53,7 +54,7 @@ export default class MainScene extends ApplicationScene {
     this.createVisibleTiles();
 
     setGameMode({ scene: this, mode: this.appConfig.defaultMode });
-    moveToPosition({ x: 300, y: 400, scene: this })
+    moveToPosition({ x: randomIntFromInterval(10,999), y: randomIntFromInterval(10,999), scene: this })
 
     /** 
      * Mouse Events

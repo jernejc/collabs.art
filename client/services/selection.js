@@ -40,7 +40,7 @@ export default class SelectionManager {
       this.pixels.unshift(pixel);
     else {
       if (this.pixels.length > 0)
-        this.clearActivePixels();
+        this.clearActiveSelection();
 
       this.pixels = [pixel];
     }
@@ -76,10 +76,13 @@ export default class SelectionManager {
     this.highlight = null;
   }
 
-  clearActivePixels() {
+  clearActiveSelection() {
     this.pixels.forEach(pixel => {
       pixel.clearActivePixel();
     });
+
+    this.pixels = [];
+    this.game.emitter.emit('selection/clear');
   }
 
   reset() {
@@ -89,6 +92,6 @@ export default class SelectionManager {
       this.clearHighlight();
 
     if (this.pixels.length > 0)
-      this.clearActivePixels();
+      this.clearActiveSelection();
   }
 }

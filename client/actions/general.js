@@ -55,8 +55,8 @@ export async function handleMouseDown({ pointer, scene }) {
           scene.game.tools.clearInfoBox()
       } else {
         if (scene.game.mode === 'select')
-          scene.game.selection.clearActivePixels();
-          
+          scene.game.selection.clearActiveSelection();
+
         await scene.game.tools.setActivePixel({ tile, scene });
       }
 
@@ -141,6 +141,9 @@ export function navigateMinimap({ pointer, scene }) {
   const cx = (x * scene.sceneConfig.sizeRatio) - (fieldWidth / 2);
   const cy = (y * scene.sceneConfig.sizeRatio) - (fieldHeight / 2);
 
+  if (scene.game.selection.pixels.length > 0)
+    scene.game.selection.clearActiveSelection();
+
   resetActiveSelection({ scene });
   moveToPosition({ scene: scene.mainscene, x: cx, y: cy });
 }
@@ -200,8 +203,8 @@ export function setGameMode({ scene, mode }) {
       scene.input.setDefaultCursor('grabbing');
       scene.game.mode = 'move';
 
-      if (scene.game.tools.infobox)
-        scene.game.tools.clearInfoBox()
+      if (scene.game.selection.pixels.length > 0)
+        scene.game.selection.clearActiveSelection();
 
       resetActiveSelection({ scene });
       generalResetStrokeStyle({ scene, size: 0 });

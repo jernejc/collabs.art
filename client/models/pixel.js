@@ -161,10 +161,8 @@ export default class Pixel {
     if (!this.price)
       this.price = this.scene.game.web3.defaultPrice;
 
-    if (data.color) {
-      console.log('data.color', data.color);
+    if (data.color) 
       this.changeToColorHex(data.color);
-    }
 
     this.owner = data.owner.toLowerCase();
   }

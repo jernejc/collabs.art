@@ -137,3 +137,27 @@ export async function delay(seconds) {
 export function insertAfter(newNode, referenceNode) {
   referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }
+
+export function randomIntFromInterval(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+// Cookies
+// https://stackoverflow.com/questions/4825683/how-do-i-create-and-read-a-value-from-cookie
+
+export function setCookie(name, value, days = 7, path = '/') {
+  const expires = new Date(Date.now() + days * 864e5).toUTCString()
+  document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=' + path
+}
+
+export function getCookie(name) {
+  return document.cookie.split('; ').reduce((r, v) => {
+    const parts = v.split('=')
+    return parts[0] === name ? decodeURIComponent(parts[1]) : r
+  }, '')
+}
+
+export function deleteCookie(name, path) {
+  setCookie(name, '', -1, path)
+}
+

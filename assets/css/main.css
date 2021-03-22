@@ -773,3 +773,57 @@ Info Box
   box-shadow: rgba(255, 255, 255, 0.1);
   color: var(--active-black);
 }
+
+/***
+ Overlay
+***/
+
+.overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: var(--active-black);
+  opacity: 0.98;
+  z-index: 2;
+}
+
+.overlay h1 {
+  font-size: 3em;
+}
+
+.overlay .center {
+  position: relative;
+  top: 50%;
+  margin: 0 auto;
+  z-index: 3;
+  color: #fff;
+  width: 50%;
+  font-family: monospace;
+  font-size: 16px;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+  text-align: center;
+}
+
+.overlay button {
+  background: transparent;
+  line-height: 27px;
+  padding: 0 1em;
+  color: #FFF;
+  border: 1px solid #FFF;
+}
+
+.overlay button.active {
+  background: transparent;
+  line-height: 27px;
+  padding: 0 1em;
+  color: #FFF;
+  border: 1px solid #FFF;
+}
+
+.overlay .nav {
+  margin-top: 10px;
+  text-align: center;
+}

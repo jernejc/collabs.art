@@ -38,9 +38,9 @@ All pixels and their bids are indexed using <a href="https://thegraph.com/" targ
 
 ## Dev (run locally)
 
-Make sure to have a recent version of node installed, including global packages `truffle` and `ganache-cli`. Also make sure to install <a href="https://www.docker.com/" target="_blank">Docker</a> and that it's running.
+Make sure to have a recent version of <a href="https://nodejs.org/en/" target="_blank">Node.js</a> installed, including global packages `truffle` and `ganache-cli`. Also make sure to install <a href="https://www.docker.com/" target="_blank">Docker</a> and that it's running.
 
-1.) Install project dependencies using:
+1.) Install project dependencies
 
 ```
 npm install
@@ -64,7 +64,7 @@ cd graph-node/docker
 docker-compose up
 ```
 
-4.) Migrate contracts and deploy subgraph
+4.) Build and migrate smart contracts 
 
 Migrate smart contracts to local Ganache.
 
@@ -72,11 +72,11 @@ In app root directory:
 ```
 truffle migrate
 ```
-This should build the contracts and generate dapp-config.json.
+This should build, deploy the contracts and generate dapp-config.json.
 
 5.) Create and deploy local subgraph (<a href="https://thegraph.com/docs/quick-start#5.-deploy-the-subgraph-to-the-local-graph-node" target="_blank">details</a>)
 
-Make sure you have Graph CLI installed.
+Make sure you have <a href="https://github.com/graphprotocol/graph-cli" target="_blank">Graph CLI</a> installed.
 
 In app subgraph directory:
 ```
@@ -91,4 +91,4 @@ In app root directory:
 npm run dev
 ```
 
-If all goes well the client application should be available at http://localhost:9000
+If all goes well, the client application should be available at http://localhost:9000

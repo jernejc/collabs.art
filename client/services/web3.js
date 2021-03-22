@@ -189,7 +189,7 @@ export default class Web3Manager {
   async getDefaultPrice() {
     if (DEBUG) console.log('Web3Manager: getDefaultPrice');
 
-    if (!this.defaultPrice)
+    if (!this.defaultPrice) 
       this.defaultPrice = Web3.utils.fromWei(await this.bidContract.methods.defaultPrice().call());
 
     return this.defaultPrice;

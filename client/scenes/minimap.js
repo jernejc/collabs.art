@@ -46,7 +46,7 @@ export default class MinimapScene extends ApplicationScene {
       1
     );
     this.visibleField.setAlpha(0);
-    this.visibleField.setStrokeStyle(1, 0xffffff, 1);
+    this.visibleField.setStrokeStyle(1, 0xe59500, 1);
 
     this.mapoverlay.mask = new Phaser.Display.Masks.GeometryMask(this, this.visibleField);
     this.mapoverlay.mask.setInvertAlpha(true);
