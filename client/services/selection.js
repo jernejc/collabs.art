@@ -35,7 +35,7 @@ export default class SelectionManager {
     this.highlight.setFillStyle(invertedColor.color, 0.15);
   }
 
-  async addSelection(pixel) {
+  addSelection(pixel) {
     if (this.game.mode === 'multiselect')
       this.pixels.unshift(pixel);
     else {
@@ -44,9 +44,6 @@ export default class SelectionManager {
 
       this.pixels = [pixel];
     }
-
-    await pixel.loadGraphData();
-    pixel.setActivePixel();
 
     this.game.emitter.emit('selection/update', this.pixels);
   }

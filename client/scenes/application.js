@@ -1,4 +1,3 @@
-import Phaser from 'phaser'
 
 export default class ApplicationScene extends Phaser.Scene {
   constructor(options = undefined) {

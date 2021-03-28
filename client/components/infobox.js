@@ -63,7 +63,7 @@ export default class InfoBox {
     this.wrapper.appendChild(this.loadingIcon);
     this.setPosition();
 
-    if (refresh)
+    if (refresh || !this.pixel.graphLoaded)
       await this.pixel.loadGraphData(refresh);
 
     this.wrapper.removeChild(this.loadingIcon);
@@ -162,7 +162,7 @@ export default class InfoBox {
         //console.log('e', e)
         _self.setPosition();
       },
-      update: (value) => this.pixel.changeToColorNumber(value)
+      update: (value) => { console.log('ColorPicker update', value); _self.pixel.changeToColorNumber(value) }
     }));
 
     this.wrapper.classList.add('ownerUI');

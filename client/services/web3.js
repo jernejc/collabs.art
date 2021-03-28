@@ -29,7 +29,7 @@ export default class Web3Manager {
       this.instance = new Web3(window.ethereum);
 
       // Enable web3 related events
-      this.enableEvents();
+      this.enableProviderEvents();
 
       // Get network and chain data
       await this.getNetworkAndChainId();
@@ -38,6 +38,7 @@ export default class Web3Manager {
       if (this.isNetworkConnected) {
         this.initContracts();
         this.getDefaultPrice();
+        this.enableContractEvents();
       }
 
       // Get connected accounts
@@ -59,15 +60,24 @@ export default class Web3Manager {
     );
   }
 
-  enableEvents() {
-    if (DEBUG) console.log('Web3Manager: enableEvents');
+  enableProviderEvents() {
+    /*if (DEBUG)*/ console.log('Web3Manager: enableProviderEvents');
 
     const _self = this; // Had to wrap them in anonymous functions to handle 'this'
 
+    // Provider events
     this.instance.currentProvider.on('chainChanged', chainId => _self.handleNewChain(chainId));
     this.instance.currentProvider.on('networkChanged', networkId => _self.handleNewNetwork(networkId));
     this.instance.currentProvider.on('accountsChanged', accounts => _self.handleAccountsChanged(accounts));
-    this.instance.currentProvider.on('message', msg => _self.handleProviderMessage(msg));
+    //this.instance.currentProvider.on('message', msg => _self.handleProviderMessage(msg));
+  }
+
+  enableContractEvents() {
+    /*if (DEBUG)*/ console.log('Web3Manager: enableContractEvents', this.instance.eth);
+
+    // Contract events
+    this.pixelContract.events.ColorPixel({fromBlock: this.instance.eth.blockNumber}).on('data', (event) => { console.log('ColorPixel', event) });
+    this.pixelContract.events.ColorPixels({fromBlock: this.instance.eth.blockNumber}).on('data', (event) => { console.log('ColorPixels', event) });
   }
 
   handleNewChain(chainId) {

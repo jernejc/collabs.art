@@ -1,4 +1,3 @@
-import Phaser from 'phaser';
 
 import ApplicationScene from '@scenes/application';
 import { setGameMode } from '@actions/general';

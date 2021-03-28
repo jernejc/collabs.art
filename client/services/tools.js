@@ -152,11 +152,12 @@ export default class ToolsManager {
 
     const pixel = Pixel.fromTile({ tile, scene });
 
-    console.log('setActivePixel selection', this.game.selection)
-    await this.game.selection.addSelection(pixel);
+    this.game.selection.addSelection(pixel);
 
     if (this.infobox)
       this.clearInfoBox();
+
+    pixel.setActivePixel();
 
     if (this.game.selection.pixels.length === 1) {
       this.infobox = new InfoBox({ pixel: pixel, parent: this.parent, scene });

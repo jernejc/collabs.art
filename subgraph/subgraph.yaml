@@ -6,9 +6,9 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Pixels
-    network: mainnet
+    network: mumbai
     source:
-      address: '0x1B38Cb72Ad0441AFd48f23d74261C3D7d4cce0cD'
+      address: '0xc51aBb0677419689A8C5cbF6D44C2dEA1C552B9e'
       abi: Pixels
     mapping:
       kind: ethereum/events
@@ -27,9 +27,9 @@ dataSources:
       file: ./mappings/pixels.ts
   - kind: ethereum/contract
     name: PixelsBid
-    network: mainnet
+    network: mumbai
     source:
-      address: '0x685f0b92F734523680fF0986A05bEa5c45808C20'
+      address: '0x055953988C5048De5a08fff4b9C6182C20286300'
       abi: PixelsBid
     mapping:
       kind: ethereum/events

@@ -165,6 +165,7 @@ export default class Pixel {
       this.changeToColorHex(data.color);
 
     this.owner = data.owner.toLowerCase();
+    this.graphLoaded = true;
   }
 
   setActivePixel() {

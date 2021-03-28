@@ -100,7 +100,7 @@ export default class GraphManager {
       })
     };
 
-    const response = await fetch(config.subgraph.local, options)
+    const response = await fetch(config.subgraph.url, options)
       .then(res => res.json());
 
     if (response.errors)

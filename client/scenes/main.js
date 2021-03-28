@@ -1,8 +1,7 @@
 
-import Phaser from 'phaser';
-
 import { getColorForXY } from '@actions/pixel';
 import { randomIntFromInterval } from '@util/helpers';
+
 import ApplicationScene from '@scenes/application';
 import MinimapScene from '@scenes/minimap';
 import {
@@ -26,7 +25,7 @@ export default class MainScene extends ApplicationScene {
   }
 
   preload() {
-    this.load.image('worldimage', 'assets/images/blank.png');
+    this.load.image('worldimage', 'assets/images/world.png');
   }
 
   create(data) {

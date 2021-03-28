@@ -18,7 +18,7 @@ const config = {
     }
   },
   subgraph: {
-    local: 'http://127.0.0.1:8000/subgraphs/name/jernejc/pixelworld'
+    url: 'https://api.thegraph.com/subgraphs/name/jernejc/pixelworld' // 'http://127.0.0.1:8000/subgraphs/name/jernejc/pixelworld'
   }
 }
 

@@ -16,7 +16,11 @@ module.exports = async (deployer, network) => {
   if (!httpUrl)
     throw new Error('No network URL found.');
 
-  const wsUrl = (httpUrl) ? httpUrl.replace('http', 'ws') : '';
+  const wsUrl = deployer.networks[network].websocket;
+
+  if (!wsUrl)
+    throw new Error('No websocket URL found.');
+
   const maxPixels = 1000000;
   const defaultPrice = Web3.utils.toWei('0.005');
   const contractFee = 10000;
