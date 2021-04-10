@@ -139,14 +139,24 @@ export default class Pixel {
   }
 
   async loadGraphData(refresh) {
+    console.log('loadGraphData')
+    this.loadingGraph = true;
+
     const data = await this.scene.game.graph.loadPixel({
       id: this.position
     }, refresh);
 
-    if (!data)
-      return;
+    this.loadingGraph = false;
+    this.graphLoaded = true;
 
-    this.setGraphData(data);
+    console.log('loaded graph data', data);
+
+    if (data)
+      this.setGraphData(data);
+
+    console.log('pixel graph data loaded', this.infobox)
+    if (this.infobox)
+      await this.infobox.setUI();
   }
 
   setGraphData(data) {
@@ -165,7 +175,6 @@ export default class Pixel {
       this.changeToColorHex(data.color);
 
     this.owner = data.owner.toLowerCase();
-    this.graphLoaded = true;
   }
 
   setActivePixel() {

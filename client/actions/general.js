@@ -42,23 +42,16 @@ export async function handleMouseDown({ pointer, scene }) {
     case 'select':
 
       if (pointer.button === 2) { // Detect right click
-        resetActiveSelection({ scene });
+        scene.game.selection.reset();
         return;
       }
 
       const tile = getTileForPointer({ pointer, scene });
 
-      if (scene.game.selection.isSelected(tile.cx, tile.cy)) {
+      if (scene.game.selection.isSelected(tile.cx, tile.cy)) 
         scene.game.selection.removeSelected({ tile, scene });
-
-        if (scene.game.tools.infobox)
-          scene.game.tools.clearInfoBox()
-      } else {
-        if (scene.game.mode === 'select')
-          scene.game.selection.clearActiveSelection();
-
-        await scene.game.tools.setActivePixel({ tile, scene });
-      }
+      else 
+        await scene.game.selection.addSelected({ tile, scene });
 
       break;
     case 'mininav':
@@ -142,9 +135,8 @@ export function navigateMinimap({ pointer, scene }) {
   const cy = (y * scene.sceneConfig.sizeRatio) - (fieldHeight / 2);
 
   if (scene.game.selection.pixels.length > 0)
-    scene.game.selection.clearActiveSelection();
+    scene.game.selection.reset();
 
-  resetActiveSelection({ scene });
   moveToPosition({ scene: scene.mainscene, x: cx, y: cy });
 }
 
@@ -203,10 +195,6 @@ export function setGameMode({ scene, mode }) {
       scene.input.setDefaultCursor('grabbing');
       scene.game.mode = 'move';
 
-      if (scene.game.selection.pixels.length > 0)
-        scene.game.selection.clearActiveSelection();
-
-      resetActiveSelection({ scene });
       generalResetStrokeStyle({ scene, size: 0 });
       break;
     case 'select':
@@ -219,7 +207,6 @@ export function setGameMode({ scene, mode }) {
       scene.input.setDefaultCursor('copy');
       scene.game.mode = 'multiselect';
 
-      //resetActiveSelection({ scene });
       generalResetStrokeStyle({ scene, selection: true });
       break;
     case 'mininav':
@@ -230,10 +217,6 @@ export function setGameMode({ scene, mode }) {
       throw new Error('Trying to set unknown game mode: ' + mode);
   }
   //scene.game.emitter.emit('scene/mode', mode);
-}
-
-export function resetActiveSelection({ scene }) {
-  scene.game.selection.reset();
 }
 
 export function generalResetStrokeStyle({ scene, size, selection }) {

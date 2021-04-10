@@ -1,5 +1,6 @@
 
 import config from '@util/config';
+
 import { stringToHex, delay } from '@util/helpers';
 
 export default class GraphManager {

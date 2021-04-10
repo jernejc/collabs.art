@@ -55,7 +55,7 @@ export function getTileForXY({ x, y, scene }) {
 export async function purchasePixels({ scene, selection }) {
   if (DEBUG) console.log('purchasePixels', selection)
 
-  let fullPrice = 0, positions = [], gas = 220000;
+  let fullPrice = 0, positions = [], gas = 0; 
 
   if (!scene.game.web3.activeAddress)
     await scene.game.web3.getActiveAddress();
@@ -66,7 +66,7 @@ export async function purchasePixels({ scene, selection }) {
   selection.forEach(pixel => {
     positions.push(stringToBN(pixel.position));
     fullPrice += Number(pixel.price);
-    gas += 110000;
+    gas += 150000; // 150000 gas per pixel
     pixel.owner = scene.game.web3.activeAddress;
   })
 

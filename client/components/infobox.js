@@ -11,14 +11,18 @@ import { formatColorNumber, formatExpireDate } from '@util/helpers';
 
 export default class InfoBox {
 
-  constructor({ pixel, parent, scene }) {
+  constructor({ pixel, parent, game }) {
     if (DEBUG) console.log('Info Box: constructor', pixel);
 
-    this.scene = scene;
+    this.game = game;
+    this.scene = game.scene.keys['MainScene'];
     this.parent = parent;
-    this.pixel = pixel;
     this.updateTimeout = null;
     this.UIs = ['purchaseUI', 'ownerUI', 'bidUI', 'activeBidUI'];
+
+    // Pixel relationship
+    this.pixel = pixel;
+    this.pixel.infobox = this;
 
     this.setupTemplate();
   }
@@ -62,6 +66,9 @@ export default class InfoBox {
 
     this.wrapper.appendChild(this.loadingIcon);
     this.setPosition();
+
+    if (this.pixel.loadingGraph)
+      return;
 
     if (refresh || !this.pixel.graphLoaded)
       await this.pixel.loadGraphData(refresh);
@@ -320,6 +327,7 @@ export default class InfoBox {
 
     this.scene.game.emitter.off('controller/update');
     this.parent.removeChild(this.wrapper);
+    this.pixel.infobox = null;
   }
 
   hasUI() {

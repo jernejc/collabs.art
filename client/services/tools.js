@@ -1,5 +1,5 @@
 
-import Pixel from '@models/pixel';
+import config from '@util/config';
 
 import InfoBox from '@components/infobox';
 import Menu from '@components/menu';
@@ -19,7 +19,7 @@ export default class ToolsManager {
     this.search = {
       text: ''
     }
-    
+
     this.addConnectionStatus();
     this.addBottomNav();
     this.addEvents();
@@ -46,38 +46,59 @@ export default class ToolsManager {
         await this.infobox.setUI();
     });
 
-    this.emitter.on('selection/update', async () => {
-      if (this.menu && this.menu.loaded) {
-        if (this.menu.activeTab === 'selection') {
-          await this.menu.loadPixels();
+    this.emitter.on('selection/update', async pixels => {
+      if (pixels.length === 1) {
+        if (!this.infobox)
+          await this.openInfoBox({ pixel: pixels[0], scene: this.game.scene });
+        else
+          await this.infobox.setUI();
 
-          if (this.setting)
-            this.resetSettings();
+        if (this.menu)
+          this.clearMenu();
+      } else if (pixels.length > 1) {
+        if (this.infobox)
+          this.clearInfoBox();
 
-          this.menu.createSettings();
-        } /*else
-          this.menu.switchToTab('selection');*/
+        if (!this.menu)
+          await this.openMenu('selection');
+        else if (this.menu) {
+          if (this.menu.activeTab === 'selection') {
+            await this.menu.loadPixels();
+            this.menu.createSettings();
+          }
+        }
       }
     })
 
     this.emitter.on('selection/clear', async () => {
-      if (this.menu && this.menu.loaded) 
-        this.menu.close()
-        
+      console.log('selection/clear event')
+      if (this.menu)
+        this.clearMenu();
+
       if (this.infobox)
-        this.clearInfoBox()
+        this.clearInfoBox();
     })
   }
 
   async openMenu(activeTab) {
 
     if (this.menu && this.menu.loaded)
-      this.menu.close();
+      this.clearMenu();
 
     this.menu = new Menu({ parent: this.parent, game: this.game, activeTab });
 
     // Init is async 
     await this.menu.init();
+  }
+
+  async openInfoBox({ pixel }) {
+    if (this.infobox)
+      this.clearInfoBox()
+
+    this.infobox = new InfoBox({ pixel: pixel, parent: this.parent, game: this.game });
+
+    // Init is async, not sure if this is best approach
+    await this.infobox.init();
   }
 
   setActiveConnection(address) {
@@ -104,9 +125,12 @@ export default class ToolsManager {
       elClasses: ['pixels', 'menu-btn'],
       iconClass: 'gg-row-last',
       clickAction: async () => {
-        if (!this.menu || !this.menu.loaded)
+        if (!this.menu || !this.menu.loaded) {
+          if (this.infobox)
+            this.clearInfoBox()
+
           await this.openMenu(this.game.selection.pixels.length > 0 ? 'selection' : null);
-        else
+        } else
           await this.menu.loadPixels();
       }
     }));
@@ -144,32 +168,6 @@ export default class ToolsManager {
     this.parent.appendChild(this.domConnectionStatus);
   }
 
-  async setActivePixel({ tile, scene }) {
-    if (DEBUG) console.log('SelectionManager: setActivePixel');
-
-    if (this.game.selection.isSelected(tile.cx, tile.cy))
-      return;
-
-    const pixel = Pixel.fromTile({ tile, scene });
-
-    this.game.selection.addSelection(pixel);
-
-    if (this.infobox)
-      this.clearInfoBox();
-
-    pixel.setActivePixel();
-
-    if (this.game.selection.pixels.length === 1) {
-      this.infobox = new InfoBox({ pixel: pixel, parent: this.parent, scene });
-
-      // Init is async, not sure if this is best approach
-      await this.infobox.init();
-    } else if (this.game.selection.pixels.length > 1) {
-      if (!this.menu || !this.menu.loaded)
-        await this.openMenu('selection');
-    }
-  }
-
   addOverlay() {
     this.overlay = document.createElement('div');
     this.overlay.classList.add('overlay');
@@ -178,37 +176,7 @@ export default class ToolsManager {
     this.overlayContent.classList.add('center');
 
     // Find better solution for this
-    this.overlayContent.innerHTML = ` 
-        <h1>Pixelworld</h1>
-        <br />
-        <p>
-          The world is a grid of 1.000.000 pixels, where each pixel is represented by a non-fungible token (NFT) on the
-          Ethereum network.
-          Ownership is stored and transfered based on the <a href="https://eips.ethereum.org/EIPS/eip-721"
-            target="_blank" style="color: #FFF;">ERC-721 standard</a>
-          as most digital art and collectibles. It cannot be taken away or destroyed.
-        </p>
-        <br />
-        Each position has unique identifier within the grid:
-        <br />
-        <pre>
-      0 →              999
-    A ┌──────────────────┐  
-    ↓ │                  │  
-      │    TN220         │  
-      │     ┌─┐          │  
-      │     └─┘          │  
-      │                  │  
-      │                  │  
- ALK └──────────────────┘ 
-        </pre>
-        <p>
-          Horizontal axis are numbers from 0 to 999.<br />
-          Vertical axis are letters from A to ALK.<br /><br />
-          Example ID: <b>TN220</b><br />
-          Vertical: <b>TN</b> Horizontal: <b>220</b>
-        </p>
-      `;
+    this.overlayContent.innerHTML = config.overlayContent;
 
     this.overlayNav = document.createElement('div');
     this.overlayNav.classList.add('nav');
@@ -223,13 +191,6 @@ export default class ToolsManager {
     });
 
     this.overlayNav.appendChild(this.closeOverlay);
-    
-    /*<div class="nav">
-    <!--<button>More</button>-->
-    <button>Close</button>
-    <!--<input type="checkbox">
-    Don't show again-->
-  </div>*/
 
     this.overlayContent.appendChild(this.overlayNav);
     this.overlay.appendChild(this.overlayContent);
@@ -249,5 +210,10 @@ export default class ToolsManager {
   clearInfoBox() {
     this.infobox.destroy();
     this.infobox = null;
+  }
+
+  clearMenu() {
+    this.menu.destroy();
+    this.menu = null;
   }
 }

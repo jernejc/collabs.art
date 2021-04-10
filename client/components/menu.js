@@ -50,7 +50,7 @@ export default class Menu {
       */
 
     if (e.target.classList.contains('close')) { // Handle close button
-      this.close();
+      this.game.selection.clearActiveSelection();
       return;
     }
     else if (e.target.classList.contains('tab')) { // Handle tab click
@@ -79,7 +79,7 @@ export default class Menu {
 
         /*console.log('clickHandler this.scene', this.scene)*/
         const tile = getRelativeTile({ cx, cy, scene: this.scene, color: true });
-        await this.game.tools.setActivePixel({ tile, scene: this.scene });
+        await this.game.selection.addSelected({ tile, scene: this.scene });
       }
     }
 
@@ -166,6 +166,7 @@ export default class Menu {
     if (!pixels || pixels.length === 0)
       return;
 
+    console.log('createBatchSetting pixels', pixels)
     const lastPixel = pixels[pixels.length - 1],
       fullPrice = pixels.reduce((aggregator, pixel) => {
         aggregator += Number(pixel.price);
@@ -221,6 +222,7 @@ export default class Menu {
         break;
       case 'ownerUI':
         relevantPixels = pixels.filter(pixel => pixel.owner === this.game.web3.activeAddress);
+        console.log('ownerUI relevantPixels', relevantPixels)
 
         this.settings.appendChild(new ColorPicker(batchSettings, 'color', {
           width: '45%',
@@ -324,12 +326,8 @@ export default class Menu {
     this.menuList = null;
   }
 
-  close() {
+  destroy() {
     this.domElement.removeEventListener('click', this.clickHandler);
-    this.domElement.removeChild(this.tabs);
-    this.tabs = null;
-    this.domElement.removeChild(this.menuList);
-    this.menuList = null;
     this.parent.removeChild(this.domElement);
     this.loaded = false;
   }

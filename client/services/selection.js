@@ -35,7 +35,17 @@ export default class SelectionManager {
     this.highlight.setFillStyle(invertedColor.color, 0.15);
   }
 
-  addSelection(pixel) {
+  async addSelected({ tile, scene }) {
+    if (DEBUG) console.log('SelectionManager: addSelected');
+
+    if (this.isSelected(tile.cx, tile.cy))
+      return;
+
+    const pixel = Pixel.fromTile({ tile, scene });
+
+    // start loading graph data, but dont wait for it
+    pixel.loadGraphData();
+
     if (this.game.mode === 'multiselect')
       this.pixels.unshift(pixel);
     else {
@@ -44,6 +54,8 @@ export default class SelectionManager {
 
       this.pixels = [pixel];
     }
+
+    pixel.setActivePixel();
 
     this.game.emitter.emit('selection/update', this.pixels);
   }
