@@ -61,7 +61,7 @@ export default class Web3Manager {
   }
 
   enableProviderEvents() {
-    /*if (DEBUG)*/ console.log('Web3Manager: enableProviderEvents');
+    if (DEBUG) console.log('Web3Manager: enableProviderEvents');
 
     const _self = this; // Had to wrap them in anonymous functions to handle 'this'
 
@@ -73,11 +73,11 @@ export default class Web3Manager {
   }
 
   enableContractEvents() {
-    /*if (DEBUG)*/ console.log('Web3Manager: enableContractEvents', this.instance.eth);
+    if (DEBUG) console.log('Web3Manager: enableContractEvents', this.instance.eth);
 
     // Contract events
-    this.pixelContract.events.ColorPixel({fromBlock: this.instance.eth.blockNumber}).on('data', (event) => { console.log('ColorPixel', event) });
-    this.pixelContract.events.ColorPixels({fromBlock: this.instance.eth.blockNumber}).on('data', (event) => { console.log('ColorPixels', event) });
+    this.pixelContract.events.ColorPixel({fromBlock: this.instance.eth.blockNumber}).on('data', (event) => { if (DEBUG) console.log('ColorPixel', event) });
+    this.pixelContract.events.ColorPixels({fromBlock: this.instance.eth.blockNumber}).on('data', (event) => { if (DEBUG) console.log('ColorPixels', event) });
   }
 
   handleNewChain(chainId) {

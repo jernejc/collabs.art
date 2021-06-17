@@ -25,7 +25,7 @@ export default class MainScene extends ApplicationScene {
   }
 
   preload() {
-    this.load.image('worldimage', 'assets/images/world.png');
+    this.load.image('worldimage', 'assets/images/place.png');
   }
 
   create(data) {

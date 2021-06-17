@@ -51,7 +51,6 @@ export default class Pixel {
 
     try {
       const purchase = await purchasePixels({ scene: this.scene, selection: [this] });
-      console.log('purchase', purchase)
       success = true;
     } catch (error) {
       console.error('Purchase pixel error', error);
@@ -139,7 +138,6 @@ export default class Pixel {
   }
 
   async loadGraphData(refresh) {
-    console.log('loadGraphData')
     this.loadingGraph = true;
 
     const data = await this.scene.game.graph.loadPixel({
@@ -149,12 +147,9 @@ export default class Pixel {
     this.loadingGraph = false;
     this.graphLoaded = true;
 
-    console.log('loaded graph data', data);
-
     if (data)
       this.setGraphData(data);
 
-    console.log('pixel graph data loaded', this.infobox)
     if (this.infobox)
       await this.infobox.setUI();
   }

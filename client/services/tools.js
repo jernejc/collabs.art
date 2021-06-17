@@ -71,7 +71,6 @@ export default class ToolsManager {
     })
 
     this.emitter.on('selection/clear', async () => {
-      console.log('selection/clear event')
       if (this.menu)
         this.clearMenu();
 

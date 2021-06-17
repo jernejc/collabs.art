@@ -120,7 +120,7 @@ export default class Menu {
   }
 
   createSettings() {
-    /*if (DEBUG)*/ console.log('createSettings', this.activeTab)
+    if (DEBUG) console.log('createSettings', this.activeTab)
 
     if (!this.activeTab || !this.tabs)
       return;
@@ -166,7 +166,6 @@ export default class Menu {
     if (!pixels || pixels.length === 0)
       return;
 
-    console.log('createBatchSetting pixels', pixels)
     const lastPixel = pixels[pixels.length - 1],
       fullPrice = pixels.reduce((aggregator, pixel) => {
         aggregator += Number(pixel.price);
@@ -222,8 +221,7 @@ export default class Menu {
         break;
       case 'ownerUI':
         relevantPixels = pixels.filter(pixel => pixel.owner === this.game.web3.activeAddress);
-        console.log('ownerUI relevantPixels', relevantPixels)
-
+        
         this.settings.appendChild(new ColorPicker(batchSettings, 'color', {
           width: '45%',
           scene: this.scene,

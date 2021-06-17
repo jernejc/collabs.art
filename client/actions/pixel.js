@@ -7,7 +7,6 @@ export function getColorForXY({ x, y, color, scene }) {
 
   const { cx, cy } = getRelativePosition({ x, y, scene });
   scene.worldmap.getPixel(cx, cy, color);
-  //console.log('GET pixel', cx, cy, color.color);
 
   return { cx, cy, color };
 }
@@ -55,7 +54,7 @@ export function getTileForXY({ x, y, scene }) {
 export async function purchasePixels({ scene, selection }) {
   if (DEBUG) console.log('purchasePixels', selection)
 
-  let fullPrice = 0, positions = [], gas = 0; 
+  let fullPrice = 0, positions = [], gas = 50000; 
 
   if (!scene.game.web3.activeAddress)
     await scene.game.web3.getActiveAddress();
@@ -66,12 +65,11 @@ export async function purchasePixels({ scene, selection }) {
   selection.forEach(pixel => {
     positions.push(stringToBN(pixel.position));
     fullPrice += Number(pixel.price);
-    gas += 150000; // 150000 gas per pixel
+    gas += 130000; // 150000 gas per pixel
     pixel.owner = scene.game.web3.activeAddress;
   })
 
   fullPrice = toWei(fullPrice.toString()); // web3.toWei needs strings or BN
-  console.log('buying pixels', positions, fullPrice.toString(), gas);
 
   await scene.game.web3.bidContract.methods.purchase(
     positions // pixel position(s)
@@ -100,8 +98,6 @@ export async function colorPixels({ scene, selection }) {
 
   if (!scene.game.web3.activeAddress)
     return false;
-
-  console.log("colorPixels", positions, colors);
 
   try {
     await scene.game.web3.pixelContract.methods.setColors(
