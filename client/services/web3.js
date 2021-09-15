@@ -76,8 +76,8 @@ export default class Web3Manager {
     if (DEBUG) console.log('Web3Manager: enableContractEvents', this.instance.eth);
 
     // Contract events
-    this.pixelContract.events.ColorPixel({fromBlock: this.instance.eth.blockNumber}).on('data', (event) => { if (DEBUG) console.log('ColorPixel', event) });
-    this.pixelContract.events.ColorPixels({fromBlock: this.instance.eth.blockNumber}).on('data', (event) => { if (DEBUG) console.log('ColorPixels', event) });
+    this.pixelContract.events.ColorPixel({ fromBlock: this.instance.eth.blockNumber }).on('data', (event) => { if (DEBUG) console.log('ColorPixel', event) });
+    this.pixelContract.events.ColorPixels({ fromBlock: this.instance.eth.blockNumber }).on('data', (event) => { if (DEBUG) console.log('ColorPixels', event) });
   }
 
   handleNewChain(chainId) {
@@ -197,11 +197,23 @@ export default class Web3Manager {
   }
 
   async getDefaultPrice() {
-    if (DEBUG) console.log('Web3Manager: getDefaultPrice');
+    /*if (DEBUG)*/ console.log('Web3Manager: getDefaultPrice');
 
-    if (!this.defaultPrice) 
-      this.defaultPrice = Web3.utils.fromWei(await this.bidContract.methods.defaultPrice().call());
+    if (!this.defaultPrice) {
+      let defaultPrice;
 
+      try {
+        defaultPrice = await this.bidContract.methods.defaultPrice().call();
+        console.log('Fetched defaultPrice', defaultPrice)
+        this.defaultPrice = Web3.utils.fromWei(defaultPrice);
+      } catch (error) {
+        console.error('Failed to fetch default price: ' + error);
+        console.warn('Falling back on hardcoded default value.')
+        this.defaultPrice = 0.05
+      }
+    }
+
+    console.log('Got defaultPrice: ' + this.defaultPrice);
     return this.defaultPrice;
   }
 

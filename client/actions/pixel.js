@@ -65,7 +65,7 @@ export async function purchasePixels({ scene, selection }) {
   selection.forEach(pixel => {
     positions.push(stringToBN(pixel.position));
     fullPrice += Number(pixel.price);
-    gas += 130000; // 150000 gas per pixel
+    gas += 150000; // 150000 gas per pixel
     pixel.owner = scene.game.web3.activeAddress;
   })
 
