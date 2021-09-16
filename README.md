@@ -1,3 +1,8 @@
+# Idea and concept
+
+Better described here:
+<a href="https://gist.github.com/jernejc/b0e192aa80d6efd307e423397ae405db" target="_blank">https://gist.github.com/jernejc/b0e192aa80d6efd307e423397ae405db</a>
+
 # PixelWorld
 
 The world is a grid of 1.000.000 pixels, where each pixel is represented by a non-fungible token (NFT) on the Ethereum network. Ownership is stored and transfered based on the <a href="https://eips.ethereum.org/EIPS/eip-721" target="_blank">ERC-721 standard</a> as most digital art and collectibles. It cannot be taken away or destroyed. 
