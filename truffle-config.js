@@ -22,7 +22,7 @@ const HDWalletProvider = require('@truffle/hdwallet-provider');
 
 const fs = require('fs');
 const private_key = fs.readFileSync('.secret').toString().trim();
-const mumbaiURL = 'https://rpc-mumbai.matic.today';
+const mumbaiURL = 'https://matic-mumbai.chainstacklabs.com';
 
 module.exports = {
   /**
@@ -50,12 +50,16 @@ module.exports = {
       network_id: '*',       // Any network (default: none)
     },
 
-    maticTestnet: {
+    matic: {
       url: mumbaiURL,
-      websocket: 'wss://ws-mumbai.matic.today',
-      provider: () => new HDWalletProvider([private_key], mumbaiURL, 0, 1),
+      websocket: 'wss://ws-matic-mumbai.chainstacklabs.com',
+      provider: () => new HDWalletProvider({
+        privateKeys: [private_key],
+        numberOfAddresses: 1,
+        addressIndex: 0, 
+        providerOrUrl: mumbaiURL 
+      }),
       network_id: 80001,
-      addressIndex: 1,
       confirmations: 2,
       timeoutBlocks: 200,
       skipDryRun: true

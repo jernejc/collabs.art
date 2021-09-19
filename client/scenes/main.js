@@ -1,6 +1,7 @@
 
 import { getColorForXY } from '@actions/pixel';
 import { randomIntFromInterval } from '@util/helpers';
+import config from '@util/config';
 
 import ApplicationScene from '@scenes/application';
 import MinimapScene from '@scenes/minimap';
@@ -25,7 +26,7 @@ export default class MainScene extends ApplicationScene {
   }
 
   preload() {
-    this.load.image('worldimage', 'assets/images/place.png');
+    this.load.image('worldimage', `${config.events.url}/image`);
   }
 
   create(data) {

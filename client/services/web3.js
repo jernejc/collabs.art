@@ -197,14 +197,13 @@ export default class Web3Manager {
   }
 
   async getDefaultPrice() {
-    /*if (DEBUG)*/ console.log('Web3Manager: getDefaultPrice');
+    if (DEBUG) console.log('Web3Manager: getDefaultPrice');
 
     if (!this.defaultPrice) {
       let defaultPrice;
 
       try {
         defaultPrice = await this.bidContract.methods.defaultPrice().call();
-        console.log('Fetched defaultPrice', defaultPrice)
         this.defaultPrice = Web3.utils.fromWei(defaultPrice);
       } catch (error) {
         console.error('Failed to fetch default price: ' + error);

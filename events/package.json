@@ -11,8 +11,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@maticnetwork/dagger": "^0.2.0",
+    "@google-cloud/storage": "^5.14.2",
+    "express": "^4.17.1",
+    "ipfs-http-client": "^52.0.5",
     "jimp": "^0.16.1",
+    "node-fetch": "npm:@achingbrain/node-fetch@^2.6.7",
     "web3": "^1.3.4"
   }
 }

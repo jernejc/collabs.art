@@ -8,11 +8,11 @@ dataSources:
     name: Pixels
     network: mumbai
     source:
-      address: '0xe70A94140089697Dd91966833Fd41dE92Bdc989c'
+      address: '0x625D29d2ea9539062079dB11B1804BF2D6005870'
       abi: Pixels
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
         - Pixel
@@ -29,11 +29,11 @@ dataSources:
     name: PixelsBid
     network: mumbai
     source:
-      address: '0xD36E279f89Fa64C771BcCF517D9AFd15A88D7ffF'
+      address: '0xEd68B8Ec3cbd1588711DaD9d26BC7E57bAFFC87a'
       abi: PixelsBid
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
         - Pixel

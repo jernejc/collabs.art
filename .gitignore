@@ -5,3 +5,5 @@ dist
 dapp-config.json
 .vscode
 .secret
+app.yaml
+events/env

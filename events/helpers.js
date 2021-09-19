@@ -1,11 +1,29 @@
 
+const fs = require('fs')
+const path = require('path')
+
 const Web3 = require('web3');
+const Jimp = require('jimp');
+
+const {Storage} = require('@google-cloud/storage');
+
+// Instantiate a storage client
+const storage = new Storage();
+
+// A bucket is a container for objects (files).
+const bucket = storage.bucket(process.env.GCLOUD_STORAGE_BUCKET);
+
+// Config
+const config = require('./config');
 
 // Needs refractor, copy of client/helpers
 module.exports = {
   formatPosition,
   letterToNumberColumn,
-  colorPixel
+  colorPixel,
+  updateWorldImage,
+  loadWorldImage,
+  findWorldImage
 }
 
 function formatPosition(string) {
@@ -48,4 +66,75 @@ function colorPixel(position, color, worldImage) {
   console.log('Color Pixel', positionInfo, colorString);
 
   worldImage.setPixelColor(colorInt, positionInfo.x, positionInfo.y);
+}
+
+async function updateWorldImage(worldImage, ipfs) {
+  const imageBuffer = await worldImage.getBufferAsync(Jimp.MIME_PNG);
+  const response = await ipfs.add({
+    content: imageBuffer
+  });
+
+  await updateGoogleStorage(`${config.assests}/worlds/${response.cid}.png`, imageBuffer);
+  console.log('World image pixels updated!');
+}
+
+async function updateGoogleStorage(path, buffer) {
+  try {
+    await bucket.deleteFiles({
+      prefix: `${config.assests}/worlds/`
+    })
+  
+    const file = bucket.file(path);
+    await file.save(buffer);
+  } catch (error) {
+    console.error('Failed to update Google storage', error)
+  }
+}
+
+async function loadWorldImage() {
+  let buffer;
+
+  try {
+    // Get world image path
+    const worldImage = await findWorldImage()
+    buffer = await worldImage.download();
+
+    if (!buffer)
+      throw new Error('Missing image buffer')
+  } catch (error) {
+    console.error('No world image not found', error);
+    return;
+  }
+
+  // Load world image
+  const jimpImage = await Jimp.read(buffer[0]);
+  console.log('Image loaded.');
+
+  return jimpImage;
+}
+
+async function findWorldImage() {
+  let worldImage, images;
+
+  try {
+    images = await bucket.getFiles({
+      prefix: `${config.assests}/worlds`
+    });
+  } catch (error) {
+    console.warn('Failed to get files', error)
+  }
+
+  if (images && images.length > 0) {
+    if (images[0].length > 0)
+      worldImage = images[0][0];
+
+    console.log('Found an existing world image', worldImage.name);
+  }
+
+  if (!worldImage) {
+    console.warn('Defaulting to blank image');
+    worldImage = bucket.file(`${config.assests}/blank.png`);
+  }
+
+  return worldImage
 }

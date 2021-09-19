@@ -6,11 +6,10 @@
     "create-local": "graph create jernejc/pixelworld --node http://127.0.0.1:8020",
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy jernejc/pixelworld --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
-    "deploy-local": "graph deploy jernejc/pixelworld --ipfs http://localhost:5001 --node http://127.0.0.1:8020"
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ pixelworld"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "^0.20.0",
-    "@graphprotocol/graph-ts": "^0.20.0"
+    "@graphprotocol/graph-cli": "^0.22.0",
+    "@graphprotocol/graph-ts": "^0.22.0"
   }
 }

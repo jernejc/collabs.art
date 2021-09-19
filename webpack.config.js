@@ -11,12 +11,12 @@ const PROD = process.env.NODE_ENV == 'production';
 const config = {
   target: 'web',
   mode: PROD ? process.env.NODE_ENV : 'development',
+  devtool: 'source-map',
 
   //context: path.resolve(__dirname, 'client'),
 
   entry: {
-    app: './client/index.js',
-    vendors: ['phaser','web3']
+    app: './client/index.js'
   },
 
   output: {
@@ -66,12 +66,12 @@ const config = {
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'client/index.html'),
       inject: 'head',
-      chunksSortMode: (a, b) => { 
-        if (a[0] < b[0]) 
+      chunksSortMode: (a, b) => {
+        if (a[0] < b[0])
           return 1;
-        if (a[0] > b[0]) 
+        if (a[0] > b[0])
           return -1;
-  
+
         return 0;
       }
     })
