@@ -149,11 +149,11 @@ export default class InfoBox {
 
     this.ownerUI = document.createElement('div');
 
-    /*if (this.pixel.highestBid && !this.pixel.highestBid.expired) {
+    if (this.pixel.highestBid && !this.pixel.highestBid.expired) {
       this.ownerUI.appendChild(this.createInfoText('Pending bid', 'active-bid'));
       this.ownerUI.appendChild(this.createBidsInfo(this.pixel.highestBid));
     } else
-      this.ownerUI.appendChild(this.createInfoText('Owned', 'owned'));*/
+      this.ownerUI.appendChild(this.createInfoText('Owned', 'owned'));
 
     this.ownerUI.appendChild(new ColorPicker(this.pixel, 'color', {
       //label: 'hex',
@@ -170,6 +170,14 @@ export default class InfoBox {
         _self.setPosition();
       },
       update: (value) => { console.log('ColorPicker update', value); _self.pixel.changeToColorNumber(value) }
+    }));
+
+    this.ownerUI.appendChild(new Button({
+      elClasses: ['apply', 'action-button'],
+      text: 'Apply',
+      clickAction: async e => {
+        await colorPixels({ scene: this.scene, selection: this.game.selection.pixels })
+      }
     }));
 
     this.wrapper.classList.add('ownerUI');

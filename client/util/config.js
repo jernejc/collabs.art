@@ -15,15 +15,13 @@ const config = {
     }
   },
   subgraph: {
-    url: 'https://api.studio.thegraph.com/query/9304/pixelworld/v0.0.5' // 'http://127.0.0.1:8000/subgraphs/name/jernejc/pixelworld'
+    url: 'https://api.studio.thegraph.com/query/9304/autopoietic.art/v0.1.0'
   },
   events: {
     url: 'https://pixelworld-2e64c.uc.r.appspot.com'
   },
   // Need a better solution here
   overlayContent: `
-        <h1>Pixelworld</h1>
-        <br />
         <p>
           The world is a grid of 1.000.000 pixels, where each pixel is represented by a non-fungible token (NFT) on the
           Ethereum network.

@@ -1,15 +1,16 @@
 {
-  "name": "pixelworld",
+  "name": "autopoietic",
   "version": "0.1.0",
   "scripts": {
-    "create": "graph create jernejc/pixelworld --node https://api.thegraph.com/deploy/",
-    "create-local": "graph create jernejc/pixelworld --node http://127.0.0.1:8020",
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ pixelworld"
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ autopoietic.art",
+    "create-local": "graph create --node http://localhost:8020/ autopoietic.art",
+    "remove-local": "graph remove --node http://localhost:8020/ autopoietic.art",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 autopoietic.art"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "^0.22.0",
-    "@graphprotocol/graph-ts": "^0.22.0"
+    "@graphprotocol/graph-cli": "^0.22.1",
+    "@graphprotocol/graph-ts": "^0.22.1"
   }
 }

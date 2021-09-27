@@ -23,6 +23,8 @@ export default class Pixel {
 
     if (color)
       this.color = Phaser.Display.Color.HexStringToColor('#' + formatColorNumber(color));
+
+    this.originalColor = null;
   }
 
   get position() {
@@ -50,7 +52,7 @@ export default class Pixel {
     let success = false;
 
     try {
-      const purchase = await purchasePixels({ scene: this.scene, selection: [this] });
+      await purchasePixels({ scene: this.scene, selection: [this] });
       success = true;
     } catch (error) {
       console.error('Purchase pixel error', error);
@@ -94,6 +96,7 @@ export default class Pixel {
   }
 
   changeToColorHex(hex) {
+    this.originalColor = this.color;
     this.color = Phaser.Display.Color.HexStringToColor('#' + hexToString(hex));
 
     if (this.tile)
@@ -101,6 +104,7 @@ export default class Pixel {
   }
   
   changeToColorNumber(number) {
+    this.originalColor = this.color;
     this.color = Phaser.Display.Color.HexStringToColor('#' + formatColorNumber(number));
 
     if (this.tile)

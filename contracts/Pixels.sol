@@ -21,7 +21,7 @@ contract Pixels is ERC721Batch, AccessControl {
     /**
      * @dev Contract Constructor, calls ERC721Batch constructor and sets name and symbol
      */
-    constructor(uint48 _maxPixels) public ERC721Batch("PixelWorld", "PW") {
+    constructor(uint48 _maxPixels) public ERC721Batch("autopoietic", "PW") {
         require(_maxPixels > 0, "Pixels: Max pixels must be greater than 0");
 
         maxPixels = _maxPixels;

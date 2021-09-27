@@ -1,7 +1,7 @@
 {
-  "name": "pixelworld",
+  "name": "autopoietic",
   "version": "1.0.0",
-  "description": "PixelWorld",
+  "description": "autopoietic",
   "main": "dist/app.js",
   "author": "Jernej",
   "license": "ISC",
@@ -14,7 +14,7 @@
     "copy-webpack-plugin": "^6.1.0",
     "eth-gas-reporter": "^0.2.20",
     "html-webpack-plugin": "^4.4.1",
-    "js-yaml": "^3.14.1",
+    "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
     "node-gyp": "7.1.2",
     "phaser": "^3.50.1",

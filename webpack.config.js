@@ -22,7 +22,7 @@ const config = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].[contenthash].bundle.js',
-    library: 'PixelWorld',
+    library: 'autopoietic',
     libraryTarget: 'var'
   },
 

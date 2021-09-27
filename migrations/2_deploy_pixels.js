@@ -3,7 +3,8 @@ const fs = require('fs');
 const Web3 = require('web3');
 const yaml = require('js-yaml');
 
-const subgraphYAML = __dirname + '/../subgraph/subgraph.yaml';
+const subgraphYAML = `${__dirname}/../subgraph/subgraph.yaml`;
+const eventsYAML = `${__dirname}/../events/app.yaml`;
 
 const Pixels = artifacts.require("Pixels");
 const PixelsBid = artifacts.require("PixelsBid");
@@ -44,13 +45,13 @@ module.exports = async (deployer, network) => {
     }
   }
 
-  fs.writeFileSync(__dirname + '/../dapp-config.json', JSON.stringify(config, null, '\t'), 'utf8');
+  fs.writeFileSync(`${__dirname}/../dapp-config.json`, JSON.stringify(config, null, '\t'), 'utf8');
 
   // Update subgraph yaml
-  const doc = yaml.safeLoad(fs.readFileSync(subgraphYAML, 'utf8'));
+  const subgraphConf = yaml.load(fs.readFileSync(subgraphYAML, 'utf8'));
 
   // Loop through data sources
-  doc.dataSources.forEach(data => {
+  subgraphConf.dataSources.forEach(data => {
     switch (data.source.abi) {
       case 'Pixels':
         data.source.address = Pixels.address;
@@ -61,8 +62,23 @@ module.exports = async (deployer, network) => {
     }
   });
 
-  const newYAML = yaml.safeDump(doc);
-  fs.writeFileSync(subgraphYAML, newYAML, 'utf8');
+  const newSubgraphYAML = yaml.dump(subgraphConf);
+  fs.writeFileSync(subgraphYAML, newSubgraphYAML, 'utf8');
+
+  // Update events app yaml
+  const eventsConf = yaml.load(fs.readFileSync(eventsYAML, 'utf8'));
+
+  // Update ENV vars
+  eventsConf.env_variables.PIXELS_ADDRESS = Pixels.address;
+  eventsConf.env_variables.BIDS_ADDRESS = PixelsBid.address;
+  eventsConf.env_variables.WSURL = wsUrl;
+
+  const newEventsYAML = yaml.dump(eventsConf);
+  fs.writeFileSync(eventsYAML, newEventsYAML, 'utf8');
+
+  // Copy ABIs to events
+  fs.writeFileSync(`${__dirname}/../events/abis/Pixels.json`, JSON.stringify(Pixels.abi), { flag: 'w' });
+  fs.writeFileSync(`${__dirname}/../events/abis/PixelsBid.json`, JSON.stringify(PixelsBid.abi), { flag: 'w' });
 
   return;
 };

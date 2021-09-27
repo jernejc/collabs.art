@@ -1,7 +1,4 @@
 
-const fs = require('fs')
-const path = require('path')
-
 const Web3 = require('web3');
 const Jimp = require('jimp');
 
@@ -23,7 +20,9 @@ module.exports = {
   colorPixel,
   updateWorldImage,
   loadWorldImage,
-  findWorldImage
+  findWorldImage,
+  CORSorigin,
+  getImage
 }
 
 function formatPosition(string) {
@@ -127,14 +126,55 @@ async function findWorldImage() {
   if (images && images.length > 0) {
     if (images[0].length > 0)
       worldImage = images[0][0];
-
-    console.log('Found an existing world image', worldImage.name);
   }
 
   if (!worldImage) {
     console.warn('Defaulting to blank image');
     worldImage = bucket.file(`${config.assests}/blank.png`);
+  } else {
+    console.log('Found an existing world image', worldImage.name);
   }
 
   return worldImage
+}
+
+// Express
+
+// https://medium.com/zero-equals-false/using-cors-in-express-cac7e29b005b
+function CORSorigin(origin, callback) {
+  // allow requests with no origin 
+  // (like mobile apps or curl requests)
+  if (!origin) return callback(null, true);
+  if (config.allowedOrigins.indexOf(origin) === -1) {
+    const msg = 'The CORS policy for this site does not ' +
+      'allow access from the specified Origin.';
+    return callback(new Error(msg), false);
+  }
+  return callback(null, true);
+}
+
+
+async function getImage(req, res)  {  
+  try {
+
+    const file = await findWorldImage();
+    const stream = file.createReadStream();
+
+    res.writeHead(200, {'Content-Type': 'image/png' });
+
+    stream.on('data', function (data) {
+      res.write(data);
+    });
+
+    stream.on('error', function (err) {
+      console.log('error reading stream', err);
+    });
+
+    stream.on('end', function () {
+      res.end();
+    });
+  } catch (error) {
+    console.error('Failed to redirect', error);
+    res.status(500).end()
+  }
 }
