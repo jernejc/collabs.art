@@ -2,6 +2,7 @@
 import Input from '@components/form/input';
 import Button from '@components/form/button';
 import ColorPicker from '@components/color/picker';
+import LoadingBar from '@components/loading';
 
 import { formatColorNumber, formatExpireDate } from '@util/helpers';
 
@@ -51,9 +52,7 @@ export default class InfoBox {
 
     this.wrapper.appendChild(this.arrow);
 
-    this.loadingIcon = document.createElement('div');
-    this.loadingIcon.classList.add('loadingbar');
-    this.loadingIcon.innerHTML = `<i class="gg-loadbar-alt"></i><br /> Loading..`;
+    this.loadingIcon = new LoadingBar();
 
     this.parent.appendChild(this.wrapper);
   }
@@ -77,14 +76,14 @@ export default class InfoBox {
 
     if (!this.pixel.owner)
       this.createPurchaseUI();
-    else if (this.scene.game.web3.activeAddress === this.pixel.owner)
+    else if (this.game.web3.activeAddress === this.pixel.owner)
       this.createOwnerUI();
-    else if (this.pixel.highestBid && this.pixel.highestBid.bidder === this.scene.game.web3.activeAddress)
+    else if (this.pixel.highestBid && this.pixel.highestBid.bidder === this.game.web3.activeAddress)
       this.createActiveBidUI();
     else
       this.createBidUI();
 
-    this.scene.game.emitter.emit('controller/update'); // Update components once everything is in the dom
+    this.game.emitter.emit('controller/update'); // Update components once everything is in the dom
     this.setPosition();
   }
 
@@ -108,7 +107,7 @@ export default class InfoBox {
     this.purchaseUI = document.createElement('div');
     this.purchaseUI.appendChild(this.createInfoText('Available', 'purchase'));
     this.purchaseUI.appendChild(new Input(this.pixel, 'price', {
-      label: 'ETH',
+      label: this.game.web3.currentSymbol,
       width: '100%',
       disabled: true,
       border: true,
@@ -172,13 +171,13 @@ export default class InfoBox {
       update: (value) => { console.log('ColorPicker update', value); _self.pixel.changeToColorNumber(value) }
     }));
 
-    this.ownerUI.appendChild(new Button({
+    /*this.ownerUI.appendChild(new Button({
       elClasses: ['apply', 'action-button'],
       text: 'Apply',
       clickAction: async e => {
         await colorPixels({ scene: this.scene, selection: this.game.selection.pixels })
       }
-    }));
+    }));*/
 
     this.wrapper.classList.add('ownerUI');
     this.wrapper.appendChild(this.ownerUI);
@@ -194,7 +193,7 @@ export default class InfoBox {
       max: 100,
       step: 0.001,
       type: 'number',
-      label: 'ETH',
+      label: this.game.web3.currentSymbol,
       width: '100%',
       scene: this.scene,
       border: true,
@@ -240,7 +239,7 @@ export default class InfoBox {
         max: 100,
         step: 0.001,
         type: 'number',
-        label: 'ETH',
+        label: this.game.web3.currentSymbol,
         width: '100%',
         border: true,
         elClasses: ['label-border-input'],
@@ -271,7 +270,7 @@ export default class InfoBox {
       }))
     } else { // Display existing bid
       this.activeBidUI.appendChild(new Input(this.pixel.highestBid, 'amount', {
-        label: 'ETH',
+        label: this.game.web3.currentSymbol,
         width: '49%',
         disabled: true,
         scene: this.scene,
@@ -333,7 +332,7 @@ export default class InfoBox {
   destroy() {
     if (DEBUG) console.log('Info box: destroy');
 
-    this.scene.game.emitter.off('controller/update');
+    this.game.emitter.off('controller/update');
     this.parent.removeChild(this.wrapper);
     this.pixel.infobox = null;
   }

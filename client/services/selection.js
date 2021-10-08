@@ -57,7 +57,7 @@ export default class SelectionManager {
 
     pixel.setActivePixel();
 
-    this.game.emitter.emit('selection/update', this.pixels);
+    this.emitter.emit('selection/update', this.pixels);
   }
 
   removeSelected({ tile, scene }) {
@@ -69,7 +69,7 @@ export default class SelectionManager {
 
     pixel.clearActivePixel();
 
-    this.game.emitter.emit('selection/update', this.pixels);
+    this.emitter.emit('selection/update', this.pixels);
   }
 
   isSelected(cx, cy) {
@@ -91,7 +91,7 @@ export default class SelectionManager {
     });
 
     this.pixels = [];
-    this.game.emitter.emit('selection/clear');
+    this.emitter.emit('selection/clear');
   }
 
   reset() {

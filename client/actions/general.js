@@ -1,4 +1,6 @@
 
+import _ from 'lodash';
+
 import { getTileForPointer } from '@actions/pixel';
 import { formatColorNumber } from '@util/helpers';
 
@@ -42,15 +44,15 @@ export async function handleMouseDown({ pointer, scene }) {
     case 'select':
 
       if (pointer.button === 2) { // Detect right click
-        scene.game.selection.reset();
+        //scene.game.selection.reset();
         return;
       }
 
       const tile = getTileForPointer({ pointer, scene });
 
-      if (scene.game.selection.isSelected(tile.cx, tile.cy)) 
+      if (scene.game.selection.isSelected(tile.cx, tile.cy))
         scene.game.selection.removeSelected({ tile, scene });
-      else 
+      else
         await scene.game.selection.addSelected({ tile, scene });
 
       break;
@@ -137,7 +139,7 @@ export function navigateMinimap({ pointer, scene }) {
   if (scene.game.selection.pixels.length > 0)
     scene.game.selection.reset();
 
-  moveToPosition({ scene: scene.mainscene, x: cx, y: cy });
+  moveToPosition({ scene: scene.mainscene, x: cx, y: cy, save: true });
 }
 
 export function panDragMap({ pointer, scene }) {
@@ -148,15 +150,15 @@ export function panDragMap({ pointer, scene }) {
     const newX = scene.cameraX + (scene.game.origDragPoint.x - pointer.position.x);
     const newY = scene.cameraY + (scene.game.origDragPoint.y - pointer.position.y);
 
-    moveToPosition({ scene, x: newX, y: newY });
+    moveToPosition({ scene, x: newX, y: newY, save: true });
   }
 
   // set new drag origin to current position
   scene.game.origDragPoint = pointer.position.clone();
-  scene.updateTiles();
 }
 
-export function moveToPosition({ scene, x, y }) {
+export function moveToPosition({ scene, x, y, save }) {
+  if (DEBUG) console.log('moveToPosition', x, y);
 
   scene.cameraX = x;
   scene.cameraY = y;
@@ -174,6 +176,47 @@ export function moveToPosition({ scene, x, y }) {
     scene.cameraY = 0;
 
   scene.updateTiles();
+
+  if (save)
+    debounceSaveLastPosition(x, y); // Save last known position to localStorage
+}
+
+export function saveLastPosition(x, y) {
+  if (DEBUG) console.log('saveLastPosition', x, y);
+
+  try {
+    localStorage.setItem('cx', x);
+    localStorage.setItem('cy', y);
+  } catch (error) {
+    console.error('Failed to save last known position', error);
+  }
+}
+
+// Debounce save position -- https://stackoverflow.com/questions/23858046/debounce-function-with-args-underscore/23858092
+var debounceSaveLastPosition = _.debounce(saveLastPosition, 300);
+
+export function getLastPosition() {
+  if (DEBUG) console.log('getLastPosition');
+
+  let position = {
+    x: 0,
+    y: 0
+  }
+
+  try {
+    const cx = localStorage.getItem('cx');
+    const cy = localStorage.getItem('cy');
+
+    if (cx)
+      position.x = parseFloat(cx);
+
+    if (cy)
+      position.y = parseFloat(cy);
+  } catch (error) {
+    console.error('Failed to get last known position', error);
+  }
+
+  return position;
 }
 
 // Set the Position of the Selection Block

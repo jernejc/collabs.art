@@ -26,7 +26,15 @@ export default class ToolsManager {
   }
 
   addEvents() {
+    this.emitter.on('web3/network', async network => {
+      if (DEBUG) console.log('ToolsManager: web3/network');
+
+      this.setActiveConnection(network);
+    });
+
     this.emitter.on('web3/address', async address => {
+      if (DEBUG) console.log('ToolsManager: web3/address');
+
       this.setActiveConnection(address);
 
       if (this.menu && this.menu.loaded)
@@ -38,6 +46,8 @@ export default class ToolsManager {
     });
 
     this.emitter.on('web3/purchase', async address => {
+      if (DEBUG) console.log('ToolsManager: web3/purchase');
+
       if (this.menu && this.menu.activeTab === 'selection')
         await this.menu.createSettings();
 
@@ -47,6 +57,10 @@ export default class ToolsManager {
     });
 
     this.emitter.on('selection/update', async pixels => {
+      if (DEBUG) console.log('ToolsManager: selection/update');
+
+      pixels = pixels || this.game.selection.pixels;
+
       if (pixels.length === 1) {
         if (!this.infobox)
           await this.openInfoBox({ pixel: pixels[0], scene: this.game.scene });
@@ -71,6 +85,8 @@ export default class ToolsManager {
     })
 
     this.emitter.on('selection/clear', async () => {
+      if (DEBUG) console.log('ToolsManager: selection/clear');
+
       if (this.menu)
         this.clearMenu();
 
@@ -100,7 +116,9 @@ export default class ToolsManager {
     await this.infobox.init();
   }
 
-  setActiveConnection(address) {
+  setActiveConnection(network) {
+    if (DEBUG) console.log('ToolsManager: setActiveConnection');
+
     const connection = this.domConnectionStatus.querySelector('.connection');
     const icon = connection.querySelector('i');
 
@@ -108,11 +126,11 @@ export default class ToolsManager {
       icon.classList.remove('gg-block');
       icon.classList.add('gg-data');
     } else if (icon.classList.contains('gg-data')) {
-      if (!address) {
+      if (!network) {
         icon.classList.remove('gg-data');
         icon.classList.add('gg-block');
       } else
-        console.log('blink');
+        if (DEBUG) console.log('ToolsManager: blink');
     }
   }
 
@@ -140,7 +158,7 @@ export default class ToolsManager {
       placeholder: 'Find pixel.. (eg. RK438)',
       max: 6,
       onChange: async () => {
-        console.log('this.search.text onChange', this.search.text)
+        console.log('ToolsManager: this.search.text onChange', this.search.text)
         if (this.menu && this.menu.loaded) {
 
           //await this.menu.loadPixels();
@@ -152,12 +170,15 @@ export default class ToolsManager {
   }
 
   addConnectionStatus() {
+    const isConnected = this.game.web3.isConnected;
+    if (DEBUG) console.log('ToolsManager: addConnectionStatus', isConnected);
+
     this.domConnectionStatus = document.createElement('div');
     this.domConnectionStatus.setAttribute('id', 'connection-status');
 
     this.domConnectionStatus.appendChild(new Button({
       elClasses: ['account', 'connection'],
-      iconClass: this.game.web3.isProviderConnected() ? 'gg-data' : 'gg-block',
+      iconClass: isConnected ? 'gg-data' : 'gg-block',
       clickAction: async () => {
         if (!this.game.web3.activeAddress)
           await this.game.web3.getActiveAddress();

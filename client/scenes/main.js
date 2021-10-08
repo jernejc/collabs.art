@@ -16,6 +16,7 @@ import {
   handleShiftUp,
   setGameMode,
   moveToPosition,
+  getLastPosition,
   setInvertedStroke,
   resetStrokeStyle
 } from '@actions/general';
@@ -54,7 +55,7 @@ export default class MainScene extends ApplicationScene {
     this.createVisibleTiles();
 
     setGameMode({ scene: this, mode: this.appConfig.defaultMode });
-    moveToPosition({ x: randomIntFromInterval(10,999), y: randomIntFromInterval(10,999), scene: this })
+    moveToPosition({ ...getLastPosition(), scene: this })
 
     /** 
      * Mouse Events

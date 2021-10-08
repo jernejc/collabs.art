@@ -154,8 +154,7 @@ export default class Pixel {
     if (data)
       this.setGraphData(data);
 
-    if (this.infobox)
-      await this.infobox.setUI();
+    this.scene.game.emitter.emit('selection/update');
   }
 
   setGraphData(data) {

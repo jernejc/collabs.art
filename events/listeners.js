@@ -16,6 +16,8 @@ const pixelsContract = new web3Instance.eth.Contract(
   config.PixelsAddress
 );
 
+let emitter = null;
+
 /**
  * 
  * Pixels Contract
@@ -30,10 +32,11 @@ module.exports = {
 }
 
 async function pixelsContractListeners() {
-  pixelsContract.events.ColorPixels({ fromBlock: 'earliest' })
+  clearEmitter();
+
+  emitter = pixelsContract.events.ColorPixels({ fromBlock: 'earliest' })
     .on('data', async e => {
       console.log('ColorPixels event triggered.');
-
       const worldImage = await loadWorldImage();
 
       try {
@@ -65,5 +68,17 @@ async function pixelsContractListeners() {
     })
     .on('error', error => {
       console.error('ColorPixels event error', error);
+
+      clearEmitter();
+      throw new Error('Force restart');
     });
+}
+
+function clearEmitter() {
+  if (emitter !== null) {
+    emitter.removeAllListeners('data');
+    emitter.removeAllListeners('changed');
+    emitter.removeAllListeners('error');
+    emitter = null;
+  }
 }

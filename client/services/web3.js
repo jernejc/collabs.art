@@ -20,6 +20,26 @@ export default class Web3Manager {
     this.activeAddress = null;
   }
 
+  get isConnectedToRPC() {
+    return this.instance && this.instance.currentProvider && this.instance.currentProvider.isConnected();
+  }
+
+  get isProviderConnected() {
+    return this.instance && this.activeAddress;
+  }
+
+  get isNetworkConnected() {
+    return this.chainId && this.network;
+  }
+
+  get isConnected() {
+    return this.isConnectedToRPC && this.isNetworkConnected;
+  }
+
+  get currentSymbol() {
+    return (this.network) ? this.network.symbol : 'tMATIC';
+  }
+
   async initProvider() {
     if (DEBUG) console.log('Web3Manager: initProvider');
 
@@ -76,18 +96,33 @@ export default class Web3Manager {
     if (DEBUG) console.log('Web3Manager: enableContractEvents', this.instance.eth);
 
     // Contract events
-    this.pixelContract.events.ColorPixel({ fromBlock: this.instance.eth.blockNumber }).on('data', (event) => { if (DEBUG) console.log('ColorPixel', event) });
-    this.pixelContract.events.ColorPixels({ fromBlock: this.instance.eth.blockNumber }).on('data', (event) => { if (DEBUG) console.log('ColorPixels', event) });
+    this.pixelContract.events.ColorPixel({ fromBlock: this.instance.eth.blockNumber }).on('data', (event) => { /*if (DEBUG)*/ console.log('ColorPixel', event) });
+    this.pixelContract.events.ColorPixels({ fromBlock: this.instance.eth.blockNumber }).on('data', (event) => { /*if (DEBUG)*/ console.log('ColorPixels', event) });
   }
 
   handleNewChain(chainId) {
     if (DEBUG) console.log('Web3Manager: handleNewChain', chainId);
-    this.chainId = chainId;
+    const supported = config.networks.find(net => net.chainId == chainId && net.enabled);
+
+    if (!supported) {
+      console.warn('Web3Manager: Chain ID not supported');
+      this.chainId = null;
+    } else
+      this.chainId = chainId;
   }
 
   handleNewNetwork(networkId) {
     if (DEBUG) console.log('Web3Manager: handleNewNetwork', networkId);
-    this.networkId = networkId;
+
+    const supported = config.networks.find(net => net.id == networkId && net.enabled);
+
+    if (!supported) {
+      console.warn('Web3Manager: Network ID not supported');
+      this.network = null;
+    } else
+      this.network = supported;
+
+    this.emitter.emit('web3/network', this.network);
   }
 
   handleAccountsChanged(accounts) {
@@ -110,30 +145,6 @@ export default class Web3Manager {
   handleProviderMessage(msg) {
     console.log('handleProviderMessage', msg);
   }
-
-  isConnectedToRPC() {
-    return this.instance && this.instance.currentProvider && this.instance.currentProvider.isConnected();
-  }
-
-  isProviderConnected() {
-    return this.instance && this.activeAddress;
-  }
-
-  isNetworkConnected() {
-    return this.chainId && this.networkId;
-  }
-
-  /*startOnboarding() {
-    if (DEBUG) console.log('Web3Manager: startOnboarding');
-
-    const currentUrl = new URL(window.location.href)
-    const forwarderOrigin = currentUrl.hostname === 'localhost'
-      ? 'http://localhost:9000'
-      : undefined
-
-    this.onboarding = new MetaMaskOnboarding({ forwarderOrigin })
-    this.onboarding.startOnboarding();
-  }*/
 
   async ownerOf(_position) {
     if (DEBUG) console.log('Web3Manager: ownerOf');
@@ -212,7 +223,6 @@ export default class Web3Manager {
       }
     }
 
-    console.log('Got defaultPrice: ' + this.defaultPrice);
     return this.defaultPrice;
   }
 

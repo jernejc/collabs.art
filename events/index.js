@@ -5,9 +5,6 @@
  *   - ColorPixels - generate a png image of world based on event pixels/colors
  */
 
-// Express server
-const express = require('express');
-const cors = require('cors');
 // Local helpers
 const { getImage, CORSorigin } = require('./helpers');
 // Listeners
@@ -26,6 +23,8 @@ const { pixelsContractListeners } = require('./listeners');
 })();
 
 // Expose simple express server
+const express = require('express');
+const cors = require('cors');
 const app = express();
 
 app.use(cors({

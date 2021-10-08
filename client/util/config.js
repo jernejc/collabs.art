@@ -14,6 +14,23 @@ const config = {
       abi: PixelsBidContract.abi
     }
   },
+  networks: [{
+    id: 80001,
+    chainId: 0x13881,
+    name: 'Matic Testnet',
+    symbol: 'tMATIC',
+    enabled: true
+  }, {
+    id: 137,
+    name: 'Matic Mainnet',
+    symbol: 'MATIC',
+    enabled: false
+  }, {
+    id: 1,
+    name: 'ETH Mainnet',
+    symbol: 'ETH',
+    enabled: false
+  }],
   subgraph: {
     url: 'https://api.studio.thegraph.com/query/9304/autopoietic.art/v0.1.0'
   },
@@ -25,8 +42,8 @@ const config = {
         <p>
           The world is a grid of 1.000.000 pixels, where each pixel is represented by a non-fungible token (NFT) on the
           Ethereum network.
-          Ownership is stored and transfered based on the <a href="https://eips.ethereum.org/EIPS/eip-721"
-            target="_blank" style="color: #FFF;">ERC-721 standard</a>
+          Ownership is stored and transfered based on the <a href='https://eips.ethereum.org/EIPS/eip-721'
+            target='_blank' style='color: #FFF;'>ERC-721 standard</a>
           as most digital art and collectibles. It cannot be taken away or destroyed.
         </p>
         <br />

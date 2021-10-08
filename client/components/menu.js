@@ -4,6 +4,7 @@ import Pixel from '@models/pixel';
 import Input from '@components/form/input';
 import Button from '@components/form/button';
 import ColorPicker from '@components/color/picker';
+import LoadingBar from '@components/loading';
 
 import { moveToPosition } from '@actions/general';
 import { getRelativeTile, purchasePixels, colorPixels } from '@actions/pixel';
@@ -166,6 +167,13 @@ export default class Menu {
     if (!pixels || pixels.length === 0)
       return;
 
+    const loading = pixels.filter(pixel => pixel.loadingGraph)
+
+    if (loading.length > 0) {
+      this.settings.appendChild(new LoadingBar());
+      return;
+    }
+
     const lastPixel = pixels[pixels.length - 1],
       fullPrice = pixels.reduce((aggregator, pixel) => {
         aggregator += Number(pixel.price);
@@ -201,11 +209,10 @@ export default class Menu {
         relevantPixels = pixels.filter(pixel => !pixel.owner);
 
         this.settings.appendChild(new Input(batchSettings, 'price', {
-          width: '27%',
           elClasses: ['setting'],
           type: 'text',
           scene: this.scene,
-          label: 'ETH',
+          label: this.game.web3.currentSymbol,
           disabled: true,
           format: (value) => (value) ? value.toFixed(3) : 0
         }));
@@ -223,7 +230,6 @@ export default class Menu {
         relevantPixels = pixels.filter(pixel => pixel.owner === this.game.web3.activeAddress);
         
         this.settings.appendChild(new ColorPicker(batchSettings, 'color', {
-          width: '45%',
           scene: this.scene,
           type: 'color',
           label: 'Color',
@@ -244,6 +250,7 @@ export default class Menu {
         break;
     }
 
+    if (DEBUG) console.log('Menu: relevantPixels', relevantPixels)
     batchCountElLabel.textContent = relevantPixels.length;
 
     this.settings.appendChild(batchCountElLabel);
@@ -260,6 +267,8 @@ export default class Menu {
 
     switch (this.activeTab) {
       case 'pixels':
+        //this.domElement.appendChild(new LoadingBar());
+
         pixels = await this.game.graph.loadPixels({
           owner: this.game.web3.activeAddress
         });

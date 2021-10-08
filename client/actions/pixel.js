@@ -54,7 +54,7 @@ export function getTileForXY({ x, y, scene }) {
 export async function purchasePixels({ scene, selection }) {
   if (DEBUG) console.log('purchasePixels', selection)
 
-  let fullPrice = 0, positions = [], gas = 50000; 
+  let fullPrice = 0, positions = []; //, gas = 20000; 
 
   if (!scene.game.web3.activeAddress)
     await scene.game.web3.getActiveAddress();
@@ -65,7 +65,7 @@ export async function purchasePixels({ scene, selection }) {
   selection.forEach(pixel => {
     positions.push(stringToBN(pixel.position));
     fullPrice += Number(pixel.price);
-    gas += 150000; // 150000 gas per pixel
+    //gas += 10000; // 10000 gas per pixel
     pixel.owner = scene.game.web3.activeAddress;
   })
 
@@ -75,7 +75,7 @@ export async function purchasePixels({ scene, selection }) {
     positions // pixel position(s)
   ).send({
     from: scene.game.web3.activeAddress,
-    gas: gas,
+    //gas: gas,
     value: fullPrice
   });
 
@@ -85,12 +85,11 @@ export async function purchasePixels({ scene, selection }) {
 export async function colorPixels({ scene, selection }) {
   if (DEBUG) console.log('colorPixels', selection)
 
-  let positions = [], colors = [], gas = 220000;
+  let positions = [], colors = [];
 
   selection.forEach(pixel => {
     positions.push(stringToBN(pixel.position));
     colors.push(stringToHex(pixel.HEXcolor));
-    gas += 110000;
   })
 
   if (!scene.game.web3.activeAddress)
@@ -104,8 +103,7 @@ export async function colorPixels({ scene, selection }) {
       positions,
       colors
     ).send({
-      from: scene.game.web3.activeAddress,
-      gas: gas
+      from: scene.game.web3.activeAddress
     });
   } catch (error) {
     console.error('setColors error', error)
