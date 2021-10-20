@@ -8,6 +8,8 @@ import { stringToBN } from '@util/helpers';
 export default class Web3Manager {
 
   constructor(game, emitter) {
+    /*if (DEBUG)*/ console.log('Web3Manager: constructor');
+
     this.game = game;
     this.emitter = emitter;
 
@@ -112,7 +114,7 @@ export default class Web3Manager {
   }
 
   handleNewNetwork(networkId) {
-    if (DEBUG) console.log('Web3Manager: handleNewNetwork', networkId);
+    /*if (DEBUG)*/ console.log('Web3Manager: handleNewNetwork', networkId);
 
     const supported = config.networks.find(net => net.id == networkId && net.enabled);
 
@@ -126,7 +128,7 @@ export default class Web3Manager {
   }
 
   handleAccountsChanged(accounts) {
-    if (DEBUG) console.log('Web3Manager: handleAccountsChanged', this, accounts);
+    /*if (DEBUG)*/ console.log('Web3Manager: handleAccountsChanged', this, accounts);
 
     if (accounts.length > 0) {
       this.accounts = accounts;

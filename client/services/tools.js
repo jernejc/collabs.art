@@ -10,6 +10,8 @@ import Input from '@components/form/input';
 export default class ToolsManager {
 
   constructor(game, emitter) {
+    if (DEBUG) console.log('ToolsManager: constructor');
+
     this.game = game;
     this.emitter = emitter;
 
@@ -21,19 +23,20 @@ export default class ToolsManager {
     }
 
     this.addConnectionStatus();
+    this.addNetworkAlert();
     this.addBottomNav();
-    this.addEvents();
+    this.addEventListeners();
   }
 
-  addEvents() {
+  addEventListeners() {
     this.emitter.on('web3/network', async network => {
-      if (DEBUG) console.log('ToolsManager: web3/network');
+      /*if (DEBUG)*/ console.log('ToolsManager: on web3/network');
 
       this.setActiveConnection(network);
     });
 
     this.emitter.on('web3/address', async address => {
-      if (DEBUG) console.log('ToolsManager: web3/address');
+      if (DEBUG) console.log('ToolsManager: on web3/address');
 
       this.setActiveConnection(address);
 
@@ -46,7 +49,7 @@ export default class ToolsManager {
     });
 
     this.emitter.on('web3/purchase', async address => {
-      if (DEBUG) console.log('ToolsManager: web3/purchase');
+      if (DEBUG) console.log('ToolsManager: on web3/purchase');
 
       if (this.menu && this.menu.activeTab === 'selection')
         await this.menu.createSettings();
@@ -57,7 +60,7 @@ export default class ToolsManager {
     });
 
     this.emitter.on('selection/update', async pixels => {
-      if (DEBUG) console.log('ToolsManager: selection/update');
+      if (DEBUG) console.log('ToolsManager: on selection/update');
 
       pixels = pixels || this.game.selection.pixels;
 
@@ -85,7 +88,7 @@ export default class ToolsManager {
     })
 
     this.emitter.on('selection/clear', async () => {
-      if (DEBUG) console.log('ToolsManager: selection/clear');
+      if (DEBUG) console.log('ToolsManager: on selection/clear');
 
       if (this.menu)
         this.clearMenu();
@@ -96,6 +99,7 @@ export default class ToolsManager {
   }
 
   async openMenu(activeTab) {
+    if (DEBUG) console.log('ToolsManager: openMenu');
 
     if (this.menu && this.menu.loaded)
       this.clearMenu();
@@ -107,6 +111,8 @@ export default class ToolsManager {
   }
 
   async openInfoBox({ pixel }) {
+    if (DEBUG) console.log('ToolsManager: openInfoBox');
+
     if (this.infobox)
       this.clearInfoBox()
 
@@ -117,24 +123,30 @@ export default class ToolsManager {
   }
 
   setActiveConnection(network) {
-    if (DEBUG) console.log('ToolsManager: setActiveConnection');
+    /*if (DEBUG)*/ console.log('ToolsManager: setActiveConnection', network);
 
-    const connection = this.domConnectionStatus.querySelector('.connection');
-    const icon = connection.querySelector('i');
+    const icon = this.connectionStatus.querySelector('i');
 
-    if (icon.classList.contains('gg-block')) {
+    if (network) {
       icon.classList.remove('gg-block');
       icon.classList.add('gg-data');
-    } else if (icon.classList.contains('gg-data')) {
-      if (!network) {
-        icon.classList.remove('gg-data');
-        icon.classList.add('gg-block');
-      } else
-        if (DEBUG) console.log('ToolsManager: blink');
+
+      this.networkAlert.classList.remove('show');
+      this.networkAlert.classList.add('hide');
+    } else {
+      icon.classList.remove('gg-data');
+      icon.classList.add('gg-block');
+
+      this.networkAlert.classList.remove('hide');
+      this.networkAlert.classList.add('show');
+
+      if (DEBUG) console.log('ToolsManager: blink');
     }
   }
 
   addBottomNav() {
+    if (DEBUG) console.log('ToolsManager: addBottomNav');
+
     this.domBottomNav = document.createElement('div');
     this.domBottomNav.setAttribute('id', 'bottom-nav');
 
@@ -170,25 +182,47 @@ export default class ToolsManager {
   }
 
   addConnectionStatus() {
+    /*if (DEBUG)*/ console.log('ToolsManager: addConnectionStatus', this.game.web3.isConnected);
+
     const isConnected = this.game.web3.isConnected;
-    if (DEBUG) console.log('ToolsManager: addConnectionStatus', isConnected);
 
     this.domConnectionStatus = document.createElement('div');
     this.domConnectionStatus.setAttribute('id', 'connection-status');
 
-    this.domConnectionStatus.appendChild(new Button({
+    this.connectionStatus = new Button({
       elClasses: ['account', 'connection'],
       iconClass: isConnected ? 'gg-data' : 'gg-block',
       clickAction: async () => {
         if (!this.game.web3.activeAddress)
           await this.game.web3.getActiveAddress();
       }
-    }));
+    });
+
+    this.domConnectionStatus.appendChild(this.connectionStatus);
 
     this.parent.appendChild(this.domConnectionStatus);
   }
 
+  addNetworkAlert() {
+    /*if (DEBUG)*/ console.log('ToolsManager: addNetworkAlert', this.game.web3.isConnected);
+
+    const isConnected = this.game.web3.isConnected;
+
+    this.networkAlert = document.createElement('div');
+    this.networkAlert.setAttribute('id', 'alert');
+    this.networkAlert.innerText = 'Please connect to network';
+
+    if (!isConnected)
+      this.networkAlert.classList.add('show');
+    else
+      this.networkAlert.classList.add('hide');
+
+    this.parent.appendChild(this.networkAlert);
+  }
+
   addOverlay() {
+    if (DEBUG) console.log('ToolsManager: addOverlay');
+
     this.overlay = document.createElement('div');
     this.overlay.classList.add('overlay');
 
@@ -218,6 +252,8 @@ export default class ToolsManager {
   }
 
   clearOverlay() {
+    if (DEBUG) console.log('ToolsManager: addOverlay');
+
     this.closeOverlay.removeEventListener('click', this.closeOverlay);
     this.parent.removeChild(this.overlay);
 
@@ -228,11 +264,15 @@ export default class ToolsManager {
   }
 
   clearInfoBox() {
+    if (DEBUG) console.log('ToolsManager: clearInfoBox');
+
     this.infobox.destroy();
     this.infobox = null;
   }
 
   clearMenu() {
+    if (DEBUG) console.log('ToolsManager: clearMenu');
+
     this.menu.destroy();
     this.menu = null;
   }
