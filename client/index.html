@@ -15,19 +15,14 @@
 </head>
 
 <body>
-  <div id="app">
-    <div id="header">
-      <h1>autopoietic.art</h1>
-    </div>
-    <div id="game"></div>
-  </div>
-
+  <div id="app"></div>
+  
   <script>
     new autopoietic.Main({
-      canvasElement: 'game',
+      canvasElement: 'app',
       defaultMode: 'select',
       gridSize: 19,
-      strokeSize: 0.25,
+      strokeSize: 0.13,
       strokeColor: '#4c4c4c'
     });
   </script>

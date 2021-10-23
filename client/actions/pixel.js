@@ -24,8 +24,8 @@ export function getRelativeTile({ cx, cy, scene }) {
 
   for (let y = 0; y < scene.gridHeight; y++) {
     for (let x = 0; x < scene.gridWidth; x++) {
-      if (scene.land[y][x].cx === cx && scene.land[y][x].cy === cy) {
-        tile = scene.land[y][x];
+      if (scene.tiles[y][x].cx === cx && scene.tiles[y][x].cy === cy) {
+        tile = scene.tiles[y][x];
         rx = x;
         ry = y
       }
@@ -45,8 +45,8 @@ export function getTileForXY({ x, y, scene }) {
 
   let tile;
 
-  if (scene.land[yPixel])
-    tile = scene.land[yPixel][xPixel];
+  if (scene.tiles[yPixel])
+    tile = scene.tiles[yPixel][xPixel];
 
   return tile;
 }
@@ -124,16 +124,16 @@ export async function colorPixels({ scene, selection }) {
 }
 
 /*resizePixel(x, y) {
-  const oldSize = this.land[y][x].width;
+  const oldSize = this.tiles[y][x].width;
 
   if (oldSize != getFullBoxWidth(this)) {
-    this.land[y][x].width = getFullBoxWidth(this);
-    this.land[y][x].height = getFullBoxWidth(this);
+    this.tiles[y][x].width = getFullBoxWidth(this);
+    this.tiles[y][x].height = getFullBoxWidth(this);
 
-    this.land[y][x].x = x * getFullBoxWidth(this);
-    this.land[y][x].y = y * getFullBoxWidth(this);
+    this.tiles[y][x].x = x * getFullBoxWidth(this);
+    this.tiles[y][x].y = y * getFullBoxWidth(this);
 
-    this.land[y][x].setDepth(getFullBoxWidth(this));
+    this.tiles[y][x].setDepth(getFullBoxWidth(this));
   }
 
   return;

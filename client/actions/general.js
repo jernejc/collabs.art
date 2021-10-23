@@ -50,6 +50,11 @@ export async function handleMouseDown({ pointer, scene }) {
 
       const tile = getTileForPointer({ pointer, scene });
 
+      if (scene.gameOfLife) {
+        tile.alive = !tile.alive;
+        return;
+      }
+
       if (scene.game.selection.isSelected(tile.cx, tile.cy))
         scene.game.selection.removeSelected({ tile, scene });
       else
@@ -267,7 +272,7 @@ export function generalResetStrokeStyle({ scene, size, selection }) {
 
   for (let y = 0; y < scene.gridHeight; y++) {
     for (let x = 0; x < scene.gridWidth; x++) {
-      const tile = scene.land[y][x];
+      const tile = scene.tiles[y][x];
 
       if (tile) {
         if (selection && scene.game.selection.isSelected(tile.cx, tile.cy))

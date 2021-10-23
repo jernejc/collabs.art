@@ -1,6 +1,8 @@
 
 import config from '@util/config';
 
+import MinimapScene from '@scenes/minimap';
+
 import InfoBox from '@components/infobox';
 import Menu from '@components/menu';
 
@@ -15,13 +17,15 @@ export default class ToolsManager {
     this.game = game;
     this.emitter = emitter;
 
-    this.gameCanvas = document.querySelector('#' + game.appConfig.canvasElement);
-    this.parent = document.body.querySelector('#game');
+    //this.gameCanvas = document.querySelector('#' + game.appConfig.canvasElement);
+    console.log('this.game', this.game);
+    this.parent = this.game.canvas.parentNode;
     this.infobox = null;
     this.search = {
       text: ''
     }
 
+    this.addHeader();
     this.addConnectionStatus();
     this.addNetworkAlert();
     this.addBottomNav();
@@ -181,7 +185,7 @@ export default class ToolsManager {
     if (show) {
       if (this.networkAlert.classList.contains('hide'))
         this.networkAlert.classList.remove('hide');
-      
+
       this.networkAlert.classList.add('show');
     }
     else {
@@ -213,7 +217,7 @@ export default class ToolsManager {
     }));
 
     this.domBottomNav.appendChild(new Input(this.search, 'text', {
-      scene: this.scene,
+      scene: this.game.scene,
       type: 'text',
       placeholder: 'Find pixel.. (eg. RK438)',
       max: 6,
@@ -227,6 +231,19 @@ export default class ToolsManager {
     }));
 
     this.parent.appendChild(this.domBottomNav);
+  }
+
+  addHeader() {
+    if (DEBUG) console.log('ToolsManager: addConnectionStatus');
+
+    this.header = document.createElement('div');
+    this.header.setAttribute('id', 'header');
+
+    this.title = document.createElement('h1');
+    this.title.textContent = 'autopoietic.art';
+
+    this.header.appendChild(this.title);
+    this.parent.appendChild(this.header);
   }
 
   addConnectionStatus() {
@@ -291,6 +308,89 @@ export default class ToolsManager {
     this.overlayContent.appendChild(this.overlayNav);
     this.overlay.appendChild(this.overlayContent);
     this.parent.appendChild(this.overlay);
+  }
+
+  addMinimap(scene) {
+    /*if (DEBUG)*/ console.log("Toolsmanager: addMinimap", scene, this.game.scene);
+
+    scene = scene || this.game.scene;
+
+    const sizeRatio = (window.devicePixelRatio > 1) ? 5 + (5 * 0.5 / window.devicePixelRatio) : 5;
+    const margin = 7;
+    const margin2X = margin + margin;
+
+    // Minimap size
+    const width = 1000 / sizeRatio;
+    const height = 1000 / sizeRatio;
+
+    // Minimap position
+    const x = margin2X;
+    const y = scene.appConfig.canvasHeight - (height + margin2X);
+
+    this.minimapWrapper = scene.add.zone(
+      x,
+      y,
+      width,
+      height
+    )
+      .setInteractive()
+      .setOrigin(0)
+      .setDepth(3)
+
+    this.minimapBackground = scene.add.rectangle(
+      x - margin,
+      y - margin,
+      width + margin2X,
+      height + margin2X, Phaser.Display.Color.HexStringToColor('#181a1b').color, 1
+    )
+      .setOrigin(0)
+      .setDepth(2)
+
+    scene.minimap = new MinimapScene({
+      appConfig: scene.appConfig,
+      sceneConfig: {
+        gridWidth: scene.gridWidth,
+        gridHeight: scene.gridHeight,
+        size: scene.size,
+        sizeRatio,
+        margin,
+        width,
+        height,
+        x,
+        y
+      }
+    }, this.minimapWrapper);
+
+    scene.scene.add('MinimapScene', scene.minimap, true);
+  }
+
+  hideTools() {
+    this.networkAlert.style.display = 'none';
+    this.connectionStatus.style.display = 'none';
+    this.domBottomNav.style.display = 'none';
+    this.header.style.display = 'none';
+
+    this.minimapWrapper.setVisible(false);
+    this.minimapBackground.setVisible(false);
+    this.game.scene.stop("MinimapScene");
+
+    if (this.overlay)
+      this.clearOverlay();
+    if (this.infobox)
+      this.clearInfoBox();
+    if (this.menu)
+      this.clearMenu();
+  }
+
+  showTools() {
+    this.networkAlert.style.display = 'block';
+    this.connectionStatus.style.display = 'block';
+    this.domBottomNav.style.display = 'flex';
+    this.header.style.display = 'block';
+
+    this.minimapWrapper.setVisible(true);
+    this.minimapBackground.setVisible(true);
+    this.game.scene.start("MinimapScene");
   }
 
   clearOverlay() {

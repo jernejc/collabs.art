@@ -3,7 +3,7 @@ import { getColorForXY } from '@actions/pixel';
 import config from '@util/config';
 
 import ApplicationScene from '@scenes/application';
-import MinimapScene from '@scenes/minimap';
+
 import {
   handleMouseMove,
   handleMouseDown,
@@ -50,11 +50,12 @@ export default class MainScene extends ApplicationScene {
 
     this.input.mouse.disableContextMenu(); // prevent right click context menu
 
-    this.createMinimap();
     this.createVisibleTiles();
 
     setGameMode({ scene: this, mode: this.appConfig.defaultMode });
-    moveToPosition({ ...getLastPosition(), scene: this })
+    moveToPosition({ ...getLastPosition(), scene: this });
+    
+    this.game.tools.addMinimap(this);
 
     /** 
      * Mouse Events
@@ -97,8 +98,6 @@ export default class MainScene extends ApplicationScene {
     });
 
     this.input.keyboard.on('keyup-G', (event) => {
-      console.log('keyup-G', this);
-
       if (!this.gameOfLife)
         this.startGameOfLife();
       else
@@ -116,33 +115,24 @@ export default class MainScene extends ApplicationScene {
 
     // Main scene is ready.
     this.game.emitter.emit('scene/ready');
-
-    // Pause the update function
-    //this.scene.pause();
-
-    //console.log('MainScene this', this);
-  }
-
-  update(time, delta) {
-    if (DEBUG) console.log("Main Scene: update", time, delta);
   }
 
   createVisibleTiles() {
     if (DEBUG) console.log("Main Scene: createVisibleTiles");
 
-    this.land = [];
+    this.tiles = [];
 
     for (let y = 0; y < this.gridHeight; y++) {
-      if (!this.land[y])
-        this.land[y] = [];
+      if (!this.tiles[y])
+        this.tiles[y] = [];
 
       for (let x = 0; x < this.gridWidth; x++) {
         const tx = this.size * x;
         const ty = this.size * y;
         //if (DEBUG) console.log('tx ty', tx, ty)
 
-        this.land[y][x] = this.add.rectangle(tx, ty, this.size, this.size);
-        this.land[y][x].setDisplayOrigin(0, 0);
+        this.tiles[y][x] = this.add.rectangle(tx, ty, this.size, this.size);
+        this.tiles[y][x].setDisplayOrigin(0, 0);
 
         this.updateTile(x, y);
       }
@@ -165,89 +155,37 @@ export default class MainScene extends ApplicationScene {
     if (DEBUG) console.log("Main Scene: updateTile");
 
     if (this.gameOfLife) {
-      this.land[y][x].setFillStyle(this.land[y][x].alive ? 0x000000 : 0xFFFFFF);
+      this.tiles[y][x].setFillStyle(this.tiles[y][x].alive ? 0x000000 : 0xFFFFFF);
       return;
     }
 
     const mapPixel = getColorForXY({ x, y, color: this.color, scene: this });
 
-    this.land[y][x].cx = mapPixel.cx;
-    this.land[y][x].cy = mapPixel.cy;
+    this.tiles[y][x].cx = mapPixel.cx;
+    this.tiles[y][x].cy = mapPixel.cy;
 
-    this.land[y][x].setFillStyle(mapPixel.color.color);
+    this.tiles[y][x].setFillStyle(mapPixel.color.color);
 
     if (this.game.mode !== 'move') { // Add stroke if mode is not move
       if (this.game.selection.isSelected(mapPixel.cx, mapPixel.cy))
-        setInvertedStroke({ scene: this, tile: this.land[y][x] });
+        setInvertedStroke({ scene: this, tile: this.tiles[y][x] });
       else
-        resetStrokeStyle({ scene: this, tile: this.land[y][x] });
+        resetStrokeStyle({ scene: this, tile: this.tiles[y][x] });
     }
   }
 
   clearVisibleTiles() {
     if (DEBUG) console.log("Main Scene: clearVisibleTiles");
 
-    this.land.forEach(y => {
+    this.tiles.forEach(y => {
       y.forEach(x => {
         x.destroy();
       });
     });
 
-    this.land = [];
+    this.tiles = [];
 
     return;
-  }
-
-  createMinimap() {
-    if (DEBUG) console.log("Main Scene: createMinimap");
-
-    const sizeRatio = (window.devicePixelRatio > 1) ? 5 + (5 * 0.5 / window.devicePixelRatio) : 5;
-    const margin = 7;
-    const margin2X = margin + margin;
-
-    // Minimap size
-    const width = 1000 / sizeRatio;
-    const height = 1000 / sizeRatio;
-
-    // Minimap position
-    const x = margin2X;
-    const y = this.appConfig.canvasHeight - (height + margin2X);
-
-    this.minimapWrapper = this.add.zone(
-      x,
-      y,
-      width,
-      height
-    )
-      .setInteractive()
-      .setOrigin(0)
-      .setDepth(3)
-
-    this.minimapBackground = this.add.rectangle(
-      x - margin,
-      y - margin,
-      width + margin2X,
-      height + margin2X, Phaser.Display.Color.HexStringToColor('#181a1b').color, 1
-    )
-      .setOrigin(0)
-      .setDepth(2)
-
-    this.minimap = new MinimapScene({
-      appConfig: this.appConfig,
-      sceneConfig: {
-        gridWidth: this.gridWidth,
-        gridHeight: this.gridHeight,
-        size: this.size,
-        sizeRatio,
-        margin,
-        width,
-        height,
-        x,
-        y
-      }
-    }, this.minimapWrapper);
-
-    this.scene.add('MinimapScene', this.minimap, true);
   }
 
   /**
@@ -261,11 +199,13 @@ export default class MainScene extends ApplicationScene {
 
     for (let y = 0; y < this.gridHeight; y++)
       for (let x = 0; x < this.gridWidth; x++)
-        this.land[y][x].alive = Phaser.Math.RND.between(0.085, 0.09) > Math.random();
+        this.tiles[y][x].alive = 0.15 > Math.random();
+
+    this.game.tools.hideTools();
 
     this.timer = this.time.addEvent({
-      delay: 200,
-      callback: this.checkSurrounding,
+      delay: 100,
+      callback: this.nextGeneration,
       callbackScope: this,
       loop: true
     });
@@ -276,12 +216,13 @@ export default class MainScene extends ApplicationScene {
 
     for (let y = 0; y < this.gridHeight; y++)
       for (let x = 0; x < this.gridWidth; x++)
-        this.land[y][x].alive = null;
+        this.tiles[y][x].alive = null;
 
     if (this.timer)
       this.time.removeEvent(this.timer);
 
     this.updateTiles();
+    this.game.tools.showTools();
   }
 
   isAlive(x, y) {
@@ -289,12 +230,13 @@ export default class MainScene extends ApplicationScene {
       return false;
     }
 
-    return this.land[y][x].alive ? 1 : 0;
+    return this.tiles[y][x].alive ? 1 : 0;
   }
 
-  checkSurrounding() {
-    if (DEBUG) console.log("Main Scene: checkSurrounding");
-    // Loop over all cells
+  nextGeneration() {
+    if (DEBUG) console.log("Main Scene: nextGeneration");
+
+    // Calculate next generation
     for (let x = 0; x < this.gridWidth; x++) {
       for (let y = 0; y < this.gridHeight; y++) {
 
@@ -308,25 +250,30 @@ export default class MainScene extends ApplicationScene {
           this.isAlive(x, y + 1) +
           this.isAlive(x + 1, y + 1);
 
-        //console.log('numAlive', numAlive);
-        const alive = this.land[y][x].alive;
+        const state = this.tiles[y][x].alive;
 
         // Cell is lonely and dies
-        if (alive && (aliveNeighbours < 2))
-          this.land[y][x].alive = 0;
+        if (state && (aliveNeighbours < 2))
+          this.tiles[y][x].nextState = false;
 
         // Cell dies due to over population
-        else if (alive && (aliveNeighbours > 3))
-          this.land[y][x].alive = 0;
+        else if (state && (aliveNeighbours > 3))
+          this.tiles[y][x].nextState = false;
 
         // A new cell is born
-        else if (!alive && (aliveNeighbours == 3))
-          this.land[y][x].alive = 1;
+        else if (!state && (aliveNeighbours == 3))
+          this.tiles[y][x].nextState = true;
 
         // Remains the same
         else
-          this.land[y][x].alive = this.land[y][x].alive;
+          this.tiles[y][x].nextState = state;
       }
+    }
+
+    // Apply the new state to the tiles
+    for (let x = 0; x < this.gridWidth; x++) {
+      for (let y = 0; y < this.gridHeight; y++)
+        this.tiles[y][x].alive = this.tiles[y][x].nextState;
     }
 
     this.updateTiles();
