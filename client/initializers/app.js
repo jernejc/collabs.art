@@ -28,7 +28,10 @@ export async function AppInitializer({
     type: WEBGL,
     width: canvas.clientWidth,
     height: canvas.clientHeight,
-    parent: canvasElement
+    parent: canvasElement,
+    physics: {
+      default: 'arcade'
+    }
   });
 
 
@@ -66,8 +69,8 @@ export async function AppInitializer({
   // Add MainScene
   GameInstance.scene.add('MainScene', MainScene, true, {});
 
-  if (!getCookie('hideOverlay'))
-    GameInstance.tools.addOverlay();
+  /*if (!getCookie('hideOverlay'))
+    GameInstance.tools.addOverlay();*/
 
   return { GameInstance, Emitter };
 }

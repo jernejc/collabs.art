@@ -1,6 +1,5 @@
 
 import { getColorForXY } from '@actions/pixel';
-import { randomIntFromInterval } from '@util/helpers';
 import config from '@util/config';
 
 import ApplicationScene from '@scenes/application';
@@ -97,6 +96,15 @@ export default class MainScene extends ApplicationScene {
       handleSpaceUp({ scene: _self })
     });
 
+    this.input.keyboard.on('keyup-G', (event) => {
+      console.log('keyup-G', this);
+
+      if (!this.gameOfLife)
+        this.startGameOfLife();
+      else
+        this.stopGameOfLife();
+    });
+
     /**
      * Game mode events
      */
@@ -115,18 +123,8 @@ export default class MainScene extends ApplicationScene {
     //console.log('MainScene this', this);
   }
 
-  //update() {
-  //if (DEBUG) console.log("Main Scene: update")
-  //}
-
-  updateTiles() {
-    if (DEBUG) console.log("Main Scene: updateTiles");
-
-    for (let y = 0; y < this.gridHeight; y++)
-      for (let x = 0; x < this.gridWidth; x++)
-        this.updateTile(x, y);
-
-    return;
+  update(time, delta) {
+    if (DEBUG) console.log("Main Scene: update", time, delta);
   }
 
   createVisibleTiles() {
@@ -153,7 +151,23 @@ export default class MainScene extends ApplicationScene {
     return;
   }
 
-  updateTile(x, y, stroke) {
+  updateTiles() {
+    if (DEBUG) console.log("Main Scene: updateTiles");
+
+    for (let y = 0; y < this.gridHeight; y++)
+      for (let x = 0; x < this.gridWidth; x++)
+        this.updateTile(x, y);
+
+    return;
+  }
+
+  updateTile(x, y) {
+    if (DEBUG) console.log("Main Scene: updateTile");
+
+    if (this.gameOfLife) {
+      this.land[y][x].setFillStyle(this.land[y][x].alive ? 0x000000 : 0xFFFFFF);
+      return;
+    }
 
     const mapPixel = getColorForXY({ x, y, color: this.color, scene: this });
 
@@ -234,5 +248,87 @@ export default class MainScene extends ApplicationScene {
     }, this.minimapWrapper);
 
     this.scene.add('MinimapScene', this.minimap, true);
+  }
+
+  /**
+   * Game of life
+   * Will probably need a new scene
+   * Need to refractor "land" and move tiles to a new service
+   */
+
+  startGameOfLife() {
+    this.gameOfLife = true;
+
+    for (let y = 0; y < this.gridHeight; y++)
+      for (let x = 0; x < this.gridWidth; x++)
+        this.land[y][x].alive = Phaser.Math.RND.between(0.085, 0.09) > Math.random();
+
+    this.timer = this.time.addEvent({
+      delay: 200,
+      callback: this.checkSurrounding,
+      callbackScope: this,
+      loop: true
+    });
+  }
+
+  stopGameOfLife() {
+    this.gameOfLife = false;
+
+    for (let y = 0; y < this.gridHeight; y++)
+      for (let x = 0; x < this.gridWidth; x++)
+        this.land[y][x].alive = null;
+
+    if (this.timer)
+      this.time.removeEvent(this.timer);
+
+    this.updateTiles();
+  }
+
+  isAlive(x, y) {
+    if (x < 0 || x >= this.gridWidth || y < 0 || y >= this.gridHeight) {
+      return false;
+    }
+
+    return this.land[y][x].alive ? 1 : 0;
+  }
+
+  checkSurrounding() {
+    if (DEBUG) console.log("Main Scene: checkSurrounding");
+    // Loop over all cells
+    for (let x = 0; x < this.gridWidth; x++) {
+      for (let y = 0; y < this.gridHeight; y++) {
+
+        // Count the nearby population
+        let aliveNeighbours = this.isAlive(x - 1, y - 1) +
+          this.isAlive(x, y - 1) +
+          this.isAlive(x + 1, y - 1) +
+          this.isAlive(x - 1, y) +
+          this.isAlive(x + 1, y) +
+          this.isAlive(x - 1, y + 1) +
+          this.isAlive(x, y + 1) +
+          this.isAlive(x + 1, y + 1);
+
+        //console.log('numAlive', numAlive);
+        const alive = this.land[y][x].alive;
+
+        // Cell is lonely and dies
+        if (alive && (aliveNeighbours < 2))
+          this.land[y][x].alive = 0;
+
+        // Cell dies due to over population
+        else if (alive && (aliveNeighbours > 3))
+          this.land[y][x].alive = 0;
+
+        // A new cell is born
+        else if (!alive && (aliveNeighbours == 3))
+          this.land[y][x].alive = 1;
+
+        // Remains the same
+        else
+          this.land[y][x].alive = this.land[y][x].alive;
+      }
+    }
+
+    this.updateTiles();
   }
 }

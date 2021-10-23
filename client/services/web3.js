@@ -17,7 +17,7 @@ export default class Web3Manager {
     this.bidContract = null;
     this.pixelContract = null;
     this.defaultPrice = null;
-
+    this.metamask = false;
     this.accounts = [];
     this.activeAddress = null;
   }
@@ -45,9 +45,8 @@ export default class Web3Manager {
   async initProvider() {
     if (DEBUG) console.log('Web3Manager: initProvider');
 
-    if (!window.ethereum)
-      console.error('No Metamask'); //this.startOnboarding(); 
-    else {
+    if (window.ethereum) {
+      this.metamask = true;
       this.instance = new Web3(window.ethereum);
 
       // Enable web3 related events

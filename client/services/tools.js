@@ -32,13 +32,15 @@ export default class ToolsManager {
     this.emitter.on('web3/network', async network => {
       /*if (DEBUG)*/ console.log('ToolsManager: on web3/network');
 
-      this.setActiveConnection(network);
+      this.setConnectionStatus();
+      this.setNetworkAlert();
     });
 
     this.emitter.on('web3/address', async address => {
       if (DEBUG) console.log('ToolsManager: on web3/address');
 
-      this.setActiveConnection(address);
+      this.setConnectionStatus();
+      this.setNetworkAlert();
 
       if (this.menu && this.menu.loaded)
         await this.menu.loadPixels();
@@ -122,25 +124,71 @@ export default class ToolsManager {
     await this.infobox.init();
   }
 
-  setActiveConnection(network) {
-    /*if (DEBUG)*/ console.log('ToolsManager: setActiveConnection', network);
+  setConnectionStatus() {
+    /*if (DEBUG)*/ console.log('ToolsManager: setConnectionStatus');
+
+    console.log('this.game.web3.metamask', this.game.web3.metamask)
+    console.log('this.game.web3.isConnected', this.game.web3.isConnected)
+    console.log('this.game.web3.activeAddress', this.game.web3.activeAddress)
 
     const icon = this.connectionStatus.querySelector('i');
+    const dataClass = 'gg-data';
+    const blockClass = 'gg-block';
 
-    if (network) {
-      icon.classList.remove('gg-block');
-      icon.classList.add('gg-data');
+    if (!this.game.web3.metamask)
+      setBlock();
+    else if (!this.game.web3.isConnected)
+      setBlock();
+    else if (!this.game.web3.activeAddress)
+      setBlock();
+    else {
+      console.log('SET DATA');
+      if (icon.classList.contains(blockClass))
+        icon.classList.remove(blockClass);
 
-      this.networkAlert.classList.remove('show');
-      this.networkAlert.classList.add('hide');
-    } else {
-      icon.classList.remove('gg-data');
-      icon.classList.add('gg-block');
+      icon.classList.add(dataClass);
+    }
 
-      this.networkAlert.classList.remove('hide');
+    function setBlock() {
+      console.log('SET BLOCK');
+      if (icon.classList.contains(dataClass))
+        icon.classList.remove(dataClass);
+
+      icon.classList.add(blockClass);
+    }
+  }
+
+  setNetworkAlert() {
+    /*if (DEBUG)*/ console.log('ToolsManager: setNetworkAlert');
+
+    console.log('this.game.web3.metamask', this.game.web3.metamask)
+    console.log('this.game.web3.isConnected', this.game.web3.isConnected)
+    console.log('this.game.web3.activeAddress', this.game.web3.activeAddress)
+
+    let show = false;
+
+    if (!this.game.web3.metamask) {
+      this.networkAlert.innerText = 'Install Metamask';
+      show = true;
+    } else if (!this.game.web3.isConnected) {
+      this.networkAlert.innerText = 'Connect to Mumbai Testnet';
+      show = true;
+    } else if (!this.game.web3.activeAddress) {
+      this.networkAlert.innerText = 'Connect to Wallet';
+      show = true;
+    }
+
+    if (show) {
+      if (this.networkAlert.classList.contains('hide'))
+        this.networkAlert.classList.remove('hide');
+      
       this.networkAlert.classList.add('show');
+    }
+    else {
+      if (this.networkAlert.classList.contains('show'))
+        this.networkAlert.classList.remove('show');
 
-      if (DEBUG) console.log('ToolsManager: blink');
+      this.networkAlert.classList.add('hide');
     }
   }
 
@@ -182,16 +230,14 @@ export default class ToolsManager {
   }
 
   addConnectionStatus() {
-    /*if (DEBUG)*/ console.log('ToolsManager: addConnectionStatus', this.game.web3.isConnected);
-
-    const isConnected = this.game.web3.isConnected;
+    /*if (DEBUG)*/ console.log('ToolsManager: addConnectionStatus');
 
     this.domConnectionStatus = document.createElement('div');
     this.domConnectionStatus.setAttribute('id', 'connection-status');
 
     this.connectionStatus = new Button({
       elClasses: ['account', 'connection'],
-      iconClass: isConnected ? 'gg-data' : 'gg-block',
+      iconClass: 'gg-block',
       clickAction: async () => {
         if (!this.game.web3.activeAddress)
           await this.game.web3.getActiveAddress();
@@ -201,23 +247,19 @@ export default class ToolsManager {
     this.domConnectionStatus.appendChild(this.connectionStatus);
 
     this.parent.appendChild(this.domConnectionStatus);
+
+    this.setConnectionStatus();
   }
 
   addNetworkAlert() {
-    /*if (DEBUG)*/ console.log('ToolsManager: addNetworkAlert', this.game.web3.isConnected);
-
-    const isConnected = this.game.web3.isConnected;
+    /*if (DEBUG)*/ console.log('ToolsManager: addNetworkAlert');
 
     this.networkAlert = document.createElement('div');
     this.networkAlert.setAttribute('id', 'alert');
-    this.networkAlert.innerText = 'Please connect to network';
-
-    if (!isConnected)
-      this.networkAlert.classList.add('show');
-    else
-      this.networkAlert.classList.add('hide');
 
     this.parent.appendChild(this.networkAlert);
+
+    this.setNetworkAlert();
   }
 
   addOverlay() {
