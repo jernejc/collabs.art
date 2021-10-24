@@ -1,6 +1,7 @@
 
 import { getColorForXY } from '@actions/pixel';
 import config from '@util/config';
+import {getCookie} from '@util/helpers';
 
 import ApplicationScene from '@scenes/application';
 
@@ -54,7 +55,7 @@ export default class MainScene extends ApplicationScene {
 
     setGameMode({ scene: this, mode: this.appConfig.defaultMode });
     moveToPosition({ ...getLastPosition(), scene: this });
-    
+
     this.game.tools.addMinimap(this);
 
     /** 
@@ -129,7 +130,6 @@ export default class MainScene extends ApplicationScene {
       for (let x = 0; x < this.gridWidth; x++) {
         const tx = this.size * x;
         const ty = this.size * y;
-        //if (DEBUG) console.log('tx ty', tx, ty)
 
         this.tiles[y][x] = this.add.rectangle(tx, ty, this.size, this.size);
         this.tiles[y][x].setDisplayOrigin(0, 0);
@@ -155,7 +155,7 @@ export default class MainScene extends ApplicationScene {
     if (DEBUG) console.log("Main Scene: updateTile");
 
     if (this.gameOfLife) {
-      this.tiles[y][x].setFillStyle(this.tiles[y][x].alive ? 0x000000 : 0xFFFFFF);
+      this.tiles[y][x].setFillStyle(this.tiles[y][x].alive ? 0xFFFFFF : 0x000000);
       return;
     }
 
@@ -204,11 +204,14 @@ export default class MainScene extends ApplicationScene {
     this.game.tools.hideTools();
 
     this.timer = this.time.addEvent({
-      delay: 100,
+      delay: 125,
       callback: this.nextGeneration,
       callbackScope: this,
       loop: true
     });
+
+    if (!getCookie('hideOverlay'))
+      this.game.tools.addOverlay();
   }
 
   stopGameOfLife() {

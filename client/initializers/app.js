@@ -9,9 +9,6 @@ import SelectionManager from '@services/selection';
 import ToolsManager from '@services/tools';
 import GraphManager from '@services/subgraph';
 
-// Helpers
-import { getCookie } from '@util/helpers';
-
 // Game init
 export async function AppInitializer({
   canvasElement,
@@ -68,9 +65,6 @@ export async function AppInitializer({
 
   // Add MainScene
   GameInstance.scene.add('MainScene', MainScene, true, {});
-
-  /*if (!getCookie('hideOverlay'))
-    GameInstance.tools.addOverlay();*/
 
   return { GameInstance, Emitter };
 }

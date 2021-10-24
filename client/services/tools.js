@@ -286,7 +286,7 @@ export default class ToolsManager {
     this.overlay.classList.add('overlay');
 
     this.overlayContent = document.createElement('div');
-    this.overlayContent.classList.add('center');
+    this.overlayContent.classList.add('slideshow');
 
     // Find better solution for this
     this.overlayContent.innerHTML = config.overlayContent;
