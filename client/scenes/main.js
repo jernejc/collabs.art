@@ -58,6 +58,8 @@ export default class MainScene extends ApplicationScene {
 
     this.game.tools.addMinimap(this);
 
+    this.startGameOfLife();
+
     /** 
      * Mouse Events
      */
@@ -155,7 +157,7 @@ export default class MainScene extends ApplicationScene {
     if (DEBUG) console.log("Main Scene: updateTile");
 
     if (this.gameOfLife) {
-      this.tiles[y][x].setFillStyle(this.tiles[y][x].alive ? 0xFFFFFF : 0x000000);
+      this.tiles[y][x].setFillStyle(this.tiles[y][x].alive ? 0xFFFFFF:0x000000);
       return;
     }
 
@@ -195,6 +197,8 @@ export default class MainScene extends ApplicationScene {
    */
 
   startGameOfLife() {
+    if (DEBUG) console.log("Main Scene: startGameOfLife");
+
     this.gameOfLife = true;
 
     for (let y = 0; y < this.gridHeight; y++)
@@ -211,10 +215,12 @@ export default class MainScene extends ApplicationScene {
     });
 
     if (!getCookie('hideOverlay'))
-      this.game.tools.addOverlay();
+      this.game.tools.openOverlay();
   }
 
   stopGameOfLife() {
+    if (DEBUG) console.log("Main Scene: stopGameOfLife");
+
     this.gameOfLife = false;
 
     for (let y = 0; y < this.gridHeight; y++)
@@ -229,9 +235,10 @@ export default class MainScene extends ApplicationScene {
   }
 
   isAlive(x, y) {
-    if (x < 0 || x >= this.gridWidth || y < 0 || y >= this.gridHeight) {
+    if (DEBUG) console.log("Main Scene: isAlive");
+
+    if (x < 0 || x >= this.gridWidth || y < 0 || y >= this.gridHeight)
       return false;
-    }
 
     return this.tiles[y][x].alive ? 1 : 0;
   }
@@ -244,7 +251,7 @@ export default class MainScene extends ApplicationScene {
       for (let y = 0; y < this.gridHeight; y++) {
 
         // Count the nearby population
-        let aliveNeighbours = this.isAlive(x - 1, y - 1) +
+        const aliveNeighbours = this.isAlive(x - 1, y - 1) +
           this.isAlive(x, y - 1) +
           this.isAlive(x + 1, y - 1) +
           this.isAlive(x - 1, y) +

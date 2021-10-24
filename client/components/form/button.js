@@ -39,7 +39,7 @@ export default class Button {
       this.button.removeChild(this.icon);
 
     this.button.disabled = true;
-    this.button.appendChild(this.loadingI);
+    this.button.append(this.loadingI);
   }
 
   reset() {
@@ -55,6 +55,6 @@ export default class Button {
   setIcon() {
     this.icon = document.createElement('i');
     this.icon.classList.add(this.iconClass);
-    this.button.appendChild(this.icon);
+    this.button.append(this.icon);
   }
 }

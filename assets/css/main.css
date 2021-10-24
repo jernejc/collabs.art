@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Electrolize&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@700&display=swap');
+
 :root {
   --available-color: #02be01;
   --activebid-color: #e5d900;
@@ -373,6 +375,46 @@ input {
 #connection-status button.account i.gg-data {
   --ggs: 1.5;
 }
+
+/***
+  Alert
+***/
+
+#alert {
+  right: calc(var(--edge-margin) + 50px);
+  padding: 0px 18px;
+  background: var(--active-black);
+  font-size: 15px;
+  line-height: 50px;
+  transition: 200ms;
+  z-index: 0;
+  border-right: 1px solid #FFF;
+}
+
+#alert.show {
+  transform: translate(0%, 0px);
+  opacity: 1;
+}
+
+#alert.hide {
+  transform: translate(130%, 0px);
+  opacity: 0;
+}
+
+/*.alert:before {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: calc(100% - 44px);
+  border-left: 1px solid;
+  border-right: 2px solid;
+  border-bottom-right-radius: 3px;
+  border-top-right-radius: 3px;
+  left: 0;
+  top: 50%;
+  transform: translate(0, -50%);
+  height: 20px;
+}*/
 
 /**
 Info Box
@@ -783,7 +825,7 @@ Info Box
  Overlay
 ***/
 
-.overlay {
+#overlay {
   position: absolute;
   top: 0;
   right: 0;
@@ -793,11 +835,11 @@ Info Box
   z-index: 2;
 }
 
-.overlay h1 {
+#overlay h1 {
   font-size: 3em;
 }
 
-.overlay .slideshow {
+#overlay .slideshow {
   position: relative;
   margin: 0 auto;
   z-index: 3;
@@ -806,7 +848,7 @@ Info Box
   font-size: 16px;
 }
 
-.overlay button {
+#overlay button {
   background: transparent;
   line-height: 27px;
   padding: 0 1em;
@@ -814,7 +856,7 @@ Info Box
   border: 1px solid #FFF;
 }
 
-.overlay button.active {
+#overlay button.active {
   background: transparent;
   line-height: 27px;
   padding: 0 1em;
@@ -822,47 +864,94 @@ Info Box
   border: 1px solid #FFF;
 }
 
-.overlay .nav {
+#overlay .overlay-nav {
   margin-top: 10px;
   text-align: center;
-}
-
-/***
-  Alert
-***/
-
-#alert {
-  right: calc(var(--edge-margin) + 50px);
-  padding: 0px 18px;
-  background: var(--active-black);
-  font-size: 15px;
-  line-height: 50px;
-  transition: 200ms;
-  z-index: 0;
-  border-right: 1px solid #FFF;
-}
-
-#alert.show {
-  transform: translate(0%, 0px);
-  opacity: 1;
-}
-
-#alert.hide {
-  transform: translate(130%, 0px);
-  opacity: 0;
-}
-
-/*.alert:before {
-  content: '';
   position: absolute;
-  width: 0;
-  height: calc(100% - 44px);
-  border-left: 1px solid;
-  border-right: 2px solid;
-  border-bottom-right-radius: 3px;
-  border-top-right-radius: 3px;
+  bottom: 0;
+}
+
+.overlay-content {
+  height: 100%;
+}
+
+/**
+* Slideshow
+**/
+
+#slideshow {
+  background: rgba(0, 0, 0, 0.85);
+  color: #FFF;
+  position: relative;
+  width: 600px;
+  height: 600px;
+  padding: 30px 60px;
+  top: 10%;
+  left: 10%;
+  overflow: hidden;
+}
+
+.slides-wrapper {
+  position: relative;
+  width: 60%;
+  margin: 0 0 0 60px;
+}
+
+.post {
+  position: absolute;
+  width: 100%;
+}
+
+.post-title {
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  font-size: 1.1em;
+}
+
+.post-title img {
+  width: 40px;
+  margin-right: 10px;
+}
+
+.post-subheading {
+  font-size: 3.7em;
+  font-weight: normal;
+}
+
+.post-subheading span {
+  font-family: 'Libre Franklin', sans-serif;
+}
+
+.post-content {
+  text-align: justify;
+}
+
+.post-active {
   left: 0;
-  top: 50%;
-  transform: translate(0, -50%);
-  height: 20px;
-}*/
+  z-index: 1;
+}
+
+.post-not-active {
+  left: 250%;
+  z-index: 0;
+}
+
+.progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 5px;
+  width: 100%;
+}
+
+.progress-bar__fill {
+  width: 0;
+  height: inherit;
+  background: #FFF;
+  transition: all 0.16s;
+}
+
+.progress-bar--primary {
+  z-index: 2;
+}

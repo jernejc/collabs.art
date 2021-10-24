@@ -25,7 +25,7 @@ export default class InfoBox {
     this.pixel = pixel;
     this.pixel.infobox = this;
 
-    this.setupTemplate();
+    this.setupDom();
   }
 
   async init() {
@@ -35,26 +35,26 @@ export default class InfoBox {
     await this.setUI();
   }
 
-  setupTemplate() {
+  setupDom() {
     if (DEBUG) console.log('Info Box: Setup template');
 
-    this.wrapper = document.createElement('div');
-    this.wrapper.classList.add('info-box');
+    this.domElement = document.createElement('div');
+    this.domElement.classList.add('info-box');
 
     this.position = document.createElement('div');
     this.position.classList.add('position');
     this.position.innerHTML = this.pixel.position;
 
-    this.wrapper.appendChild(this.position);
+    this.domElement.append(this.position);
 
     this.arrow = document.createElement('i');
     this.arrow.classList.add('arrow');
 
-    this.wrapper.appendChild(this.arrow);
+    this.domElement.append(this.arrow);
 
     this.loadingIcon = new LoadingBar();
 
-    this.parent.appendChild(this.wrapper);
+    this.parent.append(this.domElement);
   }
 
   async setUI(refresh) {
@@ -63,7 +63,7 @@ export default class InfoBox {
     if (this.hasUI())
       this.resetUI();
 
-    this.wrapper.appendChild(this.loadingIcon);
+    this.domElement.append(this.loadingIcon);
     this.setPosition();
 
     if (this.pixel.loadingGraph)
@@ -72,7 +72,7 @@ export default class InfoBox {
     if (refresh || !this.pixel.graphLoaded)
       await this.pixel.loadGraphData(refresh);
 
-    this.wrapper.removeChild(this.loadingIcon);
+    this.domElement.removeChild(this.loadingIcon);
 
     if (!this.pixel.owner)
       this.createPurchaseUI();
@@ -94,19 +94,19 @@ export default class InfoBox {
     const vertical = (this.pixel.y > (this.parent.offsetHeight / 2)) ? 'bottom' : 'top';
     const horizontal = (this.pixel.x > (this.parent.offsetWidth / 2)) ? 'right' : 'left';
     //const animationClass = (vertical === 'up') ? 'fadeInUp' : 'fadeInDown';
-    const top = (vertical === 'bottom') ? this.pixel.y - this.wrapper.offsetHeight - padding : this.pixel.y + this.scene.size + padding;
-    const left = (horizontal === 'right') ? this.pixel.x - this.wrapper.offsetWidth - padding : this.pixel.x + this.scene.size + padding;
+    const top = (vertical === 'bottom') ? this.pixel.y - this.domElement.offsetHeight - padding : this.pixel.y + this.scene.size + padding;
+    const left = (horizontal === 'right') ? this.pixel.x - this.domElement.offsetWidth - padding : this.pixel.x + this.scene.size + padding;
 
-    Object.assign(this.wrapper.style, { top: top + 'px', left: left + 'px' });
-    this.wrapper.classList.add(vertical, horizontal);
+    Object.assign(this.domElement.style, { top: top + 'px', left: left + 'px' });
+    this.domElement.classList.add(vertical, horizontal);
   }
 
   createPurchaseUI() {
     if (DEBUG) console.log('Info Box: createPurchaseUI');
 
     this.purchaseUI = document.createElement('div');
-    this.purchaseUI.appendChild(this.createInfoText('Available', 'purchase'));
-    this.purchaseUI.appendChild(new Input(this.pixel, 'price', {
+    this.purchaseUI.append(this.createInfoText('Available', 'purchase'));
+    this.purchaseUI.append(new Input(this.pixel, 'price', {
       label: this.game.web3.currentSymbol,
       width: '100%',
       disabled: true,
@@ -115,7 +115,7 @@ export default class InfoBox {
       elClasses: ['label-border-input']
     }));
 
-    this.purchaseUI.appendChild(new Button({
+    this.purchaseUI.append(new Button({
       elClasses: ['create', 'action-button'],
       text: 'Create',
       clickAction: async e => {
@@ -137,8 +137,8 @@ export default class InfoBox {
       }
     }));
 
-    this.wrapper.classList.add('purchaseUI');
-    this.wrapper.appendChild(this.purchaseUI);
+    this.domElement.classList.add('purchaseUI');
+    this.domElement.append(this.purchaseUI);
   }
 
   createOwnerUI() {
@@ -149,12 +149,12 @@ export default class InfoBox {
     this.ownerUI = document.createElement('div');
 
     if (this.pixel.highestBid && !this.pixel.highestBid.expired) {
-      this.ownerUI.appendChild(this.createInfoText('Pending bid', 'active-bid'));
-      this.ownerUI.appendChild(this.createBidsInfo(this.pixel.highestBid));
+      this.ownerUI.append(this.createInfoText('Pending bid', 'active-bid'));
+      this.ownerUI.append(this.createBidsInfo(this.pixel.highestBid));
     } else
-      this.ownerUI.appendChild(this.createInfoText('Owned', 'owned'));
+      this.ownerUI.append(this.createInfoText('Owned', 'owned'));
 
-    this.ownerUI.appendChild(new ColorPicker(this.pixel, 'color', {
+    this.ownerUI.append(new ColorPicker(this.pixel, 'color', {
       //label: 'hex',
       width: '100%',
       scene: this.scene,
@@ -171,7 +171,7 @@ export default class InfoBox {
       update: (value) => { console.log('ColorPicker update', value); _self.pixel.changeToColorNumber(value) }
     }));
 
-    /*this.ownerUI.appendChild(new Button({
+    /*this.ownerUI.append(new Button({
       elClasses: ['apply', 'action-button'],
       text: 'Apply',
       clickAction: async e => {
@@ -179,16 +179,16 @@ export default class InfoBox {
       }
     }));*/
 
-    this.wrapper.classList.add('ownerUI');
-    this.wrapper.appendChild(this.ownerUI);
+    this.domElement.classList.add('ownerUI');
+    this.domElement.append(this.ownerUI);
   }
 
   createBidUI() {
     if (DEBUG) console.log('Info box: createBidUI');
 
     this.bidUI = document.createElement('div');
-    this.bidUI.appendChild(this.createInfoText('Taken', 'taken'));
-    this.bidUI.appendChild(new Input(this.pixel, 'price', {
+    this.bidUI.append(this.createInfoText('Taken', 'taken'));
+    this.bidUI.append(new Input(this.pixel, 'price', {
       min: this.pixel.price,
       max: 100,
       step: 0.001,
@@ -201,7 +201,7 @@ export default class InfoBox {
       lang: 'en'
     }));
 
-    this.bidUI.appendChild(new Button({
+    this.bidUI.append(new Button({
       elClasses: ['bid', 'action-button'],
       text: 'Place Bid',
       clickAction: async e => {
@@ -223,18 +223,18 @@ export default class InfoBox {
       }
     }));
 
-    this.wrapper.classList.add('bidUI');
-    this.wrapper.appendChild(this.bidUI);
+    this.domElement.classList.add('bidUI');
+    this.domElement.append(this.bidUI);
   }
 
   createActiveBidUI() {
     if (DEBUG) console.log('Info box: activeBidUI');
 
     this.activeBidUI = document.createElement('div');
-    this.activeBidUI.appendChild(this.createInfoText(this.pixel.highestBid.expired ? 'Bid expired' : 'Bid placed', 'placed'));
+    this.activeBidUI.append(this.createInfoText(this.pixel.highestBid.expired ? 'Bid expired' : 'Bid placed', 'placed'));
 
     if (this.pixel.highestBid.expired) { // UI for Raising expired bid
-      this.activeBidUI.appendChild(new Input(this.pixel, 'price', {
+      this.activeBidUI.append(new Input(this.pixel, 'price', {
         //min: this.pixel.price,
         max: 100,
         step: 0.001,
@@ -247,7 +247,7 @@ export default class InfoBox {
         format: (value) => (value) ? value.toFixed(3) : 0
       }));
 
-      this.activeBidUI.appendChild(new Button({
+      this.activeBidUI.append(new Button({
         elClasses: ['bid', 'action-button'],
         text: 'Raise Bid',
         clickAction: async e => {
@@ -269,7 +269,7 @@ export default class InfoBox {
         }
       }))
     } else { // Display existing bid
-      this.activeBidUI.appendChild(new Input(this.pixel.highestBid, 'amount', {
+      this.activeBidUI.append(new Input(this.pixel.highestBid, 'amount', {
         label: this.game.web3.currentSymbol,
         width: '49%',
         disabled: true,
@@ -280,7 +280,7 @@ export default class InfoBox {
         format: (value) => value.toFixed(3)
       }));
 
-      this.activeBidUI.appendChild(new Input(this.pixel.highestBid, 'expiresAt', {
+      this.activeBidUI.append(new Input(this.pixel.highestBid, 'expiresAt', {
         label: 'Expires',
         width: '49%',
         disabled: true,
@@ -291,7 +291,7 @@ export default class InfoBox {
         format: (value) => formatExpireDate(value)
       }));
 
-      this.activeBidUI.appendChild(new Button({
+      this.activeBidUI.append(new Button({
         elClasses: ['cancel', 'action-button'],
         text: 'Cancel Bid',
         clickAction: async e => {
@@ -309,8 +309,8 @@ export default class InfoBox {
       }));
     }
 
-    this.wrapper.classList.add('activeBidUI');
-    this.wrapper.appendChild(this.activeBidUI);
+    this.domElement.classList.add('activeBidUI');
+    this.domElement.append(this.activeBidUI);
   }
 
   createInfoText(text, className) {
@@ -333,7 +333,7 @@ export default class InfoBox {
     if (DEBUG) console.log('Info box: destroy');
 
     this.game.emitter.off('controller/update');
-    this.parent.removeChild(this.wrapper);
+    this.parent.removeChild(this.domElement);
     this.pixel.infobox = null;
   }
 
@@ -352,8 +352,8 @@ export default class InfoBox {
 
     for (let ui of this.UIs) {
       if (this[ui]) {
-        this.wrapper.removeChild(this[ui]);
-        this.wrapper.classList.remove(ui);
+        this.domElement.removeChild(this[ui]);
+        this.domElement.classList.remove(ui);
         this[ui] = null;
       }
     }

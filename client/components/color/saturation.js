@@ -28,8 +28,8 @@ export default class Saturation extends Controller {
 
     this.domElement.classList.add('saturation');
 
-    this.palette.appendChild(this.paletteshape);
-    this.domElement.appendChild(this.palette);
+    this.palette.append(this.paletteshape);
+    this.domElement.append(this.palette);
 
     return this.domElement;
 

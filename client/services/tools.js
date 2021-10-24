@@ -1,10 +1,9 @@
 
-import config from '@util/config';
-
 import MinimapScene from '@scenes/minimap';
 
 import InfoBox from '@components/infobox';
 import Menu from '@components/menu';
+import Overlay from '@components/overlay';
 
 import Button from '@components/form/button';
 import Input from '@components/form/input';
@@ -16,9 +15,6 @@ export default class ToolsManager {
 
     this.game = game;
     this.emitter = emitter;
-
-    //this.gameCanvas = document.querySelector('#' + game.appConfig.canvasElement);
-    console.log('this.game', this.game);
     this.parent = this.game.canvas.parentNode;
     this.infobox = null;
     this.search = {
@@ -120,7 +116,7 @@ export default class ToolsManager {
     if (DEBUG) console.log('ToolsManager: openInfoBox');
 
     if (this.infobox)
-      this.clearInfoBox()
+      this.clearInfoBox();
 
     this.infobox = new InfoBox({ pixel: pixel, parent: this.parent, game: this.game });
 
@@ -128,12 +124,21 @@ export default class ToolsManager {
     await this.infobox.init();
   }
 
-  setConnectionStatus() {
-    /*if (DEBUG)*/ console.log('ToolsManager: setConnectionStatus');
+  openOverlay() {
+    if (DEBUG) console.log('ToolsManager: openOverlay');
 
-    console.log('this.game.web3.metamask', this.game.web3.metamask)
+    if (this.overlay)
+      this.clearOverlay();
+
+    this.overlay = new Overlay({ parent: this.parent, game: this.game, close: this.clearOverlay.bind(this) }); 
+  }
+
+  setConnectionStatus() {
+    if (DEBUG) console.log('ToolsManager: setConnectionStatus');
+
+    /*console.log('this.game.web3.metamask', this.game.web3.metamask)
     console.log('this.game.web3.isConnected', this.game.web3.isConnected)
-    console.log('this.game.web3.activeAddress', this.game.web3.activeAddress)
+    console.log('this.game.web3.activeAddress', this.game.web3.activeAddress)*/
 
     const icon = this.connectionStatus.querySelector('i');
     const dataClass = 'gg-data';
@@ -163,11 +168,11 @@ export default class ToolsManager {
   }
 
   setNetworkAlert() {
-    /*if (DEBUG)*/ console.log('ToolsManager: setNetworkAlert');
+    if (DEBUG) console.log('ToolsManager: setNetworkAlert');
 
-    console.log('this.game.web3.metamask', this.game.web3.metamask)
+    /*console.log('this.game.web3.metamask', this.game.web3.metamask)
     console.log('this.game.web3.isConnected', this.game.web3.isConnected)
-    console.log('this.game.web3.activeAddress', this.game.web3.activeAddress)
+    console.log('this.game.web3.activeAddress', this.game.web3.activeAddress)*/
 
     let show = false;
 
@@ -202,7 +207,7 @@ export default class ToolsManager {
     this.domBottomNav = document.createElement('div');
     this.domBottomNav.setAttribute('id', 'bottom-nav');
 
-    this.domBottomNav.appendChild(new Button({
+    this.domBottomNav.append(new Button({
       elClasses: ['pixels', 'menu-btn'],
       iconClass: 'gg-row-last',
       clickAction: async () => {
@@ -216,7 +221,7 @@ export default class ToolsManager {
       }
     }));
 
-    this.domBottomNav.appendChild(new Input(this.search, 'text', {
+    this.domBottomNav.append(new Input(this.search, 'text', {
       scene: this.game.scene,
       type: 'text',
       placeholder: 'Find pixel.. (eg. RK438)',
@@ -230,11 +235,11 @@ export default class ToolsManager {
       }
     }));
 
-    this.parent.appendChild(this.domBottomNav);
+    this.parent.append(this.domBottomNav);
   }
 
   addHeader() {
-    if (DEBUG) console.log('ToolsManager: addConnectionStatus');
+    if (DEBUG) console.log('ToolsManager: addHeader');
 
     this.header = document.createElement('div');
     this.header.setAttribute('id', 'header');
@@ -242,12 +247,12 @@ export default class ToolsManager {
     this.title = document.createElement('h1');
     this.title.textContent = 'autopoietic.art';
 
-    this.header.appendChild(this.title);
-    this.parent.appendChild(this.header);
+    this.header.append(this.title);
+    this.parent.append(this.header);
   }
 
   addConnectionStatus() {
-    /*if (DEBUG)*/ console.log('ToolsManager: addConnectionStatus');
+    if (DEBUG) console.log('ToolsManager: addConnectionStatus');
 
     this.domConnectionStatus = document.createElement('div');
     this.domConnectionStatus.setAttribute('id', 'connection-status');
@@ -261,57 +266,26 @@ export default class ToolsManager {
       }
     });
 
-    this.domConnectionStatus.appendChild(this.connectionStatus);
+    this.domConnectionStatus.append(this.connectionStatus);
 
-    this.parent.appendChild(this.domConnectionStatus);
+    this.parent.append(this.domConnectionStatus);
 
     this.setConnectionStatus();
   }
 
   addNetworkAlert() {
-    /*if (DEBUG)*/ console.log('ToolsManager: addNetworkAlert');
+    if (DEBUG) console.log('ToolsManager: addNetworkAlert');
 
     this.networkAlert = document.createElement('div');
     this.networkAlert.setAttribute('id', 'alert');
 
-    this.parent.appendChild(this.networkAlert);
+    this.parent.append(this.networkAlert);
 
     this.setNetworkAlert();
   }
 
-  addOverlay() {
-    if (DEBUG) console.log('ToolsManager: addOverlay');
-
-    this.overlay = document.createElement('div');
-    this.overlay.classList.add('overlay');
-
-    this.overlayContent = document.createElement('div');
-    this.overlayContent.classList.add('slideshow');
-
-    // Find better solution for this
-    this.overlayContent.innerHTML = config.overlayContent;
-
-    this.overlayNav = document.createElement('div');
-    this.overlayNav.classList.add('nav');
-
-    this.closeOverlay = document.createElement('button');
-    this.closeOverlay.textContent = 'Close';
-
-    const _self = this;
-
-    this.closeOverlay.addEventListener('click', () => {
-      _self.clearOverlay()
-    });
-
-    this.overlayNav.appendChild(this.closeOverlay);
-
-    this.overlayContent.appendChild(this.overlayNav);
-    this.overlay.appendChild(this.overlayContent);
-    this.parent.appendChild(this.overlay);
-  }
-
   addMinimap(scene) {
-    /*if (DEBUG)*/ console.log("Toolsmanager: addMinimap", scene, this.game.scene);
+    if (DEBUG) console.log("ToolsManager: addMinimap");
 
     scene = scene || this.game.scene;
 
@@ -365,6 +339,8 @@ export default class ToolsManager {
   }
 
   hideTools() {
+    if (DEBUG) console.log('ToolsManager: hideTools');
+
     this.networkAlert.style.display = 'none';
     this.connectionStatus.style.display = 'none';
     this.domBottomNav.style.display = 'none';
@@ -383,6 +359,8 @@ export default class ToolsManager {
   }
 
   showTools() {
+    if (DEBUG) console.log('ToolsManager: showTools');
+
     this.networkAlert.style.display = 'block';
     this.connectionStatus.style.display = 'block';
     this.domBottomNav.style.display = 'flex';
@@ -394,15 +372,10 @@ export default class ToolsManager {
   }
 
   clearOverlay() {
-    if (DEBUG) console.log('ToolsManager: addOverlay');
+    if (DEBUG) console.log('ToolsManager: clearOverlay');
 
-    this.closeOverlay.removeEventListener('click', this.closeOverlay);
-    this.parent.removeChild(this.overlay);
-
+    this.overlay.destroy();
     this.overlay = null;
-    this.overlayContent = null;
-    this.overlayNav = null;
-    this.closeOverlay = null;
   }
 
   clearInfoBox() {

@@ -31,7 +31,7 @@ export default class Controller {
     if (this.label) {
       this.labelElement = document.createElement('label');
       this.labelElement.textContent = this.label;
-      this.domElement.appendChild(this.labelElement)
+      this.domElement.append(this.labelElement)
     }
 
     if (this.scene) {

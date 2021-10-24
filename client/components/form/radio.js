@@ -30,14 +30,14 @@ export default class Radio extends Controller {
       label.htmlFor = option.value;
 
       const labelText = document.createTextNode(option.text);
-      label.appendChild(labelText);
+      label.append(labelText);
 
-      this.radioinput.appendChild(radiobox);
-      this.radioinput.appendChild(label);
+      this.radioinput.append(radiobox);
+      this.radioinput.append(label);
     });
 
     this.domElement.classList.add('selection-radio');
-    this.domElement.appendChild(this.radioinput);
+    this.domElement.append(this.radioinput);
 
     this.radioinput.addEventListener('change', onChange);
 

@@ -27,7 +27,7 @@ export default class Menu {
     this.domElement = document.createElement('div');
     this.domElement.setAttribute('id', 'menu-item');
 
-    this.parent.appendChild(this.domElement);
+    this.parent.append(this.domElement);
   }
 
   async init() {
@@ -107,16 +107,16 @@ export default class Menu {
         this.activeTab = list;
       }
 
-      this.tabs.appendChild(listItem);
+      this.tabs.append(listItem);
 
       if (l === this.lists.length - 1) {
         const closeBtn = document.createElement('i')
         closeBtn.classList.add('close', 'gg-close');
-        this.tabs.appendChild(closeBtn);
+        this.tabs.append(closeBtn);
       }
     });
 
-    this.domElement.appendChild(this.tabs);
+    this.domElement.append(this.tabs);
     this.createSettings();
   }
 
@@ -155,8 +155,8 @@ export default class Menu {
     pendingBids.classList.add('setting');
     pendingBids.innerHTML = '<i class="gg-sort-za"></i> Pending bids';
 
-    this.settings.appendChild(activeBids);
-    this.settings.appendChild(pendingBids);
+    this.settings.append(activeBids);
+    this.settings.append(pendingBids);
   }
 
   createBatchSetting() {
@@ -170,7 +170,7 @@ export default class Menu {
     const loading = pixels.filter(pixel => pixel.loadingGraph)
 
     if (loading.length > 0) {
-      this.settings.appendChild(new LoadingBar());
+      this.settings.append(new LoadingBar());
       return;
     }
 
@@ -202,13 +202,13 @@ export default class Menu {
 
     const textIcon = document.createElement('i');
     textIcon.classList.add('gg-info');
-    this.settings.appendChild(textIcon);
+    this.settings.append(textIcon);
 
     switch (batchUI) {
       case 'purchaseUI':
         relevantPixels = pixels.filter(pixel => !pixel.owner);
 
-        this.settings.appendChild(new Input(batchSettings, 'price', {
+        this.settings.append(new Input(batchSettings, 'price', {
           elClasses: ['setting'],
           type: 'text',
           scene: this.scene,
@@ -217,7 +217,7 @@ export default class Menu {
           format: (value) => (value) ? value.toFixed(3) : 0
         }));
 
-        this.settings.appendChild(new Button({
+        this.settings.append(new Button({
           elClasses: ['action-button', 'action-settings'],
           text: 'Create',
           clickAction: async e => {
@@ -229,7 +229,7 @@ export default class Menu {
       case 'ownerUI':
         relevantPixels = pixels.filter(pixel => pixel.owner === this.game.web3.activeAddress);
         
-        this.settings.appendChild(new ColorPicker(batchSettings, 'color', {
+        this.settings.append(new ColorPicker(batchSettings, 'color', {
           scene: this.scene,
           type: 'color',
           label: 'Color',
@@ -239,7 +239,7 @@ export default class Menu {
           update: (value) => relevantPixels.forEach(pixel => pixel.changeToColorNumber(value))
         }));
 
-        this.settings.appendChild(new Button({
+        this.settings.append(new Button({
           elClasses: ['action-button', 'action-settings'],
           text: 'Apply',
           clickAction: async e => {
@@ -253,8 +253,8 @@ export default class Menu {
     if (DEBUG) console.log('Menu: relevantPixels', relevantPixels)
     batchCountElLabel.textContent = relevantPixels.length;
 
-    this.settings.appendChild(batchCountElLabel);
-    this.settings.appendChild(batchCountEl);
+    this.settings.append(batchCountElLabel);
+    this.settings.append(batchCountEl);
   }
 
   async loadPixels() {
@@ -267,7 +267,7 @@ export default class Menu {
 
     switch (this.activeTab) {
       case 'pixels':
-        //this.domElement.appendChild(new LoadingBar());
+        //this.domElement.append(new LoadingBar());
 
         pixels = await this.game.graph.loadPixels({
           owner: this.game.web3.activeAddress
@@ -289,9 +289,9 @@ export default class Menu {
   createList(pixels) {
     this.menuList = document.createElement('ul');
     this.menuList.classList.add('list');
-    this.domElement.appendChild(this.menuList);
+    this.domElement.append(this.menuList);
 
-    pixels.forEach(pixel => this.menuList.appendChild(this.listItemTemplate(pixel)));
+    pixels.forEach(pixel => this.menuList.append(this.listItemTemplate(pixel)));
     this.loaded = true;
   }
 

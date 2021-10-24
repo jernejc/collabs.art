@@ -25,12 +25,12 @@ export default class ColorPicker extends Controller {
     this.input = document.createElement('input');
     this.input.value = (this.format) ? this.format(this.getValue()) : this.getValue();
     this.input.setAttribute('type', 'text');
-    this.domElement.appendChild(this.input);
+    this.domElement.append(this.input);
 
     this.color = document.createElement('span');
     this.color.classList.add('color');
     this.color.style = `background: #${formatColorNumber(this.getValue())};`
-    this.domElement.appendChild(this.color);
+    this.domElement.append(this.color);
 
     this.input.addEventListener('blur', (e) => {
       if (!preventClose) 
@@ -63,14 +63,14 @@ export default class ColorPicker extends Controller {
         preventClose = false
     });
 
-    this.colorAdvancedUI.appendChild(new Hue(this.object[property], 'h', {
+    this.colorAdvancedUI.append(new Hue(this.object[property], 'h', {
       min: 0,
       max: 1,
       step: 0.001,
       scene: this.scene
     }));
 
-    this.colorAdvancedUI.appendChild(new Saturation(this.object[property], 's', {
+    this.colorAdvancedUI.append(new Saturation(this.object[property], 's', {
       min: 0,
       max: 1,
       step: 0.001,
@@ -78,7 +78,7 @@ export default class ColorPicker extends Controller {
     }));
 
     this.domElement.classList.add('color-picker');
-    this.domElement.appendChild(this.colorAdvancedUI);
+    this.domElement.append(this.colorAdvancedUI);
 
     return this.domElement;
   }

@@ -29,9 +29,9 @@ export default class Hue extends Controller {
 
     this.domElement.classList.add('hue');
 
-    this.rangepointer.appendChild(this.rangeshape);
-    this.rangetrack.appendChild(this.rangepointer);
-    this.domElement.appendChild(this.rangetrack);
+    this.rangepointer.append(this.rangeshape);
+    this.rangetrack.append(this.rangepointer);
+    this.domElement.append(this.rangetrack);
 
     return this.domElement;
 

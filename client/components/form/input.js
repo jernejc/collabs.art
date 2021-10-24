@@ -18,12 +18,12 @@ export default class Input extends Controller {
     this.input.value = (this.format) ? this.format(this.getValue()) : this.getValue();
     this.input.setAttribute('type', params.type || 'text');
 
-    this.domElement.appendChild(this.input);
+    this.domElement.append(this.input);
 
     if (params.border) {
       this.border = document.createElement('div');
       this.border.classList.add('input-border');
-      this.domElement.appendChild(this.border);
+      this.domElement.append(this.border);
     }
 
     if (params.step)

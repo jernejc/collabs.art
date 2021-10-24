@@ -13,8 +13,6 @@ const config = {
   mode: PROD ? process.env.NODE_ENV : 'development',
   devtool: 'source-map',
 
-  //context: path.resolve(__dirname, 'client'),
-
   entry: {
     app: './client/index.js'
   },
@@ -59,7 +57,7 @@ const config = {
       VERSION: "0.1.1",
       DEBUG: false // !PROD
     }),
-    /*new webpack.ProvidePlugin({ // in some cases fallback above did not work, so had to use https://webpack.js.org/guides/shimming/ (webpack v5 etc.)
+    /*new webpack.ProvidePlugin({ // in some cases fallback above did not work, so had to use https://webpack.js.org/guides/shimming/ (webpack v5)
       Buffer: ['buffer', 'Buffer'],
       process: 'process/browser'
     }),*/
