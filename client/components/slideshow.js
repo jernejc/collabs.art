@@ -1,3 +1,4 @@
+import config from '@util/config';
 
 export default class Slideshow {
   constructor({ parent }) {
@@ -9,22 +10,11 @@ export default class Slideshow {
     this.domElement = document.createElement('div');
     this.domElement.setAttribute('id', 'slideshow');
 
-    this.articles = [{ // This goes async from server
-      icon: 'about.svg',
-      title: 'About',
-      body: 'A social experiment where players collectively draw on a shared canvas by changing the color of individual pixels and thus continuously contribute to the emerging global image. The goal is to illustrate the process of self-organization within a community of random players with the help of blockchain technology.'
-    }, {
-      icon: 'ownership.svg',
-      title: 'Ownership',
-      body: 'Each pixel on the canvas is represented by a non-fungible token (NFT) on the Ethereum network. Ownership is stored and transferred based on the ERC-721 standard as most digital art and collectibles. It cannot be taken away or destroyed.'
-    }, {
-      icon: 'social-dynamic.svg',
-      title: 'Social dynamic',
-      body: 'Once a player takes ownership of a pixel he or she can control its color, but also auction it to a different player if an agreement between them is reached. The experiment is decentralized and not controlled by any single actor so in theory it cannot be stopped.'
-    }];
+    this.articles = config.slideshow.articles;
     
     this.setupDom();
-    this.progressInterval = setInterval(this.progress.bind(this), 100); // 180
+
+    this.progressInterval = setInterval(this.progress.bind(this), 100); // start progress interval
   }
 
   setupDom() {
@@ -37,11 +27,11 @@ export default class Slideshow {
     this.wrapper = document.createElement('div');
     this.wrapper.classList.add('slides-wrapper');
 
-    this.subheading = document.createElement('h2');
-    this.subheading.classList.add('post-subheading');
-    this.subheading.innerHTML = '<span>Contribute to social</span> experiment.<br /><span>Become a</span> Creator.';
+    this.subtitle = document.createElement('h2');
+    this.subtitle.classList.add('post-subheading');
+    this.subtitle.innerHTML = config.slideshow.subtitle;
 
-    this.domElement.append(this.subheading);
+    this.domElement.append(this.subtitle);
 
     this.articles.forEach((article, i) => {
       let active = false;
@@ -66,14 +56,14 @@ export default class Slideshow {
   }
 
   navTemplate() {
-    const item = document.createElement('div');
+    //const item = document.createElement('div');
   }
 
   slideTemplate({ title, body, icon, active }) {
     if (DEBUG) console.log('Slideshow: slideTemplate', title, body);
 
     const slide = document.createElement('article');
-    slide.classList.add('post'); // post--active
+    slide.classList.add('post');
 
     if (active)
       slide.classList.add('post-active');
@@ -93,7 +83,7 @@ export default class Slideshow {
 
     if (icon) {
       const headingIcon = document.createElement('img');
-      headingIcon.src = `assets/images/app/${icon}`;
+      headingIcon.src = `assets/images/icons/${icon}`;
 
       heading.prepend(headingIcon);
     }
@@ -139,6 +129,15 @@ export default class Slideshow {
       this.currentPost.querySelector('.progress-bar__fill').style.width = `${this.index}%`;
       this.currentPost.classList.remove('post-not-active');
       this.currentPost.classList.add('post-active');
+    }
+  }
+
+  destroy() {
+    if (DEBUG) console.log('Slideshow: destroy');
+
+    if (this.progressInterval) {
+      clearInterval(this.progressInterval);
+      this.progressInterval = null;
     }
   }
 }

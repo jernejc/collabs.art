@@ -540,7 +540,7 @@ contract ERC721Batch is
         internal
         virtual
     {
-        require(to != address(0), "Pixels: _mintBatch to zero address");
+        require(to != address(0), "ERC721Batch: _mintBatch to zero address");
 
         _beforeBatchTokenTransfer(address(0), to, tokenIds);
 
@@ -595,7 +595,7 @@ contract ERC721Batch is
      * - `ids` and `amounts` must have the same length.
      */
     function _burnBatch(address account, uint256[] memory tokenIds) internal virtual {
-        require(account != address(0), "ERC1155: burn from the zero address");
+        require(account != address(0), "ERC721Batch: burn from the zero address");
 
         _beforeBatchTokenTransfer(account, address(0), tokenIds);
 

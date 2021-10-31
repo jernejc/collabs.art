@@ -16,10 +16,16 @@ const config = {
   },
   networks: [{
     id: 80001,
-    chainId: 0x13881,
-    name: 'Matic Testnet',
-    symbol: 'tMATIC',
-    enabled: true
+    enabled: true,
+    chainId: '0x13881',
+    chainName: 'Polygon Testnet',
+    nativeCurrency: {
+      symbol: 'MATIC',
+      name: 'Matic token',
+      decimals: 18,
+    },
+    rpcUrls: ['https://rpc-mumbai.maticvigil.com/'],
+    blockExplorerUrls: ['https://mumbai.polygonscan.com/'],
   }, {
     id: 137,
     name: 'Matic Mainnet',
@@ -38,35 +44,22 @@ const config = {
     url: 'https://pixelworld-2e64c.uc.r.appspot.com'
   },
   // Need a better solution here
-  overlayContent: `
-        <p>
-          The world is a grid of 1.000.000 pixels, where each pixel is represented by a non-fungible token (NFT) on the
-          Ethereum network.
-          Ownership is stored and transfered based on the <a href='https://eips.ethereum.org/EIPS/eip-721'
-            target='_blank' style='color: #FFF;'>ERC-721 standard</a>
-          as most digital art and collectibles. It cannot be taken away or destroyed.
-        </p>
-        <br />
-        Each position has unique identifier within the grid:
-        <br />
-        <pre>
-      0 →              999
-    A ┌──────────────────┐  
-    ↓ │                  │  
-      │    TN220         │  
-      │     ┌─┐          │  
-      │     └─┘          │  
-      │                  │  
-      │                  │  
- ALK └──────────────────┘ 
-        </pre>
-        <p>
-          Horizontal axis are numbers from 0 to 999.<br />
-          Vertical axis are letters from A to ALK.<br /><br />
-          Example ID: <b>TN220</b><br />
-          Vertical: <b>TN</b> Horizontal: <b>220</b>
-        </p>
-      `
+  slideshow: {
+    subtitle: '<span>Contribute to social</span> experiment.<br /><span>Become a</span> Creator.', // is HTML
+    articles: [{ // This goes async from server
+      icon: 'about.svg',
+      title: 'About',
+      body: 'Players collectively draw on a shared canvas by changing the color of individual pixels and thus continuously contribute to the emerging global image. The goal is to illustrate the process of self-organization within a community of random players with the help of blockchain technology.'
+    }, {
+      icon: 'ownership.svg',
+      title: 'Ownership',
+      body: 'Each pixel on the canvas is represented by a non-fungible token (NFT) on the Ethereum network. Ownership is stored and transferred based on the ERC-721 standard as most digital art and collectibles. It cannot be taken away or destroyed.'
+    }, {
+      icon: 'social-dynamic.svg',
+      title: 'Social dynamic',
+      body: 'Once a player takes ownership of a pixel he or she can control its color, but also auction it to a different player if an agreement between them is reached. The experiment is decentralized and not controlled by any single actor so in theory it cannot be stopped.'
+    }]
+  }
 }
 
 export default config;

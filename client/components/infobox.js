@@ -36,7 +36,7 @@ export default class InfoBox {
   }
 
   setupDom() {
-    if (DEBUG) console.log('Info Box: Setup template');
+    if (DEBUG) console.log('Info Box: setupDom');
 
     this.domElement = document.createElement('div');
     this.domElement.classList.add('info-box');
@@ -115,7 +115,7 @@ export default class InfoBox {
       elClasses: ['label-border-input']
     }));
 
-    this.purchaseUI.append(new Button({
+    this.purchaseUIBtn = new Button({
       elClasses: ['create', 'action-button'],
       text: 'Create',
       clickAction: async e => {
@@ -135,7 +135,9 @@ export default class InfoBox {
           console.error('Failed to buy pixel', error);
         }
       }
-    }));
+    });
+
+    this.purchaseUI.append(this.purchaseUIBtn.domElement);
 
     this.domElement.classList.add('purchaseUI');
     this.domElement.append(this.purchaseUI);
@@ -151,8 +153,8 @@ export default class InfoBox {
     if (this.pixel.highestBid && !this.pixel.highestBid.expired) {
       this.ownerUI.append(this.createInfoText('Pending bid', 'active-bid'));
       this.ownerUI.append(this.createBidsInfo(this.pixel.highestBid));
-    } else
-      this.ownerUI.append(this.createInfoText('Owned', 'owned'));
+    } /*else
+      this.ownerUI.append(this.createInfoText('Owned', 'owned'));*/
 
     this.ownerUI.append(new ColorPicker(this.pixel, 'color', {
       //label: 'hex',
@@ -168,7 +170,7 @@ export default class InfoBox {
         //console.log('e', e)
         _self.setPosition();
       },
-      update: (value) => { console.log('ColorPicker update', value); _self.pixel.changeToColorNumber(value) }
+      update: (value) => { console.log('ColorPicker update', value, _self.pixel.position); _self.pixel.changeToColorNumber(value) }
     }));
 
     /*this.ownerUI.append(new Button({
@@ -201,7 +203,7 @@ export default class InfoBox {
       lang: 'en'
     }));
 
-    this.bidUI.append(new Button({
+    this.bidUIBtn = new Button({
       elClasses: ['bid', 'action-button'],
       text: 'Place Bid',
       clickAction: async e => {
@@ -221,14 +223,16 @@ export default class InfoBox {
           console.error('Failed to buy pixel', error);
         }
       }
-    }));
+    });
+
+    this.bidUI.append(this.bidUIBtn.domElement);
 
     this.domElement.classList.add('bidUI');
     this.domElement.append(this.bidUI);
   }
 
   createActiveBidUI() {
-    if (DEBUG) console.log('Info box: activeBidUI');
+    if (DEBUG) console.log('Info box: createActiveBidUI');
 
     this.activeBidUI = document.createElement('div');
     this.activeBidUI.append(this.createInfoText(this.pixel.highestBid.expired ? 'Bid expired' : 'Bid placed', 'placed'));

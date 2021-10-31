@@ -37,6 +37,8 @@ export default class Input extends Controller {
       this.input.setAttribute('min', params.min);
     if (params.placeholder)
       this.input.setAttribute('placeholder', params.placeholder)
+    if (params.lang)
+      this.input.setAttribute('lang', params.lang);
 
     if (params.disabled)
       this.input.disabled = true;

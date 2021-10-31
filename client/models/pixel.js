@@ -96,6 +96,8 @@ export default class Pixel {
   }
 
   changeToColorHex(hex) {
+    if (DEBUG) console.log('Pixel: changeToColorHex', number, this.tile);
+    
     this.originalColor = this.color;
     this.color = Phaser.Display.Color.HexStringToColor('#' + hexToString(hex));
 
@@ -104,6 +106,8 @@ export default class Pixel {
   }
   
   changeToColorNumber(number) {
+    /*if (DEBUG)*/ console.log('Pixel: changeToColorNumber', number, this.tile);
+
     this.originalColor = this.color;
     this.color = Phaser.Display.Color.HexStringToColor('#' + formatColorNumber(number));
 

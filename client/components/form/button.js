@@ -1,60 +1,91 @@
 
 export default class Button {
   constructor({ elClasses, text, iconClass, clickAction }) {
-    this.loadingI = document.createElement('i');
-    this.loadingI.classList.add('gg-loadbar-alt');
+    this.loadingUI = document.createElement('i');
+    this.loadingUI.classList.add('gg-loadbar-alt');
 
-    this.button = document.createElement('button');
-    this.button.classList.add(...elClasses); // 'action-button'
+    this.domElement = document.createElement('button');
+    this.domElement.classList.add(...elClasses); // 'action-button'
 
-    if (text) {
-      this.text = text;
-      this.button.textContent = text;
-    }
-    if (iconClass) {
-      this.iconClass = iconClass;
-      this.setIcon();
-    }
-    if (clickAction) {
-      this.button.addEventListener('click', async e => {
-        this.loading();
+    this.triggerActionListener = this.triggerAction.bind(this); // For removeEventListener to work
 
-        try {
-          await clickAction();
-        } catch (error) {
-          console.error('Button ClickAction failed', error)
-        }
-
-        this.reset();
-      });
-    }
-
-    return this.button;
+    if (iconClass) 
+      this.setIcon(iconClass);
+    if (clickAction)
+      this.setClickAction(clickAction);
+    if (text)
+      this.setText(text);
   }
 
   loading() {
-    if (this.text)
-      this.button.textContent = '';
-    if (this.icon)
-      this.button.removeChild(this.icon);
+    this.domElement.innerHTML = '';
+    this.domElement.disabled = true;
+    this.domElement.append(this.loadingUI);
+  }
 
-    this.button.disabled = true;
-    this.button.append(this.loadingI);
+  async triggerAction() {
+    if (!this.clickAction)
+      throw new Error('No action set');
+
+    this.loading();
+
+    try {
+      await this.clickAction();
+    } catch (error) {
+      console.error('Button ClickAction failed', error)
+    }
+
+    this.reset();
+  }
+
+  setText(text) {
+    this.text = text || this.text;
+    this.domElement.textContent = this.text;
+  }
+
+  setIcon(iconClass) {
+    this.iconClass = iconClass || this.iconClass;
+
+    if (this.iconClass.search('gg-') > -1) {
+      const icon = document.createElement('i');
+      icon.classList.add(this.iconClass);
+
+      this.domElement.innerHTML = '';
+      this.domElement.append(icon);
+    } else {
+      const image = document.createElement('img');
+      image.src = `assets/images/icons/${this.iconClass}.svg`;
+
+      this.domElement.innerHTML = '';
+      this.domElement.append(image);
+    }
+  }
+
+  setClickAction(action) {
+    if (DEBUG) console.log('Button: setClickAction');
+
+    if (!action)
+      throw new Error('No action provided.');
+
+    if (this.clickAction)
+      this.domElement.removeEventListener('click', this.triggerActionListener);
+
+    this.clickAction = action;
+    this.domElement.addEventListener('click', this.triggerActionListener);
   }
 
   reset() {
-    this.button.removeChild(this.loadingI);
-    this.button.disabled = false;
+    //this.domElement.removeChild(this.loadingUI);
+    this.domElement.disabled = false;
 
     if (this.text)
-      this.button.textContent = this.text;
+      this.domElement.textContent = this.text;
     if (this.iconClass)
       this.setIcon();
   }
 
-  setIcon() {
-    this.icon = document.createElement('i');
-    this.icon.classList.add(this.iconClass);
-    this.button.append(this.icon);
+  destroy() {
+    this.domElement.removeEventListener('click', this.triggerActionListener);
+    this.domElement.innerHTML = '';
   }
 }

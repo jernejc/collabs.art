@@ -58,7 +58,7 @@ export default class MinimapScene extends ApplicationScene {
     });
 
     this.wrapper.on('pointerout', () => {
-      setGameMode({ scene: this, mode: prevMode });
+      setGameMode({ scene: this, mode: this.mainscene.appConfig.defaultMode });
     });
   }
 

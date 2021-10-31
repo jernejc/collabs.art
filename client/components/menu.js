@@ -217,18 +217,20 @@ export default class Menu {
           format: (value) => (value) ? value.toFixed(3) : 0
         }));
 
-        this.settings.append(new Button({
+        this.settings.batchCreateBtn = new Button({
           elClasses: ['action-button', 'action-settings'],
           text: 'Create',
           clickAction: async e => {
             await purchasePixels({ scene: this.scene, selection: relevantPixels })
           }
-        }));
+        });
+
+        this.settings.append(this.settings.batchCreateBtn.domElement);
 
         break;
       case 'ownerUI':
         relevantPixels = pixels.filter(pixel => pixel.owner === this.game.web3.activeAddress);
-        
+
         this.settings.append(new ColorPicker(batchSettings, 'color', {
           scene: this.scene,
           type: 'color',
@@ -239,13 +241,15 @@ export default class Menu {
           update: (value) => relevantPixels.forEach(pixel => pixel.changeToColorNumber(value))
         }));
 
-        this.settings.append(new Button({
+        this.settings.batchApplyBtn = new Button({
           elClasses: ['action-button', 'action-settings'],
           text: 'Apply',
           clickAction: async e => {
             await colorPixels({ scene: this.scene, selection: this.game.selection.pixels })
           }
-        }));
+        });
+
+        this.settings.append(this.settings.batchApplyBtn.domElement);
 
         break;
     }
@@ -296,6 +300,11 @@ export default class Menu {
   }
 
   resetSettings() {
+    if (this.settings.batchCreateBtn)
+      this.settings.batchCreateBtn.destroy();
+    if (this.settings.batchApplyBtn)
+      this.settings.batchApplyBtn.destroy();
+
     this.domElement.removeChild(this.settings);
     this.settings = null;
   }

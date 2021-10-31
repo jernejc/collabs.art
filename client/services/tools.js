@@ -8,32 +8,56 @@ import Overlay from '@components/overlay';
 import Button from '@components/form/button';
 import Input from '@components/form/input';
 
+import { formatShortAddress } from '@util/helpers';
+
 export default class ToolsManager {
 
   constructor(game, emitter) {
-    if (DEBUG) console.log('ToolsManager: constructor');
+    if (DEBUG) console.log('ToolsManager: constructor', game);
 
     this.game = game;
     this.emitter = emitter;
-    this.parent = this.game.canvas.parentNode;
     this.infobox = null;
     this.search = {
       text: ''
     }
 
-    this.addHeader();
-    this.addConnectionStatus();
-    this.addNetworkAlert();
-    this.addBottomNav();
-    this.addEventListeners();
+    setTimeout(() => { // canvas null in Firefox -_-
+      this.parent = this.game.canvas.parentNode;
+      this.addHeader();
+      this.addConnectionStatus();
+      this.addNetworkAlert();
+      this.addBottomNav();
+      this.addEventListeners();
+    });
+  }
+
+  get metamaskURL() {
+    if (DEBUG) console.log('ToolsManager: metamaskURL', navigator.userAgent);
+
+    let url;
+
+    if (navigator.userAgent.search('Mozilla') > -1)
+      url = 'https://addons.mozilla.org/sl/firefox/addon/ether-metamask/'
+    else if (navigator.userAgent.search('Chrome') > -1)
+      url = 'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn';
+
+    return url;
   }
 
   addEventListeners() {
     this.emitter.on('web3/network', async network => {
-      /*if (DEBUG)*/ console.log('ToolsManager: on web3/network');
+      if (DEBUG) console.log('ToolsManager: on web3/network');
 
       this.setConnectionStatus();
       this.setNetworkAlert();
+
+      if (this.menu && this.menu.loaded)
+        await this.menu.loadPixels();
+
+      // Update infobox UI if user address changes
+      if (this.infobox && !this.infobox.preventRefresh)
+        await this.infobox.setUI();
     });
 
     this.emitter.on('web3/address', async address => {
@@ -130,74 +154,60 @@ export default class ToolsManager {
     if (this.overlay)
       this.clearOverlay();
 
-    this.overlay = new Overlay({ parent: this.parent, game: this.game, close: this.clearOverlay.bind(this) }); 
+    this.overlay = new Overlay({ parent: this.parent, game: this.game, close: this.clearOverlay.bind(this) });
   }
 
   setConnectionStatus() {
     if (DEBUG) console.log('ToolsManager: setConnectionStatus');
 
-    /*console.log('this.game.web3.metamask', this.game.web3.metamask)
-    console.log('this.game.web3.isConnected', this.game.web3.isConnected)
-    console.log('this.game.web3.activeAddress', this.game.web3.activeAddress)*/
+    let iconClass = null;
+    let action = null;
 
-    const icon = this.connectionStatus.querySelector('i');
-    const dataClass = 'gg-data';
-    const blockClass = 'gg-block';
+    if (!this.game.web3.hasMetamask) {
+      iconClass = 'metamask';
+      action = this.game.web3.onboarding.startOnboarding;
+    } else if (!this.game.web3.isConnected) {
+      iconClass = 'connected';
+      action = this.game.web3.switchToNetwork.bind(this.game.web3);
+    } else if (!this.game.web3.activeAddress) {
+      iconClass = 'gg-credit-card';
+      action = this.game.web3.getActiveAddress.bind(this.game.web3);
+    } else if (this.game.web3.activeAddress)
+      iconClass = 'gg-user';
 
-    if (!this.game.web3.metamask)
-      setBlock();
-    else if (!this.game.web3.isConnected)
-      setBlock();
-    else if (!this.game.web3.activeAddress)
-      setBlock();
-    else {
-      console.log('SET DATA');
-      if (icon.classList.contains(blockClass))
-        icon.classList.remove(blockClass);
-
-      icon.classList.add(dataClass);
-    }
-
-    function setBlock() {
-      console.log('SET BLOCK');
-      if (icon.classList.contains(dataClass))
-        icon.classList.remove(dataClass);
-
-      icon.classList.add(blockClass);
-    }
+    if (iconClass)
+      this.connectionStatusBtn.setIcon(iconClass);
+    if (action)
+      this.connectionStatusBtn.setClickAction(action);
   }
 
   setNetworkAlert() {
     if (DEBUG) console.log('ToolsManager: setNetworkAlert');
 
-    /*console.log('this.game.web3.metamask', this.game.web3.metamask)
-    console.log('this.game.web3.isConnected', this.game.web3.isConnected)
-    console.log('this.game.web3.activeAddress', this.game.web3.activeAddress)*/
+    let text = null;
 
-    let show = false;
+    if (!this.game.web3.hasMetamask)
+      text = 'Install Metamask';
+    else if (!this.game.web3.isConnected)
+      text = 'Switch to Network';
+    else if (!this.game.web3.activeAddress)
+      text = 'Connect to Wallet';
+    else if (this.game.web3.activeAddress)
+      text = formatShortAddress(this.game.web3.activeAddress);
 
-    if (!this.game.web3.metamask) {
-      this.networkAlert.innerText = 'Install Metamask';
-      show = true;
-    } else if (!this.game.web3.isConnected) {
-      this.networkAlert.innerText = 'Connect to Mumbai Testnet';
-      show = true;
-    } else if (!this.game.web3.activeAddress) {
-      this.networkAlert.innerText = 'Connect to Wallet';
-      show = true;
-    }
+    if (text) {
+      this.networkAlert.innerHTML = text;
+      this.networkAlert.classList.add('show');
 
-    if (show) {
       if (this.networkAlert.classList.contains('hide'))
         this.networkAlert.classList.remove('hide');
-
-      this.networkAlert.classList.add('show');
     }
     else {
+      this.networkAlert.innerHTML = '';
+      this.networkAlert.classList.add('hide');
+
       if (this.networkAlert.classList.contains('show'))
         this.networkAlert.classList.remove('show');
-
-      this.networkAlert.classList.add('hide');
     }
   }
 
@@ -207,7 +217,7 @@ export default class ToolsManager {
     this.domBottomNav = document.createElement('div');
     this.domBottomNav.setAttribute('id', 'bottom-nav');
 
-    this.domBottomNav.append(new Button({
+    this.bottonNavMenuBtn = new Button({
       elClasses: ['pixels', 'menu-btn'],
       iconClass: 'gg-row-last',
       clickAction: async () => {
@@ -219,8 +229,9 @@ export default class ToolsManager {
         } else
           await this.menu.loadPixels();
       }
-    }));
+    });
 
+    this.domBottomNav.append(this.bottonNavMenuBtn.domElement);
     this.domBottomNav.append(new Input(this.search, 'text', {
       scene: this.game.scene,
       type: 'text',
@@ -252,21 +263,17 @@ export default class ToolsManager {
   }
 
   addConnectionStatus() {
-    if (DEBUG) console.log('ToolsManager: addConnectionStatus');
+    /*if (DEBUG)*/ console.log('ToolsManager: addConnectionStatus');
 
     this.domConnectionStatus = document.createElement('div');
     this.domConnectionStatus.setAttribute('id', 'connection-status');
 
-    this.connectionStatus = new Button({
+    this.connectionStatusBtn = new Button({
       elClasses: ['account', 'connection'],
-      iconClass: 'gg-block',
-      clickAction: async () => {
-        if (!this.game.web3.activeAddress)
-          await this.game.web3.getActiveAddress();
-      }
+      iconClass: 'gg-block'
     });
 
-    this.domConnectionStatus.append(this.connectionStatus);
+    this.domConnectionStatus.append(this.connectionStatusBtn.domElement);
 
     this.parent.append(this.domConnectionStatus);
 
@@ -342,7 +349,7 @@ export default class ToolsManager {
     if (DEBUG) console.log('ToolsManager: hideTools');
 
     this.networkAlert.style.display = 'none';
-    this.connectionStatus.style.display = 'none';
+    this.connectionStatusBtn.domElement.style.display = 'none';
     this.domBottomNav.style.display = 'none';
     this.header.style.display = 'none';
 
@@ -361,8 +368,8 @@ export default class ToolsManager {
   showTools() {
     if (DEBUG) console.log('ToolsManager: showTools');
 
-    this.networkAlert.style.display = 'block';
-    this.connectionStatus.style.display = 'block';
+    this.networkAlert.style.display = 'flex';
+    this.connectionStatusBtn.domElement.style.display = 'block';
     this.domBottomNav.style.display = 'flex';
     this.header.style.display = 'block';
 
@@ -376,6 +383,11 @@ export default class ToolsManager {
 
     this.overlay.destroy();
     this.overlay = null;
+
+    const MainScene = this.game.scene.keys["MainScene"];
+
+    if (MainScene.game.mode === 'gameoflife')
+      MainScene.stopGameOfLife();
   }
 
   clearInfoBox() {
@@ -390,5 +402,14 @@ export default class ToolsManager {
 
     this.menu.destroy();
     this.menu = null;
+  }
+
+  installMetamask() {
+    /*if (DEBUG)*/ console.log('ToolsManager: installMetamask', this.metamaskURL)
+    
+    window.open(
+      this.metamaskURL,
+      '_blank'
+    );
   }
 }

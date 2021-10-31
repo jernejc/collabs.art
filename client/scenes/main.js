@@ -1,7 +1,9 @@
 
-import { getColorForXY } from '@actions/pixel';
 import config from '@util/config';
-import {getCookie} from '@util/helpers';
+
+import { getColorForXY } from '@actions/pixel';
+
+import { getCookie } from '@util/helpers';
 
 import ApplicationScene from '@scenes/application';
 
@@ -57,8 +59,6 @@ export default class MainScene extends ApplicationScene {
     moveToPosition({ ...getLastPosition(), scene: this });
 
     this.game.tools.addMinimap(this);
-
-    this.startGameOfLife();
 
     /** 
      * Mouse Events
@@ -118,6 +118,11 @@ export default class MainScene extends ApplicationScene {
 
     // Main scene is ready.
     this.game.emitter.emit('scene/ready');
+
+    if (this.game.web3.onboarding) {
+      if (this.game.web3.onboarding.state !== 'REGISTERED')
+        this.startGameOfLife();
+    }
   }
 
   createVisibleTiles() {
@@ -157,7 +162,7 @@ export default class MainScene extends ApplicationScene {
     if (DEBUG) console.log("Main Scene: updateTile");
 
     if (this.gameOfLife) {
-      this.tiles[y][x].setFillStyle(this.tiles[y][x].alive ? 0xFFFFFF:0x000000);
+      this.tiles[y][x].setFillStyle(this.tiles[y][x].alive ? 0xFFFFFF : 0x000000);
       return;
     }
 
@@ -193,7 +198,7 @@ export default class MainScene extends ApplicationScene {
   /**
    * Game of life
    * Will probably need a new scene
-   * Need to refractor "land" and move tiles to a new service
+   * Need to refractor "tiles" and move them to a new service
    */
 
   startGameOfLife() {
@@ -201,14 +206,32 @@ export default class MainScene extends ApplicationScene {
 
     this.gameOfLife = true;
 
-    for (let y = 0; y < this.gridHeight; y++)
-      for (let x = 0; x < this.gridWidth; x++)
-        this.tiles[y][x].alive = 0.15 > Math.random();
+    const edge = 10;
+    const widthEdge = this.gridWidth - edge;
+    const heightEdge = this.gridWidth - edge;
+
+    for (let y = 0; y < this.gridHeight; y++) {
+      for (let x = 0; x < this.gridWidth; x++) {
+        // Start top, bottom right
+        /*console.log('this.gridWidth', this.gridWidth)
+        console.log('x', x)
+        console.log('this.gridWidth / x', this.gridWidth / x)*/
+
+        let probability = 0.05;
+
+        if (edge > x || x > widthEdge) //(this.gridWidth / x > 1 && this.gridWidth / x < 1.1)
+          probability += 0.15
+        if (edge > y || y > heightEdge)
+          probability += 0.15
+
+        this.tiles[y][x].alive = probability > Math.random();
+      }
+    }
 
     this.game.tools.hideTools();
 
     this.timer = this.time.addEvent({
-      delay: 125,
+      delay: 150,
       callback: this.nextGeneration,
       callbackScope: this,
       loop: true
@@ -216,6 +239,8 @@ export default class MainScene extends ApplicationScene {
 
     if (!getCookie('hideOverlay'))
       this.game.tools.openOverlay();
+
+    setGameMode({ scene: this, mode: 'gameoflife' });
   }
 
   stopGameOfLife() {
@@ -232,6 +257,8 @@ export default class MainScene extends ApplicationScene {
 
     this.updateTiles();
     this.game.tools.showTools();
+
+    setGameMode({ scene: this, mode: this.appConfig.defaultMode });
   }
 
   isAlive(x, y) {

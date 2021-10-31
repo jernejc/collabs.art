@@ -1,6 +1,6 @@
 
 import Web3 from 'web3';
-//import MetaMaskOnboarding from '@metamask/onboarding'
+import MetaMaskOnboarding from '@metamask/onboarding'
 
 import config from '@util/config';
 import { stringToBN } from '@util/helpers';
@@ -8,16 +8,17 @@ import { stringToBN } from '@util/helpers';
 export default class Web3Manager {
 
   constructor(game, emitter) {
-    /*if (DEBUG)*/ console.log('Web3Manager: constructor');
+    if (DEBUG) console.log('Web3Manager: constructor');
 
     this.game = game;
     this.emitter = emitter;
 
+    this.onboarding = new MetaMaskOnboarding();
     this.instance = null;
     this.bidContract = null;
     this.pixelContract = null;
     this.defaultPrice = null;
-    this.metamask = false;
+    this.hasMetamask = false;
     this.accounts = [];
     this.activeAddress = null;
   }
@@ -39,14 +40,14 @@ export default class Web3Manager {
   }
 
   get currentSymbol() {
-    return (this.network) ? this.network.symbol : 'tMATIC';
+    return (this.network && this.network.nativeCurrency) ? this.network.nativeCurrency.symbol : 'tMATIC';
   }
 
   async initProvider() {
     if (DEBUG) console.log('Web3Manager: initProvider');
 
     if (window.ethereum) {
-      this.metamask = true;
+      this.hasMetamask = true;
       this.instance = new Web3(window.ethereum);
 
       // Enable web3 related events
@@ -103,7 +104,7 @@ export default class Web3Manager {
 
   handleNewChain(chainId) {
     if (DEBUG) console.log('Web3Manager: handleNewChain', chainId);
-    const supported = config.networks.find(net => net.chainId == chainId && net.enabled);
+    const supported = config.networks.find(net => net.chainId == chainId && net.enabled === true);
 
     if (!supported) {
       console.warn('Web3Manager: Chain ID not supported');
@@ -113,9 +114,9 @@ export default class Web3Manager {
   }
 
   handleNewNetwork(networkId) {
-    /*if (DEBUG)*/ console.log('Web3Manager: handleNewNetwork', networkId);
+    if (DEBUG) console.log('Web3Manager: handleNewNetwork', networkId);
 
-    const supported = config.networks.find(net => net.id == networkId && net.enabled);
+    const supported = config.networks.find(net => net.id == networkId && net.enabled === true);
 
     if (!supported) {
       console.warn('Web3Manager: Network ID not supported');
@@ -123,11 +124,12 @@ export default class Web3Manager {
     } else
       this.network = supported;
 
+    this.getDefaultPrice();
     this.emitter.emit('web3/network', this.network);
   }
 
   handleAccountsChanged(accounts) {
-    /*if (DEBUG)*/ console.log('Web3Manager: handleAccountsChanged', this, accounts);
+    if (DEBUG) console.log('Web3Manager: handleAccountsChanged', accounts);
 
     if (accounts.length > 0) {
       this.accounts = accounts;
@@ -208,20 +210,56 @@ export default class Web3Manager {
     return this.accounts;
   }
 
+  async addNetwork(networkConfig) {
+    if (DEBUG) console.log('Web3Manager: addNetwork');
+
+    let { id, enabled, ...chainConfig } = networkConfig;
+
+    try {
+      await this.instance.currentProvider.request({
+        method: 'wallet_addEthereumChain',
+        params: [chainConfig]
+      });
+    } catch (error) {
+      console.error('Failed to add network to provider: ', error);
+    }
+  }
+
+  async switchToNetwork(chainId) {
+    if (DEBUG) console.log('Web3Manager: switchToNetwork', chainId);
+
+    chainId = chainId || '0x13881' // Default to testnet
+
+    const networkConfig = config.networks.find(net => net.chainId === chainId && net.enabled === true);
+
+    if (!networkConfig)
+      throw new Error('Unsupported network.');
+
+    try {
+      await this.instance.currentProvider.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: networkConfig.chainId }]
+      });
+    } catch (error) {
+      if (error.code === 4902) { // Network was not found in Metamask
+        console.warn('Network not found in Metamask, adding new config.')
+        await this.addNetwork(networkConfig);
+      } else
+        throw new Error('Failed to switch network: ', error);
+    }
+  }
+
   async getDefaultPrice() {
     if (DEBUG) console.log('Web3Manager: getDefaultPrice');
 
-    if (!this.defaultPrice) {
-      let defaultPrice;
+    let defaultPrice;
 
-      try {
-        defaultPrice = await this.bidContract.methods.defaultPrice().call();
-        this.defaultPrice = Web3.utils.fromWei(defaultPrice);
-      } catch (error) {
-        console.error('Failed to fetch default price: ' + error);
-        console.warn('Falling back on hardcoded default value.')
-        this.defaultPrice = 0.05
-      }
+    try {
+      defaultPrice = await this.bidContract.methods.defaultPrice().call();
+      this.defaultPrice = Web3.utils.fromWei(defaultPrice);
+    } catch (error) {
+      console.warn('Failed to fetch default price');
+      this.defaultPrice = 0.005
     }
 
     return this.defaultPrice;

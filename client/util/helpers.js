@@ -55,6 +55,10 @@ export function formatPosition(string) {
   }
 }
 
+export function formatShortAddress(address) {
+  return address.slice(0, 6) + '...' + address.slice(-4);
+}
+
 export function formatExpireDate(endTime) { // end time in seconds
   const _second = 1000,
     _minute = _second * 60,

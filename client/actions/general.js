@@ -25,8 +25,8 @@ export function handleMouseMove({ pointer, scene }) {
 
       positionSelectionBlock({ pointer, scene });
       break;
+    case 'gameoflife':
     case 'select':
-      //generalResetStrokeStyle({ scene });
       positionSelectionBlock({ pointer, scene });
       break;
     case 'mininav':
@@ -40,6 +40,7 @@ export async function handleMouseDown({ pointer, scene }) {
   if (DEBUG) console.log('User interactions: handleMouseDown');
 
   switch (scene.game.mode) {
+    case 'gameoflife':
     case 'multiselect':
     case 'select':
 
@@ -260,6 +261,12 @@ export function setGameMode({ scene, mode }) {
     case 'mininav':
       scene.input.setDefaultCursor('crosshair');
       scene.game.mode = 'mininav';
+      break;
+    case 'gameoflife':
+      scene.input.setDefaultCursor('default');
+      scene.game.mode = 'gameoflife';
+
+      generalResetStrokeStyle({ scene, selection: true });
       break;
     default:
       throw new Error('Trying to set unknown game mode: ' + mode);

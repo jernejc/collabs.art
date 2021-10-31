@@ -1,16 +1,15 @@
-
-import config from '@util/config';
-
 import Slideshow from './slideshow';
 
 export default class Overlay {
-  constructor({ parent, close }) {
+  constructor({ game, parent, close }) {
     if (DEBUG) console.log('Overlay: constructor');
 
     if (close)
       this.close = close;
     if (parent)
       this.parent = parent;
+    if (game)
+      this.game = game;
 
     this.domElement = document.createElement('div');
     this.domElement.setAttribute('id', 'overlay');
@@ -22,7 +21,7 @@ export default class Overlay {
     this.overlayContent = document.createElement('div');
     this.overlayContent.classList.add('overlay-content');
 
-    this.slideshow = new Slideshow({parent: this.overlayContent});
+    this.slideshow = new Slideshow({parent: this.overlayContent, game: this.game});
 
     this.overlayNav = document.createElement('div');
     this.overlayNav.classList.add('overlay-nav');
@@ -47,6 +46,10 @@ export default class Overlay {
 
   destroy() {
     this.closeOverlay.removeEventListener('click', this.closeOverlay);
+
+    if (this.slideshow) 
+      this.slideshow.destroy();
+
     this.parent.removeChild(this.domElement);
   }
 }
