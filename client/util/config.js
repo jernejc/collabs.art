@@ -43,7 +43,13 @@ const config = {
   events: {
     url: 'https://pixelworld-2e64c.uc.r.appspot.com'
   },
-  // Need a better solution here
+  appConfig: {
+    canvasElement: 'app',
+    defaultMode: 'select',
+    gridSize: 19,
+    strokeSize: 0.27,
+    strokeColor: '#c1c1c1'
+  },
   slideshow: {
     subtitle: '<span>Contribute to a social</span> experiment.<br /><span>Become a</span> Creator.', // is HTML
     articles: [{ // This goes async from server

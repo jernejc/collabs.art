@@ -1,5 +1,8 @@
 import { Events, Game, WEBGL } from 'phaser';
 
+// Config
+import config from '@util/config';
+
 // Scenes
 import MainScene from '@scenes/main';
 
@@ -10,45 +13,44 @@ import ToolsManager from '@services/tools';
 import GraphManager from '@services/subgraph';
 
 // Game init
-export async function AppInitializer({
-  canvasElement,
-  defaultMode,
-  gridSize,
-  strokeColor,
-  strokeSize
-}) {
-  if (DEBUG) console.log('Init Phaser', canvasElement, defaultMode, gridSize, strokeColor, strokeSize)
+export async function AppInitializer() {
+  if (DEBUG) console.log('AppInitializer')
 
-  const canvas = document.querySelector('#' + canvasElement)
+  const canvas = document.querySelector('#' + config.appConfig.canvasElement)
   const Emitter = new Events.EventEmitter();
   const GameInstance = new Game({
     type: WEBGL,
     width: canvas.clientWidth,
     height: canvas.clientHeight,
-    parent: canvasElement,
+    parent: config.appConfig.canvasElement,
     physics: {
       default: 'arcade'
     }
   });
 
+  let gridSize = config.appConfig.gridSize, strokeSize = config.appConfig.strokeSize;
 
   if (window.devicePixelRatio > 1) {
     // GridSize calc
-    gridSize = parseInt(gridSize - (gridSize * 0.5) / window.devicePixelRatio);
+    gridSize = parseInt(gridSize - (gridSize * 0.35) / window.devicePixelRatio);
     // Stroke size calc
-    strokeSize = strokeSize + (window.devicePixelRatio * (strokeSize * 0.5));
+    strokeSize = strokeSize + (window.devicePixelRatio * (strokeSize * 0.35));
   }
+
+  console.log('window.devicePixelRatio', window.devicePixelRatio);
+  console.log('gridSize', gridSize);
+  console.log('strokeSize', strokeSize);
 
   GameInstance.emitter = Emitter;
   GameInstance.appConfig = {
     canvasWidth: canvas.clientWidth,
     canvasHeight: canvas.clientHeight,
     pixelRatio: window.devicePixelRatio,
-    defaultMode,
-    gridSize,
-    canvasElement,
-    strokeColor,
-    strokeSize
+    defaultMode: config.appConfig.defaultMode,
+    gridSize: gridSize,
+    canvasElement: config.appConfig.canvasElement,
+    strokeColor: config.appConfig.strokeColor,
+    strokeSize: strokeSize
   }
 
   // Init Web3 Manager

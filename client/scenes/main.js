@@ -212,14 +212,9 @@ export default class MainScene extends ApplicationScene {
 
     for (let y = 0; y < this.gridHeight; y++) {
       for (let x = 0; x < this.gridWidth; x++) {
-        // Start top, bottom right
-        /*console.log('this.gridWidth', this.gridWidth)
-        console.log('x', x)
-        console.log('this.gridWidth / x', this.gridWidth / x)*/
-
         let probability = 0.05;
 
-        if (edge > x || x > widthEdge) //(this.gridWidth / x > 1 && this.gridWidth / x < 1.1)
+        if (edge > x || x > widthEdge)
           probability += 0.15
         if (edge > y || y > heightEdge)
           probability += 0.15
