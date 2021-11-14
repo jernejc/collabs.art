@@ -31,9 +31,10 @@ export default class Hue extends Controller {
 
     this.rangepointer.append(this.rangeshape);
     this.rangetrack.append(this.rangepointer);
+
     this.domElement.append(this.rangetrack);
 
-    return this.domElement;
+    this.updateDisplay();
 
     // Helpers
 

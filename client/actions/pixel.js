@@ -118,6 +118,8 @@ export async function colorPixels({ scene, selection }) {
       pixel.color.g,
       pixel.color.b
     )
+
+    pixel.originalColor = null;
   })
 
   scene.worldmap.update();

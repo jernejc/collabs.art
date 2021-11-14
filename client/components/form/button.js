@@ -1,6 +1,6 @@
 
 export default class Button {
-  constructor({ elClasses, text, iconClass, clickAction }) {
+  constructor({ elClasses, text, iconClass, disabled, clickAction }) {
     this.loadingUI = document.createElement('i');
     this.loadingUI.classList.add('gg-loadbar-alt');
 
@@ -9,7 +9,11 @@ export default class Button {
 
     this.triggerActionListener = this.triggerAction.bind(this); // For removeEventListener to work
 
-    if (iconClass) 
+    if (disabled)
+      this.defaultDisabled = disabled;
+    if (this.defaultDisabled)
+      this.domElement.disabled = true;
+    if (iconClass)
       this.setIcon(iconClass);
     if (clickAction)
       this.setClickAction(clickAction);
@@ -74,14 +78,19 @@ export default class Button {
     this.domElement.addEventListener('click', this.triggerActionListener);
   }
 
-  reset() {
-    //this.domElement.removeChild(this.loadingUI);
-    this.domElement.disabled = false;
+  toggleDisabled() {
+    this.domElement.disabled = !this.domElement.disabled;
+  }
 
+  reset() {
     if (this.text)
       this.domElement.textContent = this.text;
     if (this.iconClass)
       this.setIcon();
+    if (this.defaultDisabled)
+      this.domElement.disabled = true;
+    else
+      this.domElement.disabled = false;
   }
 
   destroy() {

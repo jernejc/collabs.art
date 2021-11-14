@@ -162,6 +162,7 @@ export default class Menu {
   createBatchSetting() {
     if (DEBUG) console.log('createBatchSetting');
 
+    const _self = this;
     const pixels = this.game.selection.pixels || null;
 
     if (!pixels || pixels.length === 0)
@@ -224,31 +225,36 @@ export default class Menu {
             await purchasePixels({ scene: this.scene, selection: relevantPixels })
           }
         });
-
         this.settings.append(this.settings.batchCreateBtn.domElement);
 
         break;
       case 'ownerUI':
         relevantPixels = pixels.filter(pixel => pixel.owner === this.game.web3.activeAddress);
 
-        this.settings.append(new ColorPicker(batchSettings, 'color', {
+        this.settings.colorPicker = new ColorPicker(batchSettings, 'color', {
           scene: this.scene,
           type: 'color',
           label: 'Color',
           elClasses: ['setting'],
           format: (value) => '#' + formatColorNumber(value),
           validate: (value) => !isNaN(value) && value.length === 6,
-          update: (value) => relevantPixels.forEach(pixel => pixel.changeToColorNumber(value))
-        }));
+          update: (value) => {
+            relevantPixels.forEach(pixel => pixel.changeToColorNumber(value))
+
+            if (_self.settings.batchApplyBtn)
+              _self.settings.batchApplyBtn.domElement.disabled = false;
+          }
+        });
+        this.settings.append(this.settings.colorPicker.domElement);
 
         this.settings.batchApplyBtn = new Button({
           elClasses: ['action-button', 'action-settings'],
           text: 'Apply',
+          disabled: true,
           clickAction: async e => {
             await colorPixels({ scene: this.scene, selection: this.game.selection.pixels })
           }
         });
-
         this.settings.append(this.settings.batchApplyBtn.domElement);
 
         break;

@@ -25,15 +25,17 @@ export default class ColorPicker extends Controller {
     this.input = document.createElement('input');
     this.input.value = (this.format) ? this.format(this.getValue()) : this.getValue();
     this.input.setAttribute('type', 'text');
+
     this.domElement.append(this.input);
 
     this.color = document.createElement('span');
     this.color.classList.add('color');
     this.color.style = `background: #${formatColorNumber(this.getValue())};`
+
     this.domElement.append(this.color);
 
     this.input.addEventListener('blur', (e) => {
-      if (!preventClose) 
+      if (!preventClose && !params.visible)
         this.colorAdvancedUI.style.display = 'none';
 
       if (params.blur)
@@ -49,7 +51,11 @@ export default class ColorPicker extends Controller {
 
     this.colorAdvancedUI = document.createElement('div');
     this.colorAdvancedUI.classList.add('advanced-color');
-    this.colorAdvancedUI.style.display = 'none'; // Hide by default
+
+    if (params.visible)
+      this.colorAdvancedUI.style.display = 'block';
+    else
+      this.colorAdvancedUI.style.display = 'none';
 
     this.colorAdvancedUI.addEventListener('mouseenter', (e) => {
       //console.log('mouse enter');
@@ -63,40 +69,50 @@ export default class ColorPicker extends Controller {
         preventClose = false
     });
 
-    this.colorAdvancedUI.append(new Hue(this.object[property], 'h', {
+    this.hueController = new Hue(this.object[property], 'h', {
       min: 0,
       max: 1,
       step: 0.001,
-      scene: this.scene
-    }));
+      scene: this.scene,
+      update: () => this.updateDisplay('hue')
+    });
+    this.colorAdvancedUI.append(this.hueController.domElement);
 
-    this.colorAdvancedUI.append(new Saturation(this.object[property], 's', {
+    this.saturationController = new Saturation(this.object[property], 's', {
       min: 0,
       max: 1,
       step: 0.001,
-      scene: this.scene
-    }));
+      scene: this.scene,
+      update: () => this.updateDisplay('saturation')
+    });
+    this.colorAdvancedUI.append(this.saturationController.domElement);
 
     this.domElement.classList.add('color-picker');
     this.domElement.append(this.colorAdvancedUI);
-
-    return this.domElement;
   }
 
   getValue() {
     return _.get(this.object[this.property], 'color');
   }
 
-  updateDisplay() {
-    let value = this.getValue();
+  updateDisplay(component) {
+    if (DEBUG) console.log('ColorPicker: updateDisplay', this.object[this.property])
 
+    let formatted, value = this.getValue();
+
+    // Color picker is just a wrapper, so setValue is not used, need to trigger hooks here
     if (this.format)
-      value = this.format(value);
+      formatted = this.format(value);
+    if (this.update)
+      this.update(value);
 
-    this.input.value = value;
+    if (component === 'hue' && this.saturationController)
+      this.saturationController.updateDisplay();
+
+    this.input.value = formatted;
 
     if (this.color)
-      this.color.style = `background: #${formatColorNumber(this.getValue())};`
+      this.color.style = `background: #${formatColorNumber(value)};`
 
     return super.updateDisplay();
   }

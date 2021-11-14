@@ -45,7 +45,7 @@ const config = {
   },
   // Need a better solution here
   slideshow: {
-    subtitle: '<span>Contribute to social</span> experiment.<br /><span>Become a</span> Creator.', // is HTML
+    subtitle: '<span>Contribute to a social</span> experiment.<br /><span>Become a</span> Creator.', // is HTML
     articles: [{ // This goes async from server
       icon: 'about.svg',
       title: 'About',

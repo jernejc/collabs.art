@@ -8,6 +8,7 @@ import _ from 'lodash';
 export default class Controller {
 
   constructor(object, property, params) {
+    if (DEBUG) console.log('Controller: constructor')
 
     this.object = object;
     this.property = property;
@@ -33,20 +34,6 @@ export default class Controller {
       this.labelElement.textContent = this.label;
       this.domElement.append(this.labelElement)
     }
-
-    if (this.scene) {
-      this.scene.game.emitter.on('controller/update', property => {
-        if (DEBUG) console.log('controller/update', this.property, property);
-
-        if (this.property !== property) // Update UI if emit not comming from the same property -- Components stay in sync
-          this.updateDisplay();
-
-        if (property) { // Not Init
-          if (this.update) // User provided callback
-            this.update(this.getValue());
-        }
-      });
-    }
   }
 
   getValue() {
@@ -54,6 +41,8 @@ export default class Controller {
   }
 
   setValue(v, property) {
+    if (DEBUG) console.log('Controller: setValue', property, v);
+
     let _v = v;
     let _property = property || this.property;
 
@@ -69,8 +58,8 @@ export default class Controller {
 
     this.updateDisplay();
 
-    if (this.scene)
-      this.scene.game.emitter.emit('controller/update', _property);
+    if (this.update) // User provided callback
+      this.update(this.getValue());
 
     return;
   }

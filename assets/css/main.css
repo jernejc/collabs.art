@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Electrolize&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@700&display=swap');
-
 :root {
   --available-color: #02be01;
   --activebid-color: #e5d900;
@@ -458,8 +457,19 @@ Info Box
   right: 2px;
 }
 
-.info-box .arrow {
+/**
+* Info box close btn and arrow pointer 
+**/
+
+.info-box .gg-close-r, .info-box .arrow {
   position: absolute;
+}
+
+.info-box .gg-close-r {
+  --ggs: 0.85;
+  color: #FFF;
+  background: var(--active-black);
+  cursor: pointer;
 }
 
 .info-box.top.left .arrow {
@@ -471,11 +481,25 @@ Info Box
   border-right: 10px solid transparent;
 }
 
+.info-box.top.left .gg-close-r{
+  bottom: -13px;
+  right: -13px;
+  top: auto;
+  left: auto;
+}
+
 .info-box.top.right .arrow {
   top: -1px;
   right: -1px;
   border-top: 10px solid white;
   border-left: 10px solid transparent;
+}
+
+.info-box.top.right .gg-close-r {
+  bottom: -13px;
+  left: -13px;
+  top: auto;
+  right: auto;
 }
 
 .info-box.bottom.left .arrow {
@@ -485,11 +509,25 @@ Info Box
   border-right: 10px solid transparent;
 }
 
+.info-box.bottom.left .gg-close-r {
+  top: -13px;
+  right: -13px;
+  bottom:  auto;
+  left: auto;
+}
+
 .info-box.bottom.right .arrow {
   bottom: -1px;
   right: -1px;
   border-bottom: 10px solid white;
   border-left: 10px solid transparent;
+}
+
+.info-box.bottom.right .gg-close-r {
+  top: -13px;
+  left: -13px;
+  right: auto;
+  bottom:  auto;
 }
 
 .info-box .loadingbar {
@@ -577,10 +615,18 @@ Info Box
   width: 100%;
   background: rgba(255, 255, 255, 0.9);
   cursor: pointer;
+  transition: all 0.3s linear;
 }
 
 .action-button i {
   margin: 0 auto;
+}
+
+.action-button:disabled {
+  opacity: 0.8;
+  background: rgba(100, 100, 100, 0.6) !important;
+  color: #FFF;
+  cursor: not-allowed;
 }
 
 .action-settings {
@@ -662,7 +708,7 @@ Info Box
 .info-box .color-picker {
   position: relative;
   text-align: left;
-  margin-top: 10px;
+  margin-top: 7px;
 }
 
 .info-box .color-picker input {
@@ -677,7 +723,7 @@ Info Box
 
 .info-box .color-picker .advanced-color {
   padding: 0;
-  margin: 10px 0 0 10px;
+  margin: 7px 0 0 10px;
   top: 0;
 }
 
@@ -883,6 +929,8 @@ Info Box
 
 .overlay-content {
   height: 100%;
+  display: flex;
+  align-items: center;
 }
 
 /**
@@ -893,12 +941,13 @@ Info Box
   background: rgba(0, 0, 0, 0.85);
   color: #FFF;
   position: relative;
-  width: 600px;
-  height: 600px;
+  width: 60vw;
+  height: 80vh;
   padding: 30px 60px;
-  top: 10%;
-  left: 10%;
+  left: 6vw;
   overflow: hidden;
+  max-width: 600px;
+  max-height: 600px;
 }
 
 .slides-wrapper {

@@ -61,6 +61,8 @@ export default class SelectionManager {
   }
 
   removeSelected({ tile, scene }) {
+    if (DEBUG) console.log('SelectionManager: removeSelected');
+
     const pixel = Pixel.fromTile({ tile, scene });
 
     this.pixels = this.pixels.filter(p => {
@@ -68,6 +70,7 @@ export default class SelectionManager {
     });
 
     pixel.clearActivePixel();
+    pixel.resetColor();
 
     this.emitter.emit('selection/update', this.pixels);
   }
@@ -88,6 +91,7 @@ export default class SelectionManager {
   clearActiveSelection() {
     this.pixels.forEach(pixel => {
       pixel.clearActivePixel();
+      pixel.resetColor();
     });
 
     this.pixels = [];

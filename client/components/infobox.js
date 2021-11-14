@@ -4,6 +4,8 @@ import Button from '@components/form/button';
 import ColorPicker from '@components/color/picker';
 import LoadingBar from '@components/loading';
 
+import { colorPixels } from '@actions/pixel';
+
 import { formatColorNumber, formatExpireDate } from '@util/helpers';
 
 /**
@@ -49,8 +51,16 @@ export default class InfoBox {
 
     this.arrow = document.createElement('i');
     this.arrow.classList.add('arrow');
-
     this.domElement.append(this.arrow);
+    
+    this.closeBtn = document.createElement('i');
+    this.closeBtn.classList.add('gg-close-r');
+    this.domElement.append(this.closeBtn);
+
+    // Need this for remove to work
+    this.clearSelectionListener = this.game.selection.clearActiveSelection.bind(this.game.selection);
+
+    this.closeBtn.addEventListener('click', this.clearSelectionListener);
 
     this.loadingIcon = new LoadingBar();
 
@@ -83,7 +93,6 @@ export default class InfoBox {
     else
       this.createBidUI();
 
-    this.game.emitter.emit('controller/update'); // Update components once everything is in the dom
     this.setPosition();
   }
 
@@ -115,12 +124,12 @@ export default class InfoBox {
       elClasses: ['label-border-input']
     }));
 
-    this.purchaseUIBtn = new Button({
+    this.purchaseUI.createBtn = new Button({
       elClasses: ['create', 'action-button'],
       text: 'Create',
       clickAction: async e => {
         try {
-          this.preventRefresh = true; // Address event refreshes UI while buying with new account, it's nasty, but it works.
+          this.preventRefresh = true;
 
           // Handle Purchase
           const success = await this.pixel.buy();
@@ -137,7 +146,7 @@ export default class InfoBox {
       }
     });
 
-    this.purchaseUI.append(this.purchaseUIBtn.domElement);
+    this.purchaseUI.append(this.purchaseUI.createBtn.domElement);
 
     this.domElement.classList.add('purchaseUI');
     this.domElement.append(this.purchaseUI);
@@ -156,10 +165,11 @@ export default class InfoBox {
     } /*else
       this.ownerUI.append(this.createInfoText('Owned', 'owned'));*/
 
-    this.ownerUI.append(new ColorPicker(this.pixel, 'color', {
-      //label: 'hex',
+    this.ownerUI.colorPicker = new ColorPicker(this.pixel, 'color', {
       width: '100%',
+      type: 'color',
       scene: this.scene,
+      visible: true,
       elClasses: ['color-picker'],
       format: (value) => '#' + formatColorNumber(value),
       validate: (value) => !isNaN(value) && value.length === 6,
@@ -167,19 +177,26 @@ export default class InfoBox {
         _self.setPosition();
       },
       blur: () => {
-        //console.log('e', e)
         _self.setPosition();
       },
-      update: (value) => { console.log('ColorPicker update', value, _self.pixel.position); _self.pixel.changeToColorNumber(value) }
-    }));
+      update: (value) => {
+        _self.pixel.changeToColorNumber(value)
 
-    /*this.ownerUI.append(new Button({
+        if (_self.ownerUI.applyBtn)
+          _self.ownerUI.applyBtn.domElement.disabled = false;
+      }
+    });
+    this.ownerUI.append(this.ownerUI.colorPicker.domElement);
+
+    this.ownerUI.applyBtn = new Button({
       elClasses: ['apply', 'action-button'],
       text: 'Apply',
+      disabled: true,
       clickAction: async e => {
         await colorPixels({ scene: this.scene, selection: this.game.selection.pixels })
       }
-    }));*/
+    });
+    this.ownerUI.append(this.ownerUI.applyBtn.domElement);
 
     this.domElement.classList.add('ownerUI');
     this.domElement.append(this.ownerUI);
@@ -203,7 +220,7 @@ export default class InfoBox {
       lang: 'en'
     }));
 
-    this.bidUIBtn = new Button({
+    this.bidUI.placeBtn = new Button({
       elClasses: ['bid', 'action-button'],
       text: 'Place Bid',
       clickAction: async e => {
@@ -225,7 +242,7 @@ export default class InfoBox {
       }
     });
 
-    this.bidUI.append(this.bidUIBtn.domElement);
+    this.bidUI.append(this.bidUI.placeBtn.domElement);
 
     this.domElement.classList.add('bidUI');
     this.domElement.append(this.bidUI);
@@ -251,7 +268,7 @@ export default class InfoBox {
         format: (value) => (value) ? value.toFixed(3) : 0
       }));
 
-      this.activeBidUI.append(new Button({
+      this.activeBidUI.raiseBtn = new Button({
         elClasses: ['bid', 'action-button'],
         text: 'Raise Bid',
         clickAction: async e => {
@@ -271,7 +288,8 @@ export default class InfoBox {
             console.error('Failed to buy pixel', error);
           }
         }
-      }))
+      });
+      this.activeBidUI.append(this.activeBidUI.raiseBtn.domElement);
     } else { // Display existing bid
       this.activeBidUI.append(new Input(this.pixel.highestBid, 'amount', {
         label: this.game.web3.currentSymbol,
@@ -295,7 +313,7 @@ export default class InfoBox {
         format: (value) => formatExpireDate(value)
       }));
 
-      this.activeBidUI.append(new Button({
+      this.activeBidUI.cancelBtn = new Button({
         elClasses: ['cancel', 'action-button'],
         text: 'Cancel Bid',
         clickAction: async e => {
@@ -310,7 +328,9 @@ export default class InfoBox {
             console.error('Failed to buy pixel', error);
           }
         }
-      }));
+      });
+
+      this.activeBidUI.append(this.activeBidUI.cancelBtn.domElement);
     }
 
     this.domElement.classList.add('activeBidUI');
@@ -336,9 +356,11 @@ export default class InfoBox {
   destroy() {
     if (DEBUG) console.log('Info box: destroy');
 
-    this.game.emitter.off('controller/update');
+    this.closeBtn.removeEventListener('click', this.clearSelectionListener);
     this.parent.removeChild(this.domElement);
-    this.pixel.infobox = null;
+
+    if (this.pixel) 
+      this.pixel.infobox = null;
   }
 
   hasUI() {

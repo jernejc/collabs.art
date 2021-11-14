@@ -16,6 +16,8 @@ import { purchasePixels } from '@actions/pixel';
 export default class Pixel {
 
   constructor({ tile, scene, color, cx, cy }) {
+    if (DEBUG) console.log('Pixel: constructor', color, cx, cy)
+
     this.tile = tile;
     this.scene = scene;
     this.cx = cx;
@@ -96,23 +98,27 @@ export default class Pixel {
   }
 
   changeToColorHex(hex) {
-    if (DEBUG) console.log('Pixel: changeToColorHex', number, this.tile);
-    
+    if (DEBUG) console.log('Pixel: changeToColorHex', hex, this.tile);
+
     this.originalColor = this.color;
     this.color = Phaser.Display.Color.HexStringToColor('#' + hexToString(hex));
 
     if (this.tile)
       this.tile.setFillStyle(this.color.color);
   }
-  
+
   changeToColorNumber(number) {
-    /*if (DEBUG)*/ console.log('Pixel: changeToColorNumber', number, this.tile);
+    if (DEBUG) console.log('Pixel: changeToColorNumber', number, this.tile);
 
-    this.originalColor = this.color;
-    this.color = Phaser.Display.Color.HexStringToColor('#' + formatColorNumber(number));
+    if (!this.originalColor)
+      this.originalColor = this.color.clone();
 
-    if (this.tile)
+    this.color.setFromRGB(Phaser.Display.Color.IntegerToRGB(number))
+
+    if (this.tile) {
+      //console.log('Pixel: changeToColorNumber FOUND TILE', this.tile, this.color)
       this.tile.setFillStyle(this.color.color);
+    }
   }
 
   async setColor() {
@@ -173,7 +179,7 @@ export default class Pixel {
     if (!this.price)
       this.price = this.scene.game.web3.defaultPrice;
 
-    if (data.color) 
+    if (data.color)
       this.changeToColorHex(data.color);
 
     this.owner = data.owner.toLowerCase();
@@ -206,5 +212,12 @@ export default class Pixel {
     pixel.setGraphData(data);
 
     return pixel;
+  }
+
+  resetColor() {
+    if (this.originalColor) {
+      this.changeToColorNumber(this.originalColor.color);
+      this.originalColor = null;
+    }
   }
 }
