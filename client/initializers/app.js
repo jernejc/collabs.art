@@ -32,14 +32,9 @@ export async function AppInitializer() {
 
   if (window.devicePixelRatio > 1) {
     // GridSize calc
-    gridSize = parseInt(gridSize - (gridSize * 0.35) / window.devicePixelRatio);
-    // Stroke size calc
-    strokeSize = strokeSize + (window.devicePixelRatio * (strokeSize * 0.35));
+    // Size needs to be different based on screen resolution
+    gridSize = parseInt(gridSize - (gridSize * 0.1) / window.devicePixelRatio);
   }
-
-  console.log('window.devicePixelRatio', window.devicePixelRatio);
-  console.log('gridSize', gridSize);
-  console.log('strokeSize', strokeSize);
 
   GameInstance.emitter = Emitter;
   GameInstance.appConfig = {

@@ -46,8 +46,8 @@ const config = {
   appConfig: {
     canvasElement: 'app',
     defaultMode: 'select',
-    gridSize: 19,
-    strokeSize: 0.27,
+    gridSize: 17,
+    strokeSize: 0.25, 
     strokeColor: '#c1c1c1'
   },
   slideshow: {
