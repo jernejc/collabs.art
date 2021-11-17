@@ -256,7 +256,7 @@ export default class ToolsManager {
     this.header.setAttribute('id', 'header');
 
     this.title = document.createElement('h1');
-    this.title.textContent = 'autopoietic.art';
+    this.title.textContent = 'apoietic.art';
 
     this.header.append(this.title);
     this.parent.append(this.header);
