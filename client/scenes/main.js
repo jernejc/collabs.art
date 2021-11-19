@@ -162,7 +162,7 @@ export default class MainScene extends ApplicationScene {
     if (DEBUG) console.log("Main Scene: updateTile");
 
     if (this.gameOfLife) {
-      this.tiles[y][x].setFillStyle(this.tiles[y][x].alive ? 0xFFFFFF : 0x000000);
+      this.tiles[y][x].setFillStyle(this.tiles[y][x].alive ? this.appConfig.defaultTileColor : 0x000000);
       return;
     }
 
@@ -206,18 +206,21 @@ export default class MainScene extends ApplicationScene {
 
     this.gameOfLife = true;
 
-    const edge = 10;
+    const edge = 5;
     const widthEdge = this.gridWidth - edge;
     const heightEdge = this.gridWidth - edge;
 
     for (let y = 0; y < this.gridHeight; y++) {
       for (let x = 0; x < this.gridWidth; x++) {
-        let probability = 0.05;
+        let probability = 0.1;
 
-        if (edge > x || x > widthEdge)
-          probability += 0.15
-        if (edge > y || y > heightEdge)
-          probability += 0.15
+        if (
+          edge > x ||
+          x > widthEdge ||
+          edge > y ||
+          y > heightEdge
+        )
+          probability += 0.1
 
         this.tiles[y][x].alive = probability > Math.random();
       }

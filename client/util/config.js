@@ -46,9 +46,10 @@ const config = {
   appConfig: {
     canvasElement: 'app',
     defaultMode: 'select',
-    gridSize: 17,
+    gridSize: 12,
     strokeSize: 0.25, 
-    strokeColor: '#c1c1c1'
+    strokeColor: '#c1c1c1',
+    defaultTileColor: 0x00fa00
   },
   slideshow: {
     subtitle: '<span>Contribute to a social</span> experiment.<br /><span>Become a</span> Creator.', // is HTML

@@ -42,10 +42,11 @@ export async function AppInitializer() {
     canvasHeight: canvas.clientHeight,
     pixelRatio: window.devicePixelRatio,
     defaultMode: config.appConfig.defaultMode,
-    gridSize: gridSize,
     canvasElement: config.appConfig.canvasElement,
+    defaultTileColor: config.appConfig.defaultTileColor,
     strokeColor: config.appConfig.strokeColor,
-    strokeSize: strokeSize
+    strokeSize,
+    gridSize
   }
 
   // Init Web3 Manager

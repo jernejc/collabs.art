@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Electrolize&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@700&display=swap');
+
 :root {
   --available-color: #02be01;
   --activebid-color: #e5d900;
@@ -53,9 +54,15 @@ input {
 #header {
   background: var(--active-black);
   left: var(--edge-margin);
-  padding: 0px 18px;
-  font-size: 30px;
-  line-height: 50px;
+  display: flex;
+  align-items: center;
+  width: 50px;
+  height: 50px;
+}
+
+#header i {
+  --ggs: 1.5;
+  margin: 0 auto;
 }
 
 #bottom-nav {
@@ -481,7 +488,7 @@ Info Box
   border-right: 10px solid transparent;
 }
 
-.info-box.top.left .gg-close-r{
+.info-box.top.left .gg-close-r {
   bottom: -13px;
   right: -13px;
   top: auto;
@@ -512,7 +519,7 @@ Info Box
 .info-box.bottom.left .gg-close-r {
   top: -13px;
   right: -13px;
-  bottom:  auto;
+  bottom: auto;
   left: auto;
 }
 
@@ -527,7 +534,7 @@ Info Box
   top: -13px;
   left: -13px;
   right: auto;
-  bottom:  auto;
+  bottom: auto;
 }
 
 .info-box .loadingbar {
@@ -973,12 +980,12 @@ Info Box
   margin-right: 10px;
 }
 
-.post-subheading {
+.slide-subheading {
   font-size: 3.7em;
   font-weight: normal;
 }
 
-.post-subheading span {
+.slide-subheading span {
   font-family: 'Libre Franklin', sans-serif;
 }
 
@@ -987,12 +994,12 @@ Info Box
   line-height: 1.2em;
 }
 
-.post-active {
+.slide-active {
   left: 0;
   z-index: 1;
 }
 
-.post-not-active {
+.slide-not-active {
   left: 200%;
   z-index: 0;
 }
@@ -1014,4 +1021,45 @@ Info Box
 
 .progress-bar--primary {
   z-index: 2;
+}
+
+.slides-nav {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  height: 20px;
+  width: 100%;
+}
+
+.slides-nav .nav-item {
+  width: 33.3%;
+  height: 100%;
+  position: relative;
+  display: inline-block;
+}
+
+.slides-nav .nav-item span {
+  position: relative;
+  background: #FFF;
+  padding: 3px 5px;
+  float: left;
+  color: var(--active-black);
+  bottom: 10px;
+}
+
+.slides-nav .nav-item span img {
+  width: 20px;
+}
+
+.slides-nav .progress-bar__fill {
+  background: #FFF;
+}
+
+.slides-nav .nav-item.active .progress-bar__fill {
+  background: #00fa00;
+}
+
+.slides-nav .nav-item.active span {
+  background: #00fa00;
+  color: #FFF;
 }

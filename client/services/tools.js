@@ -255,15 +255,15 @@ export default class ToolsManager {
     this.header = document.createElement('div');
     this.header.setAttribute('id', 'header');
 
-    this.title = document.createElement('h1');
-    this.title.textContent = 'apoietic.art';
+    this.headerIcon = document.createElement('i');
+    this.headerIcon.classList.add('gg-details-more');
 
-    this.header.append(this.title);
+    this.header.append(this.headerIcon);
     this.parent.append(this.header);
   }
 
   addConnectionStatus() {
-    /*if (DEBUG)*/ console.log('ToolsManager: addConnectionStatus');
+    if (DEBUG) console.log('ToolsManager: addConnectionStatus');
 
     this.domConnectionStatus = document.createElement('div');
     this.domConnectionStatus.setAttribute('id', 'connection-status');
@@ -371,7 +371,7 @@ export default class ToolsManager {
     this.networkAlert.style.display = 'flex';
     this.connectionStatusBtn.domElement.style.display = 'block';
     this.domBottomNav.style.display = 'flex';
-    this.header.style.display = 'block';
+    this.header.style.display = 'flex';
 
     this.minimapWrapper.setVisible(true);
     this.minimapBackground.setVisible(true);
