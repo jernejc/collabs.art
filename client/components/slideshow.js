@@ -69,14 +69,14 @@ export default class Slideshow {
     navItem.classList.add('nav-item');
 
     const navTitle = document.createElement('span');
-    navTitle.textContent = title;
+    //navTitle.textContent = title;
 
-    /*if (icon) {
+    if (icon) {
       const navItemIcon = document.createElement('img');
       navItemIcon.src = `assets/images/icons/${icon}`;
 
       navTitle.prepend(navItemIcon);
-    }*/
+    }
 
     const progressBar = document.createElement('div');
     progressBar.classList.add('progress-bar');
@@ -84,6 +84,10 @@ export default class Slideshow {
     const progressBarFill = document.createElement('div');
     progressBarFill.classList.add('progress-bar__fill');
 
+    const progressBarWrap = document.createElement('div');
+    progressBarWrap.classList.add('progress-bar__wrap');
+
+    progressBar.append(progressBarWrap);
     progressBar.append(progressBarFill);
 
     navItem.append(navTitle);
@@ -132,17 +136,22 @@ export default class Slideshow {
     if (this.index === 100) {
       this.index = -5;
 
+      this.slideIndex++;
+
+      // Set active nav
+      this.currentNav.classList.add('nav-active');
+
+      // reset postIndex to loop over the slides again
+      if (this.slideIndex === this.slides.length) {
+        this.stopProgressInterval();
+        return;
+      }
+
       // reset progress bar
       this.currentNav.querySelector('.progress-bar__fill').style.width = 0;
 
       this.currentSlide.classList.remove('slide-active');
       this.currentSlide.classList.add('slide-not-active');
-
-      this.slideIndex++;
-
-      // reset postIndex to loop over the slides again
-      if (this.slideIndex === this.slides.length) 
-        this.slideIndex = 0;
 
       this.currentSlide = this.slides[this.slideIndex];
       this.currentNav = this.navItems[this.slideIndex];
@@ -158,6 +167,12 @@ export default class Slideshow {
 
   destroy() {
     if (DEBUG) console.log('Slideshow: destroy');
+    
+    this.stopProgressInterval();
+  }
+
+  stopProgressInterval() {
+    if (DEBUG) console.log('Slideshow: stopProgressInterval');
 
     if (this.progressInterval) {
       clearInterval(this.progressInterval);

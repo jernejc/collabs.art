@@ -48,7 +48,7 @@ const config = {
     new CleanWebpackPlugin(),
     new CopyPlugin({
       patterns: [{
-        from: path.resolve(__dirname, 'assets'),
+        from: path.resolve(__dirname, 'client/assets'),
         to: path.resolve(__dirname, 'dist/assets')
       }]
     }),
