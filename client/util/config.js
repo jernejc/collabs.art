@@ -47,20 +47,21 @@ const config = {
     canvasElement: 'app',
     defaultMode: 'select',
     gridSize: 12,
-    strokeSize: 0.25, 
+    strokeSize: 0.25,
     strokeColor: '#c1c1c1',
-    defaultTileColor: 0x00fa00
+    defaultTileColors: ['#168A33','#16912A','#197A21','#169116','#208714'],
+    fps: 40
   },
   slideshow: {
     subtitle: '<span>Contribute to a social</span> experiment.<br /><span>Become a</span> Creator.', // is HTML
     articles: [{ // This goes async from server
       icon: 'about.svg',
       title: 'About',
-      body: 'Players collectively draw on a shared canvas by changing the color of individual pixels and thus continuously contribute to the emerging global image. The goal is to illustrate the process of self-organization within a community of random players with the help of blockchain technology.'
+      body: 'Players collectively draw on a shared canvas by changing the color of individual pixels and thus continuously contribute to the emerging global image. The goal is to illustrate the process of self-organization within a community of random players with the help of <a href="https://en.wikipedia.org/wiki/Blockchain" target="_blank">blockchain</a> technology.'
     }, {
       icon: 'ownership.svg',
       title: 'Ownership',
-      body: 'Each pixel on the canvas is represented by a non-fungible token (NFT) on the Ethereum network. Ownership is stored and transferred based on the ERC-721 standard as most digital art and collectibles. It cannot be taken away or destroyed.'
+      body: 'Each pixel on the canvas is represented by a non-fungible token (NFT) on the <a href="https://ethereum.org/" target="_blank">Ethereum</a> network. Ownership is stored and transferred based on the <a href="https://eips.ethereum.org/EIPS/eip-721" target="_blank">ERC-721</a> standard as most digital art and collectibles. It cannot be taken away or destroyed.'
     }, {
       icon: 'social-dynamic.svg',
       title: 'Social dynamic',

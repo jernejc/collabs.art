@@ -129,6 +129,10 @@ export function formatColorNumber(hex) {
   return string;
 }
 
+export function hexStringToColor(hex) {
+  return Phaser.Display.Color.HexStringToColor(hex);
+}
+
 export function fromWei(number) {
   return web3.utils.fromWei(number);
 }

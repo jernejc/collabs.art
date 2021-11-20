@@ -16,15 +16,16 @@ import GraphManager from '@services/subgraph';
 export async function AppInitializer() {
   if (DEBUG) console.log('AppInitializer')
 
-  const canvas = document.querySelector('#' + config.appConfig.canvasElement)
+  const canvas = document.querySelector('#' + config.appConfig.canvasElement);
   const Emitter = new Events.EventEmitter();
   const GameInstance = new Game({
     type: WEBGL,
     width: canvas.clientWidth,
     height: canvas.clientHeight,
     parent: config.appConfig.canvasElement,
-    physics: {
-      default: 'arcade'
+    fps: {
+      target: config.appConfig.fps,
+      forceSetTimeOut: true
     }
   });
 
@@ -38,13 +39,10 @@ export async function AppInitializer() {
 
   GameInstance.emitter = Emitter;
   GameInstance.appConfig = {
+    ...config.appConfig,
     canvasWidth: canvas.clientWidth,
     canvasHeight: canvas.clientHeight,
     pixelRatio: window.devicePixelRatio,
-    defaultMode: config.appConfig.defaultMode,
-    canvasElement: config.appConfig.canvasElement,
-    defaultTileColor: config.appConfig.defaultTileColor,
-    strokeColor: config.appConfig.strokeColor,
     strokeSize,
     gridSize
   }

@@ -15,7 +15,7 @@
   --bottom-bar-settings-height: 36px;
 }
 
-body, h1 {
+body, h1, button {
   font-family: 'Electrolize', sans-serif;
   padding: 0;
   margin: 0;
@@ -902,31 +902,6 @@ Info Box
   font-size: 3em;
 }
 
-#overlay .slideshow {
-  position: relative;
-  margin: 0 auto;
-  z-index: 3;
-  color: #fff;
-  font-family: monospace;
-  font-size: 16px;
-}
-
-#overlay button {
-  background: transparent;
-  line-height: 27px;
-  padding: 0 1em;
-  color: #FFF;
-  border: 1px solid #FFF;
-}
-
-#overlay button.active {
-  background: transparent;
-  line-height: 27px;
-  padding: 0 1em;
-  color: #FFF;
-  border: 1px solid #FFF;
-}
-
 #overlay .overlay-nav {
   margin-top: 10px;
   text-align: center;
@@ -957,6 +932,24 @@ Info Box
   max-height: 600px;
 }
 
+#slideshow button {
+  background: transparent;
+  line-height: 27px;
+  font-size: 18px;
+  padding: 0.3em 1.4em;
+  color: #FFF;
+  border: 1px solid #FFF;
+  position: absolute;
+  bottom: 55px;
+  right: 5%;
+  cursor: pointer;
+}
+
+#slideshow button.active {
+  background: #19610D;
+  border: 1px solid #19610D;
+}
+
 .slides-wrapper {
   position: relative;
   width: 60%;
@@ -983,16 +976,20 @@ Info Box
 .slide-subheading {
   font-size: 3.7em;
   font-weight: normal;
-  margin: 25px 0px;
+  margin: 30px 0px;
 }
 
 .slide-subheading span {
   font-family: 'Libre Franklin', sans-serif;
 }
 
-.post-content {
+.slide-content {
   text-align: justify;
   line-height: 1.2em;
+}
+
+.slide-content a {
+  color: #FFF;
 }
 
 .slide-active {
@@ -1006,9 +1003,6 @@ Info Box
 }
 
 .progress-bar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
   height: 5px;
   width: 100%;
 }
@@ -1017,7 +1011,7 @@ Info Box
   width: 0;
   height: inherit;
   background: #FFF;
-  transition: all 0.13s;
+  transition: background-color 0.13s;
 }
 
 .progress-bar--primary {
@@ -1029,7 +1023,7 @@ Info Box
   height: 30px;
   width: 49%;
   margin: 0 0 0 60px;
-  bottom: 50px;
+  bottom: 60px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1037,20 +1031,21 @@ Info Box
 
 .slides-nav .nav-item {
   width: 33.3%;
-  position: relative;
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .slides-nav .nav-item span {
   background: var(--active-black);
-  padding: 6px;
-  float: right;
   color: var(--active-black);
-  bottom: 10px;
+  padding: 9px;
+  cursor: pointer;
 }
 
 .slides-nav .nav-item span img {
   width: 20px;
+  display: none;
 }
 
 .slides-nav .progress-bar__wrap,
@@ -1060,16 +1055,25 @@ Info Box
 }
 
 .slides-nav .nav-item .progress-bar__fill {
-  background: #00fa00;
+  background: #19610D;
   position: relative;
   bottom: 5px;
 }
 
-.slides-nav .nav-item.nav-active .progress-bar__wrap {
-  background: #00fa00;
+/*.slides-nav .nav-item.nav-active .progress-bar__wrap {
+  background: #19610D;
+}*/
+
+.slides-nav .nav-item.nav-seen span, 
+.slides-nav .nav-item.nav-active span {
+  background: #19610D;
 }
 
-.slides-nav .nav-item.nav-active span {
-  background: rgba(0,250,0,0.8);
-  opacity: 0.7;
+.slides-nav .nav-item.nav-seen .progress-bar__wrap {
+  background: #19610D;
+}
+
+/*.slides-nav .nav-item.nav-active span*/
+.slides-nav .nav-item span:hover {
+  border: 1px solid #fff;
 }

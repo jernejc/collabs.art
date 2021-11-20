@@ -406,7 +406,7 @@ export default class ToolsManager {
 
   installMetamask() {
     /*if (DEBUG)*/ console.log('ToolsManager: installMetamask', this.metamaskURL)
-    
+
     window.open(
       this.metamaskURL,
       '_blank'

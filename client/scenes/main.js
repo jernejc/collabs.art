@@ -3,7 +3,7 @@ import config from '@util/config';
 
 import { getColorForXY } from '@actions/pixel';
 
-import { getCookie } from '@util/helpers';
+import { getCookie, hexStringToColor } from '@util/helpers';
 
 import ApplicationScene from '@scenes/application';
 
@@ -40,7 +40,7 @@ export default class MainScene extends ApplicationScene {
 
     this.size = this.appConfig.gridSize;
     this.strokeSize = this.appConfig.strokeSize;
-    this.strokeColor = Phaser.Display.Color.HexStringToColor(this.appConfig.strokeColor);
+    this.strokeColor = hexStringToColor(this.appConfig.strokeColor);
     this.gridWidth = this.appConfig.canvasWidth / this.size;
     this.gridHeight = this.appConfig.canvasHeight / this.size;
     this.pMax = 1000;
@@ -123,6 +123,15 @@ export default class MainScene extends ApplicationScene {
       if (this.game.web3.onboarding.state !== 'REGISTERED')
         this.startGameOfLife();
     }
+
+    //this.scene.pause();
+  }
+
+  update() {
+    if (DEBUG) console.log('Main scene: update');
+
+    /*if (this.game.mode === 'gameoflife')
+      this.updateTiles()*/
   }
 
   createVisibleTiles() {
@@ -161,8 +170,12 @@ export default class MainScene extends ApplicationScene {
   updateTile(x, y) {
     if (DEBUG) console.log("Main Scene: updateTile");
 
+    const random = hexStringToColor(this.appConfig.defaultTileColors[Phaser.Math.Between(0, this.appConfig.defaultTileColors.length - 1)])
+
     if (this.gameOfLife) {
-      this.tiles[y][x].setFillStyle(this.tiles[y][x].alive ? this.appConfig.defaultTileColor : 0x000000);
+      const fillColor = this.tiles[y][x].alive ? random.color : 0x000000;
+
+      this.tiles[y][x].setFillStyle(fillColor);
       return;
     }
 
@@ -229,7 +242,7 @@ export default class MainScene extends ApplicationScene {
     this.game.tools.hideTools();
 
     this.timer = this.time.addEvent({
-      delay: 150,
+      delay: 160,
       callback: this.nextGeneration,
       callbackScope: this,
       loop: true
