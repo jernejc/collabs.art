@@ -19,7 +19,6 @@ body, h1, button {
   font-family: 'Electrolize', sans-serif;
   padding: 0;
   margin: 0;
-  overflow: hidden;
 }
 
 h1 {
@@ -928,32 +927,15 @@ Info Box
   padding: 30px 60px;
   left: 6vw;
   overflow: hidden;
-  max-width: 550px;
+  max-width: 590px;
   max-height: 600px;
-}
-
-#slideshow button {
-  background: transparent;
-  line-height: 27px;
-  font-size: 18px;
-  padding: 0.3em 1.4em;
-  color: #FFF;
-  border: 1px solid #FFF;
-  position: absolute;
-  bottom: 55px;
-  right: 5%;
-  cursor: pointer;
-}
-
-#slideshow button.active {
-  background: #19610D;
-  border: 1px solid #19610D;
 }
 
 .slides-wrapper {
   position: relative;
   width: 60%;
   margin: 0 0 0 60px;
+  min-height: 290px;
 }
 
 .post {
@@ -961,14 +943,14 @@ Info Box
   width: 100%;
 }
 
-.post-title {
+.slide-title {
   text-transform: uppercase;
   display: flex;
   align-items: center;
   font-size: 1.1em;
 }
 
-.post-title img {
+.slide-title img {
   width: 40px;
   margin-right: 10px;
 }
@@ -1002,28 +984,27 @@ Info Box
   z-index: 0;
 }
 
-.progress-bar {
+.slides-nav .progress-bar {
   height: 5px;
   width: 100%;
 }
 
-.progress-bar__fill {
+.slides-nav .progress-bar__fill {
   width: 0;
   height: inherit;
   background: #FFF;
   transition: background-color 0.13s;
 }
 
-.progress-bar--primary {
+.slides-nav .progress-bar--primary {
   z-index: 2;
 }
 
 .slides-nav {
   position: absolute;
-  height: 30px;
-  width: 49%;
-  margin: 0 0 0 60px;
-  bottom: 60px;
+  height: 39px;
+  width: 100%;
+  bottom: 15px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1034,13 +1015,15 @@ Info Box
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  cursor: pointer;
 }
 
 .slides-nav .nav-item span {
   background: var(--active-black);
   color: var(--active-black);
   padding: 9px;
-  cursor: pointer;
+  transition: background-color linear 300ms;
 }
 
 .slides-nav .nav-item span img {
@@ -1058,13 +1041,24 @@ Info Box
   background: #19610D;
   position: relative;
   bottom: 5px;
+  transition: all 150ms;
 }
 
 /*.slides-nav .nav-item.nav-active .progress-bar__wrap {
   background: #19610D;
 }*/
 
-.slides-nav .nav-item.nav-seen span, 
+.slides-nav .nav-item .nav-title {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 30px;
+  opacity: 0.65;
+  z-index: 4;
+  font-size: 14px;
+}
+
+.slides-nav .nav-item.nav-seen span,
 .slides-nav .nav-item.nav-active span {
   background: #19610D;
 }
@@ -1073,7 +1067,79 @@ Info Box
   background: #19610D;
 }
 
-/*.slides-nav .nav-item.nav-active span*/
-.slides-nav .nav-item span:hover {
+/*.slides-nav .nav-item.nav-active span,*/
+.slides-nav .nav-item:hover span {
   border: 1px solid #fff;
+}
+
+.slides-nav .nav-item:hover .nav-title {
+  display: block;
+}
+
+.slides-nav .play-pause {
+  position: absolute;
+  left: -50px;
+  --ggs: 1.8;
+  padding: 10px;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.slides-nav .play-pause .gg-play-pause {
+  margin-left: 10px;
+}
+
+.slides-nav .slide-action {
+  background: transparent;
+  line-height: 27px;
+  font-size: 18px;
+  padding: 0.3em 1.4em;
+  color: #FFF;
+  border: 1px solid #FFF;
+  position: absolute;
+  bottom: 0px;
+  right: -180px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.slides-nav .slide-action:hover,
+.slides-nav .slide-action.active {
+  background: #19610D;
+  border: 1px solid #19610D;
+}
+
+.slides-nav .slide-action .gg-chevron-double-down {
+  position: absolute;
+  top: -45px;
+  --ggs: 1.6;
+  opacity: 0.7;
+  left: 50%;
+  margin-left: -11px;
+  display: none;
+  animation: bounce 0.7s infinite;
+}
+
+.slides-nav .slide-action.active .gg-chevron-double-down {
+  display: block;
+}
+
+/* Animations */
+
+@keyframes bounce {
+  0% {
+    top: -36px;
+  }
+
+  25%, 75% {
+    top: -38px;
+  }
+
+  50% {
+    top: -40px;
+  }
+
+  100% {
+    top: -36px;
+  }
 }

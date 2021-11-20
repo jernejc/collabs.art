@@ -13,41 +13,50 @@ export default class Slideshow {
     this.domElement.setAttribute('id', 'slideshow');
 
     this.articles = config.slideshow.articles;
+    this.playing = false;
 
     this.setupDom();
-
-    this.progressInterval = setInterval(this.progress.bind(this), 100); // start progress interval
   }
 
   setupDom() {
-    if (DEBUG) console.log('Slideshow: slideTemplate', title, body);
+    /*if (DEBUG)*/ console.log('Slideshow: setupDom');
 
     this.index = 0;
     this.slideIndex = 0;
     this.slides = [];
     this.navItems = [];
 
+    // Slide article 
     this.slidesWrapper = document.createElement('div');
     this.slidesWrapper.classList.add('slides-wrapper');
 
+    // Navigation
     this.navWrapper = document.createElement('div');
     this.navWrapper.classList.add('slides-nav');
 
-    this.navWrapper.addEventListener('click', this.navAction);
+    this.navWrapper.addEventListener('click', this.navAction.bind(this));
 
+    // Play/Pause button
+    this.playPauseBtn = document.createElement('div');
+    this.playPauseBtn.classList.add('play-pause');
+
+    this.playPauseBtn.addEventListener('click', this.playPauseSlideshow.bind(this));
+
+    // Subtitle
     this.subtitle = document.createElement('h2');
     this.subtitle.classList.add('slide-subheading');
     this.subtitle.innerHTML = config.slideshow.subtitle;
 
+    // Action button
     if (this.buttonAction) {
       this.slideActionButton = document.createElement('button');
       this.slideActionButton.classList.add('slide-action');
-      this.slideActionButton.innerText = 'Start game';
+      this.slideActionButton.innerHTML = '<i class="gg-chevron-double-down"></i>Start game';
 
       this.slideActionButton.addEventListener('click', this.buttonAction);
-      this.domElement.append(this.slideActionButton);
     }
 
+    // Load articles
     this.articles.forEach((article, i) => {
       let active = false;
 
@@ -68,11 +77,19 @@ export default class Slideshow {
       }
     });
 
+    // Attach to DOM
+    this.navWrapper.append(this.slideActionButton);
+    this.navWrapper.append(this.playPauseBtn);
+
+    this.slidesWrapper.append(this.navWrapper);
+    this.slidesWrapper.append();
+
     this.domElement.append(this.subtitle);
     this.domElement.append(this.slidesWrapper);
-    this.domElement.append(this.navWrapper);
 
     this.parent.append(this.domElement);
+
+    this.playPauseSlideshow(false);
   }
 
   navTemplate({ title, icon, active }) {
@@ -86,12 +103,10 @@ export default class Slideshow {
     if (active)
       navItem.classList.add('nav-active');
 
-    /*if (icon) {
-      const navItemIcon = document.createElement('img');
-      navItemIcon.src = `assets/images/icons/${icon}`;
+    const navItemTitle = document.createElement('div');
+    navItemTitle.classList.add('nav-title');
 
-      navTitle.prepend(navItemIcon);
-    }*/
+    navItemTitle.innerText = title.split(' ')[0];
 
     const progressBar = document.createElement('div');
     progressBar.classList.add('progress-bar');
@@ -105,6 +120,7 @@ export default class Slideshow {
     progressBar.append(progressBarWrap);
     progressBar.append(progressBarFill);
 
+    navItem.append(navItemTitle);
     navItem.append(navTitle);
     navItem.append(progressBar);
 
@@ -123,7 +139,7 @@ export default class Slideshow {
       slide.classList.add('slide-not-active');
 
     const heading = document.createElement('h2');
-    heading.classList.add('post-title');
+    heading.classList.add('slide-title');
 
     heading.textContent = title;
 
@@ -149,7 +165,7 @@ export default class Slideshow {
     if (DEBUG) console.log('Slideshow: progress', this.index, this.slideIndex);
 
     if (this.index === 100) {
-      this.index = -5;
+      this.index = -1;
 
       this.slideIndex++;
 
@@ -158,7 +174,8 @@ export default class Slideshow {
 
       // Reset postIndex to loop over the slides again
       if (this.slideIndex === this.slides.length) {
-        this.stopProgressInterval();
+        this.playPauseSlideshow();
+
         this.currentNav.classList.remove('nav-active');
         this.currentNav.classList.add('nav-seen');
 
@@ -175,12 +192,8 @@ export default class Slideshow {
       this.currentNav.classList.remove('nav-active');
 
       // Show next slide
-      this.currentSlide = this.slides[this.slideIndex];
-      this.currentSlide.classList.remove('slide-not-active')
-      this.currentSlide.classList.add('slide-active');
-
-      this.currentNav = this.navItems[this.slideIndex];
-      this.currentNav.classList.add('nav-active');
+      this.setActiveSlide({ index: this.slideIndex });
+      this.secActiveNav({ index: this.slideIndex });
     } else {
       this.index++;
 
@@ -195,7 +208,8 @@ export default class Slideshow {
     if (this.buttonAction)
       this.slideActionButton.removeEventListener('click', this.buttonAction);
 
-    this.navWrapper.removeEventListener('click', this.navAction);
+    this.navWrapper.removeEventListener('click', this.navAction.bind(this));
+    this.playPauseBtn.removeEventListener('click', this.playPauseSlideshow.bind(this));
 
     this.stopProgressInterval();
   }
@@ -209,7 +223,92 @@ export default class Slideshow {
     }
   }
 
-  navAction() {
+  navAction(e) {
+    if (DEBUG) console.log('Slideshow: navAction');
 
+    const children = Array.prototype.slice.call(this.navWrapper.children);
+    let navItem;
+
+    if (e.target.classList.contains('nav-item'))
+      navItem = e.target;
+    else
+      navItem = e.target.closest('.nav-item');
+
+    const goToIndex = children.indexOf(navItem);
+
+    if (goToIndex > -1) {
+      this.index = -1;
+      this.resetSlideShow(goToIndex);
+    }
+  }
+
+  playPauseSlideshow(reset) {
+    if (DEBUG) console.log('Slideshow: playPauseSlideshow');
+
+    const playIcon = '<i class="gg-play-button"></i>';
+    const pauseIcon = '<i class="gg-play-pause"></i>';
+
+    const navItemsSeen = this.navWrapper.querySelectorAll('.nav-item.nav-seen');
+
+    this.playing = !this.playing;
+    this.playPauseBtn.innerHTML = (this.playing) ? pauseIcon : playIcon;
+
+    if ((navItemsSeen.length === this.navItems.length) || reset)
+      this.resetSlideShow(0);
+
+    if (this.playing) {
+      this.progressInterval = setInterval(this.progress.bind(this), 150); // start progress interval
+    } else {
+      this.stopProgressInterval();
+    }
+  }
+
+  resetSlideShow(toIndex) {
+    if (DEBUG) console.log('Slideshow: resetSlideShow');
+
+    this.slides.forEach((slide, index) => {
+
+      slide.classList.add('slide-not-active');
+      slide.classList.remove('slide-active');
+
+      const navItem = this.navItems[index];
+      navItem.classList.remove('nav-active');
+
+      if (this.playing && toIndex > index)
+        navItem.classList.add('nav-seen');
+      else if (!this.playing && toIndex >= index)
+        navItem.classList.add('nav-seen');
+      else
+        navItem.classList.remove('nav-seen');
+
+      navItem.querySelector('.progress-bar__fill').style.width = 0;
+
+      if ((index === toIndex) || (!toIndex && index === 0)) {
+        this.slideIndex = index;
+
+        this.setActiveSlide({ index })
+        this.secActiveNav({ index })
+      }
+    });
+
+    if ((this.slideIndex === this.slides.length - 1) && !this.playing)
+      this.slideActionButton.classList.add('active');
+    else
+      this.slideActionButton.classList.remove('active');
+  }
+
+  setActiveSlide({ index, slide }) {
+    if (DEBUG) console.log('Slideshow: setActiveSlide');
+    
+    this.currentSlide = slide || this.slides[index];
+    this.currentSlide.classList.remove('slide-not-active');
+    this.currentSlide.classList.add('slide-active');
+  }
+
+  secActiveNav({ index, navItem }) {
+    if (DEBUG) console.log('Slideshow: secActiveNav');
+
+    this.currentNav = navItem || this.navItems[index];
+    this.currentNav.classList.add('nav-active');
   }
 }

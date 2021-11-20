@@ -53,7 +53,7 @@ const config = {
     fps: 40
   },
   slideshow: {
-    subtitle: '<span>Contribute to a social</span> experiment.<br /><span>Become a</span> Creator.', // is HTML
+    subtitle: '<span>Contribute to a living</span> canvas.<br /><span>Become a</span> Creator.', // is HTML
     articles: [{ // This goes async from server
       icon: 'about.svg',
       title: 'About',
@@ -65,7 +65,7 @@ const config = {
     }, {
       icon: 'social-dynamic.svg',
       title: 'Social dynamic',
-      body: 'Once a player takes ownership of a pixel he or she can control its color, but also auction it to a different player if an agreement between them is reached. The experiment is decentralized and not controlled by any single actor so in theory it cannot be stopped.'
+      body: 'Once a player takes ownership of a pixel he or she can control its color, but also auction it to a different player if an agreement between them is reached. The experiment is decentralized and not controlled by any single actor so it cannot be stopped.'
     }]
   }
 }
