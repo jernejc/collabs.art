@@ -122,7 +122,7 @@ export default class Pixel {
   }
 
   async setColor() {
-    if (DEBUG) console.log("setColor", this.cx, this.cy, this.color, this.HEXcolor);
+    /*if (DEBUG)*/ console.log("setColor", this.cx, this.cy, this.color, this.HEXcolor);
 
     try {
       await this.scene.game.web3.pixelContract.methods.setColor(

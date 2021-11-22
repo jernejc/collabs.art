@@ -52,7 +52,7 @@ export function getTileForXY({ x, y, scene }) {
 }
 
 export async function purchasePixels({ scene, selection }) {
-  if (DEBUG) console.log('purchasePixels', selection)
+  if (DEBUG) console.log('purchasePixels', selection, scene.game.web3.activeAddress)
 
   let fullPrice = 0, positions = []; //, gas = 20000; 
 
@@ -63,9 +63,10 @@ export async function purchasePixels({ scene, selection }) {
     return false;
 
   selection.forEach(pixel => {
+    //console.log('pushing position', stringToBN(pixel.position));
     positions.push(stringToBN(pixel.position));
     fullPrice += Number(pixel.price);
-    //gas += 10000; // 10000 gas per pixel
+    //gas += 250000; // 10000 gas per pixel
     pixel.owner = scene.game.web3.activeAddress;
   })
 
@@ -110,7 +111,13 @@ export async function colorPixels({ scene, selection }) {
   }
 
   // Set colors on the image
-  selection.forEach(pixel => {
+  updateWorldImagePixelColors({ pixels: selection, scene });
+}
+
+export function updateWorldImagePixelColors({ pixels, scene, updateTile }) {
+  if (DEBUG) console.log('updateWorldImagePixelColors', pixels, scene);
+
+  pixels.forEach(pixel => {
     scene.worldmap.setPixel(
       pixel.cx,
       pixel.cy,
@@ -119,8 +126,14 @@ export async function colorPixels({ scene, selection }) {
       pixel.color.b
     )
 
-    pixel.originalColor = null;
-  })
+    if (pixel.originalColor)
+      pixel.originalColor = null;
+
+    const tile = getRelativeTile({ cx: pixel.cx, cy: pixel.cy, scene });
+
+    if (tile)
+      tile.setFillStyle(pixel.color.color);
+  });
 
   scene.worldmap.update();
 }

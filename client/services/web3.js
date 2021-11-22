@@ -3,7 +3,10 @@ import Web3 from 'web3';
 import MetaMaskOnboarding from '@metamask/onboarding'
 
 import config from '@util/config';
-import { stringToBN } from '@util/helpers';
+
+import { stringToBN, formatPosition, hexStringToColor } from '@util/helpers';
+
+import { updateWorldImagePixelColors } from '@actions/pixel';
 
 export default class Web3Manager {
 
@@ -14,7 +17,7 @@ export default class Web3Manager {
     this.emitter = emitter;
 
     this.onboarding = new MetaMaskOnboarding();
-    this.instance = null;
+    this.RPCinstance = null;
     this.bidContract = null;
     this.pixelContract = null;
     this.defaultPrice = null;
@@ -24,11 +27,11 @@ export default class Web3Manager {
   }
 
   get isConnectedToRPC() {
-    return this.instance && this.instance.currentProvider && this.instance.currentProvider.isConnected();
+    return this.RPCinstance && this.RPCinstance.currentProvider && this.RPCinstance.currentProvider.isConnected();
   }
 
   get isProviderConnected() {
-    return this.instance && this.activeAddress;
+    return this.RPCinstance && this.activeAddress;
   }
 
   get isNetworkConnected() {
@@ -43,25 +46,18 @@ export default class Web3Manager {
     return (this.network && this.network.nativeCurrency) ? this.network.nativeCurrency.symbol : 'tMATIC';
   }
 
-  async initProvider() {
-    if (DEBUG) console.log('Web3Manager: initProvider');
+  async initProviders() {
+    if (DEBUG) console.log('Web3Manager: initProviders');
 
     if (window.ethereum) {
       this.hasMetamask = true;
-      this.instance = new Web3(window.ethereum);
+      this.RPCinstance = new Web3(window.ethereum);
 
       // Enable web3 related events
       this.enableProviderEvents();
 
       // Get network and chain data
       await this.getNetworkAndChainId();
-
-      // Init contracts if network received
-      if (this.isNetworkConnected) {
-        this.initContracts();
-        this.getDefaultPrice();
-        this.enableContractEvents();
-      }
 
       // Get connected accounts
       await this.getAccounts();
@@ -71,15 +67,34 @@ export default class Web3Manager {
   initContracts() {
     if (DEBUG) console.log('Web3Manager: initContracts');
 
-    this.bidContract = new this.instance.eth.Contract(
-      config.contracts.bids.abi,
-      config.contracts.bids.address
-    );
+    if (this.RPCinstance) {
+      this.bidContract = new this.RPCinstance.eth.Contract(
+        config.contracts.bids.abi,
+        config.contracts.bids.address
+      );
 
-    this.pixelContract = new this.instance.eth.Contract(
-      config.contracts.pixels.abi,
-      config.contracts.pixels.address
-    );
+      this.pixelContract = new this.RPCinstance.eth.Contract(
+        config.contracts.pixels.abi,
+        config.contracts.pixels.address
+      );
+    }
+
+    if (this.websocketInstance) {
+      this.eventBidContract = new this.websocketInstance.eth.Contract(
+        config.contracts.bids.abi,
+        config.contracts.bids.address
+      );
+
+      this.eventPixelContract = new this.websocketInstance.eth.Contract(
+        config.contracts.pixels.abi,
+        config.contracts.pixels.address
+      );
+    }
+  }
+
+  connectWebsocket() {
+    if (this.network.wsUrls && this.network.wsUrls.length > 0)
+      this.websocketInstance = new Web3(this.network.wsUrls[0]);
   }
 
   enableProviderEvents() {
@@ -87,19 +102,38 @@ export default class Web3Manager {
 
     const _self = this; // Had to wrap them in anonymous functions to handle 'this'
 
+    this.handleNewChainListener = chainId => _self.handleNewChain(chainId);
+    this.handleNewNetworkListener = networkId => _self.handleNewNetwork(networkId);
+    this.handleAccountsChangedListener = accounts => _self.handleAccountsChanged(accounts);
+
     // Provider events
-    this.instance.currentProvider.on('chainChanged', chainId => _self.handleNewChain(chainId));
-    this.instance.currentProvider.on('networkChanged', networkId => _self.handleNewNetwork(networkId));
-    this.instance.currentProvider.on('accountsChanged', accounts => _self.handleAccountsChanged(accounts));
-    //this.instance.currentProvider.on('message', msg => _self.handleProviderMessage(msg));
+    this.RPCinstance.currentProvider.on('chainChanged', this.handleNewChainListener);
+    this.RPCinstance.currentProvider.on('networkChanged', this.handleNewNetworkListener);
+    this.RPCinstance.currentProvider.on('accountsChanged', this.handleAccountsChangedListener);
+    //this.RPCinstance.currentProvider.on('message', msg => _self.handleProviderMessage(msg));
   }
 
   enableContractEvents() {
-    if (DEBUG) console.log('Web3Manager: enableContractEvents', this.instance.eth);
+    if (DEBUG) console.log('Web3Manager: enableContractEvents', this.pixelContract.events.ColorPixels());
 
     // Contract events
-    this.pixelContract.events.ColorPixel({ fromBlock: this.instance.eth.blockNumber }).on('data', (event) => { /*if (DEBUG)*/ console.log('ColorPixel', event) });
-    this.pixelContract.events.ColorPixels({ fromBlock: this.instance.eth.blockNumber }).on('data', (event) => { /*if (DEBUG)*/ console.log('ColorPixels', event) });
+    if (this.websocketInstance) {
+      this.socketColorPixelsListener = this.eventPixelContract.events.ColorPixels({ fromBlock: 'latest' })
+        .on('data', (e) => {
+          if (DEBUG) console.log('ColorPixels', e);
+          const _positions = e.returnValues._positions;
+          const _colors = e.returnValues._colors;
+
+          const pixels = _positions.map((position, i) => {
+            return {
+              ...formatPosition(Web3.utils.hexToUtf8(Web3.utils.numberToHex(position))),
+              color: hexStringToColor('#' + Web3.utils.hexToUtf8(_colors[i]))
+            }
+          });
+
+          updateWorldImagePixelColors({ pixels, scene: this.game.scene.keys["MainScene"], updateTile: true })
+        });
+    }
   }
 
   handleNewChain(chainId) {
@@ -124,7 +158,15 @@ export default class Web3Manager {
     } else
       this.network = supported;
 
-    this.getDefaultPrice();
+    this.removeAllListeners();
+
+    if (this.network) {
+      this.connectWebsocket();
+      this.initContracts();
+      this.getDefaultPrice();
+      this.enableContractEvents();
+    }
+
     this.emitter.emit('web3/network', this.network);
   }
 
@@ -170,13 +212,13 @@ export default class Web3Manager {
     if (DEBUG) console.log('Web3Manager: getNetworkAndChainId');
 
     try {
-      const chainId = await this.instance.currentProvider.request({
+      const chainId = await this.RPCinstance.currentProvider.request({
         method: 'eth_chainId',
       });
 
       this.handleNewChain(chainId)
 
-      const networkId = await this.instance.currentProvider.request({
+      const networkId = await this.RPCinstance.currentProvider.request({
         method: 'net_version',
       });
 
@@ -189,7 +231,7 @@ export default class Web3Manager {
   async requestAccounts() {
     if (DEBUG) console.log('Web3Manager: requestAccounts');
 
-    const accounts = await this.instance.currentProvider.request({
+    const accounts = await this.RPCinstance.currentProvider.request({
       method: 'eth_requestAccounts',
     });
 
@@ -201,7 +243,7 @@ export default class Web3Manager {
   async getAccounts() {
     if (DEBUG) console.log('Web3Manager: getAccounts');
 
-    const accounts = await this.instance.currentProvider.request({
+    const accounts = await this.RPCinstance.currentProvider.request({
       method: 'eth_accounts',
     });
 
@@ -216,7 +258,7 @@ export default class Web3Manager {
     let { id, enabled, ...chainConfig } = networkConfig;
 
     try {
-      await this.instance.currentProvider.request({
+      await this.RPCinstance.currentProvider.request({
         method: 'wallet_addEthereumChain',
         params: [chainConfig]
       });
@@ -236,7 +278,7 @@ export default class Web3Manager {
       throw new Error('Unsupported network.');
 
     try {
-      await this.instance.currentProvider.request({
+      await this.RPCinstance.currentProvider.request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: networkConfig.chainId }]
       });
@@ -278,5 +320,10 @@ export default class Web3Manager {
       return this.activeAddress;
     else
       throw new Error('No activeAddress found');
+  }
+
+  removeAllListeners() {
+    if (this.socketColorPixelsListener)
+      this.socketColorPixelsListener.removeAllListeners('data');
   }
 }

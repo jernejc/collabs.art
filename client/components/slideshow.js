@@ -19,7 +19,7 @@ export default class Slideshow {
   }
 
   setupDom() {
-    /*if (DEBUG)*/ console.log('Slideshow: setupDom');
+    if (DEBUG) console.log('Slideshow: setupDom');
 
     this.index = 0;
     this.slideIndex = 0;
@@ -51,7 +51,7 @@ export default class Slideshow {
     if (this.buttonAction) {
       this.slideActionButton = document.createElement('button');
       this.slideActionButton.classList.add('slide-action');
-      this.slideActionButton.innerHTML = '<i class="gg-chevron-double-down"></i>Start game';
+      this.slideActionButton.innerHTML = '<i class="gg-chevron-down"></i>' + config.slideshow.slideActionText;
 
       this.slideActionButton.addEventListener('click', this.buttonAction);
     }
@@ -253,11 +253,13 @@ export default class Slideshow {
     this.playing = !this.playing;
     this.playPauseBtn.innerHTML = (this.playing) ? pauseIcon : playIcon;
 
-    if ((navItemsSeen.length === this.navItems.length) || reset)
+    if (navItemsSeen.length === this.navItems.length)
       this.resetSlideShow(0);
+    if (reset)
+      this.resetSlideShow(this.slideIndex);
 
     if (this.playing) {
-      this.progressInterval = setInterval(this.progress.bind(this), 150); // start progress interval
+      this.progressInterval = setInterval(this.progress.bind(this), 100); // start progress interval
     } else {
       this.stopProgressInterval();
     }
@@ -299,7 +301,7 @@ export default class Slideshow {
 
   setActiveSlide({ index, slide }) {
     if (DEBUG) console.log('Slideshow: setActiveSlide');
-    
+
     this.currentSlide = slide || this.slides[index];
     this.currentSlide.classList.remove('slide-not-active');
     this.currentSlide.classList.add('slide-active');

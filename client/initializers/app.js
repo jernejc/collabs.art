@@ -26,6 +26,9 @@ export async function AppInitializer() {
     fps: {
       target: config.appConfig.fps,
       forceSetTimeOut: true
+    },
+    scale: {
+      mode: Phaser.Scale.RESIZE
     }
   });
 
@@ -50,7 +53,7 @@ export async function AppInitializer() {
   // Init Web3 Manager
   GameInstance.web3 = new Web3Manager(GameInstance, Emitter);
   // Web3Provider init is async
-  await GameInstance.web3.initProvider();
+  await GameInstance.web3.initProviders();
 
   // Init Selection Manager
   GameInstance.selection = new SelectionManager(GameInstance, Emitter);

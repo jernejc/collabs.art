@@ -1,12 +1,11 @@
+import _ from 'lodash';
 
 import config from '@util/config';
 
-import { getColorForXY } from '@actions/pixel';
-
 import { getCookie, hexStringToColor } from '@util/helpers';
-
 import ApplicationScene from '@scenes/application';
 
+import { getColorForXY } from '@actions/pixel';
 import {
   handleMouseMove,
   handleMouseDown,
@@ -124,7 +123,11 @@ export default class MainScene extends ApplicationScene {
         this.startGameOfLife();
     }
 
-    //this.scene.pause();
+    window.addEventListener('resize', () => {
+      //console.log('window resize', window.innerWidth, window.innerHeight);
+      //this.resizeGame();
+      //this.resizeDebounce()
+    });
   }
 
   update() {
@@ -132,6 +135,21 @@ export default class MainScene extends ApplicationScene {
 
     /*if (this.game.mode === 'gameoflife')
       this.updateTiles()*/
+  }
+
+  resizeGame() {
+    /*if (DEBUG)*/ console.log('Main scene: resizeGame');
+
+    //this.game.scale.resize(window.innerWidth, window.innerHeight);
+  }
+
+  resizeMainScene() {
+    /*if (DEBUG)*/ console.log('Main scene: resizeMainScene');
+
+    //this.scene.stop();
+    //this.registry.destroy();
+    //this.events.off();
+    //this.scene.start();
   }
 
   createVisibleTiles() {
