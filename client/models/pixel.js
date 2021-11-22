@@ -191,8 +191,6 @@ export default class Pixel {
   }
 
   clearActivePixel() {
-    console.log('clearActivePixel');
-    
     if (this.tile)
       resetStrokeStyle({ tile: this.tile, scene: this.scene });
   }

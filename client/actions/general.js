@@ -302,11 +302,11 @@ export function resetStrokeStyle({ tile, scene, size, alpha=0.2 }) {
 }
 
 export function setInvertedStroke({ tile, scene }) {
-  /*if (DEBUG)*/ console.log('User interactions: setInvertedStroke');
+  if (DEBUG) console.log('User interactions: setInvertedStroke');
 
   const invertedColor = invertColor(tile.fillColor, true);
 
-  tile.setStrokeStyle(scene.strokeSize + 1, invertedColor.color, 1);
+  tile.setStrokeStyle(scene.strokeSize + (1 * window.devicePixelRatio), invertedColor.color, 1);
   tile.setDepth(10);
 }
 

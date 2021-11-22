@@ -42,7 +42,7 @@ export async function AppInitializer() {
     // GridSize calc
     // Size needs to be different based on screen resolution
     gridSize = parseInt(gridSize + (gridSize * 0.2) / window.devicePixelRatio);
-    strokeSize = strokeSize / window.devicePixelRatio;
+    strokeSize = strokeSize - (gridSize * 0.2 / window.devicePixelRatio);
   }
 
   GameInstance.emitter = Emitter;
