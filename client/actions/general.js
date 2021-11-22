@@ -244,7 +244,7 @@ export function setGameMode({ scene, mode }) {
       scene.input.setDefaultCursor('grabbing');
       scene.game.mode = 'move';
 
-      generalResetStrokeStyle({ scene, size: 0 });
+      generalResetStrokeStyle({ scene, alpha: 0 });
       break;
     case 'select':
       scene.input.setDefaultCursor('default');
@@ -274,8 +274,8 @@ export function setGameMode({ scene, mode }) {
   //scene.game.emitter.emit('scene/mode', mode);
 }
 
-export function generalResetStrokeStyle({ scene, size, selection }) {
-  if (DEBUG) console.log('generalStrokeReset', scene, size);
+export function generalResetStrokeStyle({ scene, size, selection, alpha }) {
+  if (DEBUG) console.log('generalStrokeReset', scene, size, alpha);
 
   for (let y = 0; y < scene.gridHeight; y++) {
     for (let x = 0; x < scene.gridWidth; x++) {
@@ -285,22 +285,24 @@ export function generalResetStrokeStyle({ scene, size, selection }) {
         if (selection && scene.game.selection.isSelected(tile.cx, tile.cy))
           setInvertedStroke({ scene, tile });
         else
-          resetStrokeStyle({ tile, scene, size });
+          resetStrokeStyle({ tile, scene, size, alpha });
       }
     }
   }
 }
 
-export function resetStrokeStyle({ tile, scene, size = 0.9 }) {
+export function resetStrokeStyle({ tile, scene, size, alpha=0.2 }) {
   // Reset stroke around the tile
+  size = size || scene.strokeSize;
+
   if (tile) {
-    tile.setStrokeStyle(scene.strokeSize, scene.strokeColor.color, size);
+    tile.setStrokeStyle(size, scene.strokeColor.color, alpha);
     tile.setDepth(0);
   }
 }
 
 export function setInvertedStroke({ tile, scene }) {
-  if (DEBUG) console.log('User interactions: setInvertedStroke');
+  /*if (DEBUG)*/ console.log('User interactions: setInvertedStroke');
 
   const invertedColor = invertColor(tile.fillColor, true);
 

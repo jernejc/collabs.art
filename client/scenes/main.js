@@ -54,9 +54,6 @@ export default class MainScene extends ApplicationScene {
 
     this.createVisibleTiles();
 
-    setGameMode({ scene: this, mode: this.appConfig.defaultMode });
-    moveToPosition({ ...getLastPosition(), scene: this });
-
     this.game.tools.addMinimap(this);
 
     /** 
@@ -118,16 +115,16 @@ export default class MainScene extends ApplicationScene {
     // Main scene is ready.
     this.game.emitter.emit('scene/ready');
 
+    moveToPosition({ ...getLastPosition(), scene: this });
+
     if (this.game.web3.onboarding) {
-      if (this.game.web3.onboarding.state !== 'REGISTERED')
+      if (this.game.web3.onboarding.state !== 'REGISTERED') {
         this.startGameOfLife();
+      } else
+        setGameMode({ scene, mode: 'select' })
     }
 
-    window.addEventListener('resize', () => {
-      //console.log('window resize', window.innerWidth, window.innerHeight);
-      //this.resizeGame();
-      //this.resizeDebounce()
-    });
+    //window.addEventListener('resize', this.resize.bind(this));
   }
 
   update() {
@@ -137,19 +134,21 @@ export default class MainScene extends ApplicationScene {
       this.updateTiles()*/
   }
 
-  resizeGame() {
-    /*if (DEBUG)*/ console.log('Main scene: resizeGame');
+  // based on https://supernapie.com/blog/support-retina-with-phaser-3/
+  resize() {
+    let w = window.innerWidth * window.devicePixelRatio;
+    let h = window.innerHeight * window.devicePixelRatio;
 
-    //this.game.scale.resize(window.innerWidth, window.innerHeight);
-  }
+    //this.scale.resize(w, h);
 
-  resizeMainScene() {
-    /*if (DEBUG)*/ console.log('Main scene: resizeMainScene');
-
-    //this.scene.stop();
-    //this.registry.destroy();
-    //this.events.off();
-    //this.scene.start();
+    /*for (let scene of this.scene.manager.scenes) {
+      if (scene.scene.settings.active) {
+        scene.cameras.main.setViewport(0, 0, w, h);
+        if (scene.resizeField) {
+          scene.resizeField(w, h);
+        }
+      }
+    }*/
   }
 
   createVisibleTiles() {
@@ -192,7 +191,6 @@ export default class MainScene extends ApplicationScene {
 
     if (this.gameOfLife) {
       const fillColor = this.tiles[y][x].alive ? random.color : 0x000000;
-
       this.tiles[y][x].setFillStyle(fillColor);
       return;
     }

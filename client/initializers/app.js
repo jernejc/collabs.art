@@ -17,18 +17,22 @@ export async function AppInitializer() {
   if (DEBUG) console.log('AppInitializer')
 
   const canvas = document.querySelector('#' + config.appConfig.canvasElement);
+  const canvasWidth = canvas.clientWidth //* window.devicePixelRatio;
+  const canvasHeight = canvas.clientHeight //* window.devicePixelRatio;
+
   const Emitter = new Events.EventEmitter();
   const GameInstance = new Game({
     type: WEBGL,
-    width: canvas.clientWidth,
-    height: canvas.clientHeight,
+    width: canvasWidth,
+    height: canvasHeight,
     parent: config.appConfig.canvasElement,
     fps: {
       target: config.appConfig.fps,
       forceSetTimeOut: true
     },
     scale: {
-      mode: Phaser.Scale.RESIZE
+      mode: Phaser.Scale.RESIZE,
+      //zoom: 1 / window.devicePixelRatio
     }
   });
 
@@ -37,17 +41,18 @@ export async function AppInitializer() {
   if (window.devicePixelRatio > 1) {
     // GridSize calc
     // Size needs to be different based on screen resolution
-    gridSize = parseInt(gridSize - (gridSize * 0.1) / window.devicePixelRatio);
+    gridSize = parseInt(gridSize + (gridSize * 0.2) / window.devicePixelRatio);
+    strokeSize = strokeSize / window.devicePixelRatio;
   }
 
   GameInstance.emitter = Emitter;
   GameInstance.appConfig = {
     ...config.appConfig,
-    canvasWidth: canvas.clientWidth,
-    canvasHeight: canvas.clientHeight,
+    canvasWidth: canvasWidth,
+    canvasHeight: canvasHeight,
     pixelRatio: window.devicePixelRatio,
-    strokeSize,
-    gridSize
+    gridSize,
+    strokeSize
   }
 
   // Init Web3 Manager
