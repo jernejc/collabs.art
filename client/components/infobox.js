@@ -121,6 +121,7 @@ export default class InfoBox {
       disabled: true,
       border: true,
       scene: this.scene,
+      type: 'number',
       elClasses: ['label-border-input']
     }));
 

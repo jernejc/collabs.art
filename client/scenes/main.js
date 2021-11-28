@@ -121,18 +121,18 @@ export default class MainScene extends ApplicationScene {
       if (this.game.web3.onboarding.state !== 'REGISTERED') {
         this.startGameOfLife();
       } else
-        setGameMode({ scene, mode: 'select' })
+        setGameMode({ scene: this, mode: 'select' });
     }
 
     //window.addEventListener('resize', this.resize.bind(this));
   }
 
-  update() {
+  /*update() {
     if (DEBUG) console.log('Main scene: update');
 
-    /*if (this.game.mode === 'gameoflife')
-      this.updateTiles()*/
-  }
+    if (this.game.mode === 'gameoflife')
+      this.updateTiles()
+  }*/
 
   // based on https://supernapie.com/blog/support-retina-with-phaser-3/
   resize() {

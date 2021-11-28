@@ -51,7 +51,7 @@ export default class Slideshow {
     if (this.buttonAction) {
       this.slideActionButton = document.createElement('button');
       this.slideActionButton.classList.add('slide-action');
-      this.slideActionButton.innerHTML = '<i class="gg-chevron-down"></i>' + config.slideshow.slideActionText;
+      this.slideActionButton.innerHTML = '<i class="gg-chevron-double-down"></i>' + config.slideshow.slideActionText;
 
       this.slideActionButton.addEventListener('click', this.buttonAction);
     }

@@ -23,7 +23,10 @@ export function handleMouseMove({ pointer, scene }) {
       else
         scene.input.setDefaultCursor('copy');
 
-      positionSelectionBlock({ pointer, scene });
+      if (pointer.isDown && scene.game.selection.rectangleSelection)
+        scene.game.selection.resizeRectangleSelection({ pointer, scene });
+      else
+        positionSelectionBlock({ pointer, scene });
       break;
     case 'gameoflife':
     case 'select':
@@ -42,13 +45,14 @@ export async function handleMouseDown({ pointer, scene }) {
   switch (scene.game.mode) {
     case 'gameoflife':
     case 'multiselect':
-    case 'select':
-
       if (pointer.button === 2) { // Detect right click
         //scene.game.selection.reset();
         return;
       }
 
+      scene.game.selection.createRectangleSelection({ pointer, scene });
+      break;
+    case 'select':
       const tile = getTileForPointer({ pointer, scene });
 
       if (scene.gameOfLife) {
@@ -59,8 +63,7 @@ export async function handleMouseDown({ pointer, scene }) {
       if (scene.game.selection.isSelected(tile.cx, tile.cy))
         scene.game.selection.removeSelected({ tile, scene });
       else
-        await scene.game.selection.addSelected({ tile, scene });
-
+        await scene.game.selection.addSelected({ tiles: [tile], scene });
       break;
     case 'mininav':
       navigateMinimap({ pointer, scene: scene.minimap })
@@ -68,8 +71,50 @@ export async function handleMouseDown({ pointer, scene }) {
   }
 }
 
-export function handleMouseUp({ pointer, scene }) {
-  if (DEBUG) console.log('User interactions: handleMouseUp');
+export async function handleMouseUp({ pointer, scene }) {
+  if (DEBUG) console.log('User interactions: handleMouseUp', pointer, scene);
+
+  const selection = scene.game.selection;
+
+  switch (scene.game.mode) {
+    case 'multiselect':
+      if (
+        !selection.rectangleSelectionBeginPixel ||
+        !selection.rectangleSelectionEndPixel ||
+        (selection.rectangleSelectionBeginPixel.x === selection.rectangleSelectionEndPixel.x &&
+          selection.rectangleSelectionBeginPixel.y === selection.rectangleSelectionEndPixel.y)) {
+        
+        selection.clearRectangleSelection();
+
+        const tile = getTileForPointer({ pointer, scene });
+
+        if (scene.gameOfLife) {
+          tile.alive = !tile.alive;
+          return;
+        }
+
+        if (scene.game.selection.isSelected(tile.cx, tile.cy))
+          scene.game.selection.removeSelected({ tile, scene });
+        else
+          await scene.game.selection.addSelected({ tiles: [tile], scene });
+
+        return;
+      }
+
+      const rectangleSelection = selection.rectangleSelection;
+
+      if (!rectangleSelection)
+        return;
+
+      selection.selectRange({
+        startPixel: selection.rectangleSelectionBeginPixel, 
+        endPixel: selection.rectangleSelectionEndPixel, 
+        scene
+      });
+
+      selection.clearRectangleSelection();
+      break;
+  }
 }
 
 export function handleMouseWheel({ scene, dx, dy, dz }) {
@@ -291,9 +336,10 @@ export function generalResetStrokeStyle({ scene, size, selection, alpha }) {
   }
 }
 
-export function resetStrokeStyle({ tile, scene, size, alpha=0.2 }) {
+export function resetStrokeStyle({ tile, scene, size, alpha }) {
   // Reset stroke around the tile
   size = size || scene.strokeSize;
+  alpha = alpha || (0.4 / window.devicePixelRatio).toFixed(2)
 
   if (tile) {
     tile.setStrokeStyle(size, scene.strokeColor.color, alpha);
@@ -306,7 +352,7 @@ export function setInvertedStroke({ tile, scene }) {
 
   const invertedColor = invertColor(tile.fillColor, true);
 
-  tile.setStrokeStyle(scene.strokeSize + (1 * window.devicePixelRatio), invertedColor.color, 1);
+  tile.setStrokeStyle(scene.strokeSize + (1 * window.devicePixelRatio), invertedColor.color, 0.8);
   tile.setDepth(10);
 }
 

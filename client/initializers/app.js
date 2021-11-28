@@ -1,4 +1,4 @@
-import { Events, Game, WEBGL } from 'phaser';
+import { Events, Game, WEBGL, Scale } from 'phaser';
 
 // Config
 import config from '@util/config';
@@ -30,8 +30,11 @@ export async function AppInitializer() {
       target: config.appConfig.fps,
       forceSetTimeOut: true
     },
+    physics: {
+      default: 'arcade'
+    },
     scale: {
-      mode: Phaser.Scale.RESIZE,
+      mode: Scale.RESIZE,
       //zoom: 1 / window.devicePixelRatio
     }
   });

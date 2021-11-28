@@ -19,7 +19,7 @@ Each position has unique identifier within the grid:
 ALK └──────────────────┘ 
 </pre>
 
-Within the same <a href="https://en.wikipedia.org/wiki/Smart_contract" target="_blank">smart contract</a> owners can set colors to their pixels and thus contribute to the final outlook of the world.
+Within the same <a href="https://en.wikipedia.org/wiki/Smart_contract" target="_blank">smart contract</a> owners can set colors to their pixels and thus contribute to the ever emerging image.
 
 ## ERC721Batch
 

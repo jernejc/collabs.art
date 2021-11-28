@@ -6,7 +6,7 @@ module.exports = {
   'wsUrl': WSURL,
 	'PixelsAddress': PIXELS_ADDRESS,
 	'PixelsBidAddress': BIDS_ADDRESS,
-	'allowedOrigins': ['http://autopoietic.art','https://autopoietic.art','http://apoietic.com/','https://apoietic.com/','http://localhost:9000'],
+	'allowedOrigins': ['http://autopoietic.art','https://autopoietic.art','http://apoietic.com','https://apoietic.com','http://localhost:9000'],
 	'ipfs': {
 		'host': 'ipfs.infura.io',
 		'protocol': 'https',

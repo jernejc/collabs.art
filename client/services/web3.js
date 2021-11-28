@@ -42,8 +42,23 @@ export default class Web3Manager {
     return this.isConnectedToRPC && this.isNetworkConnected;
   }
 
+  get currentStateTag() {
+    let stateTag = null;
+
+    if (!this.hasMetamask)
+      stateTag = 'metamask';
+    else if (!this.isConnected)
+      stateTag = 'network';
+    else if (!this.activeAddress)
+      stateTag = 'wallet';
+    else if (this.activeAddress)
+      stateTag = 'address';
+
+    return stateTag;
+  }
+
   get currentSymbol() {
-    return (this.network && this.network.nativeCurrency) ? this.network.nativeCurrency.symbol : 'tMATIC';
+    return (this.network && this.network.nativeCurrency) ? this.network.nativeCurrency.symbol : 'MATIC';
   }
 
   async initProviders() {
@@ -62,6 +77,9 @@ export default class Web3Manager {
       // Get connected accounts
       await this.getAccounts();
     }
+
+    if (!this.network)
+      this.handleDefaultNetwork();
   }
 
   initContracts() {
@@ -134,6 +152,15 @@ export default class Web3Manager {
           updateWorldImagePixelColors({ pixels, scene: this.game.scene.keys["MainScene"], updateTile: true })
         });
     }
+  }
+
+  handleDefaultNetwork() {
+    /*if (DEBUG)*/ console.log('Web3Manager: handleDefaultNetwork');
+    this.network = config.networks.find(net => net.default === true);
+
+    this.connectWebsocket();
+    this.initContracts();
+    this.getDefaultPrice();
   }
 
   handleNewChain(chainId) {
@@ -282,6 +309,11 @@ export default class Web3Manager {
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: networkConfig.chainId }]
       });
+
+      /*await setTimeout(() => { }, 2000);
+
+      if (!this.game.web3.activeAddress)
+        await this.getActiveAddress();*/
     } catch (error) {
       if (error.code === 4902) { // Network was not found in Metamask
         console.warn('Network not found in Metamask, adding new config.')
@@ -300,8 +332,15 @@ export default class Web3Manager {
       defaultPrice = await this.bidContract.methods.defaultPrice().call();
       this.defaultPrice = Web3.utils.fromWei(defaultPrice);
     } catch (error) {
-      console.warn('Failed to fetch default price');
-      this.defaultPrice = 0.005
+      console.warn('Failed to fetch RPC default price');
+
+      try {
+        defaultPrice = await this.eventBidContract.methods.defaultPrice().call();
+        this.defaultPrice = Web3.utils.fromWei(defaultPrice);
+      } catch (error) {
+        console.warn('Failed to fetch WS default price');
+        this.defaultPrice = 0.005;
+      }
     }
 
     return this.defaultPrice;

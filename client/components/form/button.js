@@ -47,7 +47,10 @@ export default class Button {
     this.domElement.textContent = this.text;
   }
 
-  setIcon(iconClass) {
+  setIcon(iconClass, alertAction) {
+    if (this.iconClass)
+      this.domElement.classList.remove(this.iconClass.replace('gg-', ''));
+      
     this.iconClass = iconClass || this.iconClass;
 
     if (this.iconClass.search('gg-') > -1) {
@@ -62,6 +65,14 @@ export default class Button {
 
       this.domElement.innerHTML = '';
       this.domElement.append(image);
+    }
+
+    this.domElement.classList.add(this.iconClass.replace('gg-', ''));
+
+    if (alertAction) {
+      this.alertIcon = document.createElement('i');
+      this.alertIcon.classList.add('gg-chevron-double-up');
+      this.domElement.append(this.alertIcon);
     }
   }
 

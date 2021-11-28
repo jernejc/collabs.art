@@ -80,7 +80,7 @@ export default class Menu {
 
         /*console.log('clickHandler this.scene', this.scene)*/
         const tile = getRelativeTile({ cx, cy, scene: this.scene, color: true });
-        await this.game.selection.addSelected({ tile, scene: this.scene });
+        await this.game.selection.addSelected({ tiles: [tile], scene: this.scene });
       }
     }
 

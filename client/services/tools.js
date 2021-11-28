@@ -98,6 +98,8 @@ export default class ToolsManager {
 
         if (this.menu)
           this.clearMenu();
+
+        this.game.selection.clearRectangleSelection();
       } else if (pixels.length > 1) {
         if (this.infobox)
           this.clearInfoBox();
@@ -121,6 +123,8 @@ export default class ToolsManager {
 
       if (this.infobox)
         this.clearInfoBox();
+
+      this.game.selection.clearRectangleSelection();
     })
   }
 
@@ -162,21 +166,29 @@ export default class ToolsManager {
 
     let iconClass = null;
     let action = null;
+    let alertIcon = true;
 
-    if (!this.game.web3.hasMetamask) {
-      iconClass = 'metamask';
-      action = this.game.web3.onboarding.startOnboarding;
-    } else if (!this.game.web3.isConnected) {
-      iconClass = 'connected';
-      action = this.game.web3.switchToNetwork.bind(this.game.web3);
-    } else if (!this.game.web3.activeAddress) {
-      iconClass = 'gg-credit-card';
-      action = this.game.web3.getActiveAddress.bind(this.game.web3);
-    } else if (this.game.web3.activeAddress)
-      iconClass = 'gg-user';
+    switch (this.game.web3.currentStateTag) {
+      case 'metamask':
+        iconClass = 'metamask-white';
+        action = this.game.web3.onboarding.startOnboarding;
+        break;
+      case 'network':
+        iconClass = 'polygon';
+        action = this.game.web3.switchToNetwork.bind(this.game.web3);
+        break;
+      case 'wallet':
+        iconClass = 'gg-link';
+        action = this.game.web3.getActiveAddress.bind(this.game.web3);
+        break;
+      case 'address':
+        alertIcon = false;
+        iconClass = 'gg-user';
+        break;
+    }
 
     if (iconClass)
-      this.connectionStatusBtn.setIcon(iconClass);
+      this.connectionStatusBtn.setIcon(iconClass, alertIcon);
     if (action)
       this.connectionStatusBtn.setClickAction(action);
   }
@@ -186,14 +198,20 @@ export default class ToolsManager {
 
     let text = null;
 
-    if (!this.game.web3.hasMetamask)
-      text = 'Install Metamask';
-    else if (!this.game.web3.isConnected)
-      text = 'Switch to Network';
-    else if (!this.game.web3.activeAddress)
-      text = 'Connect to Wallet';
-    else if (this.game.web3.activeAddress)
-      text = formatShortAddress(this.game.web3.activeAddress);
+    switch (this.game.web3.currentStateTag) {
+      case 'metamask':
+        text = 'Install Metamask';
+        break;
+      case 'network':
+        text = 'Switch to Network';
+        break;
+      case 'wallet':
+        text = 'Connect to Wallet';
+        break;
+      case 'address':
+        text = formatShortAddress(this.game.web3.activeAddress);
+        break;
+    }
 
     if (text) {
       this.networkAlert.innerHTML = text;
@@ -283,10 +301,19 @@ export default class ToolsManager {
   addNetworkAlert() {
     if (DEBUG) console.log('ToolsManager: addNetworkAlert');
 
+    if (!this.domConnectionStatus) {
+      console.warn('No connectino status DOM found. Skipping network alert');
+      return;
+    }
+
     this.networkAlert = document.createElement('div');
     this.networkAlert.setAttribute('id', 'alert');
 
-    this.parent.append(this.networkAlert);
+    this.domConnectionStatus.prepend(this.networkAlert);
+
+    this.networkAlert.addEventListener('click', (e) => {
+      this.connectionStatusBtn.domElement.dispatchEvent(new Event('click', { 'bubbles': true }));
+    });
 
     this.setNetworkAlert();
   }
@@ -369,7 +396,7 @@ export default class ToolsManager {
     if (DEBUG) console.log('ToolsManager: showTools');
 
     this.networkAlert.style.display = 'flex';
-    this.connectionStatusBtn.domElement.style.display = 'block';
+    this.connectionStatusBtn.domElement.style.display = 'flex';
     this.domBottomNav.style.display = 'flex';
     this.header.style.display = 'flex';
 
@@ -402,14 +429,5 @@ export default class ToolsManager {
 
     this.menu.destroy();
     this.menu = null;
-  }
-
-  installMetamask() {
-    /*if (DEBUG)*/ console.log('ToolsManager: installMetamask', this.metamaskURL)
-
-    window.open(
-      this.metamaskURL,
-      '_blank'
-    );
   }
 }

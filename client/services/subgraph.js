@@ -6,7 +6,7 @@ import { stringToHex, delay } from '@util/helpers';
 export default class GraphManager {
 
   async loadPixels(params) {
-    if (DEBUG) console.log('GraphManager: loadPixels');
+    if (DEBUG) console.log('GraphManager: loadPixels', params);
 
     try {
       const response = await this.postQueryToGraph('pixels', params);
@@ -42,14 +42,14 @@ export default class GraphManager {
 
   getPixelsQuery(params) {
 
-    if (!params.first || params.first > 100)
+    if (!params.first)
       params.first = 50;
 
     let where = '';
 
     for (let param in params) {
       if (param !== 'first')
-        where += `${param}:"${params[param]}"`
+        where += `${param}:${params[param]}`
     }
 
     return `{ pixels(first: ${params.first}, where: {${where}}) ${this.pixelBodyQuery} }`
@@ -88,8 +88,6 @@ export default class GraphManager {
 
     if (!query)
       throw new Error('No query found for name: ' + queryName);
-
-    //console.log('posting query', query)
 
     const options = {
       method: 'post',

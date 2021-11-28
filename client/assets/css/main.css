@@ -3,9 +3,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@700&display=swap');
 
 :root {
-  --available-color: #02be01;
+  --light-green-color: #2b871c;
+  --dark-green-color: #19610D;
   --activebid-color: #e5d900;
-  --taken-color: #0083c7;
+  --metamask-color: #e7893c;
+  --polygon-color: #8247e5;
+  --blue-color: #255ebe;
   --active-black: rgb(24, 26, 27);
   --header-white: rgba(255, 255, 255, 0.8);
   --edge-margin: 7px;
@@ -36,6 +39,7 @@ input {
   left: 0;
   bottom: 0;
   right: 0;
+  overflow: hidden;
   position: relative;
   margin: 0px;
   padding: 0;
@@ -43,7 +47,7 @@ input {
   height: 100vh;
 }
 
-#connection-status, #header, #bottom-nav, #alert {
+#connection-status, #header, #bottom-nav {
   color: #FFF;
   position: absolute;
   top: var(--edge-margin);
@@ -217,11 +221,11 @@ input {
 }
 
 .settings.purchaseUI i.gg-info {
-  color: var(--available-color);
+  color: var(--light-green-color);
 }
 
 .settings.bidUI i.gg-info {
-  color: var(--taken-color);
+  color: var(--blue-color);
 }
 
 .settings.activeBidUI i.gg-info {
@@ -343,7 +347,6 @@ input {
 #connection-status {
   right: var(--edge-margin);
   display: flex;
-  overflow: hidden;
 }
 
 #connection-status button {
@@ -358,6 +361,8 @@ input {
   height: 50px;
   display: block;
   z-index: 1;
+  display: flex;
+  position: relative;
 }
 
 #connection-status button.active {
@@ -366,7 +371,7 @@ input {
 }
 
 #connection-status button i {
-  margin: 0px auto 0px;
+  margin: auto;
 }
 
 #connection-status button i.gg-data {
@@ -377,12 +382,64 @@ input {
   --ggs: 1.5;
 }
 
-#connection-status button.account i.gg-credit-card {
-  --ggs: 1.1;
+#connection-status button.account i.gg-link {
+  --ggs: 1.3;
 }
 
 #connection-status button.account i.gg-block {
   --ggs: 1.8;
+}
+
+#connection-status button.metamask-white {
+  background: var(--metamask-color);
+}
+
+#connection-status button.metamask-white img,
+#connection-status button.metamask img {
+  width: 80%;
+  margin: auto;
+}
+
+#connection-status button.metamask-white i.gg-chevron-double-up {
+  color: var(--metamask-color);
+}
+
+#connection-status button.polygon {
+  background: var(--polygon-color);
+}
+
+#connection-status button.polygon img {
+  width: 87%;
+  margin: auto;
+}
+
+#connection-status button.polygon i.gg-chevron-double-up {
+  color: var(--polygon-color);
+}
+
+#connection-status button.user {
+  background: var(--light-green-color);
+}
+
+#connection-status button.user i.gg-chevron-double-up {
+  color: var(--light-green-color);
+}
+
+#connection-status button.link {
+  background: var(--blue-color);
+}
+
+#connection-status button.link i.gg-chevron-double-up {
+  color: var(--blue-color);
+}
+
+#connection-status button .gg-chevron-double-up {
+  position: absolute;
+  --ggs: 1.6;
+  opacity: 0.7;
+  left: 50%;
+  margin-left: -11px;
+  animation: bounceUp 0.7s infinite;
 }
 
 /***
@@ -390,16 +447,17 @@ input {
 ***/
 
 #alert {
-  right: calc(var(--edge-margin) + 50px);
   padding: 0px 18px;
   background: var(--active-black);
   font-size: 16px;
   line-height: 50px;
   transition: 200ms;
-  z-index: 0;
+  z-index: 1;
   border-right: 1px solid #FFF;
   display: flex;
   align-items: center;
+  cursor: pointer;
+  user-select: none;
 }
 
 #alert.show {
@@ -472,10 +530,16 @@ Info Box
 }
 
 .info-box .gg-close-r {
-  --ggs: 0.85;
+  --ggs: 0.65;
   color: #FFF;
   background: var(--active-black);
   cursor: pointer;
+  opacity: 0.9;
+  transition: 0.1s opacity;
+}
+
+.info-box .gg-close-r:hover {
+  opacity: 1;
 }
 
 .info-box.top.left .arrow {
@@ -488,9 +552,8 @@ Info Box
 }
 
 .info-box.top.left .gg-close-r {
-  bottom: -13px;
-  right: -13px;
-  top: auto;
+  top: -12px;
+  right: -12px;
   left: auto;
 }
 
@@ -502,9 +565,8 @@ Info Box
 }
 
 .info-box.top.right .gg-close-r {
-  bottom: -13px;
-  left: -13px;
-  top: auto;
+  top: -12px;
+  left: -12px;
   right: auto;
 }
 
@@ -516,9 +578,8 @@ Info Box
 }
 
 .info-box.bottom.left .gg-close-r {
-  top: -13px;
-  right: -13px;
-  bottom: auto;
+  top: -12px;
+  right: -12px;
   left: auto;
 }
 
@@ -530,8 +591,8 @@ Info Box
 }
 
 .info-box.bottom.right .gg-close-r {
-  top: -13px;
-  left: -13px;
+  top: -12px;
+  left: -12px;
   right: auto;
   bottom: auto;
 }
@@ -587,17 +648,17 @@ Info Box
   cursor: pointer;
 }
 
-.info-box.purchaseUI .text-info {
-  color: var(--available-color);
+/*.info-box.purchaseUI .text-info {
+  color: var(--dark-green-color);
 }
 
 .info-box.bidUI .text-info {
-  color: var(--taken-color);
+  color: var(--blue-color);
 }
 
 .info-box.activeBidUI .text-info {
   color: var(--activebid-color);
-}
+}*/
 
 /*.text-info.active-bid {
   color: var(--activebid-color);
@@ -619,7 +680,8 @@ Info Box
   min-height: 25px;
   font-family: inherit;
   width: 100%;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--active-black);
+  color: #FFF;
   cursor: pointer;
   transition: all 0.3s linear;
 }
@@ -642,11 +704,11 @@ Info Box
 }
 
 .purchaseUI .action-button {
-  background: var(--available-color);
+  background: var(--light-green-color);
 }
 
 .bidUI .action-button {
-  background: var(--taken-color);
+  background: var(--blue-color);
 }
 
 .activeBidUI .action-button {
@@ -1004,7 +1066,7 @@ Info Box
   position: absolute;
   height: 39px;
   width: 100%;
-  bottom: 25px;
+  bottom: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1038,14 +1100,14 @@ Info Box
 }
 
 .slides-nav .nav-item .progress-bar__fill {
-  background: #19610D;
+  background: var(--light-green-color);
   position: relative;
   bottom: 5px;
   transition: all 100ms;
 }
 
 /*.slides-nav .nav-item.nav-active .progress-bar__wrap {
-  background: #19610D;
+  background: var(--light-green-color);
 }*/
 
 .slides-nav .nav-item .nav-title {
@@ -1060,11 +1122,11 @@ Info Box
 
 .slides-nav .nav-item.nav-seen span,
 .slides-nav .nav-item.nav-active span {
-  background: #19610D;
+  background: var(--light-green-color);
 }
 
 .slides-nav .nav-item.nav-seen .progress-bar__wrap {
-  background: #19610D;
+  background: var(--light-green-color);
 }
 
 /*.slides-nav .nav-item.nav-active span,*/
@@ -1106,11 +1168,11 @@ Info Box
 
 .slides-nav .slide-action:hover,
 .slides-nav .slide-action.active {
-  background: #19610D;
-  border: 1px solid #19610D;
+  background: rgba(25, 97, 13, 0.7);
+  border: 1px solid var(--light-green-color);
 }
 
-.slides-nav .slide-action .gg-chevron-double-down, 
+.slides-nav .slide-action .gg-chevron-double-down,
 .slides-nav .slide-action .gg-chevron-down {
   position: absolute;
   top: -45px;
@@ -1119,30 +1181,64 @@ Info Box
   left: 50%;
   margin-left: -11px;
   display: none;
-  animation: bounce 0.7s infinite;
+  animation: bounceDown 0.7s infinite;
 }
 
-.slides-nav .slide-action.active .gg-chevron-double-down, 
+.slides-nav .slide-action.active .gg-chevron-double-down,
 .slides-nav .slide-action.active .gg-chevron-down {
   display: block;
 }
 
 /* Animations */
 
-@keyframes bounce {
-  0% {
-    top: -36px;
+@keyframes bounceDown {
+  0%, 100% {
+    top: -35px;
   }
 
-  25%, 75% {
+  10%, 90% {
+    top: -36px;
+  }
+  
+  20%, 80% {
+    top: -37px;
+  }
+
+  30%, 70% {
     top: -38px;
+  }
+
+  40%, 60% {
+    top: -39px;
   }
 
   50% {
     top: -40px;
   }
+}
 
-  100% {
-    top: -36px;
+@keyframes bounceUp {
+  0%, 100% {
+    bottom: -30px;
+  }
+
+  10%, 90% {
+    bottom: -31px;
+  }
+  
+  20%, 80% {
+    bottom: -32px;
+  }
+
+  30%, 70% {
+    bottom: -33px;
+  }
+
+  40%, 60% {
+    bottom: -34px;
+  }
+
+  50% {
+    bottom: -35px;
   }
 }

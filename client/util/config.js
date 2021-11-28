@@ -17,6 +17,7 @@ const config = {
   networks: [{
     id: 80001,
     enabled: true,
+    default: true,
     chainId: '0x13881',
     chainName: 'Polygon Testnet',
     nativeCurrency: {
@@ -39,7 +40,7 @@ const config = {
     enabled: false
   }],
   subgraph: {
-    url: 'https://api.studio.thegraph.com/query/9304/autopoietic.art/v0.1.0'
+    url: 'https://api.thegraph.com/subgraphs/name/jernejc/apoietic' //'https://api.studio.thegraph.com/query/9304/autopoietic.art/v0.1.0'
   },
   events: {
     url: 'https://pixelworld-2e64c.uc.r.appspot.com'
@@ -48,10 +49,10 @@ const config = {
     canvasElement: 'app',
     defaultMode: 'select',
     gridSize: 12,
-    strokeSize: 0.25,
+    strokeSize: 0.3,
     strokeColor: '#c1c1c1',
     defaultTileColors: ['#168A33','#16912A','#197A21','#169116','#208714'],
-    fps: 40
+    fps: 30
   },
   slideshow: {
     slideActionText: 'Get Started',
