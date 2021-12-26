@@ -276,6 +276,9 @@ export default class ToolsManager {
     this.headerIcon = document.createElement('i');
     this.headerIcon.classList.add('gg-details-more');
 
+    this.headerMenu = document.createElement('div');
+    this.headerMenu.classList.add('header-menu');
+
     this.header.append(this.headerIcon);
     this.parent.append(this.header);
   }

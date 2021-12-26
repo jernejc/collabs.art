@@ -39,6 +39,8 @@ export async function AppInitializer() {
     }
   });
 
+  window.devicePixelRatio = Math.ceil(window.devicePixelRatio);
+  console.log('window.devicePixelRatio', window.devicePixelRatio);
   let gridSize = config.appConfig.gridSize, strokeSize = config.appConfig.strokeSize;
 
   if (window.devicePixelRatio > 1) {

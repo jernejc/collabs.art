@@ -190,7 +190,13 @@ export default class MainScene extends ApplicationScene {
     const random = hexStringToColor(this.appConfig.defaultTileColors[Phaser.Math.Between(0, this.appConfig.defaultTileColors.length - 1)])
 
     if (this.gameOfLife) {
-      const fillColor = this.tiles[y][x].alive ? random.color : 0x000000;
+      let fillColor = 0x000000;
+
+      if (this.tiles[y][x].intial)
+        fillColor = random.color;
+      else if (this.tiles[y][x].alive)
+        fillColor = random.color;
+
       this.tiles[y][x].setFillStyle(fillColor);
       return;
     }
@@ -239,8 +245,13 @@ export default class MainScene extends ApplicationScene {
     const widthEdge = this.gridWidth - edge;
     const heightEdge = this.gridWidth - edge;
 
+    this.xPadding = -10;
+    this.currentState = config.intialGameState['contribute'];
+    this.middleY = Math.floor(this.gridHeight / 2);
+
     for (let y = 0; y < this.gridHeight; y++) {
       for (let x = 0; x < this.gridWidth; x++) {
+
         let probability = 0.1;
 
         if (
@@ -250,6 +261,15 @@ export default class MainScene extends ApplicationScene {
           y > heightEdge
         )
           probability += 0.1
+
+        if (this.currentState) {
+          const relativeY = this.middleY - y;
+          const relativeX = x + this.xPadding;
+
+          if (this.currentState[relativeY] && this.currentState[relativeY][relativeX])
+            this.tiles[y][x].intial = true;
+          //probability = 1;
+        }
 
         this.tiles[y][x].alive = probability > Math.random();
       }
@@ -267,6 +287,7 @@ export default class MainScene extends ApplicationScene {
     if (!getCookie('hideOverlay'))
       this.game.tools.openOverlay();
 
+    this.updateTiles();
     setGameMode({ scene: this, mode: 'gameoflife' });
   }
 
@@ -335,10 +356,9 @@ export default class MainScene extends ApplicationScene {
     }
 
     // Apply the new state to the tiles
-    for (let x = 0; x < this.gridWidth; x++) {
+    for (let x = 0; x < this.gridWidth; x++)
       for (let y = 0; y < this.gridHeight; y++)
         this.tiles[y][x].alive = this.tiles[y][x].nextState;
-    }
 
     this.updateTiles();
   }

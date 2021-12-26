@@ -28,20 +28,22 @@ export default class Menu {
     this.domElement.setAttribute('id', 'menu-item');
 
     this.parent.append(this.domElement);
+
+    this.clickHandlerBind = this.clickHandler.bind(this); // For easier removing of event listeners
   }
 
   async init() {
 
     // Create tabs header
     this.createTabs();
+    this.domElement.addEventListener('click', this.clickHandlerBind);
 
     // Load initial pixels
     await this.loadPixels();
-
-    this.domElement.addEventListener('click', e => this.clickHandler(e));
   }
 
   async clickHandler(e) {
+    if (DEBUG) console.log('Menu: clickhandler', e);
 
     /* Handle clicks:
       - Close Btn
@@ -349,7 +351,7 @@ export default class Menu {
   }
 
   destroy() {
-    this.domElement.removeEventListener('click', this.clickHandler);
+    this.domElement.removeEventListener('click', this.clickHandlerBind);
     this.parent.removeChild(this.domElement);
     this.loaded = false;
   }

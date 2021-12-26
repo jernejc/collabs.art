@@ -13,7 +13,10 @@ export default class Slideshow {
     this.domElement.setAttribute('id', 'slideshow');
 
     this.articles = config.slideshow.articles;
+
     this.playing = false;
+    this.playIcon = '<i class="gg-play-button"></i>';
+    this.pauseIcon = '<i class="gg-play-pause"></i>';
 
     this.setupDom();
   }
@@ -39,13 +42,17 @@ export default class Slideshow {
     // Play/Pause button
     this.playPauseBtn = document.createElement('div');
     this.playPauseBtn.classList.add('play-pause');
+    this.playPauseBtn.innerHTML = this.playIcon;
 
     this.playPauseBtn.addEventListener('click', this.playPauseSlideshow.bind(this));
 
     // Subtitle
-    this.subtitle = document.createElement('h2');
-    this.subtitle.classList.add('slide-subheading');
-    this.subtitle.innerHTML = config.slideshow.subtitle;
+    /*
+      this.subtitle = document.createElement('h2');
+      this.subtitle.classList.add('slide-subheading');
+      this.subtitle.innerHTML = config.slideshow.subtitle;
+      this.domElement.append(this.subtitle);
+    */
 
     // Action button
     if (this.buttonAction) {
@@ -84,12 +91,11 @@ export default class Slideshow {
     this.slidesWrapper.append(this.navWrapper);
     this.slidesWrapper.append();
 
-    this.domElement.append(this.subtitle);
     this.domElement.append(this.slidesWrapper);
 
     this.parent.append(this.domElement);
 
-    this.playPauseSlideshow(false);
+    //this.playPauseSlideshow(false);
   }
 
   navTemplate({ title, icon, active }) {
@@ -245,13 +251,10 @@ export default class Slideshow {
   playPauseSlideshow(reset) {
     if (DEBUG) console.log('Slideshow: playPauseSlideshow');
 
-    const playIcon = '<i class="gg-play-button"></i>';
-    const pauseIcon = '<i class="gg-play-pause"></i>';
-
     const navItemsSeen = this.navWrapper.querySelectorAll('.nav-item.nav-seen');
 
     this.playing = !this.playing;
-    this.playPauseBtn.innerHTML = (this.playing) ? pauseIcon : playIcon;
+    this.playPauseBtn.innerHTML = (this.playing) ? this.pauseIcon : this.playIcon;
 
     if (navItemsSeen.length === this.navItems.length)
       this.resetSlideShow(0);

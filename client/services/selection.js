@@ -210,8 +210,6 @@ export default class SelectionManager {
   }
 
   clearActiveSelection() {
-    if (this.pixels.length === 0) return;
-
     this.pixels.forEach((pixel) => {
       pixel.clearActivePixel();
       pixel.resetColor();
