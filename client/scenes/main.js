@@ -243,23 +243,25 @@ export default class MainScene extends ApplicationScene {
 
     const edge = 5;
     const widthEdge = this.gridWidth - edge;
-    const heightEdge = this.gridWidth - edge;
+    const heightEdge = this.gridHeight - edge;
 
-    this.xPadding = -10;
-    this.currentState = config.intialGameState['contribute'];
+    this.xPadding = -Math.ceil(this.gridWidth / 2);
     this.middleY = Math.floor(this.gridHeight / 2);
+
+    this.currentState = config.intialGameState['contribute'];
 
     for (let y = 0; y < this.gridHeight; y++) {
       for (let x = 0; x < this.gridWidth; x++) {
 
         let probability = 0.1;
 
-        if (
-          edge > x ||
-          x > widthEdge ||
-          edge > y ||
-          y > heightEdge
-        )
+        if (x < edge)
+          probability += 0.1
+        if (x > widthEdge)
+          probability += 0.1
+        if (y < edge)
+          probability += 0.1
+        if (y > heightEdge)
           probability += 0.1
 
         if (this.currentState) {
@@ -268,7 +270,6 @@ export default class MainScene extends ApplicationScene {
 
           if (this.currentState[relativeY] && this.currentState[relativeY][relativeX])
             this.tiles[y][x].intial = true;
-          //probability = 1;
         }
 
         this.tiles[y][x].alive = probability > Math.random();
@@ -287,7 +288,7 @@ export default class MainScene extends ApplicationScene {
     if (!getCookie('hideOverlay'))
       this.game.tools.openOverlay();
 
-    this.updateTiles();
+    //this.updateTiles();
     setGameMode({ scene: this, mode: 'gameoflife' });
   }
 
