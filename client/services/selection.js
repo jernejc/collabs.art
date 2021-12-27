@@ -1,6 +1,6 @@
 import Pixel from "@models/pixel";
 
-import { getTileForPointer } from "@actions/pixel";
+import { getTileForPointer, getTileForXY } from "@actions/pixel";
 import { invertColor } from "@actions/general";
 import { stringToHex } from "@util/helpers";
 
@@ -40,7 +40,7 @@ export default class SelectionManager {
   }
 
   async addSelected({ tiles, scene }) {
-    if (DEBUG) console.log("SelectionManager: addSelected");
+    if (DEBUG)  console.log("SelectionManager: addSelected", tiles);
 
     for (let i = 0; i < tiles.length; i++) {
       const tile = tiles[i];
@@ -69,7 +69,7 @@ export default class SelectionManager {
   }
 
   selectRange({ startPixel, endPixel, scene }) {
-    if (DEBUG) console.log("SelectionManager: selectRange");
+    if (DEBUG) console.log("SelectionManager: selectRange", startPixel, endPixel);
 
     let tiles = [],
       startX,
@@ -78,24 +78,25 @@ export default class SelectionManager {
       endY;
 
     // It could be drawn up / down, left / right, calc req positions
-    if (startPixel.cx > endPixel.cx) {
-      startX = endPixel.cx;
-      endX = startPixel.cx;
+    if (startPixel.tile.x > endPixel.tile.x) {
+      startX = endPixel.tile.x;
+      endX = startPixel.tile.x;
     } else {
-      startX = startPixel.cx;
-      endX = endPixel.cx;
+      startX = startPixel.tile.x;
+      endX = endPixel.tile.x;
     }
 
-    if (startPixel.cy > endPixel.cy) {
-      startY = endPixel.cy;
-      endY = startPixel.cy;
+    if (startPixel.tile.y > endPixel.tile.y) {
+      startY = endPixel.tile.y;
+      endY = startPixel.tile.y;
     } else {
-      startY = startPixel.cy;
-      endY = endPixel.cy;
+      startY = startPixel.tile.y;
+      endY = endPixel.tile.y;
     }
 
-    for (let y = startY; y < endY; y++)
-      for (let x = startX; x < endX; x++) tiles.push(scene.tiles[y][x]);
+    for (let y = startY; y < endY; y += scene.appConfig.gridSize)
+      for (let x = startX; x < endX; x += scene.appConfig.gridSize) 
+        tiles.push(getTileForXY({ x, y, scene }));
 
     this.addSelected({ tiles, scene });
   }

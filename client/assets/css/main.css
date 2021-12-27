@@ -986,10 +986,10 @@ Info Box
   position: relative;
   width: 60vw;
   padding: 30px 20px;
-  left: 4vw;
+  right: 5vw;
   overflow: hidden;
   max-width: 590px;
-  margin-right: auto;
+  margin-left: auto;
 }
 
 .slides-wrapper {

@@ -244,6 +244,7 @@ export function saveLastPosition(x, y) {
 }
 
 // Debounce save position -- https://stackoverflow.com/questions/23858046/debounce-function-with-args-underscore/23858092
+// should be var for hoisting
 var debounceSaveLastPosition = _.debounce(saveLastPosition, 300);
 
 export function getLastPosition() {

@@ -245,7 +245,7 @@ export default class MainScene extends ApplicationScene {
     const widthEdge = this.gridWidth - edge;
     const heightEdge = this.gridHeight - edge;
 
-    this.xPadding = -Math.ceil(this.gridWidth / 2);
+    this.xPadding = -5 //-Math.ceil(this.gridWidth / 2);
     this.middleY = Math.floor(this.gridHeight / 2);
 
     this.currentState = config.intialGameState['contribute'];
