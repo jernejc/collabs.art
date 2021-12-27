@@ -84,7 +84,7 @@ const config = {
    */
   intialGameState: {
     'contribute': {
-      
+
       // Canvas
       '-9': {
         0: true,
@@ -101,7 +101,8 @@ const config = {
         24: true,
         25: true,
         26: true,
-        27: true
+        27: true,
+        29: true
       },
       '-8': {
         0: true,
