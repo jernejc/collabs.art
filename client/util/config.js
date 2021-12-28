@@ -55,8 +55,9 @@ const config = {
     fps: 30
   },
   slideshow: {
-    slideActionText: 'Get Started',
+    slideActionText: 'Invite',
     subtitle: '<span>Contribute to a living</span> canvas.<br /><span>Become a</span> Creator.', // is HTML
+    discordLink: 'https://discord.gg/7BcneMCVAH',
     articles: [{ // This goes async from server
       icon: 'about.svg',
       title: 'About',
@@ -84,6 +85,7 @@ const config = {
    */
   intialGameState: {
     'contribute': {
+      'max-length': 46,
 
       // Canvas
       '-9': {

@@ -18,7 +18,7 @@
   --bottom-bar-settings-height: 36px;
 }
 
-body, h1, button {
+body, h1, button, input {
   font-family: 'Electrolize', sans-serif;
   padding: 0;
   margin: 0;
@@ -66,6 +66,20 @@ input {
 #header i {
   --ggs: 1.5;
   margin: 0 auto;
+}
+
+#inspired-by {
+  opacity: 0.7;
+  z-index: 3;
+  position: absolute;
+  bottom: 8px;
+  right: 11px;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.7em;
+}
+
+#inspired-by a {
+  color: rgba(255,255,255,0.6);
 }
 
 #bottom-nav {
@@ -985,10 +999,10 @@ Info Box
   color: #FFF;
   position: relative;
   width: 60vw;
-  padding: 30px 20px;
+  padding: 30px 20px 40px;
   overflow: hidden;
   max-width: 590px;
-  margin-left: 54%;
+  margin-left: 52%;
 }
 
 .slides-wrapper {
@@ -1045,6 +1059,8 @@ Info Box
   z-index: 0;
 }
 
+/* Slideshow navigation */
+
 .slides-nav .progress-bar {
   height: 5px;
   width: 100%;
@@ -1063,8 +1079,8 @@ Info Box
 
 .slides-nav {
   position: absolute;
-  bottom: 20px;
-  height: 42px;
+  bottom: 10px;
+  height: 60px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1156,29 +1172,33 @@ Info Box
   cursor: default;
 }
 
-.slides-nav .slide-action {
-  background: transparent;
-  line-height: 27px;
+/* Action bar */
+
+.action-bar {
+  margin: 0 0 0 10px;
+  display: flex;
+  position: relative;
+}
+
+.action-bar .slide-action {
+  background: rgba(25, 97, 13, 0.7);
+  line-height: 25px;
   font-size: 18px;
-  padding: 0.3em 1.4em;
+  min-width: 68px;
+  padding: 10px;
+  margin-left: 5px;
   color: #FFF;
-  border: 1px solid #FFF;
-  position: absolute;
-  bottom: 0px;
-  right: -170px;
+  border: 1px solid var(--light-green-color);
   cursor: pointer;
-  z-index: 2;
   transition: background-color 0.2s;
 }
 
-.slides-nav .slide-action:hover,
-.slides-nav .slide-action.active {
-  background: rgba(25, 97, 13, 0.7);
-  border: 1px solid var(--light-green-color);
+.action-bar .slide-action:hover {
+  background: var(--light-green-color);
 }
 
-.slides-nav .slide-action .gg-chevron-double-down,
-.slides-nav .slide-action .gg-chevron-down {
+.action-bar .slide-action .gg-chevron-double-down,
+.action-bar .slide-action .gg-chevron-down {
   position: absolute;
   top: -45px;
   --ggs: 1.6;
@@ -1192,6 +1212,64 @@ Info Box
 .slides-nav .slide-action.active .gg-chevron-double-down,
 .slides-nav .slide-action.active .gg-chevron-down {
   display: block;
+}
+
+.action-bar .text-input {
+  background: rgba(0, 0, 0, 0.8);
+  padding: 10px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.6)
+}
+
+.action-bar .text-input:focus {
+  outline: none;
+  border: 1px solid rgba(255, 255, 255, 1)
+}
+
+.action-bar .key-note {
+  position: absolute;
+  bottom: -21.5px;
+  font-size: 0.7em;
+  color: rgba(245, 240, 255, 0.6);
+  opacity: 0.7;
+  cursor: pointer;
+  left: 15px;
+  display: flex;
+  align-items: center;
+  --ggs: 0.9;
+}
+
+.action-bar .key-note:hover {
+  text-decoration: underline;
+}
+
+.action-bar .key-note i {
+  margin-left: 6px;
+}
+
+.action-bar .key-note i.gg-mail {
+  --ggs: 0.8;
+}
+
+.action-bar .discord-action {
+  background: transparent;
+  border: 0;
+  margin-left: 5px;
+  padding: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border: 1px solid #5c6bc0;
+  background: rgba(92, 107, 192, 0.5);
+}
+
+.action-bar .discord-action:hover {
+  background: #5c6bc0;
+}
+
+.action-bar .discord-action img {
+  width: 30px;
+  padding: 8px;
+  border-radius: 5px;
 }
 
 /* Animations */

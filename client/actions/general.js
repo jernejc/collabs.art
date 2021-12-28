@@ -43,7 +43,6 @@ export async function handleMouseDown({ pointer, scene }) {
   if (DEBUG) console.log('User interactions: handleMouseDown');
 
   switch (scene.game.mode) {
-    case 'gameoflife':
     case 'multiselect':
       if (pointer.button === 2) { // Detect right click
         //scene.game.selection.reset();
@@ -52,6 +51,7 @@ export async function handleMouseDown({ pointer, scene }) {
 
       scene.game.selection.createRectangleSelection({ pointer, scene });
       break;
+    case 'gameoflife':
     case 'select':
       const tile = getTileForPointer({ pointer, scene });
 
@@ -83,7 +83,7 @@ export async function handleMouseUp({ pointer, scene }) {
         !selection.rectangleSelectionEndPixel ||
         (selection.rectangleSelectionBeginPixel.x === selection.rectangleSelectionEndPixel.x &&
           selection.rectangleSelectionBeginPixel.y === selection.rectangleSelectionEndPixel.y)) {
-        
+
         selection.clearRectangleSelection();
 
         const tile = getTileForPointer({ pointer, scene });
@@ -107,8 +107,8 @@ export async function handleMouseUp({ pointer, scene }) {
         return;
 
       selection.selectRange({
-        startPixel: selection.rectangleSelectionBeginPixel, 
-        endPixel: selection.rectangleSelectionEndPixel, 
+        startPixel: selection.rectangleSelectionBeginPixel,
+        endPixel: selection.rectangleSelectionEndPixel,
         scene
       });
 

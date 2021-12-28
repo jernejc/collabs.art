@@ -14,10 +14,10 @@ export default class Slideshow {
 
     this.articles = config.slideshow.articles;
 
-    this.playing = false;
-
     this.bindNavAction = this.navAction.bind(this);
     this.bindNextPrevAction = this.nextPrevAction.bind(this);
+    this.bindDiscordAction = this.discordAction.bind(this);
+    this.bindToggleActionBar = this.toggleActionBar.bind(this);
 
     this.setupDom();
   }
@@ -44,7 +44,6 @@ export default class Slideshow {
     this.navItemsWrapper.addEventListener('click', this.bindNavAction);
 
     // Navigation buttons
-
     this.leftIcon = document.createElement('i')
     this.leftIcon.classList.add('gg-play-button', 'left', 'disabled');
 
@@ -54,14 +53,25 @@ export default class Slideshow {
     this.leftIcon.addEventListener('click', this.bindNextPrevAction);
     this.rightIcon.addEventListener('click', this.bindNextPrevAction);
 
-    // Action button
-    if (this.buttonAction) {
-      this.slideActionButton = document.createElement('button');
-      this.slideActionButton.classList.add('slide-action');
-      this.slideActionButton.innerHTML = '<i class="gg-chevron-double-down"></i>' + config.slideshow.slideActionText;
+    // Action bar
+    this.actionBarWrapper = document.createElement('form');
+    this.actionBarWrapper.classList.add('action-bar');
 
-      this.slideActionButton.addEventListener('click', this.buttonAction);
-    }
+    this.keyNoteWrapper = document.createElement('span');
+    this.keyNoteWrapper.classList.add('key-note');
+
+    this.keyNoteWrapper.addEventListener('click', this.bindToggleActionBar);
+
+    this.setActionBarAction('email');
+
+    this.discordButton = document.createElement('button')
+    this.discordButton.classList.add('discord-action');
+    this.discordButton.innerHTML = '<img src="assets/images/icons/discord-icon.png" />';
+
+    this.discordButton.addEventListener('click', this.bindDiscordAction);
+
+    this.actionBarWrapper.append(this.discordButton);
+    this.actionBarWrapper.append(this.keyNoteWrapper);
 
     // Load articles
     this.articles.forEach((article, i) => {
@@ -84,15 +94,13 @@ export default class Slideshow {
       }
     });
 
-    // Attach to DOM
+    // Assemble DOM
     this.navWrapper.append(this.navItemsWrapper);
-    this.navWrapper.append(this.slideActionButton);
-
     this.navWrapper.prepend(this.leftIcon);
     this.navWrapper.append(this.rightIcon);
+    this.navWrapper.append(this.actionBarWrapper);
 
     this.slidesWrapper.append(this.navWrapper);
-
     this.domElement.append(this.slidesWrapper);
 
     this.parent.append(this.domElement);
@@ -163,6 +171,7 @@ export default class Slideshow {
     this.navWrapper.removeEventListener('click', this.bindNavAction);
     this.leftIcon.removeEventListener('click', this.bindNextPrevAction);
     this.rightIcon.removeEventListener('click', this.bindNextPrevAction);
+    this.discordButton.removeEventListener('click', this.bindDiscordAction);
 
     this.stopProgressInterval();
   }
@@ -176,8 +185,72 @@ export default class Slideshow {
     }
   }
 
+  setActionBarAction(action) {
+    if (DEBUG) console.log('Slideshow: setActionBarAction', action);
+
+    if (!this.buttonAction)
+      throw new Error('setActionBarAction: No buttonAction set');
+
+    this.actionBarAction = action;
+
+    if (this.slideActionButton) {
+      this.slideActionButton.removeEventListener('click', this.buttonAction);
+      this.actionBarWrapper.removeChild(this.slideActionButton);
+    }
+    if (this.actionTextInput)
+      this.actionBarWrapper.removeChild(this.actionTextInput);
+
+    switch (this.actionBarAction) {
+      case 'email':
+        this.slideActionButton = document.createElement('button');
+        this.slideActionButton.type = 'submit';
+        this.slideActionButton.classList.add('slide-action');
+        this.slideActionButton.innerHTML = 'Invite';
+
+        this.slideActionButton.addEventListener('click', this.buttonAction);
+
+        this.actionTextInput = document.createElement('input');
+        this.actionTextInput.type = 'email';
+        this.actionTextInput.classList.add('text-input');
+        this.actionTextInput.placeholder = 'email@example.com';
+
+        this.actionBarWrapper.prepend(this.slideActionButton);
+        this.actionBarWrapper.prepend(this.actionTextInput);
+
+        this.keyNoteWrapper.innerHTML = 'Use a key <i class="gg-key"></i>';
+        break;
+      case 'key':
+        this.slideActionButton = document.createElement('button');
+        this.slideActionButton.type = 'submit';
+        this.slideActionButton.classList.add('slide-action');
+        this.slideActionButton.innerHTML = 'Enter';
+
+        this.slideActionButton.addEventListener('click', this.buttonAction);
+
+        this.actionTextInput = document.createElement('input');
+        this.actionTextInput.type = 'text';
+        this.actionTextInput.classList.add('text-input');
+        this.actionTextInput.placeholder = `${crypto.randomUUID().split('-').slice(0, 2)} ..`;
+
+        this.actionBarWrapper.prepend(this.slideActionButton);
+        this.actionBarWrapper.prepend(this.actionTextInput);
+
+        this.keyNoteWrapper.innerHTML = 'Get an invite <i class="gg-mail"></i>';
+        break;
+    }
+  }
+
+  toggleActionBar() {
+    if (DEBUG) console.log('Slideshow: toggleActionBar');
+
+    if (this.actionBarAction === 'email') 
+      this.setActionBarAction('key');
+    else
+      this.setActionBarAction('email');
+  }
+
   navAction(e) {
-    /*if (DEBUG)*/ console.log('Slideshow: navAction', e);
+    if (DEBUG) console.log('Slideshow: navAction', e);
 
     let navItem;
 
@@ -185,8 +258,6 @@ export default class Slideshow {
       navItem = e.target;
     else
       navItem = e.target.closest('.nav-item');
-
-    console.log('navItem', navItem);
 
     // https://stackoverflow.com/questions/5913927/get-child-node-index
     // Need to wrap items
@@ -219,6 +290,10 @@ export default class Slideshow {
     this.navigateSlideshow(currentIndex);
   }
 
+  discordAction() {
+    window.open(config.slideshow.discordLink, '_blank').focus();
+  }
+
   navigateSlideshow(toIndex) {
     if (DEBUG) console.log('Slideshow: navigateSlideshow', toIndex);
 
@@ -243,8 +318,8 @@ export default class Slideshow {
       }
     });
 
-    if ((this.slideIndex === this.slides.length - 1) && !this.playing) {
-      this.slideActionButton.classList.add('active');
+    if (this.slideIndex === this.slides.length - 1) {
+      //this.slideActionButton.classList.add('active');
       this.rightIcon.classList.add('disabled');
     }
     else {

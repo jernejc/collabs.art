@@ -96,12 +96,12 @@ export default class MainScene extends ApplicationScene {
       handleSpaceUp({ scene: _self })
     });
 
-    this.input.keyboard.on('keyup-G', (event) => {
+    /*this.input.keyboard.on('keyup-G', (event) => {
       if (!this.gameOfLife)
         this.startGameOfLife();
       else
         this.stopGameOfLife();
-    });
+    });*/
 
     /**
      * Game mode events
@@ -240,16 +240,20 @@ export default class MainScene extends ApplicationScene {
     if (DEBUG) console.log("Main Scene: startGameOfLife");
 
     this.gameOfLife = true;
+    this.currentState = config.intialGameState['contribute'];
 
     const edge = 5;
+
     const widthEdge = this.gridWidth - edge;
     const heightEdge = this.gridHeight - edge;
 
-    this.xPadding = -parseInt((this.gridWidth / 2) - Math.ceil(this.gridWidth * 0.38));
-    console.log('xPadding', this.xPadding);
+    const halfWidth = Math.floor(this.gridWidth * 0.5);
+    const halfHeight = Math.floor(this.gridHeight * 0.5);
 
-    this.middleY = Math.floor(this.gridHeight / 2);
-    this.currentState = config.intialGameState['contribute'];
+    this.xPadding = -parseInt((halfWidth - this.currentState['max-length']) / 2);
+    //console.log('xPadding', this.xPadding);
+
+    this.middleY = halfHeight;
 
     for (let y = 0; y < this.gridHeight; y++) {
       for (let x = 0; x < this.gridWidth; x++) {
