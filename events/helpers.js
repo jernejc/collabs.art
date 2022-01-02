@@ -2,7 +2,7 @@
 const Web3 = require('web3');
 const Jimp = require('jimp');
 
-const {Storage} = require('@google-cloud/storage');
+const { Storage } = require('@google-cloud/storage');
 
 // Instantiate a storage client
 const storage = new Storage();
@@ -13,7 +13,7 @@ const bucket = storage.bucket(process.env.GCLOUD_STORAGE_BUCKET);
 // Config
 const config = require('./config');
 
-// Needs refractor, copy of client/helpers
+// Needs refractor
 module.exports = {
   formatPosition,
   letterToNumberColumn,
@@ -21,8 +21,7 @@ module.exports = {
   updateWorldImage,
   loadWorldImage,
   findWorldImage,
-  CORSorigin,
-  getImage
+  CORSconfig
 }
 
 function formatPosition(string) {
@@ -82,7 +81,7 @@ async function updateGoogleStorage(path, buffer) {
     await bucket.deleteFiles({
       prefix: `${config.assests}/worlds/`
     })
-  
+
     const file = bucket.file(path);
     await file.save(buffer);
   } catch (error) {
@@ -138,43 +137,14 @@ async function findWorldImage() {
   return worldImage
 }
 
-// Express
-
-// https://medium.com/zero-equals-false/using-cors-in-express-cac7e29b005b
-function CORSorigin(origin, callback) {
-  // allow requests with no origin 
-  // (like mobile apps or curl requests)
-  if (!origin) return callback(null, true);
-  if (config.allowedOrigins.indexOf(origin) === -1) {
-    const msg = 'The CORS policy for this site does not ' +
-      'allow access from the specified Origin.';
-    return callback(new Error(msg), false);
+function CORSconfig(req, callback) {
+  const cors = {
+    origin: false,
+    methods: ['GET', 'OPTION', 'POST']
   }
-  return callback(null, true);
-}
 
+  if (config.allowedOrigins.indexOf(req.header('Origin')) !== -1)
+    cors.origin = true;
 
-async function getImage(req, res)  {  
-  try {
-
-    const file = await findWorldImage();
-    const stream = file.createReadStream();
-
-    res.writeHead(200, {'Content-Type': 'image/png' });
-
-    stream.on('data', function (data) {
-      res.write(data);
-    });
-
-    stream.on('error', function (err) {
-      console.log('error reading stream', err);
-    });
-
-    stream.on('end', function () {
-      res.end();
-    });
-  } catch (error) {
-    console.error('Failed to redirect', error);
-    res.status(500).end()
-  }
+  return callback(null, cors);
 }

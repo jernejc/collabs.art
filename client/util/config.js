@@ -55,20 +55,25 @@ const config = {
     fps: 30
   },
   slideshow: {
-    slideActionText: 'Invite',
+    emailActionText: 'Join',
+    keyActionText: 'Enter',
+    emailRegex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     subtitle: '<span>Contribute to a living</span> canvas.<br /><span>Become a</span> Creator.', // is HTML
     discordLink: 'https://discord.gg/7BcneMCVAH',
     articles: [{ // This goes async from server
       icon: 'about.svg',
       title: 'About',
+      shortTitle: 'about',
       body: 'Players collectively draw on a shared canvas by changing the color of individual pixels and thus continuously contribute to the emerging global image. The goal is to illustrate the process of self-organization within a community of random players with the help of <a href="https://en.wikipedia.org/wiki/Blockchain" target="_blank">blockchain</a> technology.'
     }, {
       icon: 'ownership.svg',
       title: 'Ownership',
+      shortTitle: 'ownership',
       body: 'Each pixel on the canvas is represented by a non-fungible token (NFT) on the <a href="https://ethereum.org/" target="_blank">Ethereum</a> network. Ownership is stored and transferred based on the <a href="https://eips.ethereum.org/EIPS/eip-721" target="_blank">ERC-721</a> standard as most digital art and collectibles. It cannot be taken away or destroyed.'
     }, {
       icon: 'social-dynamic.svg',
-      title: 'Social dynamic',
+      title: '30 day Snapshot',
+      shortTitle: 'snap',
       body: 'Once a player takes ownership of a pixel he or she can control its color, but also auction it to a different player if an agreement between them is reached. The experiment is decentralized and not controlled by any single actor.'
     }]
   },
@@ -83,6 +88,188 @@ const config = {
    * }
    * 
    */
+  intialShapes: {
+    'r-pentomino-up': {
+      'xPadding': 70,
+      '24': {
+        26: true,
+        27: true
+      },
+      '25': {
+        25: true,
+        26: true
+      },
+      '26': {
+        26: true
+      }
+    },
+    'glider': {
+      '27': {
+        13: true,
+        14: true
+      },
+      '28': {
+        12: true,
+        16: true
+      },
+      '29': {
+        11: true,
+        17: true,
+        25: true
+      },
+      '30': {
+        1: true,
+        2: true,
+        11: true,
+        15: true,
+        17: true,
+        18: true,
+        23: true,
+        25: true
+      },
+      '31': {
+        1: true,
+        2: true,
+        11: true,
+        17: true,
+        21: true,
+        22: true
+      },
+      '32': {
+        12: true,
+        16: true,
+        21: true,
+        22: true,
+        35: true,
+        36: true
+      },
+      '33': {
+        13: true,
+        14: true,
+        21: true,
+        22: true,
+        35: true,
+        36: true
+      },
+      '34': {
+        23: true,
+        25: true
+      },
+      '35': {
+        25: true
+      }
+    },
+    'simkin': {
+      'xPadding': 80,
+      '-17': {
+        2: true,
+        3: true,
+        9: true,
+        10: true
+      },
+      '-18': {
+        2: true,
+        3: true,
+        9: true,
+        10: true
+      },
+      '-20': {
+        6: true,
+        7: true
+      },
+      '-21': {
+        6: true,
+        7: true
+      },
+      '-26': {
+        24: true,
+        25: true,
+        27: true,
+        28: true
+      },
+      '-27': {
+        23: true,
+        29: true
+      },
+      '-28': {
+        23: true,
+        30: true,
+        33: true,
+        34: true
+      },
+      '-29': {
+        23: true,
+        24: true,
+        25: true,
+        29: true,
+        33: true,
+        34: true
+      },
+      '-30': {
+        28: true
+      },
+      '-34': {
+        22: true,
+        23: true
+      },
+      '-35': {
+        22: true
+      },
+      '-36': {
+        23: true,
+        24: true,
+        25: true
+      },
+      '-37': {
+        25: true
+      }
+    },
+    'r-pentomino-down': {
+      '-27': {
+        26: true,
+        27: true
+      },
+      '-28': {
+        25: true,
+        26: true
+      },
+      '-29': {
+        26: true
+      }
+    },
+    'figure8': {
+      '10': {
+        6: true,
+        7: true,
+        8: true
+      },
+      '11': {
+        6: true,
+        7: true,
+        8: true
+      },
+      '12': {
+        6: true,
+        7: true,
+        8: true
+      },
+      '13': {
+        3: true,
+        4: true,
+        5: true
+      },
+      '14': {
+        3: true,
+        4: true,
+        5: true
+      },
+      '15': {
+        3: true,
+        4: true,
+        5: true
+      }
+    }
+  },
   intialGameState: {
     'contribute': {
       'max-length': 46,

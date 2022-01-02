@@ -166,8 +166,6 @@ export default class MainScene extends ApplicationScene {
 
         this.tiles[y][x] = this.add.rectangle(tx, ty, this.size, this.size);
         this.tiles[y][x].setDisplayOrigin(0, 0);
-
-        this.updateTile(x, y);
       }
     }
 
@@ -241,40 +239,38 @@ export default class MainScene extends ApplicationScene {
 
     this.gameOfLife = true;
     this.currentState = config.intialGameState['contribute'];
-
-    const edge = 5;
-
-    const widthEdge = this.gridWidth - edge;
-    const heightEdge = this.gridHeight - edge;
+    this.initialShapes = Object.keys(config.intialShapes);
 
     const halfWidth = Math.floor(this.gridWidth * 0.5);
     const halfHeight = Math.floor(this.gridHeight * 0.5);
 
-    this.xPadding = -parseInt((halfWidth - this.currentState['max-length']) / 2);
-    //console.log('xPadding', this.xPadding);
-
+    this.xPadding = parseInt((halfWidth - this.currentState['max-length']) * 0.6);
     this.middleY = halfHeight;
 
     for (let y = 0; y < this.gridHeight; y++) {
       for (let x = 0; x < this.gridWidth; x++) {
 
-        let probability = 0.1;
-
-        if (x < edge)
-          probability += 0.1
-        if (x > widthEdge)
-          probability += 0.1
-        if (y < edge)
-          probability += 0.1
-        if (y > heightEdge)
-          probability += 0.1
+        let probability = 0;
 
         if (this.currentState) {
           const relativeY = this.middleY - y;
-          const relativeX = x + this.xPadding;
+          const relativeX = x - this.xPadding;
 
           if (this.currentState[relativeY] && this.currentState[relativeY][relativeX])
             this.tiles[y][x].intial = true;
+        }
+
+        if (this.initialShapes.length > 0) { // increases probability instead of initial state..
+          this.initialShapes.forEach(shape => {
+            const relativeY = this.middleY - y;
+            const relativeX = (config.intialShapes[shape].xPadding) ? x - config.intialShapes[shape].xPadding : x; // no padding for gliders
+
+            if (
+              config.intialShapes[shape][relativeY] &&
+              config.intialShapes[shape][relativeY][relativeX]
+            )
+              probability = 1
+          });
         }
 
         this.tiles[y][x].alive = probability > Math.random();
@@ -283,6 +279,7 @@ export default class MainScene extends ApplicationScene {
 
     this.game.tools.hideTools();
 
+    this.updateTiles();
     this.timer = this.time.addEvent({
       delay: 160,
       callback: this.nextGeneration,
@@ -293,7 +290,6 @@ export default class MainScene extends ApplicationScene {
     if (!getCookie('hideOverlay'))
       this.game.tools.openOverlay();
 
-    //this.updateTiles();
     setGameMode({ scene: this, mode: 'gameoflife' });
   }
 

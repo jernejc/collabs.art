@@ -74,12 +74,12 @@ input {
   position: absolute;
   bottom: 8px;
   right: 11px;
-  color: rgba(255,255,255,0.6);
+  color: rgba(255, 255, 255, 0.6);
   font-size: 0.7em;
 }
 
 #inspired-by a {
-  color: rgba(255,255,255,0.6);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 #bottom-nav {
@@ -1000,7 +1000,6 @@ Info Box
   position: relative;
   width: 60vw;
   padding: 30px 20px 40px;
-  overflow: hidden;
   max-width: 590px;
   margin-left: 52%;
 }
@@ -1180,21 +1179,34 @@ Info Box
   position: relative;
 }
 
+.action-bar .action-text-wrapper {
+  display: flex;
+}
+
 .action-bar .slide-action {
   background: rgba(25, 97, 13, 0.7);
   line-height: 25px;
   font-size: 18px;
-  min-width: 68px;
-  padding: 10px;
+  padding: 10px 13px;
   margin-left: 5px;
   color: #FFF;
   border: 1px solid var(--light-green-color);
   cursor: pointer;
   transition: background-color 0.2s;
+  --ggs: 1.8;
 }
 
+.action-bar .slide-action i.gg-loadbar-alt {
+  --ggs: 1.3;
+}
+
+.action-bar .slide-action.success,
 .action-bar .slide-action:hover {
   background: var(--light-green-color);
+}
+
+.action-bar .slide-action.success {
+  cursor: default;
 }
 
 .action-bar .slide-action .gg-chevron-double-down,
@@ -1215,8 +1227,10 @@ Info Box
 }
 
 .action-bar .text-input {
+  font-size: 0.9em;
+  display: flex;
   background: rgba(0, 0, 0, 0.8);
-  padding: 10px 15px;
+  padding: 10px 15px 10px 36px;
   border: 1px solid rgba(255, 255, 255, 0.6)
 }
 
@@ -1225,16 +1239,31 @@ Info Box
   border: 1px solid rgba(255, 255, 255, 1)
 }
 
+.action-bar .text-input-icon {
+  position: absolute;
+  top: 50%;
+  margin-top: -7px;
+  opacity: 0.5;
+  left: 11px;
+}
+
+.action-bar .text-input-icon.gg-key {
+  margin-top: -5px;
+  left: 23px;
+  --ggs: 1.1;
+}
+
 .action-bar .key-note {
   position: absolute;
   bottom: -21.5px;
-  font-size: 0.7em;
+  font-size: 0.8em;
   color: rgba(245, 240, 255, 0.6);
-  opacity: 0.7;
+  opacity: 0.9;
   cursor: pointer;
-  left: 15px;
+  left: 5px;
   display: flex;
   align-items: center;
+  padding-right: 15px;
   --ggs: 0.9;
 }
 
@@ -1242,12 +1271,45 @@ Info Box
   text-decoration: underline;
 }
 
+.action-bar .key-note::after {
+  font-size: 1.1em;
+}
+
+.action-bar .key-note span {
+  color: rgba(245, 240, 255, 0.6);
+  margin-left: 2px;
+}
+
 .action-bar .key-note i {
   margin-left: 6px;
 }
 
 .action-bar .key-note i.gg-mail {
-  --ggs: 0.8;
+  --ggs: 0.7;
+  margin: 0 -10px 0 2px;
+}
+
+.action-bar .action-text-wrapper.error .text-input {
+  border: 1px solid #FF0000;
+}
+
+.action-bar .action-text-wrapper.error .text-input-icon,
+.action-bar .key-note.error {
+  color: #FF0000;
+}
+
+.action-bar .action-text-wrapper.success .text-input {
+  border: 1px solid var(--light-green-color);
+}
+
+.action-bar .action-text-wrapper.success .text-input-icon,
+.action-bar .key-note.success {
+  color: var(--light-green-color);
+}
+
+.action-bar .key-note.error:hover,
+.action-bar .key-note.success:hover {
+  text-decoration: none;
 }
 
 .action-bar .discord-action {

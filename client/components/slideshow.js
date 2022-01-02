@@ -18,6 +18,8 @@ export default class Slideshow {
     this.bindNextPrevAction = this.nextPrevAction.bind(this);
     this.bindDiscordAction = this.discordAction.bind(this);
     this.bindToggleActionBar = this.toggleActionBar.bind(this);
+    this.bindFormAction = this.formAction.bind(this);
+    this.bindActionTextInputChangeAction = this.actionTextInputChangeAction.bind(this);
 
     this.setupDom();
   }
@@ -54,15 +56,35 @@ export default class Slideshow {
     this.rightIcon.addEventListener('click', this.bindNextPrevAction);
 
     // Action bar
-    this.actionBarWrapper = document.createElement('form');
-    this.actionBarWrapper.classList.add('action-bar');
+    this.actionBarForm = document.createElement('form');
+    this.actionBarForm.classList.add('action-bar');
+
+    this.actionBarForm.addEventListener('submit', this.bindFormAction);
+
+    this.actionTextInputWrapper = document.createElement('div');
+    this.actionTextInputWrapper.classList.add('action-text-wrapper');
+
+    this.actionTextInput = document.createElement('input');
+    this.actionTextInput.type = 'text';
+    this.actionTextInput.classList.add('text-input');
+
+    this.actionTextInput.addEventListener('keydown', this.bindActionTextInputChangeAction);
+    this.actionTextInputWrapper.append(this.actionTextInput);
+
+    this.inputIcon = document.createElement('i');
+    this.inputIcon.classList.add('text-input-icon');
+    this.actionTextInputWrapper.append(this.inputIcon);
+
+    this.slideActionButton = document.createElement('button');
+    this.slideActionButton.type = 'submit';
+    this.slideActionButton.classList.add('slide-action');
 
     this.keyNoteWrapper = document.createElement('span');
     this.keyNoteWrapper.classList.add('key-note');
 
     this.keyNoteWrapper.addEventListener('click', this.bindToggleActionBar);
-
-    this.setActionBarAction('email');
+    this.keyNoteWrapper.setAttribute('flow', 'down');
+    this.keyNoteWrapper.setAttribute('color', 'green');
 
     this.discordButton = document.createElement('button')
     this.discordButton.classList.add('discord-action');
@@ -70,8 +92,12 @@ export default class Slideshow {
 
     this.discordButton.addEventListener('click', this.bindDiscordAction);
 
-    this.actionBarWrapper.append(this.discordButton);
-    this.actionBarWrapper.append(this.keyNoteWrapper);
+    this.actionBarForm.append(this.actionTextInputWrapper);
+    this.actionBarForm.append(this.slideActionButton);
+    this.actionBarForm.append(this.discordButton);
+    this.actionBarForm.append(this.keyNoteWrapper);
+
+    this.setActionBarAction('email');
 
     // Load articles
     this.articles.forEach((article, i) => {
@@ -98,7 +124,7 @@ export default class Slideshow {
     this.navWrapper.append(this.navItemsWrapper);
     this.navWrapper.prepend(this.leftIcon);
     this.navWrapper.append(this.rightIcon);
-    this.navWrapper.append(this.actionBarWrapper);
+    this.navWrapper.append(this.actionBarForm);
 
     this.slidesWrapper.append(this.navWrapper);
     this.domElement.append(this.slidesWrapper);
@@ -106,7 +132,7 @@ export default class Slideshow {
     this.parent.append(this.domElement);
   }
 
-  navTemplate({ title, icon, active }) {
+  navTemplate({ shortTitle, icon, active }) {
     if (DEBUG) console.log('Slideshow: navTemplate');
 
     const navItem = document.createElement('div');
@@ -120,7 +146,7 @@ export default class Slideshow {
     const navItemTitle = document.createElement('div');
     navItemTitle.classList.add('nav-title');
 
-    navItemTitle.innerText = title.split(' ')[0];
+    navItemTitle.innerText = shortTitle;
 
     navItem.append(navItemTitle);
     navItem.append(navTitle);
@@ -162,91 +188,170 @@ export default class Slideshow {
     return slide;
   }
 
-  destroy() {
-    if (DEBUG) console.log('Slideshow: destroy');
-
-    if (this.buttonAction)
-      this.slideActionButton.removeEventListener('click', this.buttonAction);
-
-    this.navWrapper.removeEventListener('click', this.bindNavAction);
-    this.leftIcon.removeEventListener('click', this.bindNextPrevAction);
-    this.rightIcon.removeEventListener('click', this.bindNextPrevAction);
-    this.discordButton.removeEventListener('click', this.bindDiscordAction);
-
-    this.stopProgressInterval();
-  }
-
-  stopProgressInterval() {
-    if (DEBUG) console.log('Slideshow: stopProgressInterval');
-
-    if (this.progressInterval) {
-      clearInterval(this.progressInterval);
-      this.progressInterval = null;
-    }
-  }
-
   setActionBarAction(action) {
     if (DEBUG) console.log('Slideshow: setActionBarAction', action);
 
-    if (!this.buttonAction)
-      throw new Error('setActionBarAction: No buttonAction set');
-
     this.actionBarAction = action;
-
-    if (this.slideActionButton) {
-      this.slideActionButton.removeEventListener('click', this.buttonAction);
-      this.actionBarWrapper.removeChild(this.slideActionButton);
-    }
-    if (this.actionTextInput)
-      this.actionBarWrapper.removeChild(this.actionTextInput);
+    this.actionTextInput.value = '';
 
     switch (this.actionBarAction) {
       case 'email':
-        this.slideActionButton = document.createElement('button');
-        this.slideActionButton.type = 'submit';
-        this.slideActionButton.classList.add('slide-action');
-        this.slideActionButton.innerHTML = 'Invite';
+        this.slideActionButton.innerHTML = config.slideshow.emailActionText;
+        this.actionTextInput.placeholder = 'join the waitlist';
 
-        this.slideActionButton.addEventListener('click', this.buttonAction);
-
-        this.actionTextInput = document.createElement('input');
-        this.actionTextInput.type = 'email';
-        this.actionTextInput.classList.add('text-input');
-        this.actionTextInput.placeholder = 'email@example.com';
-
-        this.actionBarWrapper.prepend(this.slideActionButton);
-        this.actionBarWrapper.prepend(this.actionTextInput);
-
-        this.keyNoteWrapper.innerHTML = 'Use a key <i class="gg-key"></i>';
+        this.inputIcon.classList.remove('gg-key');
+        this.inputIcon.classList.add('gg-mail');
         break;
       case 'key':
-        this.slideActionButton = document.createElement('button');
-        this.slideActionButton.type = 'submit';
-        this.slideActionButton.classList.add('slide-action');
-        this.slideActionButton.innerHTML = 'Enter';
+        this.slideActionButton.innerHTML = config.slideshow.keyActionText;
+        this.actionTextInput.placeholder = 'enter access key';
 
-        this.slideActionButton.addEventListener('click', this.buttonAction);
-
-        this.actionTextInput = document.createElement('input');
-        this.actionTextInput.type = 'text';
-        this.actionTextInput.classList.add('text-input');
-        this.actionTextInput.placeholder = `${crypto.randomUUID().split('-').slice(0, 2)} ..`;
-
-        this.actionBarWrapper.prepend(this.slideActionButton);
-        this.actionBarWrapper.prepend(this.actionTextInput);
-
-        this.keyNoteWrapper.innerHTML = 'Get an invite <i class="gg-mail"></i>';
+        this.inputIcon.classList.remove('gg-mail');
+        this.inputIcon.classList.add('gg-key');
         break;
     }
+
+    this.resetInputState();
   }
 
   toggleActionBar() {
     if (DEBUG) console.log('Slideshow: toggleActionBar');
 
-    if (this.actionBarAction === 'email') 
+    if (
+      this.keyNoteWrapper.classList.contains('error') ||
+      this.keyNoteWrapper.classList.contains('success')
+    ) {
+      this.actionTextInput.value = '';
+      this.resetInputState();
+      return;
+    }
+
+    if (this.actionBarAction === 'email')
       this.setActionBarAction('key');
     else
       this.setActionBarAction('email');
+  }
+
+  setInputErrorState() {
+    if (DEBUG) console.log('Slideshow: setInputErrorState');
+
+    this.actionTextInputWrapper.classList.add('error');
+    this.keyNoteWrapper.classList.add('error');
+
+    switch (this.actionBarAction) {
+      case 'email':
+        this.keyNoteWrapper.innerHTML = 'invalid e-mail <span> - clear</span>';
+        this.slideActionButton.innerHTML = config.slideshow.emailActionText;
+        break;
+      case 'key':
+        this.keyNoteWrapper.innerHTML = 'invalid access key <span> - clear</span>';
+        this.slideActionButton.innerHTML = config.slideshow.keyActionText;
+        break;
+    }
+
+    this.keyNoteWrapper.setAttribute('tooltip', '');
+  }
+
+  setInputSuccessState() {
+    if (DEBUG) console.log('Slideshow: setInputSuccessState');
+
+    this.actionTextInputWrapper.classList.add('success');
+    this.keyNoteWrapper.classList.add('success');
+    this.slideActionButton.classList.add('success');
+
+    switch (this.actionBarAction) {
+      case 'key':
+      case 'email':
+        this.keyNoteWrapper.innerHTML = 'we\'ll be in touch <span> - clear</span>';
+        this.slideActionButton.innerHTML = '<i class="gg-check"></i>';
+        break;
+    }
+
+    this.keyNoteWrapper.setAttribute('tooltip', '');
+  }
+
+  resetInputState() {
+    if (DEBUG) console.log('Slideshow: resetInputState');
+
+    if (this.actionTextInputWrapper.classList.contains('success'))
+      this.actionTextInputWrapper.classList.remove('success');
+    if (this.actionTextInputWrapper.classList.contains('error'))
+      this.actionTextInputWrapper.classList.remove('error');
+    if (this.keyNoteWrapper.classList.contains('success'))
+      this.keyNoteWrapper.classList.remove('success');
+    if (this.keyNoteWrapper.classList.contains('error'))
+      this.keyNoteWrapper.classList.remove('error');
+    if (this.slideActionButton.classList.contains('success'))
+      this.slideActionButton.classList.remove('success');
+
+    switch (this.actionBarAction) {
+      case 'email':
+        this.keyNoteWrapper.setAttribute('tooltip', 'While in private beta, access key is required.');
+        this.keyNoteWrapper.innerHTML = 'use a key <i class="gg-key"></i>';
+        this.slideActionButton.innerHTML = config.slideshow.emailActionText;
+        break;
+      case 'key':
+        this.keyNoteWrapper.setAttribute('tooltip', 'Access key will be sent to your e-mail.');
+        this.keyNoteWrapper.innerHTML = 'join the waitlist <i class="gg-mail"></i>';
+        this.slideActionButton.innerHTML = config.slideshow.keyActionText;
+        break;
+    }
+  }
+
+  formValid() {
+    if (DEBUG) console.log('Slideshow: formValid');
+
+    if (this.actionTextInput.value === '')
+      return false;
+
+    if (
+      this.actionBarAction === 'email' &&
+      !config.slideshow.emailRegex.test(this.actionTextInput.value)
+    )
+      return false;
+
+    return true;
+  }
+
+  async formAction(e) {
+    if (DEBUG) console.log('Slideshow: formAction', e, this.actionBarAction);
+
+    e.preventDefault();
+
+    if (this.slideActionButton.classList.contains('success'))
+      return;
+
+    if (!this.formValid())
+      return this.setInputErrorState();
+
+    this.slideActionButton.innerHTML = '<i class="gg-loadbar-alt"></i>';
+
+    try {
+      const action = (this.actionBarAction === 'email') ? 'join' : 'access';
+      const url = `${config.events.url}/${action}`
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          'email': this.actionTextInput.value
+        })
+      });
+
+      if (response.ok)
+        return this.setInputSuccessState();
+      else
+        throw new Error(`Failed to get response (${response.status})`);
+    } catch (error) {
+      return this.setInputErrorState();
+    }
+  }
+
+  actionTextInputChangeAction(e) {
+    if (DEBUG) console.log('Slideshow: actionTextInputChangeAction', e);
+
+    this.resetInputState();
   }
 
   navAction(e) {
@@ -291,6 +396,8 @@ export default class Slideshow {
   }
 
   discordAction() {
+    if (DEBUG) console.log('Slideshow: discordAction');
+
     window.open(config.slideshow.discordLink, '_blank').focus();
   }
 
@@ -314,18 +421,14 @@ export default class Slideshow {
         this.slideIndex = index;
 
         this.setActiveSlide({ index })
-        this.secActiveNav({ index })
+        this.setActiveNav({ index })
       }
     });
 
-    if (this.slideIndex === this.slides.length - 1) {
-      //this.slideActionButton.classList.add('active');
+    if (this.slideIndex === this.slides.length - 1) 
       this.rightIcon.classList.add('disabled');
-    }
-    else {
-      //this.slideActionButton.classList.remove('active');
+    else 
       this.rightIcon.classList.remove('disabled');
-    }
 
     if (this.slideIndex === 0)
       this.leftIcon.classList.add('disabled');
@@ -341,10 +444,22 @@ export default class Slideshow {
     this.currentSlide.classList.add('slide-active');
   }
 
-  secActiveNav({ index, navItem }) {
-    if (DEBUG) console.log('Slideshow: secActiveNav');
+  setActiveNav({ index, navItem }) {
+    if (DEBUG) console.log('Slideshow: setActiveNav');
 
     this.currentNav = navItem || this.navItems[index];
     this.currentNav.classList.add('nav-active');
+  }
+
+  destroy() {
+    if (DEBUG) console.log('Slideshow: destroy');
+
+    this.navWrapper.removeEventListener('click', this.bindNavAction);
+    this.leftIcon.removeEventListener('click', this.bindNextPrevAction);
+    this.rightIcon.removeEventListener('click', this.bindNextPrevAction);
+    this.discordButton.removeEventListener('click', this.bindDiscordAction);
+    this.actionBarForm.removeEventListener('submit', this.bindFormAction);
+    this.actionTextInput.removeEventListener('keydown', this.bindActionTextInputChangeAction);
+    this.keyNoteWrapper.removeEventListener('click', this.bindToggleActionBar);
   }
 }

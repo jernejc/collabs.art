@@ -82,10 +82,7 @@ if (!PROD) { // DEV config
   config.devServer = {
     contentBase: path.join(__dirname, 'dist'),
     compress: true,
-    port: 9000,
-    watchOptions: {
-      ignored: /assets/
-    }
+    port: 9000
   }
 }
 
