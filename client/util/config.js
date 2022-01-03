@@ -72,8 +72,8 @@ const config = {
       body: 'Each pixel on the canvas is represented by a non-fungible token (NFT) on the <a href="https://ethereum.org/" target="_blank">Ethereum</a> network. Ownership is stored and transferred based on the <a href="https://eips.ethereum.org/EIPS/eip-721" target="_blank">ERC-721</a> standard as most digital art and collectibles. It cannot be taken away or destroyed.'
     }, {
       icon: 'social-dynamic.svg',
-      title: '30 day Snapshot',
-      shortTitle: 'snap',
+      title: 'Social Dynamic',
+      shortTitle: 'social',
       body: 'Once a player takes ownership of a pixel he or she can control its color, but also auction it to a different player if an agreement between them is reached. The experiment is decentralized and not controlled by any single actor.'
     }]
   },

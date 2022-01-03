@@ -21,7 +21,7 @@ export default class Overlay {
     this.overlayContent = document.createElement('div');
     this.overlayContent.classList.add('overlay-content');
 
-    this.slideshow = new Slideshow({ parent: this.overlayContent, game: this.game, buttonAction: this.close });
+    this.slideshow = new Slideshow({ parent: this.parent, game: this.game, buttonAction: this.close });
 
     this.insipredBy = document.createElement('div');
     this.insipredBy.id = 'inspired-by';
@@ -35,7 +35,7 @@ export default class Overlay {
     this.overlayContent.append(this.insipredBy);
     this.domElement.append(this.overlayContent);
 
-    this.parent.append(this.domElement);
+    //this.parent.append(this.slideshow);
   }
 
   destroy() {

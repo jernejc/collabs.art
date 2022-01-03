@@ -997,11 +997,13 @@ Info Box
 #slideshow {
   background: rgba(0, 0, 0, 0.85);
   color: #FFF;
-  position: relative;
+  position: absolute;
+  top: 50%;
   width: 60vw;
+  height: 290px;
   padding: 30px 20px 40px;
   max-width: 590px;
-  margin-left: 52%;
+  margin: -180px 0 0 52%;
 }
 
 .slides-wrapper {

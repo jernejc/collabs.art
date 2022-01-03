@@ -250,7 +250,7 @@ export default class MainScene extends ApplicationScene {
     for (let y = 0; y < this.gridHeight; y++) {
       for (let x = 0; x < this.gridWidth; x++) {
 
-        let probability = 0;
+        let probability = 0.12;
 
         if (this.currentState) {
           const relativeY = this.middleY - y;
@@ -279,7 +279,6 @@ export default class MainScene extends ApplicationScene {
 
     this.game.tools.hideTools();
 
-    this.updateTiles();
     this.timer = this.time.addEvent({
       delay: 160,
       callback: this.nextGeneration,

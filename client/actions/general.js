@@ -40,7 +40,9 @@ export function handleMouseMove({ pointer, scene }) {
 }
 
 export async function handleMouseDown({ pointer, scene }) {
-  if (DEBUG) console.log('User interactions: handleMouseDown');
+  if (DEBUG) console.log('User interactions: handleMouseDown', scene.game.mode);
+
+  let tile;
 
   switch (scene.game.mode) {
     case 'multiselect':
@@ -52,13 +54,17 @@ export async function handleMouseDown({ pointer, scene }) {
       scene.game.selection.createRectangleSelection({ pointer, scene });
       break;
     case 'gameoflife':
-    case 'select':
-      const tile = getTileForPointer({ pointer, scene });
+      tile = getTileForPointer({ pointer, scene });
+      tile.alive = true;
 
-      if (scene.gameOfLife) {
-        tile.alive = !tile.alive;
-        return;
-      }
+      // Enable some neighbors to make things more fun
+      scene.tiles[tile.cy][tile.cx - 1].alive = true;
+      scene.tiles[tile.cy][tile.cx + 1].alive = true;
+      scene.tiles[tile.cy - 1][tile.cx].alive = true;
+      scene.tiles[tile.cy + 1][tile.cx].alive = true;
+      break;
+    case 'select':
+      tile = getTileForPointer({ pointer, scene });
 
       if (scene.game.selection.isSelected(tile.cx, tile.cy))
         scene.game.selection.removeSelected({ tile, scene });
