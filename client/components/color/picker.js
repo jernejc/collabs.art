@@ -22,17 +22,17 @@ export default class ColorPicker extends Controller {
 
     let preventClose = false;
 
-    this.input = document.createElement('input');
-    this.input.value = (this.format) ? this.format(this.getValue()) : this.getValue();
-    this.input.setAttribute('type', 'text');
-
-    this.domElement.append(this.input);
-
     this.color = document.createElement('span');
     this.color.classList.add('color');
     this.color.style = `background: #${formatColorNumber(this.getValue())};`
 
     this.domElement.append(this.color);
+
+    this.input = document.createElement('input');
+    this.input.value = (this.format) ? this.format(this.getValue()) : this.getValue();
+    this.input.setAttribute('type', 'text');
+
+    this.domElement.append(this.input);
 
     this.input.addEventListener('blur', (e) => {
       if (!preventClose && !params.visible)

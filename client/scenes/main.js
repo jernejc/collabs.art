@@ -28,7 +28,7 @@ export default class MainScene extends ApplicationScene {
   }
 
   preload() {
-    this.load.image('worldimage', `${config.events.url}/image`);
+    this.load.image('worldimage', 'assets/images/place.png'); //this.load.image('worldimage', `${config.events.url}/image`);
   }
 
   create(data) {
@@ -119,7 +119,7 @@ export default class MainScene extends ApplicationScene {
 
     if (this.game.web3.onboarding) {
       if (this.game.web3.onboarding.state !== 'REGISTERED') {
-        this.startGameOfLife();
+        setGameMode({ scene: this, mode: 'select' }); //this.startGameOfLife();
       } else
         setGameMode({ scene: this, mode: 'select' });
     }
@@ -190,9 +190,7 @@ export default class MainScene extends ApplicationScene {
     if (this.gameOfLife) {
       let fillColor = 0x000000;
 
-      if (this.tiles[y][x].intial)
-        fillColor = random.color;
-      else if (this.tiles[y][x].alive)
+      if (this.tiles[y][x].intial || this.tiles[y][x].alive)
         fillColor = random.color;
 
       this.tiles[y][x].setFillStyle(fillColor);
@@ -280,7 +278,7 @@ export default class MainScene extends ApplicationScene {
     this.game.tools.hideTools();
 
     this.timer = this.time.addEvent({
-      delay: 160,
+      delay: 170,
       callback: this.nextGeneration,
       callbackScope: this,
       loop: true

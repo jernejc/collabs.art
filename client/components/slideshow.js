@@ -124,9 +124,10 @@ export default class Slideshow {
     this.navWrapper.append(this.navItemsWrapper);
     this.navWrapper.prepend(this.leftIcon);
     this.navWrapper.append(this.rightIcon);
-    this.navWrapper.append(this.actionBarForm);
 
     this.slidesWrapper.append(this.navWrapper);
+    this.slidesWrapper.append(this.actionBarForm);
+    
     this.domElement.append(this.slidesWrapper);
 
     this.parent.append(this.domElement);

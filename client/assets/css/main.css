@@ -246,6 +246,10 @@ input {
   color: var(--activebid-color);
 }
 
+.settings>label {
+  margin: 0 3px 0 1px;
+}
+
 .settings .setting {
   display: inline-flex;
   padding: 12px 9px;
@@ -279,7 +283,10 @@ input {
 }
 
 .settings.ownerUI .setting input {
-  width: 60px;
+  width: 65px;
+  text-align: left;
+  padding: 5px;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .settings .setting input:focus {
@@ -298,7 +305,7 @@ input {
 }
 
 .settings.batch .setting {
-  margin: 0px 5px;
+  margin: 0px 5px 0px 2px;
   padding: 0;
   width: auto;
 }
@@ -308,10 +315,11 @@ input {
 }
 
 .settings.batch .setting .color {
-  position: static;
-  top: 0;
+  margin: 0 5px 0px 0px;
+  position: relative;
+  top: 4px;
   left: 0;
-  border: 1px solid var(--header-white);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 #menu-item ul.list {
@@ -337,6 +345,7 @@ input {
 #menu-item ul li .color {
   width: 10px;
   height: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 #menu-item ul li .text {
@@ -707,8 +716,14 @@ Info Box
 .action-button:disabled {
   opacity: 0.8;
   background: rgba(100, 100, 100, 0.6) !important;
-  color: #FFF;
+  color: #FFF !important;
   cursor: not-allowed;
+}
+
+.action-button.apply,
+.action-button.action-settings {
+  background: var(--header-white);
+  color: var(--active-black);
 }
 
 .action-settings {
@@ -795,12 +810,12 @@ Info Box
 
 .info-box .color-picker input {
   left: 35px;
-  width: 50px;
+  width: 60px;
 }
 
 .info-box .color-picker .color {
-  top: 3px;
-  left: 15px;
+  top: 2px;
+  left: 13px;
 }
 
 .info-box .color-picker .advanced-color {
@@ -825,6 +840,7 @@ Info Box
   height: 15px;
   left: 9px;
   top: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .color-picker .hue {
@@ -893,8 +909,8 @@ Info Box
 }
 
 .setting.color-picker .advanced-color {
-  left: -167px;
-  top: -11px;
+  left: -160px;
+  top: -6px;
   position: absolute;
   margin: 0;
 }
@@ -1062,6 +1078,16 @@ Info Box
 
 /* Slideshow navigation */
 
+.slides-nav {
+  position: absolute;
+  bottom: 10px;
+  left: 5px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .slides-nav .progress-bar {
   height: 5px;
   width: 100%;
@@ -1076,15 +1102,6 @@ Info Box
 
 .slides-nav .progress-bar--primary {
   z-index: 2;
-}
-
-.slides-nav {
-  position: absolute;
-  bottom: 10px;
-  height: 60px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .slides-nav .slides-nav-items {
@@ -1159,7 +1176,7 @@ Info Box
 
 .slides-nav .gg-play-button {
   position: relative;
-  --ggs: 1.5;
+  --ggs: 1.8;
   cursor: pointer;
   margin: 0px;
   color: var(--active-black);
@@ -1176,9 +1193,11 @@ Info Box
 /* Action bar */
 
 .action-bar {
-  margin: 0 0 0 10px;
+  margin: 0;
   display: flex;
-  position: relative;
+  position: absolute;
+  bottom: 16px;
+  left: 120px;
 }
 
 .action-bar .action-text-wrapper {
@@ -1233,7 +1252,8 @@ Info Box
   display: flex;
   background: rgba(0, 0, 0, 0.8);
   padding: 10px 15px 10px 36px;
-  border: 1px solid rgba(255, 255, 255, 0.6)
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  width: 100%;
 }
 
 .action-bar .text-input:focus {

@@ -236,7 +236,7 @@ export default class Menu {
         this.settings.colorPicker = new ColorPicker(batchSettings, 'color', {
           scene: this.scene,
           type: 'color',
-          label: 'Color',
+          //label: 'Color',
           elClasses: ['setting'],
           format: (value) => '#' + formatColorNumber(value),
           validate: (value) => !isNaN(value) && value.length === 6,

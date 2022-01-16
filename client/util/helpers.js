@@ -169,3 +169,35 @@ export function deleteCookie(name, path) {
   setCookie(name, '', -1, path)
 }
 
+// Blinkering issue in some android browser
+// WEBGL rendering seems to be connected
+// https://www.html5gamedevs.com/topic/25507-phaserwebgl-flickering-on-chrome-for-android-v53/
+
+export function maliDetect() {
+  const canvas = document.createElement('canvas');
+  canvas.setAttribute("width", "1");
+  canvas.setAttribute("height", "1");
+  document.body.appendChild(canvas);
+
+  const gl = canvas.getContext('webgl', { stencil: true });
+  canvas.parentNode.removeChild(canvas);
+
+  if (!gl)
+    return false;
+
+  const dbgRenderInfo = gl.getExtension("WEBGL_debug_renderer_info");
+  let renderer;
+
+  if (dbgRenderInfo != null)
+    renderer = gl.getParameter(dbgRenderInfo.UNMASKED_RENDERER_WEBGL);
+
+  if (!renderer) 
+    return false;
+
+  let n = renderer.search("Mali-400");
+
+  if (n != -1)
+    return true;
+  else
+    return false;
+}

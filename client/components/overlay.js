@@ -32,9 +32,8 @@ export default class Overlay {
       <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life" target="_blank">Game of Life</a>
     `
 
-    this.overlayContent.append(this.insipredBy);
-    this.domElement.append(this.overlayContent);
-
+    this.parent.append(this.insipredBy);
+    //this.domElement.append(this.overlayContent);
     //this.parent.append(this.slideshow);
   }
 

@@ -1,0 +1,62 @@
+/***
+*
+*  Based on:
+*  https://stackoverflow.com/questions/6370690/media-queries-how-to-target-desktop-tablet-and-mobile
+*
+***/
+
+@media (max-width:480px) {
+  /* smartphones, iPhone, portrait 480x320 phones */
+
+  #slideshow {
+    width: calc(100% - 60px);
+    min-height: 380px;
+    margin: -215px 10px;
+    padding: 20px;
+    top: 50%;
+  }
+
+  .slides-wrapper {
+    width: 100%;
+    margin: 0;
+    min-height: 360px;
+  }
+
+  .slides-nav {
+    left: 50%;
+    margin-left: -52px;
+    bottom: 60px;
+  }
+
+  .action-bar {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    width: 100%;
+  }
+
+  [tooltip]::before,
+  [tooltip]::after {
+    display: none !important;
+  }
+}
+
+@media (min-width:481px) {
+  /* portrait e-readers (Nook/Kindle), smaller tablets @ 600 or @ 640 wide. */
+}
+
+@media (min-width:641px) {
+  /* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
+}
+
+@media (min-width:961px) {
+  /* tablet, landscape iPad, lo-res laptops ands desktops */
+}
+
+@media (min-width:1025px) {
+  /* big landscape tablets, laptops, and desktops */
+}
+
+@media (min-width:1281px) {
+  /* hi-res laptops and desktops */
+}

@@ -155,7 +155,7 @@ export default class Web3Manager {
   }
 
   handleDefaultNetwork() {
-    /*if (DEBUG)*/ console.log('Web3Manager: handleDefaultNetwork');
+    if (DEBUG) console.log('Web3Manager: handleDefaultNetwork');
     this.network = config.networks.find(net => net.default === true);
 
     this.connectWebsocket();

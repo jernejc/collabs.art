@@ -21,7 +21,7 @@ const config = {
     chainId: '0x13881',
     chainName: 'Polygon Testnet',
     nativeCurrency: {
-      symbol: 'MATIC',
+      symbol: 'Ξ',
       name: 'Matic token',
       decimals: 18,
     },
@@ -31,12 +31,12 @@ const config = {
   }, {
     id: 137,
     name: 'Polygon Mainnet',
-    symbol: 'MATIC',
+    symbol: 'Ξ',
     enabled: false
   }, {
     id: 1,
     name: 'ETH Mainnet',
-    symbol: 'ETH',
+    symbol: 'Ξ',
     enabled: false
   }],
   subgraph: {
@@ -59,7 +59,7 @@ const config = {
     keyActionText: 'Enter',
     emailRegex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     subtitle: '<span>Contribute to a living</span> canvas.<br /><span>Become a</span> Creator.', // is HTML
-    discordLink: 'https://discord.gg/7BcneMCVAH',
+    discordLink: 'https://discord.gg/DKZkG4CnrC',
     articles: [{ // This goes async from server
       icon: 'about.svg',
       title: 'About',

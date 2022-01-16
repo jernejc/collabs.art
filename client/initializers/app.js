@@ -1,7 +1,10 @@
-import { Events, Game, WEBGL, Scale } from 'phaser';
+import { Events, Game, CANVAS, WEBGL, Scale } from 'phaser';
 
 // Config
 import config from '@util/config';
+
+// Helpers
+import { maliDetect } from '@util/helpers';
 
 // Scenes
 import MainScene from '@scenes/main';
@@ -22,7 +25,7 @@ export async function AppInitializer() {
 
   const Emitter = new Events.EventEmitter();
   const GameInstance = new Game({
-    type: WEBGL,
+    type: (maliDetect()) ? CANVAS : WEBGL,
     width: canvasWidth,
     height: canvasHeight,
     parent: config.appConfig.canvasElement,
@@ -34,13 +37,11 @@ export async function AppInitializer() {
       default: 'arcade'
     },
     scale: {
-      mode: Scale.RESIZE,
-      //zoom: 1 / window.devicePixelRatio
+      mode: Scale.RESIZE
     }
   });
 
   window.devicePixelRatio = Math.ceil(window.devicePixelRatio);
-  console.log('window.devicePixelRatio', window.devicePixelRatio);
   let gridSize = config.appConfig.gridSize, strokeSize = config.appConfig.strokeSize;
 
   if (window.devicePixelRatio > 1) {
