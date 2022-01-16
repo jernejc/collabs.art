@@ -4,7 +4,7 @@ import MetaMaskOnboarding from '@metamask/onboarding'
 
 import config from '@util/config';
 
-import { stringToBN, formatPosition, hexStringToColor } from '@util/helpers';
+import { stringToBN, formatPosition, hexStringToColor, formatNetworkConfig } from '@util/helpers';
 
 import { updateWorldImagePixelColors } from '@actions/pixel';
 
@@ -164,7 +164,7 @@ export default class Web3Manager {
   }
 
   handleNewChain(chainId) {
-    if (DEBUG) console.log('Web3Manager: handleNewChain', chainId);
+    /*if (DEBUG)*/ console.log('Web3Manager: handleNewChain', chainId);
     const supported = config.networks.find(net => net.chainId == chainId && net.enabled === true);
 
     if (!supported) {
@@ -287,7 +287,7 @@ export default class Web3Manager {
     try {
       await this.RPCinstance.currentProvider.request({
         method: 'wallet_addEthereumChain',
-        params: [chainConfig]
+        params: [formatNetworkConfig(chainConfig)]
       });
     } catch (error) {
       console.error('Failed to add network to provider: ', error);
@@ -295,9 +295,9 @@ export default class Web3Manager {
   }
 
   async switchToNetwork(chainId) {
-    if (DEBUG) console.log('Web3Manager: switchToNetwork', chainId);
+    /*if (DEBUG)*/ console.log('Web3Manager: switchToNetwork', chainId);
 
-    chainId = chainId || '0x13881' // Default to testnet
+    chainId = chainId || Web3.utils.toHex('80001') // Default to  Polygon testnet
 
     const networkConfig = config.networks.find(net => net.chainId === chainId && net.enabled === true);
 
@@ -307,7 +307,7 @@ export default class Web3Manager {
     try {
       await this.RPCinstance.currentProvider.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId: networkConfig.chainId }]
+        params: [{ chainId: chainId }]
       });
 
       /*await setTimeout(() => { }, 2000);

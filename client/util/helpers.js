@@ -191,7 +191,7 @@ export function maliDetect() {
   if (dbgRenderInfo != null)
     renderer = gl.getParameter(dbgRenderInfo.UNMASKED_RENDERER_WEBGL);
 
-  if (!renderer) 
+  if (!renderer)
     return false;
 
   let n = renderer.search("Mali-400");
@@ -200,4 +200,12 @@ export function maliDetect() {
     return true;
   else
     return false;
+}
+
+export function formatNetworkConfig(config) {
+  return ['id', 'chainId', 'chainName', 'nativeCurrency', 'rpcUrls', 'blockExplorerUrls']
+    .reduce((result, key) => {
+      result[key] = config[key];
+      return result;
+    }, {});
 }
