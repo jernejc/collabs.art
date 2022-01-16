@@ -119,7 +119,7 @@ export default class MainScene extends ApplicationScene {
 
     if (this.game.web3.onboarding) {
       if (this.game.web3.onboarding.state !== 'REGISTERED') {
-        this.startGameOfLife();
+        setGameMode({ scene: this, mode: 'select' }); //this.startGameOfLife();
       } else
         setGameMode({ scene: this, mode: 'select' });
     }

@@ -169,3 +169,10 @@ export function deleteCookie(name, path) {
   setCookie(name, '', -1, path)
 }
 
+export function formatNetworkConfig(config) {
+  return ['id', 'chainId', 'chainName', 'nativeCurrency', 'rpcUrls', 'blockExplorerUrls']
+    .reduce((result, key) => {
+      result[key] = config[key];
+      return result;
+    }, {});
+}

@@ -33,6 +33,10 @@ export default class SelectionManager {
     if (DEBUG) console.log("SelectionManager: repositionHighlight");
 
     const tile = getTileForPointer({ pointer, scene });
+    
+    if (!tile)
+      return;
+
     const invertedColor = invertColor(tile.fillColor, true);
 
     this.highlight.setPosition(tile.x, tile.y);
@@ -40,7 +44,7 @@ export default class SelectionManager {
   }
 
   async addSelected({ tiles, scene }) {
-    if (DEBUG)  console.log("SelectionManager: addSelected", tiles);
+    if (DEBUG) console.log("SelectionManager: addSelected", tiles);
 
     for (let i = 0; i < tiles.length; i++) {
       const tile = tiles[i];
@@ -95,7 +99,7 @@ export default class SelectionManager {
     }
 
     for (let y = startY; y < endY; y += scene.appConfig.gridSize)
-      for (let x = startX; x < endX; x += scene.appConfig.gridSize) 
+      for (let x = startX; x < endX; x += scene.appConfig.gridSize)
         tiles.push(getTileForXY({ x, y, scene }));
 
     this.addSelected({ tiles, scene });
