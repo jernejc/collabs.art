@@ -1,34 +1,19 @@
-pragma solidity >=0.6.0 <0.8.15;
+pragma solidity >=0.6.0 <0.7.3;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/utils/EnumerableSet.sol";
-import "@openzeppelin/contracts/utils/EnumerableMap.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
+import "./ERC721Batch.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-
-import "./PixelsToken.sol";
 
 /**
  * @title Pixels
- * Pixels - living canvas
+ * Pixels - non-fungible pixels
  */
 
-contract Pixels is AccessControl {
-    using SafeMath for uint256;
-    using Address for address;
-    using EnumerableSet for EnumerableSet.UintSet;
-    using EnumerableMap for EnumerableMap.UintToAddressMap;
-    using Strings for uint256;
-
-    PixelsToken public PixelsTokenContract;
+contract Pixels is ERC721Batch, AccessControl {
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     uint48 public maxPixels;
 
-    EnumerableMap.UintToAddressMap private _pixels;
-
     mapping(uint256 => bytes6) public colors;
-    mapping(uint256 => uint256) public bids;
 
     event ColorPixel(uint256 _position, bytes6 _color);
     event ColorPixels(uint256[] _positions, bytes6[] _colors);
@@ -36,13 +21,50 @@ contract Pixels is AccessControl {
     /**
      * @dev Contract Constructor, calls ERC721Batch constructor and sets name and symbol
      */
-    constructor(uint48 _maxPixels, address _pixelsTokenAddress) public {
+    constructor(uint48 _maxPixels) public ERC721Batch("autopoietic", "PW") {
         require(_maxPixels > 0, "Pixels: Max pixels must be greater than 0");
 
         maxPixels = _maxPixels;
 
-        PixelsTokenContract = PixelsToken(_pixelsTokenAddress);
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _setupRole(MINTER_ROLE, msg.sender);
+    }
+
+    /**
+     * @dev Create new pixel, deffer to ERC721Batch
+     * @param _position pixel position in the world / id
+     * @param _owner owner of the newly created pixel
+     */
+    function createPixel(address _owner, uint256 _position)
+        public
+        virtual
+        onlyMinter
+    {
+        require(_position > 0, "Pixels: Position must be provided");
+        require(
+            totalSupply() + 1 <= maxPixels,
+            "Pixels: Cannot create more than max amount of pixels"
+        );
+
+        _safeMint(_owner, _position);
+    }
+
+    /**
+     * @dev Create multiple pixel positions, deffer to ERC721Batch
+     * @param _positions array of pixel positions
+     * @param _owner owner of the newly created pixel
+     */
+    function createPixels(address _owner, uint256[] memory _positions)
+        public
+        virtual
+        onlyMinter
+    {
+        require(
+            totalSupply() + _positions.length <= maxPixels,
+            "Pixels: Cannot create more than max amount of pixels"
+        );
+
+        _safeMintBatch(_owner, _positions, "");
     }
 
     /**
@@ -154,12 +176,39 @@ contract Pixels is AccessControl {
      */
 
     /**
+     * @dev add minter
+     * @param _account address to add as the new minter
+     */
+    function addMinter(address _account) public virtual onlyAdmin {
+        grantRole(MINTER_ROLE, _account);
+    }
+
+    /**
+     * @dev remove minter
+     * @param _account address to remove as minter
+     */
+    function removeMinter(address _account) public virtual onlyAdmin {
+        revokeRole(MINTER_ROLE, _account);
+    }
+
+    /**
      * @dev Restricted to members of the admin role.
      */
     modifier onlyAdmin() {
         require(
             hasRole(DEFAULT_ADMIN_ROLE, msg.sender),
             "Pixels: Restricted to admins."
+        );
+        _;
+    }
+
+    /**
+     * @dev Restricted to members of the minter role.
+     */
+    modifier onlyMinter() {
+        require(
+            hasRole(MINTER_ROLE, msg.sender),
+            "Pixels: Restricted to minters."
         );
         _;
     }

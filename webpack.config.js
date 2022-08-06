@@ -46,12 +46,10 @@ const config = {
 
   plugins: [
     new CleanWebpackPlugin(),
-    new CopyPlugin({
-      patterns: [{
-        from: path.resolve(__dirname, 'client/assets'),
-        to: path.resolve(__dirname, 'dist/assets')
-      }]
-    }),
+    new CopyPlugin([{
+      from: path.resolve(__dirname, 'client/assets'),
+      to: path.resolve(__dirname, 'dist/assets')
+    }]),
     new webpack.DefinePlugin({
       PRODUCTION: PROD,
       VERSION: "0.1.1",
@@ -62,7 +60,7 @@ const config = {
       process: 'process/browser'
     }),*/
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, 'client/index.html'),
+      template: path.resolve(__dirname, 'client/public/index.html'),
       inject: 'head',
       chunksSortMode: (a, b) => {
         if (a[0] < b[0])
@@ -80,7 +78,7 @@ if (!PROD) { // DEV config
   config.output.filename = '[name].bundle.js';
   config.devtool = 'inline-source-map';
   config.devServer = {
-    contentBase: path.join(__dirname, 'dist'),
+    static: path.join(__dirname, 'dist'),
     compress: true,
     port: 9000
   }

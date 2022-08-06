@@ -7,25 +7,27 @@
   "license": "ISC",
   "devDependencies": {
     "@metamask/onboarding": "^1.0.1",
-    "@openzeppelin/contracts": "^4.4.1",
-    "@truffle/hdwallet-provider": "^2.0.0",
-    "chai": "^4.2.0",
-    "clean-webpack-plugin": "^3.0.0",
-    "copy-webpack-plugin": "^6.1.0",
+    "@openzeppelin/contracts": "^4.7.2",
+    "@truffle/hdwallet-provider": "^2.0.13",
+    "chai": "^4.3.6",
+    "clean-webpack-plugin": "^4.0.0",
     "eth-gas-reporter": "^0.2.20",
-    "html-webpack-plugin": "^4.4.1",
+    "html-webpack-plugin": "^4.5.2",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
-    "node-gyp": "8.4.1",
+    "node-gyp": "9.1.0",
     "phaser": "^3.55.2",
     "truffle-assertions": "^0.9.2",
-    "web3": "^1.6.1",
-    "webpack": "^4.44.1",
-    "webpack-cli": "^3.3.12",
-    "webpack-dev-server": "^3.11.1"
+    "web3": "^1.7.5",
+    "webpack": "^4.46.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.9.3"
   },
   "scripts": {
     "build": "webpack",
     "dev": "webpack-dev-server"
+  },
+  "dependencies": {
+    "copy-webpack-plugin": "^4.5.4"
   }
 }

@@ -96,12 +96,12 @@ export default class MainScene extends ApplicationScene {
       handleSpaceUp({ scene: _self })
     });
 
-    /*this.input.keyboard.on('keyup-G', (event) => {
+    this.input.keyboard.on('keyup-G', (event) => {
       if (!this.gameOfLife)
         this.startGameOfLife();
       else
         this.stopGameOfLife();
-    });*/
+    });
 
     /**
      * Game mode events
@@ -185,15 +185,16 @@ export default class MainScene extends ApplicationScene {
   updateTile(x, y) {
     if (DEBUG) console.log("Main Scene: updateTile");
 
-    const random = hexStringToColor(this.appConfig.defaultTileColors[Phaser.Math.Between(0, this.appConfig.defaultTileColors.length - 1)])
+    
 
     if (this.gameOfLife) {
-      let fillColor = 0x000000;
+      const randomPixelColor = hexStringToColor(this.appConfig.defaultTileColors[Phaser.Math.Between(0, this.appConfig.defaultTileColors.length - 1)])
+      let fillColor = this.appConfig.fillColor;
 
       if (this.tiles[y][x].intial || this.tiles[y][x].alive)
-        fillColor = random.color;
+        fillColor = randomPixelColor;
 
-      this.tiles[y][x].setFillStyle(fillColor);
+      this.tiles[y][x].setFillStyle(fillColor.color);
       return;
     }
 
@@ -204,12 +205,12 @@ export default class MainScene extends ApplicationScene {
 
     this.tiles[y][x].setFillStyle(mapPixel.color.color);
 
-    if (this.game.mode !== 'move') { // Add stroke if mode is not move
+    /*if (this.game.mode !== 'move') { // Add stroke if mode is not move
       if (this.game.selection.isSelected(mapPixel.cx, mapPixel.cy))
         setInvertedStroke({ scene: this, tile: this.tiles[y][x] });
       else
         resetStrokeStyle({ scene: this, tile: this.tiles[y][x] });
-    }
+    }*/
   }
 
   clearVisibleTiles() {

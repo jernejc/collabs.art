@@ -222,7 +222,7 @@ export default class Menu {
 
         this.settings.batchCreateBtn = new Button({
           elClasses: ['action-button', 'action-settings'],
-          text: 'Create',
+          text: 'Mint',
           clickAction: async e => {
             await purchasePixels({ scene: this.scene, selection: relevantPixels })
           }

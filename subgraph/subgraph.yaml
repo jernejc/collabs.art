@@ -1,4 +1,4 @@
-specVersion: 0.0.2
+specVersion: 0.0.4
 description: Pixels for Ethereum
 repository: https://github.com/graphprotocol/example-subgraph
 schema:
@@ -12,7 +12,7 @@ dataSources:
       abi: Pixels
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Pixel
@@ -33,7 +33,7 @@ dataSources:
       abi: PixelsBid
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Pixel
