@@ -8,7 +8,7 @@ dataSources:
     name: Pixels
     network: mumbai
     source:
-      address: '0x65d50F2BeB91DF4B1C90FBBa9b6889EC01D223Db'
+      address: '0x0C172B7B2e04CcC1f92BEc56D529ec7dda2600c1'
       abi: Pixels
     mapping:
       kind: ethereum/events
@@ -20,28 +20,8 @@ dataSources:
         - name: Pixels
           file: ../build/contracts/Pixels.json
       eventHandlers:
-        - event: TransferBatch(indexed address,indexed address,uint256[])
-          handler: handleTransferBatch
-        - event: ColorPixels(uint256[],bytes6[])
+        - event: ColorPixel(uint256,bytes6,uint256,address)
+          handler: handleColorPixel
+        - event: ColorPixels(uint256[],bytes6[],uint256[],address)
           handler: handleColorPixels
       file: ./mappings/pixels.ts
-  - kind: ethereum/contract
-    name: PixelsBid
-    network: mumbai
-    source:
-      address: '0x533e5aa49Df13e9d91753724F99598e06c760764'
-      abi: PixelsBid
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities:
-        - Pixel
-        - Bid
-      abis:
-        - name: PixelsBid
-          file: ../build/contracts/PixelsBid.json
-      eventHandlers:
-        - event: BidCreated(indexed uint256,indexed address,uint256,uint256)
-          handler: handleBidCreated
-      file: ./mappings/bids.ts

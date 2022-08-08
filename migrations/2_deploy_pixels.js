@@ -7,7 +7,7 @@ const subgraphYAML = `${__dirname}/../subgraph/subgraph.yaml`;
 const eventsYAML = `${__dirname}/../events/app.yaml`;
 
 const Pixels = artifacts.require("Pixels");
-const PixelsBid = artifacts.require("PixelsBid");
+const PixelsToken = artifacts.require("PixelsToken");
 
 module.exports = async (deployer, network) => {
 
@@ -19,25 +19,23 @@ module.exports = async (deployer, network) => {
 
   const wsUrl = deployer.networks[network].websocket || null;
   const maxPixels = 1000000;
-  const defaultPrice = Web3.utils.toWei('0.005');
-  const contractFee = 10000;
 
   // Deploy contracts
-  await deployer.deploy(Pixels, maxPixels);
+  await deployer.deploy(PixelsToken, "PixelsToken", "PXT");
+  console.log("PixelsToken.address", PixelsToken.address);
+
+  await deployer.deploy(Pixels, maxPixels, PixelsToken.address);
   console.log("Pixels.address", Pixels.address);
 
-  await deployer.deploy(PixelsBid, Pixels.address, defaultPrice, contractFee);
-  console.log("PixelsBid.address", PixelsBid.address);
-
-  const PixelsInstance = await Pixels.deployed();
-  await PixelsInstance.addMinter(PixelsBid.address);
+  //const PixelsInstance = await Pixels.deployed();
+  //await PixelsInstance.addMinter(PixelsBid.address);
 
   // Create dapp config with new addresses
   const config = {
     httpUrl: httpUrl,
     wsUrl: wsUrl,
     PixelsAddress: Pixels.address,
-    PixelsBidAddress: PixelsBid.address,
+    //PixelsBidAddress: PixelsBid.address,
     ipfs: {
       host: 'ipfs.infura.io',
       protocol: 'https',
@@ -56,9 +54,9 @@ module.exports = async (deployer, network) => {
       case 'Pixels':
         data.source.address = Pixels.address;
         break;
-      case 'PixelsBid':
+      /*case 'PixelsBid':
         data.source.address = PixelsBid.address;
-        break;
+        break;*/
     }
   });
 
@@ -70,7 +68,7 @@ module.exports = async (deployer, network) => {
 
   // Update ENV vars
   eventsConf.env_variables.PIXELS_ADDRESS = Pixels.address;
-  eventsConf.env_variables.BIDS_ADDRESS = PixelsBid.address;
+  eventsConf.env_variables.TOKEN_ADDRESS = PixelsToken.address;
   eventsConf.env_variables.WSURL = wsUrl;
 
   const newEventsYAML = yaml.dump(eventsConf);
@@ -78,7 +76,7 @@ module.exports = async (deployer, network) => {
 
   // Copy ABIs to events
   fs.writeFileSync(`${__dirname}/../events/abis/Pixels.json`, JSON.stringify(Pixels.abi), { flag: 'w' });
-  fs.writeFileSync(`${__dirname}/../events/abis/PixelsBid.json`, JSON.stringify(PixelsBid.abi), { flag: 'w' });
+  fs.writeFileSync(`${__dirname}/../events/abis/PixelsToken.json`, JSON.stringify(PixelsToken.abi), { flag: 'w' });
 
   return;
 };
