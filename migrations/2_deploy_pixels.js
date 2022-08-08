@@ -1,10 +1,9 @@
 
 const fs = require('fs');
-const Web3 = require('web3');
 const yaml = require('js-yaml');
 
 const subgraphYAML = `${__dirname}/../subgraph/subgraph.yaml`;
-const eventsYAML = `${__dirname}/../events/app.yaml`;
+//const eventsYAML = `${__dirname}/../events/app.yaml`;
 
 const Pixels = artifacts.require("Pixels");
 const PixelsToken = artifacts.require("PixelsToken");
@@ -19,9 +18,11 @@ module.exports = async (deployer, network) => {
 
   const wsUrl = deployer.networks[network].websocket || null;
   const maxPixels = 1000000;
+  const conversionRate = 500;
+  const developmentRate = 10000000;
 
   // Deploy contracts
-  await deployer.deploy(PixelsToken, "PixelsToken", "PXT");
+  await deployer.deploy(PixelsToken, "PixelsToken", "PXT", conversionRate, developmentRate);
   console.log("PixelsToken.address", PixelsToken.address);
 
   await deployer.deploy(Pixels, maxPixels, PixelsToken.address);
@@ -64,15 +65,15 @@ module.exports = async (deployer, network) => {
   fs.writeFileSync(subgraphYAML, newSubgraphYAML, 'utf8');
 
   // Update events app yaml
-  const eventsConf = yaml.load(fs.readFileSync(eventsYAML, 'utf8'));
+  //const eventsConf = yaml.load(fs.readFileSync(eventsYAML, 'utf8'));
 
   // Update ENV vars
-  eventsConf.env_variables.PIXELS_ADDRESS = Pixels.address;
-  eventsConf.env_variables.TOKEN_ADDRESS = PixelsToken.address;
-  eventsConf.env_variables.WSURL = wsUrl;
+  //eventsConf.env_variables.PIXELS_ADDRESS = Pixels.address;
+  //eventsConf.env_variables.TOKEN_ADDRESS = PixelsToken.address;
+  //eventsConf.env_variables.WSURL = wsUrl;
 
-  const newEventsYAML = yaml.dump(eventsConf);
-  fs.writeFileSync(eventsYAML, newEventsYAML, 'utf8');
+  //const newEventsYAML = yaml.dump(eventsConf);
+  //fs.writeFileSync(eventsYAML, newEventsYAML, 'utf8');
 
   // Copy ABIs to events
   fs.writeFileSync(`${__dirname}/../events/abis/Pixels.json`, JSON.stringify(Pixels.abi), { flag: 'w' });

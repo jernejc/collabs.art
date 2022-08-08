@@ -43,15 +43,15 @@ contract Pixels is AccessControl {
     );
 
     /**
-     * @dev Contract Constructor, calls ERC721Batch constructor and sets name and symbol
+     * @dev Contract Constructor, sets max pixels and tokens contract
      */
-    constructor(uint48 maxPixels, address pixelsTokenAddress) public {
+    constructor(uint48 maxPixels, address pixelsTokenAddress) {
         require(maxPixels > 0, "Pixels: Max pixels must be greater than 0");
 
         _maxPixels = maxPixels;
 
-        _PixelsTokenContract = PixelsToken(pixelsTokenAddress); // ERC20 token for bidding
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _PixelsTokenContract = PixelsToken(pixelsTokenAddress); // $PXT token for bidding
+        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
     /**
@@ -87,26 +87,12 @@ contract Pixels is AccessControl {
             "Pixels: Bid must be higher than existing"
         );
         require(
-            _PixelsTokenContract.transferFrom(msg.sender, address(this), bid)
+            _PixelsTokenContract.transferFrom(_msgSender(), address(this), bid)
         );
 
-        // Refund if existing bid
-        if (_pixels[position].bid > 0) {
-            _PixelsTokenContract.transfer(
-                _pixels[position].owner,
-                _pixels[position].bid
-            );
-        }
+        _updatePosition(position, color, bid, _msgSender());
 
-        _pixels[position] = Pixel({
-            exists: true,
-            owner: msg.sender,
-            color: color,
-            bid: bid,
-            modifiedAt: block.timestamp
-        });
-
-        emit ColorPixel(position, color, bid, msg.sender);
+        emit ColorPixel(position, color, bid, _msgSender());
     }
 
     /**
@@ -129,16 +115,13 @@ contract Pixels is AccessControl {
             "Pixels: positions and bids length mismatch"
         );
 
-        mapping(address => uint256) existingBids;
+        //mapping(address => uint256) existingBids;
         uint256 bidsSum = 0;
 
         // Validate bids and colors and prepare existing bids mapping
         for (uint256 i = 0; i < bids.length; i++) {
-            uint256 existingBid = _pixels[positions[i]].bid;
-            uint256 existingOwner = _pixels[positions[i]].owner;
-
             require(
-                bids[i] > existingBid,
+                bids[i] > _pixels[positions[i]].bid,
                 "Pixels: All bids must be higher than existing"
             );
             require(
@@ -148,23 +131,12 @@ contract Pixels is AccessControl {
 
             // sum all bid values
             bidsSum = bidsSum + bids[i];
-
-            // sum existing bids per address
-            if (existingBid > 0) {
-                if (existingBids[existingOwner] > 0) {
-                    existingBids[existingOwner] =
-                        existingBids[existingOwner] +
-                        existingBid;
-                } else {
-                    existingBids[existingOwner] = existingBid;
-                }
-            }
         }
 
         // Require for full amount to be available and transfered
         require(
             _PixelsTokenContract.transferFrom(
-                msg.sender,
+                _msgSender(),
                 address(this),
                 bidsSum
             )
@@ -175,23 +147,10 @@ contract Pixels is AccessControl {
             uint256 bid = bids[i];
             bytes6 color = colors[i];
 
-            _pixels[position] = Pixel({
-                exists: true,
-                owner: msg.sender,
-                color: color,
-                bid: bid,
-                modifiedAt: block.timestamp
-            });
+            _updatePosition(position, color, bid, _msgSender());
         }
 
-        if (_pixels[position].bid > 0) {
-            _PixelsTokenContract.transfer(
-                _pixels[position].owner,
-                _pixels[position].bid
-            );
-        }
-
-        emit ColorPixels(positions, colors, bids, msg.sender);
+        emit ColorPixels(positions, colors, bids, _msgSender());
     }
 
     /**
@@ -205,6 +164,37 @@ contract Pixels is AccessControl {
         );
 
         _maxPixels = maxPixels;
+    }
+
+    /**
+     * @dev update position
+     * @param position position in the world
+     * @param color new position color
+     * @param bid bid amount
+     * @param owner new owner
+     */
+
+    function _updatePosition(
+        uint256 position,
+        bytes6 color,
+        uint256 bid,
+        address owner
+    ) private {
+        // Refund if existing bid
+        if (_pixels[position].bid > 0) {
+            _PixelsTokenContract.transfer(
+                _pixels[position].owner,
+                _pixels[position].bid
+            );
+        }
+
+        _pixels[position] = Pixel({
+            exists: true,
+            owner: owner,
+            color: color,
+            bid: bid,
+            modifiedAt: block.timestamp
+        });
     }
 
     /**
@@ -242,7 +232,7 @@ contract Pixels is AccessControl {
      */
     modifier onlyAdmin() {
         require(
-            hasRole(DEFAULT_ADMIN_ROLE, msg.sender),
+            hasRole(DEFAULT_ADMIN_ROLE, _msgSender()),
             "Pixels: Restricted to admins."
         );
         _;
