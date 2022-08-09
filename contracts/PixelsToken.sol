@@ -9,6 +9,13 @@ contract PixelsToken is ERC20, AccessControl {
 
     uint256 private _conversionRate;
 
+    /**
+     * @dev constructor, inits erc20 and does the basic setup
+     * @param name token name
+     * @param symbol token symbol
+     * @param conversionRate token native conversion rate
+     * @param developmentRate token development rate
+     */
     constructor(
         string memory name,
         string memory symbol,
@@ -17,12 +24,15 @@ contract PixelsToken is ERC20, AccessControl {
     ) ERC20(name, symbol) {
         // set conversion rate
         _conversionRate = conversionRate;
-        // mint development tokens to msg.sender
+        // mint development tokens to sender
         _mint(_msgSender(), developmentRate * 10**uint256(decimals()));
-        // ossign admin
+        // assign admin
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
+    /**
+     * @dev credit $PXT token for native token
+     */
     function credit() public payable {
         uint256 tokensAmount = msg.value * _conversionRate;
 

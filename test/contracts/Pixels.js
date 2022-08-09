@@ -24,11 +24,11 @@ contract("Pixels coloring tests", async accounts => {
 
     // account[0] already has $PXT from constructing the contract
     // credit account[1] with some $PXT
-    await pixelsTokenInstance.credit({ from: accounts[1], value: web3.utils.toWei('2', 'ether') });
+    await pixelsTokenInstance.credit({ from: accounts[1], value: web3.utils.toWei('0.5', 'ether') });
     // give pixels contract allowance to spend in accounts[0] behalve
-    await pixelsTokenInstance.increaseAllowance(pixelsInstance.address, new BN(1000))
+    await pixelsTokenInstance.increaseAllowance(pixelsInstance.address, new BN(100))
     // give pixels contract allowance to spend in accounts[1] behalve
-    await pixelsTokenInstance.increaseAllowance(pixelsInstance.address, new BN(1000), { from: accounts[1] })
+    await pixelsTokenInstance.increaseAllowance(pixelsInstance.address, new BN(100), { from: accounts[1] })
   });
 
   it("set pixel color", async () => {
