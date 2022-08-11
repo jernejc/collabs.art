@@ -8,7 +8,7 @@ dataSources:
     name: Pixels
     network: mumbai
     source:
-      address: '0x20cC67e638dE57C285BcA54E15E963FCCF06F82a'
+      address: '0x4B8e80163263c497592D9c0FE30B4454f1251e52'
       abi: Pixels
     mapping:
       kind: ethereum/events
@@ -20,8 +20,8 @@ dataSources:
         - name: Pixels
           file: ../build/contracts/Pixels.json
       eventHandlers:
-        - event: ColorPixel(uint256,bytes6,uint256,address)
+        - event: ColorPixel(uint256,bytes6,uint256,address,uint256)
           handler: handleColorPixel
-        - event: ColorPixels(uint256[],bytes6[],uint256[],address)
+        - event: ColorPixels(uint256[],bytes6[],uint256[],address,uint256)
           handler: handleColorPixels
       file: ./mappings/pixels.ts

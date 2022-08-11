@@ -196,9 +196,9 @@ export default class Menu {
     batchCountEl.disabled = true;
     batchCountEl.checked = true;
 
-    if (!lastPixel.owner)
+    /*if (!lastPixel.owner)
       batchUI = 'purchaseUI';
-    else if (lastPixel.owner === this.game.web3.activeAddress)
+    else if (lastPixel.owner === this.game.web3.activeAddress)*/
       batchUI = 'ownerUI';
 
     this.settings.classList.add(batchUI);
@@ -230,7 +230,7 @@ export default class Menu {
         this.settings.append(this.settings.batchCreateBtn.domElement);
 
         break;
-      case 'ownerUI':
+      default:
         relevantPixels = pixels.filter(pixel => pixel.owner === this.game.web3.activeAddress);
 
         this.settings.colorPicker = new ColorPicker(batchSettings, 'color', {

@@ -46,7 +46,7 @@ export default class Pixel {
     return this.tile ? this.tile.x : null;
   }
 
-  async buy() {
+  /*async buy() {
     if (DEBUG) console.log("BUY Pixel", this);
 
     let success = false;
@@ -59,9 +59,9 @@ export default class Pixel {
     }
 
     return success;
-  }
+  }*/
 
-  async bid() {
+  /*async bid() {
     if (DEBUG) console.log("BID Pixel", pixel);
 
     let success = false;
@@ -93,7 +93,7 @@ export default class Pixel {
     }
 
     return success;
-  }
+  }*/
 
   changeToColorHex(hex) {
     if (DEBUG) console.log("Pixel: changeToColorHex", hex, this.tile);
@@ -168,18 +168,12 @@ export default class Pixel {
 
   setGraphData(data) {
     if (data) {
-      if (data.highestBid && data.highestBid.amount) {
-        // Check for highest bid
-        this.highestBid = data.highestBid;
-        this.highestBid.amount = parseFloat(fromWei(data.highestBid.amount)); // Conver from Wei
-        this.highestBid.expired =
-          new Date(data.highestBid.expiresAt * 1000) - new Date() < 0;
-        this.price = data.highestBid.amount + 0.001;
-      } else this.highestBid = null;
-
-      if (!this.price) this.price = this.scene.game.web3.defaultPrice;
-
-      if (data.color) this.changeToColorHex(data.color);
+      if (!this.bid)
+        this.bid = this.scene.game.web3.defaultPrice;
+      if (data.color)
+        this.changeToColorHex(data.color);
+      if (data.modifiedAt)
+        this.modifiedAt = data.modifiedAt;
 
       this.owner = data.owner.toLowerCase();
     }

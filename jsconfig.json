@@ -1,0 +1,20 @@
+
+/**
+  * This is based on webpack resolve aliases, 
+  * must be synced manually for now.
+**/
+
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+        "@actions/*": ["client/actions/*"],
+        "@components/*": ["client/components/*"],
+        "@models/*": ["client/models/"],
+        "@initializers/*": ["client/initializers/*"],
+        "@scenes/*": ["client/scenes/"],
+        "@services/*":  ["client/services/*"],
+        "@util/*":  ["client/util/*"]
+    }
+  }
+}

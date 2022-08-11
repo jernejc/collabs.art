@@ -413,11 +413,6 @@ export default class ToolsManager {
 
     this.overlay.destroy();
     this.overlay = null;
-
-    const MainScene = this.game.scene.keys["MainScene"];
-
-    if (MainScene.game.mode === 'gameoflife')
-      MainScene.stopGameOfLife();
   }
 
   clearInfoBox() {

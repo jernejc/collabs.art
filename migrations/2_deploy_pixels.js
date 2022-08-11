@@ -3,7 +3,7 @@ const fs = require('fs');
 const yaml = require('js-yaml');
 
 const subgraphYAML = `${__dirname}/../subgraph/subgraph.yaml`;
-//const eventsYAML = `${__dirname}/../events/app.yaml`;
+const eventsYAML = `${__dirname}/../events/app.yaml`;
 
 const Pixels = artifacts.require("Pixels");
 const PixelsToken = artifacts.require("PixelsToken");
@@ -28,15 +28,12 @@ module.exports = async (deployer, network) => {
   await deployer.deploy(Pixels, maxPixels, PixelsToken.address);
   console.log("Pixels.address", Pixels.address);
 
-  //const PixelsInstance = await Pixels.deployed();
-  //await PixelsInstance.addMinter(PixelsBid.address);
-
   // Create dapp config with new addresses
   const config = {
     httpUrl: httpUrl,
     wsUrl: wsUrl,
     PixelsAddress: Pixels.address,
-    //PixelsBidAddress: PixelsBid.address,
+    PixelsToken: PixelsToken.address,
     ipfs: {
       host: 'ipfs.infura.io',
       protocol: 'https',
@@ -55,9 +52,6 @@ module.exports = async (deployer, network) => {
       case 'Pixels':
         data.source.address = Pixels.address;
         break;
-      /*case 'PixelsBid':
-        data.source.address = PixelsBid.address;
-        break;*/
     }
   });
 
@@ -65,15 +59,15 @@ module.exports = async (deployer, network) => {
   fs.writeFileSync(subgraphYAML, newSubgraphYAML, 'utf8');
 
   // Update events app yaml
-  //const eventsConf = yaml.load(fs.readFileSync(eventsYAML, 'utf8'));
+  const eventsConf = yaml.load(fs.readFileSync(eventsYAML, 'utf8'));
 
   // Update ENV vars
-  //eventsConf.env_variables.PIXELS_ADDRESS = Pixels.address;
-  //eventsConf.env_variables.TOKEN_ADDRESS = PixelsToken.address;
-  //eventsConf.env_variables.WSURL = wsUrl;
+  eventsConf.env_variables.PIXELS_ADDRESS = Pixels.address;
+  eventsConf.env_variables.TOKEN_ADDRESS = PixelsToken.address;
+  eventsConf.env_variables.WSURL = wsUrl;
 
-  //const newEventsYAML = yaml.dump(eventsConf);
-  //fs.writeFileSync(eventsYAML, newEventsYAML, 'utf8');
+  const newEventsYAML = yaml.dump(eventsConf);
+  fs.writeFileSync(eventsYAML, newEventsYAML, 'utf8');
 
   // Copy ABIs to events
   fs.writeFileSync(`${__dirname}/../events/abis/Pixels.json`, JSON.stringify(Pixels.abi), { flag: 'w' });

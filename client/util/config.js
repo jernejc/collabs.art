@@ -44,7 +44,7 @@ const config = {
     enabled: false
   }],
   subgraph: {
-    url: 'https://api.thegraph.com/subgraphs/name/jernejc/apoietic' //'https://api.studio.thegraph.com/query/9304/autopoietic.art/v0.1.0'
+    url: 'https://api.thegraph.com/subgraphs/id/QmRcGm2sWmcXvuUvySGxWpjDb9D3DMgi5LwkxoyeBqawRj'
   },
   events: {
     url: 'https://pixelworld-2e64c.uc.r.appspot.com'

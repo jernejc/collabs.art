@@ -33,13 +33,15 @@ contract Pixels is AccessControl {
         uint256 position,
         bytes6 color,
         uint256 bid,
-        address sender
+        address owner,
+        uint256 modifiedAt
     );
     event ColorPixels(
         uint256[] positions,
         bytes6[] colors,
         uint256[] bids,
-        address sender
+        address owner,
+        uint256 modifiedAt
     );
 
     /**
@@ -48,9 +50,11 @@ contract Pixels is AccessControl {
     constructor(uint48 maxPixels, address pixelsTokenAddress) {
         require(maxPixels > 0, "Pixels: Max pixels must be greater than 0");
 
+        // set max pixels limit
         _maxPixels = maxPixels;
-
+        // initialize token contract
         _PixelsTokenContract = PixelsToken(pixelsTokenAddress); // $PXT token for bidding
+        // assign admin
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
@@ -92,7 +96,7 @@ contract Pixels is AccessControl {
 
         _updatePosition(position, color, bid, _msgSender());
 
-        emit ColorPixel(position, color, bid, _msgSender());
+        emit ColorPixel(position, color, bid, _msgSender(), block.timestamp);
     }
 
     /**
@@ -150,20 +154,13 @@ contract Pixels is AccessControl {
             _updatePosition(position, color, bid, _msgSender());
         }
 
-        emit ColorPixels(positions, colors, bids, _msgSender());
-    }
-
-    /**
-     * @dev set maxPixels
-     * @param maxPixels new maximum number of pixels
-     */
-    function setMaxPixels(uint48 maxPixels) public onlyAdmin {
-        require(
-            maxPixels > 0,
-            "Pixels: Max pixels must be greater than 0 and total current supply"
+        emit ColorPixels(
+            positions,
+            colors,
+            bids,
+            _msgSender(),
+            block.timestamp
         );
-
-        _maxPixels = maxPixels;
     }
 
     /**
@@ -198,6 +195,19 @@ contract Pixels is AccessControl {
     }
 
     /**
+     * @dev set maxPixels
+     * @param maxPixels new maximum number of pixels
+     */
+    function setMaxPixels(uint48 maxPixels) public onlyAdmin {
+        require(
+            maxPixels > 0,
+            "Pixels: Max pixels must be greater than 0 and total current supply"
+        );
+
+        _maxPixels = maxPixels;
+    }
+
+    /**
      * @dev validate hex color - https://ethereum.stackexchange.com/questions/50369/string-validation-solidity-alpha-numeric-and-length
      * @param color color value to validate
      */
@@ -226,6 +236,22 @@ contract Pixels is AccessControl {
     /********
      * ACL
      */
+
+    /**
+     * @dev add minter
+     * @param _account address to add as the new minter
+     */
+    function addAdmin(address _account) public onlyAdmin {
+        grantRole(DEFAULT_ADMIN_ROLE, _account);
+    }
+
+    /**
+     * @dev remove minter
+     * @param _account address to remove as minter
+     */
+    function removeAdmin(address _account) public onlyAdmin {
+        revokeRole(DEFAULT_ADMIN_ROLE, _account);
+    }
 
     /**
      * @dev Restricted to members of the admin role.

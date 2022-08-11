@@ -67,7 +67,7 @@ export default class GraphManager {
   }
 
   get pixelBodyQuery() {
-    return `{ id owner price color highestBid { bidder amount expiresAt } }`
+    return `{ id owner color bid modifiedAt }`
   }
 
   async postQueryToGraph(queryName, params) {

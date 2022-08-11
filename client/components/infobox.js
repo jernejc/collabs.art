@@ -84,14 +84,14 @@ export default class InfoBox {
 
     this.domElement.removeChild(this.loadingIcon);
 
-    if (!this.pixel.owner)
+    /*if (!this.pixel.owner)
       this.createPurchaseUI();
-    else if (this.game.web3.activeAddress === this.pixel.owner)
+    else if (this.game.web3.activeAddress === this.pixel.owner)*/
       this.createOwnerUI();
-    else if (this.pixel.highestBid && this.pixel.highestBid.bidder === this.game.web3.activeAddress)
+    /*else if (this.pixel.highestBid && this.pixel.highestBid.bidder === this.game.web3.activeAddress)
       this.createActiveBidUI();
     else
-      this.createBidUI();
+      this.createBidUI();*/
 
     this.setPosition();
   }

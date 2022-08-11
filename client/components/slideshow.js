@@ -130,6 +130,17 @@ export default class Slideshow {
     
     this.domElement.append(this.slidesWrapper);
 
+    this.insipredBy = document.createElement('div');
+    this.insipredBy.id = 'inspired-by';
+
+    this.insipredBy.innerHTML = `
+      Inspired by <a href="https://en.wikipedia.org/wiki/Poietic_Generator" target="_blank">Poietic Generator</a> 
+      and 
+      <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life" target="_blank">Game of Life</a>
+    `
+
+    this.domElement.append(this.insipredBy);
+
     this.parent.append(this.domElement);
   }
 
@@ -462,5 +473,8 @@ export default class Slideshow {
     this.actionBarForm.removeEventListener('submit', this.bindFormAction);
     this.actionTextInput.removeEventListener('keydown', this.bindActionTextInputChangeAction);
     this.keyNoteWrapper.removeEventListener('click', this.bindToggleActionBar);
+
+    if (this.parent) 
+      this.parent.removeChild(this.domElement);
   }
 }

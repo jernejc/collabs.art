@@ -26,7 +26,7 @@ const config = {
 
   resolve: {
     extensions: ['.js'],
-    alias: {
+    alias: { // must keep in sync with jsconfig
       '@actions': path.resolve(__dirname, 'client/actions/'),
       '@components': path.resolve(__dirname, 'client/components/'),
       '@models': path.resolve(__dirname, 'client/models/'),

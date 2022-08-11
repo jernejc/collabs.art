@@ -2,17 +2,6 @@ type Pixel @entity {
   id: ID!
   owner: Bytes!
   color: Bytes
-  price: BigInt
-  highestBid: Bid
-  bids: [Bid!]! @derivedFrom(field: "pixel")
-}
-
-type Bid @entity {
-  id: ID!
-  bidder: Bytes!
-  amount: BigInt!
-  expiresAt: BigInt!
-  accepted: Boolean
-  canceled: Boolean
-  pixel: Pixel!
+  bid: BigInt
+  modifiedAt: BigInt
 }

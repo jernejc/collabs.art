@@ -22,6 +22,15 @@ contract PixelsToken is ERC20, AccessControl {
         uint256 conversionRate,
         uint256 developmentRate
     ) ERC20(name, symbol) {
+        require(
+            conversionRate > 0,
+            "PixelsToken: Conversion rate must be greater than 0"
+        );
+        require(
+            developmentRate > 0,
+            "PixelsToken: Development rate must be greater than 0"
+        );
+
         // set conversion rate
         _conversionRate = conversionRate;
         // mint development tokens to sender
@@ -56,18 +65,15 @@ contract PixelsToken is ERC20, AccessControl {
 
         _conversionRate = conversionRate;
     }
-    
+
     /**
      * @dev withdraw funds
      * @param amount withdraw amount
      */
     function withdraw(uint256 amount) public onlyAdmin {
+        require(amount > 0, "PixelsToken: Amount must be greater than 0");
         require(
-            amount > 0,
-            "PixelsToken: Amount must be greater than 0"
-        );
-        require(
-            address(this).balance > amount,
+            address(this).balance >= amount,
             "PixelsToken: Enough funds must be available"
         );
 
@@ -77,6 +83,22 @@ contract PixelsToken is ERC20, AccessControl {
     /********
      * ACL
      */
+
+    /**
+     * @dev add minter
+     * @param _account address to add as the new minter
+     */
+    function addAdmin(address _account) public onlyAdmin {
+        grantRole(DEFAULT_ADMIN_ROLE, _account);
+    }
+
+    /**
+     * @dev remove minter
+     * @param _account address to remove as minter
+     */
+    function removeAdmin(address _account) public onlyAdmin {
+        revokeRole(DEFAULT_ADMIN_ROLE, _account);
+    }
 
     /**
      * @dev Restricted to members of the admin role.
