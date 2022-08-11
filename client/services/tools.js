@@ -9,6 +9,7 @@ import Button from '@components/form/button';
 import Input from '@components/form/input';
 
 import { formatShortAddress } from '@util/helpers';
+import Timer from '@components/timer';
 
 export default class ToolsManager {
 
@@ -273,13 +274,13 @@ export default class ToolsManager {
     this.header = document.createElement('div');
     this.header.setAttribute('id', 'header');
 
-    this.headerIcon = document.createElement('i');
-    this.headerIcon.classList.add('gg-details-more');
+    this.headerIcon = new Button({
+      elClasses: [],
+      iconClass: 'gg-details-more'
+    });
+    this.header.append(this.headerIcon.domElement);
 
-    this.headerMenu = document.createElement('div');
-    this.headerMenu.classList.add('header-menu');
-
-    this.header.append(this.headerIcon);
+    this.headerTimer = new Timer({ parent: this.header, game: this.game})
     this.parent.append(this.header);
   }
 

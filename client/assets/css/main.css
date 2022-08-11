@@ -18,7 +18,10 @@
   --bottom-bar-settings-height: 36px;
 }
 
-body, h1, button, input {
+body,
+h1,
+button,
+input {
   font-family: 'Electrolize', sans-serif;
   padding: 0;
   margin: 0;
@@ -47,7 +50,9 @@ input {
   height: 100vh;
 }
 
-#connection-status, #header, #bottom-nav {
+#connection-status,
+#header,
+#bottom-nav {
   color: #FFF;
   position: absolute;
   top: var(--edge-margin);
@@ -59,13 +64,27 @@ input {
   left: var(--edge-margin);
   display: flex;
   align-items: center;
+  height: 50px;
+}
+
+#header button {
+  background: none;
+  border: none;
+  color: white;
+  display: block;
   width: 50px;
   height: 50px;
+  border-right: 1px solid;
 }
 
 #header i {
   --ggs: 1.5;
-  margin: 0 auto;
+  margin: auto;
+}
+
+#header .timer {
+  margin: 5px 17px;
+  font-size: 1.12em;
 }
 
 #inspired-by {
@@ -76,7 +95,7 @@ input {
   right: 0;
   color: rgba(255, 255, 255, 0.7);
   font-size: 0.6em;
-  background: rgba(0,0,0,0.95);
+  background: rgba(0, 0, 0, 0.95);
   padding: 8px;
 }
 
@@ -361,7 +380,8 @@ input {
   transition: linear 300ms color;
 }
 
-#menu-item ul li:hover .text, #menu-item ul li:hover .location {
+#menu-item ul li:hover .text,
+#menu-item ul li:hover .location {
   color: #FFF;
 }
 
@@ -550,7 +570,8 @@ Info Box
 * Info box close btn and arrow pointer 
 **/
 
-.info-box .gg-close-r, .info-box .arrow {
+.info-box .gg-close-r,
+.info-box .arrow {
   position: absolute;
 }
 
@@ -836,7 +857,8 @@ Info Box
   letter-spacing: 0.15px;
 }
 
-.setting .color, .color-picker .color {
+.setting .color,
+.color-picker .color {
   position: absolute;
   width: 15px;
   height: 15px;
@@ -1362,23 +1384,29 @@ Info Box
 /* Animations */
 
 @keyframes bounceDown {
-  0%, 100% {
+
+  0%,
+  100% {
     top: -35px;
   }
 
-  10%, 90% {
+  10%,
+  90% {
     top: -36px;
   }
 
-  20%, 80% {
+  20%,
+  80% {
     top: -37px;
   }
 
-  30%, 70% {
+  30%,
+  70% {
     top: -38px;
   }
 
-  40%, 60% {
+  40%,
+  60% {
     top: -39px;
   }
 
@@ -1388,23 +1416,29 @@ Info Box
 }
 
 @keyframes bounceUp {
-  0%, 100% {
+
+  0%,
+  100% {
     bottom: -30px;
   }
 
-  10%, 90% {
+  10%,
+  90% {
     bottom: -31px;
   }
 
-  20%, 80% {
+  20%,
+  80% {
     bottom: -32px;
   }
 
-  30%, 70% {
+  30%,
+  70% {
     bottom: -33px;
   }
 
-  40%, 60% {
+  40%,
+  60% {
     bottom: -34px;
   }
 

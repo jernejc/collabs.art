@@ -35,6 +35,9 @@ export default class Overlay {
     if (this.slideshow)
       this.slideshow.destroy();
 
+    if (this.timer)
+      this.scene.time.removeEvent(this.timer);
+
     if (this.parent)
       this.parent.removeChild(this.domElement);
   }
@@ -80,10 +83,10 @@ export default class Overlay {
       }
     }
 
-    this.scene.timer = this.scene.time.addEvent({
+    this.timer = this.scene.time.addEvent({
       delay: 170,
       callback: this.scene.nextGeneration,
-      callbackScope: this.scene,
+      callbackScope: this,
       loop: true
     });
 
@@ -97,8 +100,8 @@ export default class Overlay {
       for (let x = 0; x < this.scene.gridWidth; x++)
         this.scene.tiles[y][x].alive = null;
 
-    if (scene.timer)
-      this.scene.time.removeEvent(this.scene.timer);
+    if (this.timer)
+      this.scene.time.removeEvent(this.timer);
 
     setGameMode({ scene: this.scene, mode: this.scene.appConfig.defaultMode });
   }
