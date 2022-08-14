@@ -339,7 +339,7 @@ export default class Web3Manager {
         this.defaultPrice = Web3.utils.fromWei(defaultPrice);
       } catch (error) {
         console.warn('Failed to fetch WS default price');
-        this.defaultPrice = 0.005;
+        this.defaultPrice = config.defaultPrice;
       }
     }
 

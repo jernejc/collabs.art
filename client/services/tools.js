@@ -87,7 +87,7 @@ export default class ToolsManager {
     });
 
     this.emitter.on('selection/update', async pixels => {
-      if (DEBUG) console.log('ToolsManager: on selection/update');
+      /*if (DEBUG)*/ console.log('ToolsManager: on selection/update', pixels);
 
       pixels = pixels || this.game.selection.pixels;
 

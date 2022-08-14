@@ -57,8 +57,6 @@ export default class Input extends Controller {
 
     return this.domElement;
 
-    // Helpers
-
     function onChange() {
       if (DEBUG) console.log('onChange', self.input.value);
 

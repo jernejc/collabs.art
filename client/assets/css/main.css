@@ -282,7 +282,7 @@ input {
   color: var(--header-white);
 }
 
-.settings .setting i {
+.settings.filters .setting i {
   --ggs: 0.8;
   top: 5px;
   right: 5px;
@@ -542,7 +542,7 @@ Info Box
 .info-box {
   position: absolute;
   min-height: 55px;
-  width: 110px;
+  width: 134px;
   background-color: var(--active-black);
   color: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -553,17 +553,22 @@ Info Box
 }
 
 .info-box .position {
-  text-align: center;
-  background: var(--header-white);
-  color: var(--active-black);
-  line-height: 25px;
+  display: flex;
+  text-align: left;
+  color: white;
+  padding-left: 10px;
+  align-items: center;
 }
 
 .info-box .position i {
   display: inline-block;
   --ggs: 0.65;
-  top: 1.2px;
-  right: 2px;
+}
+
+.info-box .position small {
+  color: #999;
+  margin: 0px 5px;
+  font-size: 0.55em;
 }
 
 /**
@@ -576,7 +581,7 @@ Info Box
 }
 
 .info-box .gg-close-r {
-  --ggs: 0.65;
+  --ggs: 0.75;
   color: #FFF;
   background: var(--active-black);
   cursor: pointer;
@@ -805,7 +810,7 @@ Info Box
 }
 
 .label-border-input input[type=number] {
-  width: 50%;
+  width: 30%;
 }
 
 .label-border-input input[type=number]::-webkit-inner-spin-button {
@@ -823,38 +828,46 @@ Info Box
   margin: 4px auto 0px;
 }
 
-/* Infobox color picker */
-
 .info-box .color-picker {
   position: relative;
-  text-align: left;
-  margin-top: 7px;
+  margin: 5px 0px 0px;
+  padding: 5px;
+  background-color: var(--active-black);
+  display: block;
 }
 
-.info-box .color-picker input {
-  left: 35px;
-  width: 60px;
+.settings .color-picker {
+  position: absolute;
+  left: -57%;
+  top: -109%;
+  padding: 15px;
+  max-width: 126px;
+  background: var(--active-black);
 }
 
-.info-box .color-picker .color {
-  top: 2px;
-  left: 13px;
+/*.info-box .color-picker:hover {
+  width: 280%;
+  left: -73%;
+}*/
+
+.color-picker .color-wrapper {
+  display: flex;
+  flex-flow: row wrap;
+  margin: 0 -2px -2px 0;
 }
 
-.info-box .color-picker .advanced-color {
+.color-picker .color-box {
+  width: 15px;
+  height: 15px;
   padding: 0;
-  margin: 9px 0 0 10px;
-  top: 0;
+  margin: 0 2px 2px 0;
+  border: 2px solid rgba(0, 0, 0, 0);
+  opacity: 0.9;
 }
 
-.color-picker input {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.9);
-  position: relative;
-  width: 70%;
-  font-size: 12px;
-  letter-spacing: 0.15px;
+.color-picker .color-box:hover {
+  opacity: 1;
+  border-color: rgb(220, 220, 220);
 }
 
 .setting .color,
@@ -922,21 +935,14 @@ Info Box
 .advanced-color {
   /*border-top: 1px solid rgba(255, 255, 255, 0.1);*/
   background-color: var(--active-black);
-  text-align: left;
-  position: relative;
-  height: 62px;
-  width: 114px;
-  left: -12px;
-  top: 32px;
-  padding: 5px 10px 10px;
-  margin-top: 5px;
+  padding: 5;
 }
 
-.setting.color-picker .advanced-color {
-  left: -160px;
-  top: -6px;
+.advanced-color .gg-chevron-right {
+  --ggs: 0.7;
   position: absolute;
-  margin: 0;
+  right: -10px;
+  top: 6px;
 }
 
 .color-wrap.red .slider-fg {

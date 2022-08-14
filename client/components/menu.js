@@ -195,43 +195,13 @@ export default class Menu {
     batchCountEl.type = 'checkbox';
     batchCountEl.disabled = true;
     batchCountEl.checked = true;
-
-    /*if (!lastPixel.owner)
-      batchUI = 'purchaseUI';
-    else if (lastPixel.owner === this.game.web3.activeAddress)*/
-      batchUI = 'ownerUI';
+    batchUI = 'ownerUI';
 
     this.settings.classList.add(batchUI);
 
-    const textIcon = document.createElement('i');
-    textIcon.classList.add('gg-info');
-    this.settings.append(textIcon);
-
     switch (batchUI) {
-      case 'purchaseUI':
-        relevantPixels = pixels.filter(pixel => !pixel.owner);
-
-        this.settings.append(new Input(batchSettings, 'price', {
-          elClasses: ['setting'],
-          type: 'text',
-          scene: this.scene,
-          label: this.game.web3.currentSymbol,
-          disabled: true,
-          format: (value) => (value) ? value.toFixed(3) : 0
-        }));
-
-        this.settings.batchCreateBtn = new Button({
-          elClasses: ['action-button', 'action-settings'],
-          text: 'Mint',
-          clickAction: async e => {
-            await purchasePixels({ scene: this.scene, selection: relevantPixels })
-          }
-        });
-        this.settings.append(this.settings.batchCreateBtn.domElement);
-
-        break;
       default:
-        relevantPixels = pixels.filter(pixel => pixel.owner === this.game.web3.activeAddress);
+        relevantPixels = pixels //.filter(pixel => pixel.owner === this.game.web3.activeAddress);
 
         this.settings.colorPicker = new ColorPicker(batchSettings, 'color', {
           scene: this.scene,

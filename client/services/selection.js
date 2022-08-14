@@ -33,7 +33,7 @@ export default class SelectionManager {
     if (DEBUG) console.log("SelectionManager: repositionHighlight");
 
     const tile = getTileForPointer({ pointer, scene });
-    
+
     if (!tile)
       return;
 
@@ -44,7 +44,7 @@ export default class SelectionManager {
   }
 
   async addSelected({ tiles, scene }) {
-    if (DEBUG) console.log("SelectionManager: addSelected", tiles);
+    /*if (DEBUG)*/ console.log("SelectionManager: addSelected", tiles);
 
     for (let i = 0; i < tiles.length; i++) {
       const tile = tiles[i];
@@ -105,10 +105,11 @@ export default class SelectionManager {
     this.addSelected({ tiles, scene });
   }
 
-  removeSelected({ tile, scene }) {
-    if (DEBUG) console.log("SelectionManager: removeSelected");
+  removeSelected({ tile }) {
+    /*if (DEBUG)*/ console.log("SelectionManager: removeSelected");
 
-    const pixel = Pixel.fromTile({ tile, scene });
+    const pixel = this.isSelected(tile.cx, tile.cy);
+    console.log('Pixel from tile', pixel);
 
     this.pixels = this.pixels.filter((p) => {
       return !(p.cx === tile.cx && p.cy === tile.cy);
@@ -116,6 +117,10 @@ export default class SelectionManager {
 
     pixel.clearActivePixel();
     pixel.resetColor();
+
+    if (pixel.infobox) {
+      this.game.tools.clearInfoBox();
+    }
 
     this.emitter.emit("selection/update", this.pixels);
   }
@@ -215,9 +220,13 @@ export default class SelectionManager {
   }
 
   clearActiveSelection() {
+    const _self = this;
     this.pixels.forEach((pixel) => {
       pixel.clearActivePixel();
       pixel.resetColor();
+
+      if (pixel.infobox)
+        _self.game.tools.clearInfoBox();
     });
 
     this.pixels = [];

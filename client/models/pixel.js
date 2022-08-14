@@ -4,8 +4,6 @@ import {
   stringToBN,
   stringToHex,
   hexToString,
-  toWei,
-  fromWei,
   formatPositionHex,
 } from "@util/helpers";
 
@@ -167,6 +165,8 @@ export default class Pixel {
   }
 
   setGraphData(data) {
+    console.log('setGraphData', data);
+    
     if (data) {
       if (!this.bid)
         this.bid = this.scene.game.web3.defaultPrice;
