@@ -1,12 +1,9 @@
-
 export default class ApplicationScene extends Phaser.Scene {
   constructor(options = undefined) {
     super(options);
   }
 
-  create(data) {
-    if (DEBUG) console.log('ApplicationScene', data);
-
+  create() {
     this.appConfig = this.game.appConfig;
   }
 

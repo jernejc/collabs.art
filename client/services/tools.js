@@ -4,21 +4,24 @@ import MinimapScene from '@scenes/minimap';
 import InfoBox from '@components/infobox';
 import Menu from '@components/menu';
 import Overlay from '@components/overlay';
+import Timer from '@components/timer';
 
 import Button from '@components/form/button';
 import Input from '@components/form/input';
 
 import { formatShortAddress } from '@util/helpers';
-import Timer from '@components/timer';
+import logger from '@util/logger';
+import TokenInfo from '@components/tokeninfo';
 
 export default class ToolsManager {
 
   constructor(game, emitter) {
-    if (DEBUG) console.log('ToolsManager: constructor', game);
+    logger.log('ToolsManager: constructor');
 
     this.game = game;
     this.emitter = emitter;
     this.infobox = null;
+    this.changesBounceTimer = null;
     this.search = {
       text: ''
     }
@@ -34,7 +37,7 @@ export default class ToolsManager {
   }
 
   get metamaskURL() {
-    if (DEBUG) console.log('ToolsManager: metamaskURL', navigator.userAgent);
+    logger.log('ToolsManager: metamaskURL', navigator.userAgent);
 
     let url;
 
@@ -48,7 +51,7 @@ export default class ToolsManager {
 
   addEventListeners() {
     this.emitter.on('web3/network', async network => {
-      if (DEBUG) console.log('ToolsManager: on web3/network');
+      logger.log('ToolsManager: on web3/network');
 
       this.setConnectionStatus();
       this.setNetworkAlert();
@@ -62,7 +65,7 @@ export default class ToolsManager {
     });
 
     this.emitter.on('web3/address', async address => {
-      if (DEBUG) console.log('ToolsManager: on web3/address');
+      logger.log('ToolsManager: on web3/address');
 
       this.setConnectionStatus();
       this.setNetworkAlert();
@@ -76,48 +79,53 @@ export default class ToolsManager {
     });
 
     this.emitter.on('web3/purchase', async address => {
-      if (DEBUG) console.log('ToolsManager: on web3/purchase');
+      logger.log('ToolsManager: on web3/purchase');
 
       if (this.menu && this.menu.activeTab === 'selection')
-        await this.menu.createSettings();
+        this.menu.createSettings();
 
       // Update infobox UI if user address changes
       if (this.infobox && !this.infobox.preventRefresh)
         await this.infobox.setUI();
     });
 
-    this.emitter.on('selection/update', async pixels => {
-      /*if (DEBUG)*/ console.log('ToolsManager: on selection/update', pixels);
+    this.emitter.on('selection/update', async update => {
+      logger.log('ToolsManager: on selection/update', update);
 
-      pixels = pixels || this.game.selection.pixels;
+      const pixels = this.game.selection.pixels;
+      const pixel = (update && update[0] && update[0].position) ? update[0] : pixels[0];
 
-      if (pixels.length === 1) {
-        if (!this.infobox)
-          await this.openInfoBox({ pixel: pixels[0], scene: this.game.scene });
-        else
-          await this.infobox.setUI();
+      if (this.menu && !this.menu.closed) {
+        if (!Array.isArray(update) || update.length === 1) {
+          //this.menu.close();
+          await this.openInfoBox({ pixel: pixel, scene: this.game.scene });
+          return;
+        }
 
-        if (this.menu)
-          this.clearMenu();
-
-        this.game.selection.clearRectangleSelection();
-      } else if (pixels.length > 1) {
-        if (this.infobox)
-          this.clearInfoBox();
-
-        if (!this.menu)
-          await this.openMenu('selection');
-        else if (this.menu) {
-          if (this.menu.activeTab === 'selection') {
-            await this.menu.loadPixels();
-            this.menu.createSettings();
+        if (this.menu.activeTab === 'selection') {
+          await this.menu.loadPixels();
+          this.menu.createSettings();
+        }
+      } else {
+        if (pixels.length > 0) {
+          if (!this.infobox)
+            await this.openInfoBox({ pixel: pixel, scene: this.game.scene });
+          else {
+            if (!this.infobox.pixel || pixel.position !== this.infobox.pixel.position) {
+              await this.openInfoBox({ pixel: pixel, scene: this.game.scene });
+            } else { // only refresh ui, if it's same pixel
+              await this.infobox.setUI();
+            }
           }
         }
       }
+
+      if (update[0] && update[0].hasChanges)
+        this.updateActiveChangesCount();
     })
 
     this.emitter.on('selection/clear', async () => {
-      if (DEBUG) console.log('ToolsManager: on selection/clear');
+      logger.log('ToolsManager: on selection/clear');
 
       if (this.menu)
         this.clearMenu();
@@ -126,23 +134,37 @@ export default class ToolsManager {
         this.clearInfoBox();
 
       this.game.selection.clearRectangleSelection();
+      this.updateActiveChangesCount();
+    })
+
+    this.emitter.on('graph/update', async pixel => {
+      logger.log('ToolsManager: on graph/update');
+
+      if (this.menu && !this.menu.closed)
+        this.menu.createSettings();
+      if (pixel.infobox)
+        await pixel.infobox.setUI();
     })
   }
 
   async openMenu(activeTab) {
-    if (DEBUG) console.log('ToolsManager: openMenu');
+    logger.log('ToolsManager: openMenu');
 
-    if (this.menu && this.menu.loaded)
-      this.clearMenu();
+    if (this.menu) {
+      if (this.menu.closed)
+        this.menu.open();
+      else if (this.menu.loaded)
+        this.clearMenu();
+    } else {
+      this.menu = new Menu({ parent: this.parent, game: this.game, activeTab });
+      await this.menu.init();
+    }
 
-    this.menu = new Menu({ parent: this.parent, game: this.game, activeTab });
-
-    // Init is async 
-    await this.menu.init();
+    this.updateActiveChangesCount();
   }
 
   async openInfoBox({ pixel }) {
-    if (DEBUG) console.log('ToolsManager: openInfoBox');
+    logger.log('ToolsManager: openInfoBox');
 
     if (this.infobox)
       this.clearInfoBox();
@@ -154,7 +176,7 @@ export default class ToolsManager {
   }
 
   openOverlay() {
-    if (DEBUG) console.log('ToolsManager: openOverlay');
+    logger.log('ToolsManager: openOverlay');
 
     if (this.overlay)
       this.clearOverlay();
@@ -162,8 +184,65 @@ export default class ToolsManager {
     this.overlay = new Overlay({ parent: this.parent, game: this.game, close: this.clearOverlay.bind(this) });
   }
 
+  updateActiveChangesCount() {
+    logger.log(`ToolsManager: updateActiveChangesCount`);
+
+    if (this.changesBounceTimer) {
+      clearTimeout(this.changesBounceTimer);
+      this.changesBounceTimer = null;
+      this.bottomNavChangesCount.classList.remove('bounce7');
+    }
+
+    const activePixelsCount = this.game.selection.pixels.filter(pixel => pixel.hasChanges).length;
+    this.bottomNavChangesCount.innerHTML = `<span>${activePixelsCount}</span>`;
+
+    if (this.menu && !this.menu.closed) {
+      this.hideActiveChanges();
+      return;
+    }
+
+    if (activePixelsCount > 0)
+      this.showActiveChanges();
+    else
+      this.hideActiveChanges();
+  }
+
+  showActiveChanges() {
+    const _self = this;
+
+    if (!this.bottomNavChangesCount.classList.contains('visible')) {
+      this.bottomNavChangesCount.classList.add('visible', 'bounce7');
+      this.bottomNavChangesCount.classList.remove('hidden');
+
+      this.changesBounceTimer = setTimeout(() => {
+        _self.bottomNavChangesCount.classList.remove('bounce7');
+      }, 1000);
+    } else if (!this.bottomNavChangesCount.classList.contains('bounce7')) {
+      this.bottomNavChangesCount.classList.add('bounce7');
+      this.changesBounceTimer = setTimeout(() => {
+        _self.bottomNavChangesCount.classList.remove('bounce7');
+      }, 1000);
+    }
+
+    if (!this.bottomNavClearSelection.domElement.classList.contains('visible')) {
+      this.bottomNavClearSelection.domElement.classList.add('visible');
+      this.bottomNavClearSelection.domElement.classList.remove('hidden');
+    }
+  }
+
+  hideActiveChanges() {
+    if (!this.bottomNavChangesCount.classList.contains('hidden')) {
+      this.bottomNavChangesCount.classList.add('hidden');
+      this.bottomNavChangesCount.classList.remove('visible');
+    }
+    if (!this.bottomNavClearSelection.domElement.classList.contains('hidden')) {
+      this.bottomNavClearSelection.domElement.classList.add('hidden');
+      this.bottomNavClearSelection.domElement.classList.remove('visible');
+    }
+  }
+
   setConnectionStatus() {
-    if (DEBUG) console.log('ToolsManager: setConnectionStatus');
+    logger.log('ToolsManager: setConnectionStatus');
 
     let iconClass = null;
     let action = null;
@@ -195,7 +274,7 @@ export default class ToolsManager {
   }
 
   setNetworkAlert() {
-    if (DEBUG) console.log('ToolsManager: setNetworkAlert');
+    logger.log('ToolsManager: setNetworkAlert');
 
     let text = null;
 
@@ -231,36 +310,52 @@ export default class ToolsManager {
   }
 
   addBottomNav() {
-    if (DEBUG) console.log('ToolsManager: addBottomNav');
+    logger.log('ToolsManager: addBottomNav');
 
     this.domBottomNav = document.createElement('div');
     this.domBottomNav.setAttribute('id', 'bottom-nav');
 
     this.bottonNavMenuBtn = new Button({
       elClasses: ['pixels', 'menu-btn'],
-      iconClass: 'gg-row-last',
+      icon: 'gg-row-last',
       clickAction: async () => {
         if (!this.menu || !this.menu.loaded) {
           if (this.infobox)
             this.clearInfoBox()
 
           await this.openMenu(this.game.selection.pixels.length > 0 ? 'selection' : null);
+        } else if (this.menu && this.menu.closed) {
+          if (this.infobox)
+            this.clearInfoBox()
+
+          this.menu.open();
         } else
-          await this.menu.loadPixels();
+          await this.menu.loadPixels()
       }
     });
-
     this.domBottomNav.append(this.bottonNavMenuBtn.domElement);
+
+    this.bottomNavChangesCount = document.createElement('div');
+    this.bottomNavChangesCount.classList.add('changes-count', 'hidden');
+
+    this.domBottomNav.append(this.bottomNavChangesCount);
+
+    this.bottomNavClearSelection = new Button({
+      elClasses: ['clear-selection', 'hidden'],
+      icon: 'gg-trash',
+      text: 'Clear changes',
+      clickAction: this.game.selection.clearAllSelection.bind(this.game.selection)
+    });
+
+    this.domBottomNav.append(this.bottomNavClearSelection.domElement);
     this.domBottomNav.append(new Input(this.search, 'text', {
       scene: this.game.scene,
       type: 'text',
       placeholder: 'Find pixel.. (eg. RK438)',
       max: 6,
       onChange: async () => {
-        console.log('ToolsManager: this.search.text onChange', this.search.text)
         if (this.menu && this.menu.loaded) {
-
-          //await this.menu.loadPixels();
+          //await this.menu.loadPixels()
         }
       }
     }));
@@ -269,33 +364,35 @@ export default class ToolsManager {
   }
 
   addHeader() {
-    if (DEBUG) console.log('ToolsManager: addHeader');
+    logger.log('ToolsManager: addHeader');
 
     this.header = document.createElement('div');
     this.header.setAttribute('id', 'header');
 
     this.headerIcon = new Button({
       elClasses: [],
-      iconClass: 'gg-details-more'
+      icon: 'gg-time' // <i class="gg-time"></i>
     });
     this.header.append(this.headerIcon.domElement);
 
-    this.headerTimer = new Timer({ parent: this.header, game: this.game})
+    this.headerTimer = new Timer({ parent: this.header, game: this.game })
     this.parent.append(this.header);
   }
 
   addConnectionStatus() {
-    if (DEBUG) console.log('ToolsManager: addConnectionStatus');
+    logger.log('ToolsManager: addConnectionStatus');
 
     this.domConnectionStatus = document.createElement('div');
     this.domConnectionStatus.setAttribute('id', 'connection-status');
 
     this.connectionStatusBtn = new Button({
       elClasses: ['account', 'connection'],
-      iconClass: 'gg-block'
+      icon: 'gg-block'
     });
 
     this.domConnectionStatus.append(this.connectionStatusBtn.domElement);
+
+    this.domTokenInfo = new TokenInfo({ parent: this.domConnectionStatus });
 
     this.parent.append(this.domConnectionStatus);
 
@@ -303,10 +400,10 @@ export default class ToolsManager {
   }
 
   addNetworkAlert() {
-    if (DEBUG) console.log('ToolsManager: addNetworkAlert');
+    logger.log('ToolsManager: addNetworkAlert');
 
     if (!this.domConnectionStatus) {
-      console.warn('No connectino status DOM found. Skipping network alert');
+      logger.warn('No connectino status DOM found. Skipping network alert');
       return;
     }
 
@@ -323,7 +420,7 @@ export default class ToolsManager {
   }
 
   addMinimap(scene) {
-    if (DEBUG) console.log("ToolsManager: addMinimap");
+    logger.log("ToolsManager: addMinimap");
 
     scene = scene || this.game.scene;
 
@@ -377,7 +474,7 @@ export default class ToolsManager {
   }
 
   hideTools() {
-    if (DEBUG) console.log('ToolsManager: hideTools');
+    logger.log('ToolsManager: hideTools');
 
     this.networkAlert.style.display = 'none';
     this.connectionStatusBtn.domElement.style.display = 'none';
@@ -397,7 +494,7 @@ export default class ToolsManager {
   }
 
   showTools() {
-    if (DEBUG) console.log('ToolsManager: showTools');
+    logger.log('ToolsManager: showTools');
 
     this.networkAlert.style.display = 'flex';
     this.connectionStatusBtn.domElement.style.display = 'flex';
@@ -410,21 +507,21 @@ export default class ToolsManager {
   }
 
   clearOverlay() {
-    if (DEBUG) console.log('ToolsManager: clearOverlay');
+    logger.log('ToolsManager: clearOverlay');
 
     this.overlay.destroy();
     this.overlay = null;
   }
 
   clearInfoBox() {
-    if (DEBUG) console.log('ToolsManager: clearInfoBox');
+    logger.log('ToolsManager: clearInfoBox');
 
     this.infobox.destroy();
     this.infobox = null;
   }
 
   clearMenu() {
-    if (DEBUG) console.log('ToolsManager: clearMenu');
+    logger.log('ToolsManager: clearMenu');
 
     this.menu.destroy();
     this.menu = null;

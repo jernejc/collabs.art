@@ -1,10 +1,8 @@
 import { Events, Game, CANVAS, WEBGL, Scale } from 'phaser';
 
-// Config
 import config from '@util/config';
-
-// Helpers
 import { maliDetect } from '@util/helpers';
+import logger from '@util/logger';
 
 // Scenes
 import MainScene from '@scenes/main';
@@ -17,7 +15,7 @@ import GraphManager from '@services/subgraph';
 
 // Game init
 export async function AppInitializer() {
-  if (DEBUG) console.log('AppInitializer')
+  logger.log('AppInitializer')
 
   const canvas = document.querySelector('#' + config.appConfig.canvasElement);
   const canvasWidth = canvas.clientWidth //* window.devicePixelRatio;

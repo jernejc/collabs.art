@@ -1,7 +1,8 @@
 import { toWei, stringToBN, stringToHex } from '@util/helpers';
+import logger from '@util/logger';
 
 export function getColorForXY({ x, y, color, scene }) {
-  if (DEBUG) console.log('getColorForXY', x, y, color, scene);
+  //logger.log('getColorForXY', x, y, color, scene);
 
   color = color || new Phaser.Display.Color();
 
@@ -20,17 +21,12 @@ export function getRelativePosition({ x, y, scene }) {
 
 export function getRelativeTile({ cx, cy, scene }) {
 
-  let rx, ry, tile;
+  let tile;
 
-  for (let y = 0; y < scene.gridHeight; y++) {
-    for (let x = 0; x < scene.gridWidth; x++) {
-      if (scene.tiles[y][x].cx === cx && scene.tiles[y][x].cy === cy) {
+  for (let y = 0; y < scene.gridHeight; y++)
+    for (let x = 0; x < scene.gridWidth; x++)
+      if (scene.tiles[y][x].cx === cx && scene.tiles[y][x].cy === cy)
         tile = scene.tiles[y][x];
-        rx = x;
-        ry = y
-      }
-    }
-  }
 
   return tile;
 }
@@ -51,46 +47,15 @@ export function getTileForXY({ x, y, scene }) {
   return tile;
 }
 
-export async function purchasePixels({ scene, selection }) {
-  if (DEBUG) console.log('purchasePixels', selection, scene.game.web3.activeAddress)
-
-  let fullPrice = 0, positions = []; //, gas = 20000; 
-
-  if (!scene.game.web3.activeAddress)
-    await scene.game.web3.getActiveAddress();
-
-  if (!scene.game.web3.activeAddress)
-    return false;
-
-  selection.forEach(pixel => {
-    //console.log('pushing position', stringToBN(pixel.position));
-    positions.push(stringToBN(pixel.position));
-    fullPrice += Number(pixel.price);
-    //gas += 250000; // 10000 gas per pixel
-    pixel.owner = scene.game.web3.activeAddress;
-  })
-
-  fullPrice = toWei(fullPrice.toString()); // web3.toWei needs strings or BN
-
-  await scene.game.web3.bidContract.methods.purchase(
-    positions // pixel position(s)
-  ).send({
-    from: scene.game.web3.activeAddress,
-    //gas: gas,
-    value: fullPrice
-  });
-
-  scene.game.emitter.emit('web3/purchase', selection);
-}
-
 export async function colorPixels({ scene, selection }) {
-  if (DEBUG) console.log('colorPixels', selection)
+  logger.log('colorPixels', selection)
 
-  let positions = [], colors = [];
+  let positions = [], colors = [], bids = [];
 
   selection.forEach(pixel => {
     positions.push(stringToBN(pixel.position));
     colors.push(stringToHex(pixel.HEXcolor));
+    bids.push(stringToBN(pixel.bid.toString()))
   })
 
   if (!scene.game.web3.activeAddress)
@@ -102,20 +67,24 @@ export async function colorPixels({ scene, selection }) {
   try {
     await scene.game.web3.pixelContract.methods.setColors(
       positions,
-      colors
+      colors,
+      bids
     ).send({
       from: scene.game.web3.activeAddress
     });
   } catch (error) {
-    console.error('setColors error', error)
+    logger.error('Action colorPixels: ', error);
+    return;
   }
 
   // Set colors on the image
   updateWorldImagePixelColors({ pixels: selection, scene });
+  // clear selection
+  scene.game.selection.clearAllSelection();
 }
 
 export function updateWorldImagePixelColors({ pixels, scene, updateTile }) {
-  if (DEBUG) console.log('updateWorldImagePixelColors', pixels, scene);
+  logger.log('updateWorldImagePixelColors', pixels, scene);
 
   pixels.forEach(pixel => {
     scene.worldmap.setPixel(

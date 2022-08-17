@@ -4,6 +4,8 @@ import _ from 'lodash';
 import Controller from '@components/controller';
 
 import config from '@util/config';
+import { colorToHexString } from '@util/helpers';
+import logger from '@util/logger';
 
 /**
  * UI for controlling a Phaser Color Object
@@ -13,11 +15,10 @@ import config from '@util/config';
 
 export default class ColorPicker extends Controller {
   constructor(object, property, params) {
-    if (DEBUG) console.log('ColorPicker: constructor', object, property, params);
+    logger.log('ColorPicker: constructor');
 
     super(object, property, params);
-
-    this.setupDom()
+    this.setupDom();
   }
 
   setupDom() {
@@ -27,33 +28,82 @@ export default class ColorPicker extends Controller {
     this.boxesWrapper = document.createElement('div');
     this.boxesWrapper.classList.add('color-wrapper')
 
+    const activeColor = this.getValue();
+
     config.appConfig.supportedColors.forEach(color => {
-      this.boxesWrapper.append(this.createColorBox(color))
+      this.boxesWrapper.append(this.createColorBox(color, activeColor))
     })
 
     this.domElement.append(this.boxesWrapper);
+
+    this.selectColorListener = this.selectColor.bind(this);
+
+    this.boxesWrapper.addEventListener('click', this.selectColorListener);
   }
 
-  getValue() {
-    return _.get(this.object[this.property], 'color');
+  setValue(newColorObject, index) {
+    logger.log('ColorPicker: setValue')
+
+    const _colorObject = this.object[this.property];
+    _colorObject.setFromRGB(newColorObject);
+
+    this.updateDisplay(index);
+
+    if (this.update) // User provided callback
+      this.update(this.getValue());
   }
 
-  updateDisplay(component) {
-    if (DEBUG) console.log('ColorPicker: updateDisplay', this.object[this.property])
+  selectColor(event) {
+    logger.log('ColorPicker: selectColor')
+    let bgColor = window.getComputedStyle(event.target, null).getPropertyValue('background-color');
 
-    let value = this.getValue();
+    if (!event.target.classList.contains('color-box') || !bgColor)
+      return;
 
-    if (this.update)
-      this.update(value);
+    let colorBoxIndex = this.getColorBoxIndex(event.target)
 
+    this.setValue(Phaser.Display.Color.RGBStringToColor(bgColor), colorBoxIndex);
+  }
+
+  getColorBoxIndex(element) {
+    return Array.from(element.parentNode.children).indexOf(element)
+  }
+
+  updateDisplay(index) {
+    logger.log('ColorPicker: updateDisplay')
+
+    const currentActive = this.boxesWrapper.getElementsByClassName('active');
+
+    Array.from(currentActive).forEach(node => {
+      node.classList.remove('active');
+    })
+
+    Array.from(this.boxesWrapper.children)[index].classList.add('active');
     return super.updateDisplay();
   }
 
-  createColorBox(hex) {
+  createColorBox(hex, activeColor) {
     const color = document.createElement('span');
-    color.classList.add('color-box')
-    color.style = `background: ${hex};`
+    color.classList.add('color-box');
+    color.style = `background: ${hex};`;
+
+    if (colorToHexString(activeColor) === hex) {
+      color.classList.add('active');
+    }
 
     return color;
+  }
+
+  destroy() {
+    logger.log('ColorPicker: destroy');
+
+    if (this.boxesWrapper) {
+      this.boxesWrapper.removeEventListener('click', this.selectColorListener);
+      this.boxesWrapper = null;
+    }
+
+    if (this.parent) {
+      this.parent.removeChild(this.domElement);
+    }
   }
 }

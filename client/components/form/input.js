@@ -1,4 +1,6 @@
 
+import logger from '@util/logger';
+
 import Controller from '@components/controller';
 
 /**
@@ -8,7 +10,7 @@ import Controller from '@components/controller';
 export default class Input extends Controller {
 
   constructor(object, property, params) {
-    if (DEBUG) console.log('Input: constructor', object, property, params);
+    logger.log('Input: constructor');
 
     super(object, property, params);
 
@@ -58,7 +60,7 @@ export default class Input extends Controller {
     return this.domElement;
 
     function onChange() {
-      if (DEBUG) console.log('onChange', self.input.value);
+      logger.log('onChange', self.input.value);
 
       //const format = self.input.value.replace('#', '');
       let valid = true;

@@ -129,6 +129,10 @@ export function formatColorNumber(hex) {
   return string;
 }
 
+export function colorToHexString(color) {
+  return Phaser.Display.Color.RGBToString(color.r, color.g, color.b, color.a);
+}
+
 export function hexStringToColor(hex) {
   return Phaser.Display.Color.HexStringToColor(hex);
 }

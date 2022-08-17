@@ -1,6 +1,8 @@
 
+import logger from '@util/logger';
+
 export default class Button {
-  constructor({ elClasses, text, iconClass, disabled, clickAction }) {
+  constructor({ elClasses, text, icon, disabled, clickAction }) {
     this.loadingUI = document.createElement('i');
     this.loadingUI.classList.add('gg-loadbar-alt');
 
@@ -13,8 +15,8 @@ export default class Button {
       this.defaultDisabled = disabled;
     if (this.defaultDisabled)
       this.domElement.disabled = true;
-    if (iconClass)
-      this.setIcon(iconClass);
+    if (icon)
+      this.setIcon(icon);
     if (clickAction)
       this.setClickAction(clickAction);
     if (text)
@@ -36,7 +38,7 @@ export default class Button {
     try {
       await this.clickAction();
     } catch (error) {
-      console.error('Button ClickAction failed', error)
+      logger.error('Button ClickAction failed', error)
     }
 
     this.reset();
@@ -44,30 +46,40 @@ export default class Button {
 
   setText(text) {
     this.text = text || this.text;
+
+    if (this.icon) {
+      this.setIcon(this.icon)
+      return;
+    }
+
     this.domElement.textContent = this.text;
   }
 
-  setIcon(iconClass, alertAction) {
-    if (this.iconClass)
-      this.domElement.classList.remove(this.iconClass.replace('gg-', ''));
+  setIcon(icon, alertAction) {
+    if (this.icon)
+      this.domElement.classList.remove(this.icon.replace('gg-', ''));
       
-    this.iconClass = iconClass || this.iconClass;
+    this.icon = icon || this.icon;
 
-    if (this.iconClass.search('gg-') > -1) {
+    if (this.icon.search('gg-') > -1) {
       const icon = document.createElement('i');
-      icon.classList.add(this.iconClass);
+      icon.classList.add(this.icon);
 
       this.domElement.innerHTML = '';
       this.domElement.append(icon);
     } else {
       const image = document.createElement('img');
-      image.src = `assets/images/icons/${this.iconClass}.svg`;
+      image.src = `assets/images/icons/${this.icon}`;
 
       this.domElement.innerHTML = '';
       this.domElement.append(image);
     }
 
-    this.domElement.classList.add(this.iconClass.replace('gg-', ''));
+    if (this.text) {
+      this.domElement.innerHTML += this.text;
+    }
+
+    this.domElement.classList.add(this.icon.replace('gg-', ''));
 
     if (alertAction) {
       this.alertIcon = document.createElement('i');
@@ -77,7 +89,7 @@ export default class Button {
   }
 
   setClickAction(action) {
-    if (DEBUG) console.log('Button: setClickAction');
+    logger.log('Button: setClickAction');
 
     if (!action)
       throw new Error('No action provided.');
@@ -96,7 +108,7 @@ export default class Button {
   reset() {
     if (this.text)
       this.domElement.textContent = this.text;
-    if (this.iconClass)
+    if (this.icon)
       this.setIcon();
     if (this.defaultDisabled)
       this.domElement.disabled = true;

@@ -1,5 +1,6 @@
 
 import { normalize } from '@util/helpers';
+import logger from '@util/logger';
 
 import Controller from '@components/controller';
 
@@ -11,7 +12,7 @@ import Controller from '@components/controller';
 export default class Saturation extends Controller {
 
   constructor(object, property, params) {
-    if (DEBUG) console.log('Saturation: constructor')
+    logger.log('Saturation: constructor')
 
     super(object, property, params);
 
@@ -102,7 +103,7 @@ export default class Saturation extends Controller {
   }
 
   updateDisplay() {
-    if (DEBUG) console.log('Saturation: updateDisplay', this.object);
+    logger.log('Saturation: updateDisplay', this.object);
 
     const Xpos = parseInt(this.getValue() * 100);
     const Ypos = parseInt((1 - this.object.v) * 100); // Reverse the Y value again for proper shape calc

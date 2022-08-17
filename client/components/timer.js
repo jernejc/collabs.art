@@ -1,6 +1,8 @@
+import logger from '@util/logger';
+
 export default class Timer {
   constructor({ parent, game }) {
-    if (DEBUG) console.log('Timer: constructor');
+    logger.log('Timer: constructor');
 
     if (parent)
       this.parent = parent;
@@ -53,7 +55,7 @@ export default class Timer {
   }
 
   destroy() {
-    if (DEBUG) console.log("Timer: destroy");
+    logger.log("Timer: destroy");
 
     if (this.interval) {
       this.scene.time.removeEvent(this.interval);

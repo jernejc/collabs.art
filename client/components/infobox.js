@@ -2,6 +2,8 @@
 import ColorPicker from '@components/color/picker';
 import LoadingBar from '@components/loading';
 
+import logger from '@util/logger';
+
 
 /**
  * InfoBox Class
@@ -10,18 +12,16 @@ import LoadingBar from '@components/loading';
 export default class InfoBox {
 
   constructor({ pixel, parent, game }) {
-    /*if (DEBUG)*/ console.log('Info Box: constructor', pixel);
+    logger.log('InfoBox: constructor');
 
     this.game = game;
     this.scene = game.scene.keys['MainScene'];
     this.parent = parent;
     this.updateTimeout = null;
-    this.UIs = ['purchaseUI', 'ownerUI', 'bidUI', 'activeBidUI'];
 
     // Pixel relationship
     this.pixel = pixel;
     this.pixel.infobox = this;
-    console.log('InfoBox pixel', pixel);
 
     this.setupDom();
   }
@@ -34,14 +34,14 @@ export default class InfoBox {
   }
 
   setupDom() {
-    if (DEBUG) console.log('Info Box: setupDom');
+    logger.log('InfoBox: setupDom');
 
     this.domElement = document.createElement('div');
     this.domElement.classList.add('info-box');
 
     this.position = document.createElement('div');
     this.position.classList.add('position');
-    this.position.innerHTML = `${this.pixel.position} <small>| &nbsp;${this.pixel.bid || 1} $COLAB</small>`;
+    this.position.innerHTML = `${this.pixel.position}`;
 
     this.domElement.append(this.position);
 
@@ -53,9 +53,7 @@ export default class InfoBox {
     this.closeBtn.classList.add('gg-close-r');
     this.domElement.append(this.closeBtn);
 
-    // Need this for remove to work
-    this.clearSelectionListener = this.game.selection.clearActiveSelection.bind(this.game.selection);
-
+    this.clearSelectionListener = this.destroy.bind(this);
     this.closeBtn.addEventListener('click', this.clearSelectionListener);
 
     this.loadingIcon = new LoadingBar();
@@ -64,10 +62,14 @@ export default class InfoBox {
   }
 
   async setUI(refresh) {
-    if (DEBUG) console.log('Info Box: setUI');
+    logger.log('InfoBox: setUI');
 
-    if (this.hasUI())
+    const _self = this;
+    const hasUI = this.hasUI();
+
+    if (hasUI) {
       this.resetUI();
+    }
 
     this.domElement.append(this.loadingIcon);
     this.setPosition();
@@ -80,22 +82,18 @@ export default class InfoBox {
 
     this.domElement.removeChild(this.loadingIcon);
 
+    // update price
+    this.position.innerHTML += `<small>| &nbsp;${this.pixel.bid || 1} $COLAB</small>`;
+
     this.colorPicker = new ColorPicker(this.pixel, 'color', {
       width: '100%',
       type: 'color',
       scene: this.scene,
       elClasses: ['color-picker'],
-      /*focus: () => {
-        _self.setPosition();
-      },
-      blur: () => {
-        _self.setPosition();
-      },*/
       update: (value) => {
-        _self.pixel.changeToColorNumber(value)
-
-        if (_self.applyBtn)
-          _self.applyBtn.domElement.disabled = false;
+        _self.pixel.changeToColorNumber(value);
+        _self.pixel.setActivePixel();
+        _self.game.tools.updateActiveChangesCount();
       }
     });
 
@@ -105,12 +103,11 @@ export default class InfoBox {
   }
 
   setPosition() {
-    if (DEBUG) console.log('Info Box: setPosition');
+    logger.log('InfoBox: setPosition');
 
     const padding = 2;
     const vertical = (this.pixel.y > (this.parent.offsetHeight / 2)) ? 'bottom' : 'top';
     const horizontal = (this.pixel.x > (this.parent.offsetWidth / 2)) ? 'right' : 'left';
-    //const animationClass = (vertical === 'up') ? 'fadeInUp' : 'fadeInDown';
     const top = (vertical === 'bottom') ? this.pixel.y - this.domElement.offsetHeight - padding : this.pixel.y + this.scene.size + padding;
     const left = (horizontal === 'right') ? this.pixel.x - this.domElement.offsetWidth - padding : this.pixel.x + this.scene.size + padding;
 
@@ -119,34 +116,52 @@ export default class InfoBox {
   }
 
   destroy() {
-    if (DEBUG) console.log('Info box: destroy');
+    logger.log('InfoBox: destroy');
 
-    this.closeBtn.removeEventListener('click', this.clearSelectionListener);
-    this.parent.removeChild(this.domElement);
+    if (this.closeBtn) {
+      this.closeBtn.removeEventListener('click', this.clearSelectionListener);
+      this.closeBtn = null;
+    }
 
-    if (this.pixel)
+    if (this.pixel) {
       this.pixel.infobox = null;
+
+      if (!this.pixel.hasChanges) {
+        this.pixel.removeFromSelection();
+        this.game.selection.removeByReference(this.pixel);
+      }
+
+      this.pixel = null;
+    }
+
+    if (this.colorPicker) {
+      this.colorPicker.destroy();
+      this.domElement.removeChild(this.colorPicker.domElement);
+      this.colorPicker = null;
+    }
+
+    if (this.domElement) {
+      this.parent.removeChild(this.domElement);
+      this.domElement = null;
+    }
   }
 
   hasUI() {
-    if (DEBUG) console.log('Info box: hasUI');
+    logger.log('InfoBox: hasUI');
 
-    for (let ui of this.UIs)
-      if (this[ui])
-        return true;
+    if (this.colorPicker)
+      return true;
 
     return false;
   }
 
   resetUI() {
-    if (DEBUG) console.log('Info box: resetUI');
+    logger.log('InfoBox: resetUI');
 
-    for (let ui of this.UIs) {
-      if (this[ui]) {
-        this.domElement.removeChild(this[ui]);
-        this.domElement.classList.remove(ui);
-        this[ui] = null;
-      }
-    }
+    this.colorPicker.destroy();
+    this.domElement.removeChild(this.colorPicker.domElement);
+    this.colorPicker = null;
+
+    this.position.innerHTML = `${this.pixel.position}`;
   }
 }

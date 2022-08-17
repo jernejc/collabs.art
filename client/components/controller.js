@@ -1,6 +1,8 @@
 
 import _ from 'lodash';
 
+import logger from '@util/logger';
+
 /**
  * Used to control a JS object property with UI componets
  */
@@ -8,7 +10,7 @@ import _ from 'lodash';
 export default class Controller {
 
   constructor(object, property, params) {
-    if (DEBUG) console.log('Controller: constructor')
+    logger.log('Controller: constructor')
 
     this.object = object;
     this.property = property;
@@ -41,7 +43,7 @@ export default class Controller {
   }
 
   setValue(v, property) {
-    if (DEBUG) console.log('Controller: setValue', property, v);
+    logger.log('Controller: setValue', property, v);
 
     let _v = v;
     let _property = property || this.property;

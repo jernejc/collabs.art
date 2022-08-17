@@ -2,11 +2,12 @@
 import config from '@util/config';
 
 import { stringToHex, delay } from '@util/helpers';
+import logger from '@util/logger';
 
 export default class GraphManager {
 
   async loadPixels(params) {
-    if (DEBUG) console.log('GraphManager: loadPixels', params);
+    logger.log('GraphManager: loadPixels', params);
 
     try {
       const response = await this.postQueryToGraph('pixels', params);
@@ -16,13 +17,13 @@ export default class GraphManager {
 
       return response.pixels;
     } catch (error) {
-      console.error('Error while loading pixels: ' + error);
+      logger.error('Error while loading pixels: ' + error);
       return [];
     }
   }
 
   async loadPixel(params, refresh) {
-    if (DEBUG) console.log('GraphManager: loadPixel');
+    logger.log('GraphManager: loadPixel');
 
     if (refresh) // delay for 3s so the graph is up to date, need better solution here
       await delay(1);
@@ -35,7 +36,7 @@ export default class GraphManager {
 
       return response.pixel;
     } catch (error) {
-      console.error('Error while loading pixel: ' + error);
+      logger.error('Error while loading pixel: ' + error);
       return null;
     }
   }
@@ -71,7 +72,7 @@ export default class GraphManager {
   }
 
   async postQueryToGraph(queryName, params) {
-    if (DEBUG) console.log('GraphManager: postQueryToGraph');
+    logger.log('GraphManager: postQueryToGraph');
 
     let query;
 

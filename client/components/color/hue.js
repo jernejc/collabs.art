@@ -1,5 +1,6 @@
 
 import { normalize } from '@util/helpers';
+import logger from '@util/logger';
 
 import Controller from '@components/controller';
 
@@ -10,7 +11,7 @@ import Controller from '@components/controller';
 export default class Hue extends Controller {
 
   constructor(object, property, params) {
-    if (DEBUG) console.log('Hue: constructor')
+    logger.log('Hue: constructor')
 
     super(object, property, params);
 
@@ -89,7 +90,7 @@ export default class Hue extends Controller {
   }
 
   updateDisplay() {
-    if (DEBUG) console.log('Hue: updateDisplay', this.object);
+    logger.log('Hue: updateDisplay', this.object);
 
     const pct = (this.getValue() - this.min) / (this.max - this.min);
 

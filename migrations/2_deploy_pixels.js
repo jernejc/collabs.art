@@ -33,7 +33,7 @@ module.exports = async (deployer, network) => {
     httpUrl: httpUrl,
     wsUrl: wsUrl,
     PixelsAddress: Pixels.address,
-    PixelsToken: PixelsToken.address,
+    PixelsTokenAddress: PixelsToken.address,
     ipfs: {
       host: 'ipfs.infura.io',
       protocol: 'https',

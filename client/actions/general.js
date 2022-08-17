@@ -3,10 +3,11 @@ import _ from 'lodash';
 
 import { getTileForPointer } from '@actions/pixel';
 import { formatColorNumber } from '@util/helpers';
+import logger from '@util/logger';
 
 // Fired when user moves pointer through the grid
 export function handleMouseMove({ pointer, scene }) {
-  if (DEBUG) console.log('User interactions: handleMove');
+  //logger.log('User interactions: handleMove');
 
   switch (scene.game.mode) {
     case 'move':
@@ -40,7 +41,7 @@ export function handleMouseMove({ pointer, scene }) {
 }
 
 export async function handleMouseDown({ pointer, scene }) {
-  if (DEBUG) console.log('User interactions: handleMouseDown', scene.game.mode);
+  //logger.log('User interactions: handleMouseDown', scene.game.mode);
 
   let tile;
 
@@ -66,9 +67,9 @@ export async function handleMouseDown({ pointer, scene }) {
     case 'select':
       tile = getTileForPointer({ pointer, scene });
 
-      if (scene.game.selection.isSelected(tile.cx, tile.cy))
+      /*if (scene.game.selection.isSelected(tile.cx, tile.cy))
         scene.game.selection.removeSelected({ tile, scene });
-      else
+      else*/
         await scene.game.selection.addSelected({ tiles: [tile], scene });
       break;
     case 'mininav':
@@ -78,7 +79,7 @@ export async function handleMouseDown({ pointer, scene }) {
 }
 
 export async function handleMouseUp({ pointer, scene }) {
-  if (DEBUG) console.log('User interactions: handleMouseUp', pointer, scene);
+  //logger.log('User interactions: handleMouseUp', pointer, scene);
 
   const selection = scene.game.selection;
 
@@ -124,7 +125,7 @@ export async function handleMouseUp({ pointer, scene }) {
 }
 
 export function handleMouseWheel({ scene, dx, dy, dz }) {
-  if (DEBUG) console.log('User interactions: Mouse wheel event');
+  //logger.log('User interactions: Mouse wheel event');
 
   const newSize = (dy < 0) ? scene.size + 1 : scene.size - 1;
 
@@ -139,7 +140,7 @@ export function handleMouseWheel({ scene, dx, dy, dz }) {
 }
 
 export function handleShiftDown({ scene }) {
-  if (DEBUG) console.log('User interactions: handleShiftDown');
+ // logger.log('User interactions: handleShiftDown');
 
   if (scene.game.mode === 'select')
     setGameMode({ scene, mode: 'multiselect' });
@@ -148,7 +149,7 @@ export function handleShiftDown({ scene }) {
 }
 
 export function handleShiftUp({ scene }) {
-  if (DEBUG) console.log('User interactions: handleShiftUp');
+  //logger.log('User interactions: handleShiftUp');
 
   if (scene.game.mode === 'multiselect')
     setGameMode({ scene, mode: 'select' });
@@ -159,7 +160,7 @@ export function handleShiftUp({ scene }) {
 }
 
 export function handleSpaceDown({ scene }) {
-  if (DEBUG) console.log('User interactions: handleSpaceDown');
+  //logger.log('User interactions: handleSpaceDown');
 
   if (scene.game.mode === 'select')
     setGameMode({ scene, mode: 'move' });
@@ -168,7 +169,7 @@ export function handleSpaceDown({ scene }) {
 }
 
 export function handleSpaceUp({ scene }) {
-  if (DEBUG) console.log('User interactions: handleSpaceUp');
+  //logger.log('User interactions: handleSpaceUp');
 
   if (scene.game.mode === 'move')
     setGameMode({ scene, mode: 'select' });
@@ -179,7 +180,7 @@ export function handleSpaceUp({ scene }) {
 }
 
 export function navigateMinimap({ pointer, scene }) {
-  if (DEBUG) console.log('User interactions: navigateMinimap', pointer, scene);
+  //logger.log('User interactions: navigateMinimap', pointer, scene);
 
   const margin = scene.sceneConfig.margin * 2; // we have to use double margin due to black border
   const fieldWidth = scene.fieldWidth * scene.sceneConfig.sizeRatio;
@@ -200,7 +201,7 @@ export function navigateMinimap({ pointer, scene }) {
 }
 
 export function panDragMap({ pointer, scene }) {
-  if (DEBUG) console.log('User interactions: panDragMap');
+  //logger.log('User interactions: panDragMap');
 
   if (scene.game.origDragPoint) {
     // move the camera by the amount the mouse has moved since last update
@@ -215,7 +216,7 @@ export function panDragMap({ pointer, scene }) {
 }
 
 export function moveToPosition({ scene, x, y, save }) {
-  if (DEBUG) console.log('moveToPosition', x, y);
+  //logger.log('moveToPosition', x, y);
 
   scene.cameraX = x;
   scene.cameraY = y;
@@ -239,13 +240,13 @@ export function moveToPosition({ scene, x, y, save }) {
 }
 
 export function saveLastPosition(x, y) {
-  if (DEBUG) console.log('saveLastPosition', x, y);
+  //logger.log('saveLastPosition', x, y);
 
   try {
     localStorage.setItem('cx', x);
     localStorage.setItem('cy', y);
   } catch (error) {
-    console.error('Failed to save last known position', error);
+    logger.error('Failed to save last known position', error);
   }
 }
 
@@ -254,7 +255,7 @@ export function saveLastPosition(x, y) {
 var debounceSaveLastPosition = _.debounce(saveLastPosition, 300);
 
 export function getLastPosition() {
-  if (DEBUG) console.log('getLastPosition');
+  //logger.log('getLastPosition');
 
   let position = {
     x: 0,
@@ -271,7 +272,7 @@ export function getLastPosition() {
     if (cy)
       position.y = parseFloat(cy);
   } catch (error) {
-    console.error('Failed to get last known position', error);
+    logger.error('Failed to get last known position', error);
   }
 
   return position;
@@ -279,7 +280,7 @@ export function getLastPosition() {
 
 // Set the Position of the Selection Block
 export function positionSelectionBlock({ pointer, scene }) {
-  if (DEBUG) console.log('User interactions: positionSelectionBlock');
+  //logger.log('User interactions: positionSelectionBlock');
 
   if (scene.game.selection.highlight)
     scene.game.selection.repositionHighlight({ pointer, scene });
@@ -289,7 +290,7 @@ export function positionSelectionBlock({ pointer, scene }) {
 
 // Set scene mode
 export function setGameMode({ scene, mode }) {
-  if (DEBUG) console.log('User interactions: setGameMode', mode);
+  //logger.log('User interactions: setGameMode', mode);
 
   switch (mode) {
     case 'move':
@@ -327,7 +328,7 @@ export function setGameMode({ scene, mode }) {
 }
 
 export function generalResetStrokeStyle({ scene, size, selection, alpha }) {
-  if (DEBUG) console.log('generalStrokeReset', scene, size, alpha);
+  //logger.log('generalStrokeReset', scene, size, alpha);
 
   for (let y = 0; y < scene.gridHeight; y++) {
     for (let x = 0; x < scene.gridWidth; x++) {
@@ -355,7 +356,7 @@ export function resetStrokeStyle({ tile, scene, size, alpha }) {
 }
 
 export function setInvertedStroke({ tile, scene }) {
-  if (DEBUG) console.log('User interactions: setInvertedStroke');
+  //logger.log('User interactions: setInvertedStroke');
 
   const invertedColor = invertColor(tile.fillColor, true);
 
@@ -364,7 +365,7 @@ export function setInvertedStroke({ tile, scene }) {
 }
 
 export function invertColor(fillColor, bw) {
-  if (DEBUG) console.log('User interactions: invertColor');
+  //logger.log('User interactions: invertColor');
 
   const color = Phaser.Display.Color.HexStringToColor('#' + formatColorNumber(fillColor));
   let { r, g, b } = color;

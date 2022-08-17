@@ -1,4 +1,6 @@
 import config from '@util/config';
+import logger from '@util/logger';
+
 import {
   setGameMode
 } from '@actions/general';
@@ -7,7 +9,7 @@ import Slideshow from './slideshow';
 
 export default class Overlay {
   constructor({ game, parent, close }) {
-    if (DEBUG) console.log('Overlay: constructor');
+    logger.log('Overlay: constructor');
 
     if (close)
       this.close = close;
@@ -30,7 +32,7 @@ export default class Overlay {
   }
 
   destroy() {
-    if (DEBUG) console.log("Overlay: destroy");
+    logger.log("Overlay: destroy");
 
     if (this.slideshow)
       this.slideshow.destroy();
@@ -43,7 +45,7 @@ export default class Overlay {
   }
 
   startGameOfLife() {
-    if (DEBUG) console.log("Overlay: startGameOfLife");
+    logger.log("Overlay: startGameOfLife");
 
     this.scene.initialShapes = Object.keys(config.intialShapes);
 
@@ -94,7 +96,7 @@ export default class Overlay {
   }
 
   stopGameOfLife() {
-    if (DEBUG) console.log("Overlay: stopGameOfLife");
+    logger.log("Overlay: stopGameOfLife");
 
     for (let y = 0; y < this.scene.gridHeight; y++)
       for (let x = 0; x < this.scene.gridWidth; x++)
@@ -107,7 +109,7 @@ export default class Overlay {
   }
 
   isAlive(x, y) {
-    if (DEBUG) console.log("Overlay: isAlive");
+    logger.log("Overlay: isAlive");
 
     if (x < 0 || x >= this.scene.gridWidth || y < 0 || y >= this.scene.gridHeight)
       return false;
@@ -116,7 +118,7 @@ export default class Overlay {
   }
 
   nextGeneration() {
-    if (DEBUG) console.log("Overlay: nextGeneration");
+    logger.log("Overlay: nextGeneration");
 
     // Calculate next generation
     for (let x = 0; x < this.scene.gridWidth; x++) {

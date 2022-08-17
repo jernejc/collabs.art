@@ -6,25 +6,26 @@ import {
   hexToString,
   formatPositionHex,
 } from "@util/helpers";
+import logger from '@util/logger';
 
 import { setInvertedStroke, resetStrokeStyle } from "@actions/general";
-import { purchasePixels } from "@actions/pixel";
 
 export default class Pixel {
   constructor({ tile, scene, color, cx, cy }) {
-    if (DEBUG) console.log("Pixel: constructor", color, cx, cy);
+    logger.log("Pixel: constructor", cx, cy);
 
     this.tile = tile;
     this.scene = scene;
     this.cx = cx;
     this.cy = cy;
 
-    if (color)
+    if (color) {
       this.color = Phaser.Display.Color.HexStringToColor(
         "#" + formatColorNumber(color)
       );
 
-    this.originalColor = null;
+      this.originalColor = this.color.clone();
+    }
   }
 
   get position() {
@@ -44,77 +45,36 @@ export default class Pixel {
     return this.tile ? this.tile.x : null;
   }
 
-  /*async buy() {
-    if (DEBUG) console.log("BUY Pixel", this);
-
-    let success = false;
-
-    try {
-      await purchasePixels({ scene: this.scene, selection: [this] });
-      success = true;
-    } catch (error) {
-      console.error("Purchase pixel error", error);
-    }
-
-    return success;
-  }*/
-
-  /*async bid() {
-    if (DEBUG) console.log("BID Pixel", pixel);
-
-    let success = false;
-
-    try {
-      if (!this.scene.game.web3.activeAddress)
-        await this.scene.game.web3.getActiveAddress();
-
-      if (!this.scene.game.web3.activeAddress) return success;
-
-      let price = this.price;
-
-      if (typeof price === "number") price = price.toString(); // web3.toWei needs strings or BN
-
-      await this.scene.game.web3.bidContract.methods
-        .placeBid(
-          stringToBN(this.position), // pixel position
-          3600 * 7 // duration in seconds: 7h
-        )
-        .send({
-          from: this.scene.game.web3.activeAddress,
-          gas: 300000,
-          value: toWei(price),
-        });
-
-      success = true;
-    } catch (error) {
-      console.error("Purchase pixel error", error);
-    }
-
-    return success;
-  }*/
+  get hasChanges() {
+    return (this.originalColor && (this.originalColor.color !== this.color.color));
+  }
 
   changeToColorHex(hex) {
-    if (DEBUG) console.log("Pixel: changeToColorHex", hex, this.tile);
+    logger.log("Pixel: changeToColorHex", hex)
 
-    this.originalColor = this.color;
+    if (!this.originalColor) this.originalColor = this.color;
+
     this.color = Phaser.Display.Color.HexStringToColor("#" + hexToString(hex));
 
     if (this.tile) this.tile.setFillStyle(this.color.color);
+
+    //this.setActivePixel();
   }
 
-  changeToColorNumber(number) {
-    if (DEBUG) console.log("Pixel: changeToColorNumber", number, this.tile);
+  changeToColorNumber(color) {
+    logger.log("Pixel: changeToColorNumber");
 
     if (!this.originalColor) this.originalColor = this.color.clone();
 
-    this.color.setFromRGB(Phaser.Display.Color.IntegerToRGB(number));
+    this.color.setFromRGB(color);
 
     if (this.tile) this.tile.setFillStyle(this.color.color);
+
+    //this.setActivePixel();
   }
 
   async setColor() {
-    if (DEBUG)
-      console.log("setColor", this.cx, this.cy, this.color, this.HEXcolor);
+    logger.log("setColor", this.cx, this.cy, this.HEXcolor);
 
     try {
       await this.scene.game.web3.pixelContract.methods
@@ -127,7 +87,7 @@ export default class Pixel {
           gas: 200000,
         });
     } catch (error) {
-      console.error("setColor pixel error", error);
+      logger.error("Pixel: setColor", error);
     }
 
     this.setWorldCanvasPixel();
@@ -161,12 +121,12 @@ export default class Pixel {
       this.graphLoaded = true;
     }
 
-    this.scene.game.emitter.emit("selection/update");
+    this.scene.game.emitter.emit("graph/update", this);
   }
 
   setGraphData(data) {
-    console.log('setGraphData', data);
-    
+    logger.log('Pixel: setGraphData');
+
     if (data) {
       if (!this.bid)
         this.bid = this.scene.game.web3.defaultPrice;
@@ -183,20 +143,31 @@ export default class Pixel {
   }
 
   setActivePixel() {
+    logger.log('Pixel: setActivePixel');
+
     if (this.tile) setInvertedStroke({ tile: this.tile, scene: this.scene });
   }
 
   clearActivePixel() {
+    logger.log('Pixel: clearActivePixel');
+
     if (this.tile) resetStrokeStyle({ tile: this.tile, scene: this.scene });
 
     this.scene.game.selection.clearRectangleSelection();
+  }
+
+  removeFromSelection() {
+    logger.log('Pixel: removeFromSelection');
+
+    this.clearActivePixel();
+    this.resetColor();
   }
 
   static fromTile({ tile, scene }) {
     const color = tile.fillColor;
     const pixel = new Pixel({ tile, scene, color, cx: tile.cx, cy: tile.cy });
 
-    if (!pixel.price) pixel.price = scene.game.web3.defaultPrice;
+    if (!pixel.bid) pixel.bid = scene.game.web3.defaultPrice;
 
     return pixel;
   }
@@ -210,14 +181,14 @@ export default class Pixel {
       cy: position.cy,
     });
 
-    pixel.setGraphData(data);
+    pixel.setGraphData(data)
 
     return pixel;
   }
 
   resetColor() {
-    if (this.originalColor) {
-      this.changeToColorNumber(this.originalColor.color);
+    if (this.originalColor && this.originalColor.color !== this.color.color) {
+      this.changeToColorNumber(this.originalColor);
       this.originalColor = null;
     }
   }

@@ -1,8 +1,5 @@
 import _ from 'lodash';
 
-import config from '@util/config';
-
-import { hexStringToColor } from '@util/helpers';
 import ApplicationScene from '@scenes/application';
 
 import { getColorForXY } from '@actions/pixel';
@@ -18,6 +15,10 @@ import {
   moveToPosition,
   getLastPosition,
 } from '@actions/general';
+
+import config from '@util/config';
+import { hexStringToColor } from '@util/helpers';
+import logger from '@util/logger';
 
 export default class MainScene extends ApplicationScene {
   constructor() {
@@ -77,13 +78,13 @@ export default class MainScene extends ApplicationScene {
      * Keyboard events
      */
 
-    this.input.keyboard.on('keydown-SHIFT', (event) => {
+    /*this.input.keyboard.on('keydown-SHIFT', (event) => {
       handleShiftDown({ scene: _self })
     });
 
     this.input.keyboard.on('keyup-SHIFT', (event) => {
       handleShiftUp({ scene: _self })
-    });
+    });*/
 
     this.input.keyboard.on('keydown-SPACE', (event) => {
       handleSpaceDown({ scene: _self })
@@ -141,7 +142,7 @@ export default class MainScene extends ApplicationScene {
   }
 
   createVisibleTiles() {
-    if (DEBUG) console.log("Main Scene: createVisibleTiles");
+    logger.log("MainScene: createVisibleTiles");
 
     this.tiles = [];
 
@@ -162,7 +163,7 @@ export default class MainScene extends ApplicationScene {
   }
 
   updateTiles() {
-    if (DEBUG) console.log("Main Scene: updateTiles");
+    //logger.log("MainScene: updateTiles");
 
     for (let y = 0; y < this.gridHeight; y++)
       for (let x = 0; x < this.gridWidth; x++)
@@ -172,11 +173,9 @@ export default class MainScene extends ApplicationScene {
   }
 
   updateTile(x, y) {
-    if (DEBUG) console.log("Main Scene: updateTile");
+    //logger.log("MainScene: updateTile");
 
-    
-
-    if (this.gameOfLife) {
+    /*if (this.gameOfLife) {
       const randomPixelColor = hexStringToColor(this.appConfig.defaultTileColors[Phaser.Math.Between(0, this.appConfig.defaultTileColors.length - 1)])
       let fillColor = this.appConfig.fillColor;
 
@@ -185,7 +184,7 @@ export default class MainScene extends ApplicationScene {
 
       this.tiles[y][x].setFillStyle(fillColor.color);
       return;
-    }
+    }*/
 
     const mapPixel = getColorForXY({ x, y, color: this.color, scene: this });
 
@@ -193,6 +192,12 @@ export default class MainScene extends ApplicationScene {
     this.tiles[y][x].cy = mapPixel.cy;
 
     this.tiles[y][x].setFillStyle(mapPixel.color.color);
+    /*const selected = this.game.selection.isSelected(mapPixel.cx, mapPixel.cy);
+
+    if (selected)
+      this.tiles[y][x].setFillStyle(selected.color.color);
+    else
+      this.tiles[y][x].setFillStyle(mapPixel.color.color);*/
 
     /*if (this.game.mode !== 'move') { // Add stroke if mode is not move
       if (this.game.selection.isSelected(mapPixel.cx, mapPixel.cy))
@@ -203,7 +208,7 @@ export default class MainScene extends ApplicationScene {
   }
 
   clearVisibleTiles() {
-    if (DEBUG) console.log("Main Scene: clearVisibleTiles");
+    logger.log("MainScene: clearVisibleTiles");
 
     this.tiles.forEach(y => {
       y.forEach(x => {
@@ -223,19 +228,16 @@ export default class MainScene extends ApplicationScene {
    */
 
   openOverlay() {
-    /*if (DEBUG)*/ console.log("Main Scene: openOverlay");
+    logger.log("MainScene: openOverlay");
 
     this.currentState = config.intialGameState['contribute'];
 
-    //this.game.tools.hideTools();
     this.game.tools.openOverlay();
   }
 
   closeOverlay() {
-    /*if (DEBUG)*/ console.log("Main Scene: closeOverlay");
+    logger.log("MainScene: closeOverlay");
 
-    //this.updateTiles();
     this.game.tools.clearOverlay();
-    //this.game.tools.showTools();
   }
 }

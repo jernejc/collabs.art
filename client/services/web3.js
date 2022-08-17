@@ -1,24 +1,24 @@
 
 import Web3 from 'web3';
-import MetaMaskOnboarding from '@metamask/onboarding'
-
-import config from '@util/config';
-
-import { stringToBN, formatPosition, hexStringToColor, formatNetworkConfig } from '@util/helpers';
+import MetaMaskOnboarding from '@metamask/onboarding';
 
 import { updateWorldImagePixelColors } from '@actions/pixel';
+
+import config from '@util/config';
+import { stringToBN, formatPosition, hexStringToColor, formatNetworkConfig } from '@util/helpers';
+import logger from '@util/logger';
 
 export default class Web3Manager {
 
   constructor(game, emitter) {
-    if (DEBUG) console.log('Web3Manager: constructor');
+    logger.log('Web3Manager: constructor');
 
     this.game = game;
     this.emitter = emitter;
 
     this.onboarding = new MetaMaskOnboarding();
     this.RPCinstance = null;
-    this.bidContract = null;
+    this.tokenContract = null;
     this.pixelContract = null;
     this.defaultPrice = null;
     this.hasMetamask = false;
@@ -62,7 +62,7 @@ export default class Web3Manager {
   }
 
   async initProviders() {
-    if (DEBUG) console.log('Web3Manager: initProviders');
+    logger.log('Web3Manager: initProviders');
 
     if (window.ethereum) {
       this.hasMetamask = true;
@@ -83,12 +83,12 @@ export default class Web3Manager {
   }
 
   initContracts() {
-    if (DEBUG) console.log('Web3Manager: initContracts');
+    logger.log('Web3Manager: initContracts');
 
     if (this.RPCinstance) {
-      this.bidContract = new this.RPCinstance.eth.Contract(
-        config.contracts.bids.abi,
-        config.contracts.bids.address
+      this.tokenContract = new this.RPCinstance.eth.Contract(
+        config.contracts.token.abi,
+        config.contracts.token.address
       );
 
       this.pixelContract = new this.RPCinstance.eth.Contract(
@@ -98,9 +98,9 @@ export default class Web3Manager {
     }
 
     if (this.websocketInstance) {
-      this.eventBidContract = new this.websocketInstance.eth.Contract(
-        config.contracts.bids.abi,
-        config.contracts.bids.address
+      this.eventTokenContract = new this.websocketInstance.eth.Contract(
+        config.contracts.token.abi,
+        config.contracts.token.address
       );
 
       this.eventPixelContract = new this.websocketInstance.eth.Contract(
@@ -116,7 +116,7 @@ export default class Web3Manager {
   }
 
   enableProviderEvents() {
-    if (DEBUG) console.log('Web3Manager: enableProviderEvents');
+    logger.log('Web3Manager: enableProviderEvents');
 
     const _self = this; // Had to wrap them in anonymous functions to handle 'this'
 
@@ -132,15 +132,16 @@ export default class Web3Manager {
   }
 
   enableContractEvents() {
-    if (DEBUG) console.log('Web3Manager: enableContractEvents', this.pixelContract.events.ColorPixels());
+    logger.log('Web3Manager: enableContractEvents', this.pixelContract.events.ColorPixels());
 
     // Contract events
     if (this.websocketInstance) {
       this.socketColorPixelsListener = this.eventPixelContract.events.ColorPixels({ fromBlock: 'latest' })
         .on('data', (e) => {
-          if (DEBUG) console.log('ColorPixels', e);
-          const _positions = e.returnValues._positions;
-          const _colors = e.returnValues._colors;
+          logger.log('ColorPixels', e)
+          const _positions = e.returnValues.positions;
+          const _colors = e.returnValues.colors;
+          const _bids = e.returnValues.bids;
 
           const pixels = _positions.map((position, i) => {
             return {
@@ -155,7 +156,7 @@ export default class Web3Manager {
   }
 
   handleDefaultNetwork() {
-    if (DEBUG) console.log('Web3Manager: handleDefaultNetwork');
+    logger.log('Web3Manager: handleDefaultNetwork');
     this.network = config.networks.find(net => net.default === true);
 
     this.connectWebsocket();
@@ -164,23 +165,23 @@ export default class Web3Manager {
   }
 
   handleNewChain(chainId) {
-    /*if (DEBUG)*/ console.log('Web3Manager: handleNewChain', chainId);
+    logger.log('Web3Manager: handleNewChain', chainId);
     const supported = config.networks.find(net => net.chainId == chainId && net.enabled === true);
 
     if (!supported) {
-      console.warn('Web3Manager: Chain ID not supported');
+      logger.warn('Web3Manager: Chain ID not supported');
       this.chainId = null;
     } else
       this.chainId = chainId;
   }
 
   handleNewNetwork(networkId) {
-    if (DEBUG) console.log('Web3Manager: handleNewNetwork', networkId);
+    logger.log('Web3Manager: handleNewNetwork', networkId);
 
     const supported = config.networks.find(net => net.id == networkId && net.enabled === true);
 
     if (!supported) {
-      console.warn('Web3Manager: Network ID not supported');
+      logger.warn('Web3Manager: Network ID not supported');
       this.network = null;
     } else
       this.network = supported;
@@ -198,7 +199,7 @@ export default class Web3Manager {
   }
 
   handleAccountsChanged(accounts) {
-    if (DEBUG) console.log('Web3Manager: handleAccountsChanged', accounts);
+    logger.log('Web3Manager: handleAccountsChanged', accounts);
 
     if (accounts.length > 0) {
       this.accounts = accounts;
@@ -215,11 +216,11 @@ export default class Web3Manager {
   }
 
   handleProviderMessage(msg) {
-    console.log('handleProviderMessage', msg);
+    logger.log('handleProviderMessage', msg);
   }
 
   async ownerOf(_position) {
-    if (DEBUG) console.log('Web3Manager: ownerOf');
+    logger.log('Web3Manager: ownerOf');
 
     if (typeof _position === 'string')
       _position = stringToBN(_position);
@@ -229,14 +230,14 @@ export default class Web3Manager {
     try {
       owner = await this.pixelContract.methods.ownerOf(_position).call();
     } catch (error) {
-      console.warn('No owner found', error);
+      logger.warn('No owner found', error);
     }
 
     return owner;
   }
 
   async getNetworkAndChainId() {
-    if (DEBUG) console.log('Web3Manager: getNetworkAndChainId');
+    logger.log('Web3Manager: getNetworkAndChainId');
 
     try {
       const chainId = await this.RPCinstance.currentProvider.request({
@@ -251,12 +252,12 @@ export default class Web3Manager {
 
       this.handleNewNetwork(networkId)
     } catch (err) {
-      console.error(err)
+      logger.error(err)
     }
   }
 
   async requestAccounts() {
-    if (DEBUG) console.log('Web3Manager: requestAccounts');
+    logger.log('Web3Manager: requestAccounts');
 
     const accounts = await this.RPCinstance.currentProvider.request({
       method: 'eth_requestAccounts',
@@ -268,7 +269,7 @@ export default class Web3Manager {
   }
 
   async getAccounts() {
-    if (DEBUG) console.log('Web3Manager: getAccounts');
+    logger.log('Web3Manager: getAccounts');
 
     const accounts = await this.RPCinstance.currentProvider.request({
       method: 'eth_accounts',
@@ -280,7 +281,7 @@ export default class Web3Manager {
   }
 
   async addNetwork(networkConfig) {
-    if (DEBUG) console.log('Web3Manager: addNetwork');
+    logger.log('Web3Manager: addNetwork');
 
     let { id, enabled, ...chainConfig } = networkConfig;
 
@@ -290,12 +291,12 @@ export default class Web3Manager {
         params: [formatNetworkConfig(chainConfig)]
       });
     } catch (error) {
-      console.error('Failed to add network to provider: ', error);
+      logger.error('Failed to add network to provider: ', error);
     }
   }
 
   async switchToNetwork(chainId) {
-    /*if (DEBUG)*/ console.log('Web3Manager: switchToNetwork', chainId);
+    logger.log('Web3Manager: switchToNetwork', chainId);
 
     chainId = chainId || Web3.utils.toHex('80001') // Default to  Polygon testnet
 
@@ -316,7 +317,7 @@ export default class Web3Manager {
         await this.getActiveAddress();*/
     } catch (error) {
       if (error.code === 4902) { // Network was not found in Metamask
-        console.warn('Network not found in Metamask, adding new config.')
+        logger.warn('Network not found in Metamask, adding new config.')
         await this.addNetwork(networkConfig);
       } else
         throw new Error('Failed to switch network: ', error);
@@ -324,21 +325,21 @@ export default class Web3Manager {
   }
 
   async getDefaultPrice() {
-    if (DEBUG) console.log('Web3Manager: getDefaultPrice');
+    logger.log('Web3Manager: getDefaultPrice');
 
     let defaultPrice;
 
     try {
-      defaultPrice = await this.bidContract.methods.defaultPrice().call();
+      defaultPrice = await this.tokenContract.methods.defaultPrice().call();
       this.defaultPrice = Web3.utils.fromWei(defaultPrice);
     } catch (error) {
-      console.warn('Failed to fetch RPC default price');
+      logger.warn('Failed to fetch RPC default price');
 
       try {
-        defaultPrice = await this.eventBidContract.methods.defaultPrice().call();
+        defaultPrice = await this.eventTokenContract.methods.defaultPrice().call();
         this.defaultPrice = Web3.utils.fromWei(defaultPrice);
       } catch (error) {
-        console.warn('Failed to fetch WS default price');
+        logger.warn('Failed to fetch WS default price');
         this.defaultPrice = config.defaultPrice;
       }
     }
@@ -347,7 +348,7 @@ export default class Web3Manager {
   }
 
   async getActiveAddress() {
-    if (DEBUG) console.log('Web3Manager: getActiveAddress');
+    logger.log('Web3Manager: getActiveAddress');
 
     if (this.activeAddress)
       return this.activeAddress;

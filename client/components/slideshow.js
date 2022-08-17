@@ -1,8 +1,9 @@
 import config from '@util/config';
+import logger from '@util/logger';
 
 export default class Slideshow {
   constructor({ parent, buttonAction }) {
-    if (DEBUG) console.log('Slideshow: constructor');
+    logger.log('Slideshow: constructor');
 
     if (parent)
       this.parent = parent;
@@ -25,7 +26,7 @@ export default class Slideshow {
   }
 
   setupDom() {
-    if (DEBUG) console.log('Slideshow: setupDom');
+    logger.log('Slideshow: setupDom');
 
     this.index = 0;
     this.slideIndex = 0;
@@ -145,7 +146,7 @@ export default class Slideshow {
   }
 
   navTemplate({ shortTitle, icon, active }) {
-    if (DEBUG) console.log('Slideshow: navTemplate');
+    logger.log('Slideshow: navTemplate');
 
     const navItem = document.createElement('div');
     navItem.classList.add('nav-item');
@@ -167,7 +168,7 @@ export default class Slideshow {
   }
 
   slideTemplate({ title, body, icon, active }) {
-    if (DEBUG) console.log('Slideshow: slideTemplate', title, body);
+    logger.log('Slideshow: slideTemplate');
 
     const slide = document.createElement('article');
     slide.classList.add('post');
@@ -201,7 +202,7 @@ export default class Slideshow {
   }
 
   setActionBarAction(action) {
-    if (DEBUG) console.log('Slideshow: setActionBarAction', action);
+    logger.log('Slideshow: setActionBarAction', action);
 
     this.actionBarAction = action;
     this.actionTextInput.value = '';
@@ -227,7 +228,7 @@ export default class Slideshow {
   }
 
   toggleActionBar() {
-    if (DEBUG) console.log('Slideshow: toggleActionBar');
+    logger.log('Slideshow: toggleActionBar');
 
     if (
       this.keyNoteWrapper.classList.contains('error') ||
@@ -245,7 +246,7 @@ export default class Slideshow {
   }
 
   setInputErrorState() {
-    if (DEBUG) console.log('Slideshow: setInputErrorState');
+    logger.log('Slideshow: setInputErrorState');
 
     this.actionTextInputWrapper.classList.add('error');
     this.keyNoteWrapper.classList.add('error');
@@ -265,7 +266,7 @@ export default class Slideshow {
   }
 
   setInputSuccessState() {
-    if (DEBUG) console.log('Slideshow: setInputSuccessState');
+    logger.log('Slideshow: setInputSuccessState');
 
     this.actionTextInputWrapper.classList.add('success');
     this.keyNoteWrapper.classList.add('success');
@@ -283,7 +284,7 @@ export default class Slideshow {
   }
 
   resetInputState() {
-    if (DEBUG) console.log('Slideshow: resetInputState');
+    logger.log('Slideshow: resetInputState');
 
     if (this.actionTextInputWrapper.classList.contains('success'))
       this.actionTextInputWrapper.classList.remove('success');
@@ -311,7 +312,7 @@ export default class Slideshow {
   }
 
   formValid() {
-    if (DEBUG) console.log('Slideshow: formValid');
+    logger.log('Slideshow: formValid');
 
     if (this.actionTextInput.value === '')
       return false;
@@ -326,7 +327,7 @@ export default class Slideshow {
   }
 
   async formAction(e) {
-    if (DEBUG) console.log('Slideshow: formAction', e, this.actionBarAction);
+    logger.log('Slideshow: formAction', e, this.actionBarAction);
 
     e.preventDefault();
 
@@ -361,13 +362,13 @@ export default class Slideshow {
   }
 
   actionTextInputChangeAction(e) {
-    if (DEBUG) console.log('Slideshow: actionTextInputChangeAction', e);
+    logger.log('Slideshow: actionTextInputChangeAction', e);
 
     this.resetInputState();
   }
 
   navAction(e) {
-    if (DEBUG) console.log('Slideshow: navAction', e);
+    logger.log('Slideshow: navAction', e);
 
     let navItem;
 
@@ -387,7 +388,7 @@ export default class Slideshow {
   }
 
   nextPrevAction(e) {
-    if (DEBUG) console.log('Slideshow: nextPrevAction', e, this.slideIndex)
+    logger.log('Slideshow: nextPrevAction', e, this.slideIndex)
 
     let navItem, currentIndex = this.slideIndex;
 
@@ -408,13 +409,13 @@ export default class Slideshow {
   }
 
   discordAction() {
-    if (DEBUG) console.log('Slideshow: discordAction');
+    logger.log('Slideshow: discordAction');
 
     window.open(config.slideshow.discordLink, '_blank').focus();
   }
 
   navigateSlideshow(toIndex) {
-    if (DEBUG) console.log('Slideshow: navigateSlideshow', toIndex);
+    logger.log('Slideshow: navigateSlideshow', toIndex);
 
     this.slides.forEach((slide, index) => {
 
@@ -449,7 +450,7 @@ export default class Slideshow {
   }
 
   setActiveSlide({ index, slide }) {
-    if (DEBUG) console.log('Slideshow: setActiveSlide');
+    logger.log('Slideshow: setActiveSlide');
 
     this.currentSlide = slide || this.slides[index];
     this.currentSlide.classList.remove('slide-not-active');
@@ -457,14 +458,14 @@ export default class Slideshow {
   }
 
   setActiveNav({ index, navItem }) {
-    if (DEBUG) console.log('Slideshow: setActiveNav');
+    logger.log('Slideshow: setActiveNav');
 
     this.currentNav = navItem || this.navItems[index];
     this.currentNav.classList.add('nav-active');
   }
 
   destroy() {
-    if (DEBUG) console.log('Slideshow: destroy');
+    logger.log('Slideshow: destroy');
 
     this.navWrapper.removeEventListener('click', this.bindNavAction);
     this.leftIcon.removeEventListener('click', this.bindNextPrevAction);

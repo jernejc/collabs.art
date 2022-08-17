@@ -2,10 +2,14 @@ import Pixel from "@models/pixel";
 
 import { getTileForPointer, getTileForXY } from "@actions/pixel";
 import { invertColor } from "@actions/general";
+
 import { stringToHex } from "@util/helpers";
+import logger from '@util/logger';
 
 export default class SelectionManager {
   constructor(game, emitter) {
+    logger.log("SelectionManager: constructor");
+
     this.game = game;
     this.emitter = emitter;
 
@@ -13,7 +17,7 @@ export default class SelectionManager {
   }
 
   highlightTile({ pointer, scene }) {
-    if (DEBUG) console.log("SelectionManager: highlightTile");
+    //logger.log("SelectionManager: highlightTile")
 
     const tile = getTileForPointer({ pointer, scene });
     const invertedColor = invertColor(tile.fillColor, true);
@@ -30,7 +34,7 @@ export default class SelectionManager {
   }
 
   repositionHighlight({ pointer, scene }) {
-    if (DEBUG) console.log("SelectionManager: repositionHighlight");
+    //logger.log("SelectionManager: repositionHighlight");
 
     const tile = getTileForPointer({ pointer, scene });
 
@@ -44,36 +48,42 @@ export default class SelectionManager {
   }
 
   async addSelected({ tiles, scene }) {
-    /*if (DEBUG)*/ console.log("SelectionManager: addSelected", tiles);
+    logger.log("SelectionManager: addSelected");
+
+    const added = [];
 
     for (let i = 0; i < tiles.length; i++) {
       const tile = tiles[i];
+      let pixel = this.isSelected(tile.cx, tile.cy);
 
-      if (this.isSelected(tile.cx, tile.cy)) continue;
+      if (!pixel) {
+        pixel = Pixel.fromTile({ tile, scene });
 
-      const pixel = Pixel.fromTile({ tile, scene });
+        const previous = this.pixels[0];
+
+        if (previous && !previous.hasChanges && this.game.mode !== 'multiselect') {
+          previous.clearActivePixel();
+          this.pixels.shift();
+        }
+
+        this.pixels.unshift(pixel);
+      }
 
       // start loading graph data, but dont wait for it
       if (tiles.length === 1) pixel.loadGraphData();
       else pixel.loadingGraph = true;
 
-      if (this.game.mode === "multiselect") this.pixels.unshift(pixel);
-      else {
-        if (this.pixels.length > 0) this.clearActiveSelection();
-
-        this.pixels = [pixel];
-      }
-
       pixel.setActivePixel();
+      added.push(pixel);
     }
 
     if (tiles.length > 1) this.updateGraphData();
 
-    this.emitter.emit("selection/update", this.pixels);
+    this.emitter.emit("selection/update", added);
   }
 
   selectRange({ startPixel, endPixel, scene }) {
-    if (DEBUG) console.log("SelectionManager: selectRange", startPixel, endPixel);
+    logger.log("SelectionManager: selectRange", startPixel, endPixel);
 
     let tiles = [],
       startX,
@@ -106,10 +116,9 @@ export default class SelectionManager {
   }
 
   removeSelected({ tile }) {
-    /*if (DEBUG)*/ console.log("SelectionManager: removeSelected");
+    logger.log("SelectionManager: removeSelected");
 
     const pixel = this.isSelected(tile.cx, tile.cy);
-    console.log('Pixel from tile', pixel);
 
     this.pixels = this.pixels.filter((p) => {
       return !(p.cx === tile.cx && p.cy === tile.cy);
@@ -122,7 +131,7 @@ export default class SelectionManager {
       this.game.tools.clearInfoBox();
     }
 
-    this.emitter.emit("selection/update", this.pixels);
+    this.emitter.emit("selection/update");
   }
 
   isSelected(cx, cy) {
@@ -133,8 +142,16 @@ export default class SelectionManager {
     return selected;
   }
 
+  removeByReference(pixel) {
+    logger.log("SelectionManager: removeByReference");
+
+    this.pixels = this.pixels.filter((p) => {
+      return !(p.cx === pixel.cx && p.cy === pixel.cy);
+    });
+  }
+
   async updateGraphData() {
-    if (DEBUG) console.log("SelectionManager: updateGraphData", this.pixels);
+    logger.log("SelectionManager: updateGraphData");
 
     const params = {
       first: this.pixels.length,
@@ -159,7 +176,7 @@ export default class SelectionManager {
   /* Rectangle drag selection */
 
   createRectangleSelection({ pointer, scene }) {
-    if (DEBUG) console.log("SelectionManager: createRectangleSelection");
+    logger.log("SelectionManager: createRectangleSelection");
 
     this.clearHighlight();
     this.clearRectangleSelection();
@@ -185,7 +202,7 @@ export default class SelectionManager {
   }
 
   resizeRectangleSelection({ pointer, scene }) {
-    if (DEBUG) console.log("SelectionManager: resizeRectangleSelection");
+    logger.log("SelectionManager: resizeRectangleSelection");
 
     const tile = getTileForPointer({ pointer, scene });
 
@@ -220,21 +237,31 @@ export default class SelectionManager {
   }
 
   clearActiveSelection() {
-    const _self = this;
-    this.pixels.forEach((pixel) => {
-      pixel.clearActivePixel();
-      pixel.resetColor();
+    logger.log("SelectionManager: clearActiveSelection");
 
-      if (pixel.infobox)
-        _self.game.tools.clearInfoBox();
+    const relevant = this.pixels.filter(pixel => {
+      return !pixel.hasChanges;
     });
 
+    relevant.forEach((pixel) => pixel.removeFromSelection());
+
+    this.pixels = this.pixels.filter(pixel => {
+      return pixel.hasChanges;
+    });
+  }
+
+  clearAllSelection() {
+    logger.log("SelectionManager: clearAllSelection");
+
+    this.pixels.forEach((pixel) => pixel.removeFromSelection());
+
     this.pixels = [];
+
     this.emitter.emit("selection/clear");
   }
 
   reset() {
-    if (DEBUG) console.log("SelectionManager: Reset");
+    logger.log("SelectionManager: Reset");
 
     this.clearHighlight();
 

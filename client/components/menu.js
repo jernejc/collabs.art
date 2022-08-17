@@ -7,19 +7,21 @@ import ColorPicker from '@components/color/picker';
 import LoadingBar from '@components/loading';
 
 import { moveToPosition } from '@actions/general';
-import { getRelativeTile, purchasePixels, colorPixels } from '@actions/pixel';
+import { getRelativeTile, colorPixels } from '@actions/pixel';
 
-import { insertAfter, formatColorNumber } from '@util/helpers';
+import { insertAfter, formatColorNumber, colorToHexString } from '@util/helpers';
+import logger from '@util/logger';
 
 export default class Menu {
   constructor({ parent, game, activeTab }) {
-    if (DEBUG) console.log('Menu: constructor', parent, game, activeTab)
+    logger.log('Menu: constructor')
 
     this.parent = parent;
     this.game = game;
     this.scene = game.scene.keys['MainScene'];
     this.lists = ['pixels', 'selection'];
     this.loaded = false;
+    this.closed = false;
 
     if (activeTab && this.lists.includes(activeTab))
       this.activeTab = activeTab;
@@ -43,7 +45,7 @@ export default class Menu {
   }
 
   async clickHandler(e) {
-    if (DEBUG) console.log('Menu: clickhandler', e);
+    logger.log('Menu: clickhandler');
 
     /* Handle clicks:
       - Close Btn
@@ -53,16 +55,17 @@ export default class Menu {
       */
 
     if (e.target.classList.contains('close')) { // Handle close button
-      this.game.selection.clearActiveSelection();
+      this.close();
       return;
     }
     else if (e.target.classList.contains('tab')) { // Handle tab click
       this.switchToTab(e.target.dataset.list, e.target);
       return;
     }
-    else if (e.target.classList.contains('settings'))
-      console.log('settings btn click')
-    else {
+    else if (e.target.classList.contains('settings')) {
+      logger.log('Menu: settings btn click')
+      return;
+    } else {
 
       let target;
 
@@ -78,9 +81,8 @@ export default class Menu {
         const cameraX = parseInt(cx - (this.scene.gridWidth / 2));
         const cameraY = parseInt(cy - (this.scene.gridHeight / 2));
 
-        moveToPosition({ scene: this.scene, x: cameraX, y: cameraY });
+        //moveToPosition({ scene: this.scene, x: cameraX, y: cameraY });
 
-        /*console.log('clickHandler this.scene', this.scene)*/
         const tile = getRelativeTile({ cx, cy, scene: this.scene, color: true });
         await this.game.selection.addSelected({ tiles: [tile], scene: this.scene });
       }
@@ -90,7 +92,7 @@ export default class Menu {
   }
 
   createTabs() {
-    if (DEBUG) console.log('createTabs', this.activeTab);
+    logger.log('Menu: createTabs');
 
     this.tabs = document.createElement('ul');
     this.tabs.classList.add('tabs');
@@ -123,7 +125,7 @@ export default class Menu {
   }
 
   createSettings() {
-    if (DEBUG) console.log('createSettings', this.activeTab)
+    logger.log('Menu: createSettings')
 
     if (!this.activeTab || !this.tabs)
       return;
@@ -162,9 +164,8 @@ export default class Menu {
   }
 
   createBatchSetting() {
-    if (DEBUG) console.log('createBatchSetting');
+    logger.log('Menu: createBatchSetting');
 
-    const _self = this;
     const pixels = this.game.selection.pixels || null;
 
     if (!pixels || pixels.length === 0)
@@ -178,69 +179,73 @@ export default class Menu {
     }
 
     const lastPixel = pixels[pixels.length - 1],
-      fullPrice = pixels.reduce((aggregator, pixel) => {
-        aggregator += Number(pixel.price);
+    fullBid = pixels.reduce((aggregator, pixel) => {
+        aggregator += pixel.bid;
         return aggregator;
       }, 0),
       batchSettings = {
         color: lastPixel.color || Phaser.Display.Color.HexStringToColor('#ffffff'),
-        price: fullPrice
+        bid: fullBid
       }
 
-    let batchUI = 'bidUI',
-      relevantPixels = [],
-      batchCountEl = document.createElement('input'),
-      batchCountElLabel = document.createElement('label');
+    let relevantPixels = [],
+      batchCountElLabel = document.createElement('div');
+      batchCountElLabel.classList.add('changes-stats')
 
-    batchCountEl.type = 'checkbox';
-    batchCountEl.disabled = true;
-    batchCountEl.checked = true;
-    batchUI = 'ownerUI';
-
-    this.settings.classList.add(batchUI);
-
-    switch (batchUI) {
-      default:
-        relevantPixels = pixels //.filter(pixel => pixel.owner === this.game.web3.activeAddress);
-
-        this.settings.colorPicker = new ColorPicker(batchSettings, 'color', {
-          scene: this.scene,
-          type: 'color',
-          //label: 'Color',
-          elClasses: ['setting'],
-          format: (value) => '#' + formatColorNumber(value),
-          validate: (value) => !isNaN(value) && value.length === 6,
-          update: (value) => {
-            relevantPixels.forEach(pixel => pixel.changeToColorNumber(value))
-
-            if (_self.settings.batchApplyBtn)
-              _self.settings.batchApplyBtn.domElement.disabled = false;
-          }
-        });
-        this.settings.append(this.settings.colorPicker.domElement);
-
-        this.settings.batchApplyBtn = new Button({
-          elClasses: ['action-button', 'action-settings'],
-          text: 'Apply',
-          disabled: true,
-          clickAction: async e => {
-            await colorPixels({ scene: this.scene, selection: this.game.selection.pixels })
-          }
-        });
-        this.settings.append(this.settings.batchApplyBtn.domElement);
-
-        break;
-    }
-
-    if (DEBUG) console.log('Menu: relevantPixels', relevantPixels)
-    batchCountElLabel.textContent = relevantPixels.length;
+    relevantPixels = pixels //.filter(pixel => pixel.owner === this.game.web3.activeAddress);
+    batchCountElLabel.innerHTML = `<span>${fullBid} $COLAB</span> <i class="gg-arrows-exchange"></i> ${relevantPixels.length} ${(relevantPixels.length > 1) ? 'changes' : 'change'}`;
 
     this.settings.append(batchCountElLabel);
-    this.settings.append(batchCountEl);
+
+    /*this.settings.colorPicker = new ColorPicker(batchSettings, 'color', {
+      scene: this.scene,
+      type: 'color',
+      //label: 'Color',
+      elClasses: ['setting'],
+      format: (value) => '#' + formatColorNumber(value),
+      validate: (value) => !isNaN(value) && value.length === 6,
+      update: (value) => {
+        relevantPixels.forEach(pixel => pixel.changeToColorNumber(value))
+
+        if (_self.settings.batchApplyBtn)
+          _self.settings.batchApplyBtn.domElement.disabled = false;
+      }
+    });
+    this.settings.append(this.settings.colorPicker.domElement);*/
+
+    this.settings.batchApplyBtn = new Button({
+      elClasses: ['action-button', 'action-settings'],
+      text: 'Apply',
+      //icon: 'gg-check-r',
+      clickAction: async e => {
+        await colorPixels({ scene: this.scene, selection: this.game.selection.pixels })
+      }
+    });
+
+    this.settings.append(this.settings.batchApplyBtn.domElement);
+  }
+
+  close() {
+    if (!this.domElement.classList.contains('closed'))
+      this.domElement.classList.add('closed')
+
+    this.closed = true;
+    this.game.tools.updateActiveChangesCount();
+  }
+
+  open() {
+    this.loadPixels();
+    this.createSettings();
+
+    if (this.domElement.classList.contains('closed'))
+      this.domElement.classList.remove('closed')
+
+    this.closed = false;
+    this.game.tools.updateActiveChangesCount();
   }
 
   async loadPixels() {
-    if (DEBUG) console.log('Menu loadPixels', this.game.selection, this.activeTab);
+    logger.log('Menu loadPixels');
 
     if (this.menuList)
       this.resetList();
@@ -268,6 +273,15 @@ export default class Menu {
     this.createList(pixels);
   }
 
+  /*refreshList() {
+    logger.log('Menu: refreshList', this.game.selection.pixels);
+
+    if (this.menuList)
+      this.resetList();
+
+    this.createList(this.game.selection.pixels);
+  }*/
+
   createList(pixels) {
     this.menuList = document.createElement('ul');
     this.menuList.classList.add('list');
@@ -288,7 +302,7 @@ export default class Menu {
   }
 
   switchToTab(tab) {
-    if (DEBUG) console.log('switchToTab', tab);
+    logger.log('Menu: switchToTab', tab);
 
     this.tabs.querySelector('.active').classList.remove('active');
     this.tabs.querySelector(`li[data-list="${tab}"]`).classList.add('active');
@@ -306,7 +320,14 @@ export default class Menu {
     item.dataset.cx = pixel.cx;
     item.dataset.cy = pixel.cy;
 
-    item.innerHTML = `
+    if (pixel.originalColor) {
+      item.innerHTML = `
+        <span class="color" style="background: ${colorToHexString(pixel.originalColor)}"></span>
+        <i class="gg-chevron-right"></i>
+      `
+    }
+
+    item.innerHTML += `
       <span class="color" style="background: #${pixel.HEXcolor}"></span>
       <span class="text">${pixel.position}</span>
       <i class="gg-track location" />
