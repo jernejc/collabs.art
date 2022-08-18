@@ -348,7 +348,8 @@ export default class ToolsManager {
     });
 
     this.domBottomNav.append(this.bottomNavClearSelection.domElement);
-    this.domBottomNav.append(new Input(this.search, 'text', {
+
+    this.bottomNavInput = new Input(this.search, 'text', {
       scene: this.game.scene,
       type: 'text',
       placeholder: 'Find pixel.. (eg. RK438)',
@@ -358,9 +359,10 @@ export default class ToolsManager {
           //await this.menu.loadPixels();
         }
       }
-    }));
+    });
 
-    this.parent.append(this.domBottomNav.domElement); 
+    this.domBottomNav.append(this.bottomNavInput.domElement);
+    this.parent.append(this.domBottomNav); 
   }
 
   addHeader() {

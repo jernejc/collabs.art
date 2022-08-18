@@ -69,18 +69,18 @@ input {
 }
 
 #header button {
-  background: none;
+  background: var(--header-white);
   border: none;
-  color: white;
-  display: block;
+  color: var(--active-black);
+  display: flex;
   width: 50px;
   height: 50px;
-  border-right: 1px solid rgba(255, 255, 255, 0.3);
+  justify-content: center;
+  align-items: center;
 }
 
 #header i {
   --ggs: 1.5;
-  margin: auto;
 }
 
 #header button i {
@@ -570,11 +570,15 @@ input {
   position: absolute;
   background: var(--active-black);
   width: 350px;
-  height: 230px;
+  height: 260px;
   padding: 25px;
   right: 0;
   top: 50px;
   font-size: 0.95em;
+}
+
+#connection-status .colab-info h3 {
+  font-weight: normal;
 }
 
 #connection-status .colab-info .social-connect {
@@ -608,6 +612,23 @@ input {
   background: #5c6bc0;
 }
 
+#connection-status .colab-info .credit-token {
+  color: var(--header-white);
+  border: 1px solid var(--light-green-color); /* #c3a428;*/
+  height: 43px;
+  width: 100%;
+  margin: 12px 0px 0px;
+  background-color: rgba(43, 135, 28, 0.5) /*rgba(195, 164, 40, 0.6);*/
+}
+
+#connection-status .colab-info .credit-token i {
+  margin: auto 13px auto 10px;
+}
+
+#connection-status .colab-info .credit-token:hover {
+  background: var(--light-green-color);
+}
+
 #connection-status .colab-info .social-connect img {
   width: 30px;
   margin-right: 15px;
@@ -617,28 +638,36 @@ input {
 #connection-status .colab-info .colab-calc {
   display: inline-flex;
   align-items: center;
+  font-size: 1.6em;
 }
 
 #connection-status .colab-info .colab-calc {
-  font-size: 1.7em;
+  font-size: 1.2em;
 }
 
 #connection-status .colab-info .colab-calc i {
   margin: 0px 10px;
 }
 
+#connection-status .colab-info .input label {
+  margin-left: 7px;
+}
+
 #connection-status .colab-info .input input {
-  width: 65px;
-  font-size: 1.7em;
+  width: 2.9em;
+  font-size: 1em;
+  outline: 1px solid;
+  padding: 0px 0px 0px 7px;
 }
 
 #connection-status .colab-info .input input:focus-visible {
-  outline: none;
+  outline-color: var(--activebid-color);
 }
 
-#connection-status .colab-info input[type=number]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
+#connection-status .colab-info .input input[type=number]::-webkit-inner-spin-button {
+  opacity: 1;
 }
+
 
 /***
   Alert
@@ -651,7 +680,6 @@ input {
   line-height: 50px;
   transition: 200ms;
   z-index: 1;
-  border-right: 1px solid #FFF;
   display: flex;
   align-items: center;
   cursor: pointer;

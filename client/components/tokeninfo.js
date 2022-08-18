@@ -19,7 +19,7 @@ export default class TokenInfo {
 
     this.domElement = document.createElement('div');
     this.domElement.classList.add('colab-info');
-    this.domElement.innerHTML = '$COLAB token is used to draw on the canvas, you can get it <b>FREE mint</b>, by connecting your Twitter account or come say hi on our Discord channel.';
+    this.domElement.innerHTML = '$COLAB token is used to draw on the canvas, you can get it <b>FREE mint</b>, by connecting your Twitter account and come say hi on our Discord channel.';
 
     this.twitterButton = new Button({
       icon: 'twitter-logo.png',
@@ -33,37 +33,47 @@ export default class TokenInfo {
       icon: 'discord-icon.png',
       text: 'Say "hi"',
       elClasses: ['action-button', 'social-connect', 'discord']
-    })
+    });
 
     this.domElement.append(this.discordButton.domElement);
 
     this.supportForm = {
-      value: 0.15
+      value: 0.2
     }
 
     this.supportHeader = document.createElement('h3');
-    this.supportHeader.textContent = 'Support the project';
+    this.supportHeader.textContent = 'or Support the project: ';
 
     this.domElement.append(this.supportHeader);
 
     this.supportInput = new Input(this.supportForm, 'value', {
       elClasses: ['input'],
       type: 'number',
-      step: 0.15,
-      min: 0.15,
-      onChange: async (value) => {
+      step: 0.2,
+      min: 0.2,
+      max: 9999,
+      label: 'ETH',
+      dynamicWidth: true,
+      decimals: 1,
+      onChange: async () => {
         _self.refreshTokenCalc()
-      },
-      format: (value) => {
-        return parseFloat(value).toFixed(2);
       }
     });
+
     this.domElement.append(this.supportInput.domElement);
 
     this.tokenCalc = document.createElement('div');
     this.tokenCalc.classList.add('colab-calc');
-
     this.domElement.append(this.tokenCalc);
+
+    this.creditButton = new Button({
+      icon: 'gg-arrows-exchange-alt',
+      text: 'Exchange',
+      elClasses: ['action-button', 'credit-token'],
+    });
+
+    this.domElement.append(this.creditButton.domElement);
+
     this.parent.append(this.domElement);
     
     this.refreshTokenCalc();
@@ -71,7 +81,7 @@ export default class TokenInfo {
 
   refreshTokenCalc() {
     //console.log('refreshTokenCalc', this.supportInput.input.value, this.supportForm.value)
-    this.tokenCalc.innerHTML = `ETH <i class="gg-arrows-exchange"></i> ${parseInt(this.supportInput.input.value * 500)} $COLAB`;
+    this.tokenCalc.innerHTML = `<i class="gg-arrows-exchange-alt"></i> ${parseInt(this.supportInput.input.value * 500)} $COLAB`;
   }
 
   destroy() {

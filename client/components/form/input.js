@@ -28,8 +28,10 @@ export default class Input extends Controller {
       this.domElement.append(this.border);
     }
 
-    if (params.step)
+    if (params.step) {
+      this.originalStep = params.step;
       this.input.setAttribute('step', params.step);
+    }
     if (params.max) {
       if (params.type === 'text')
         this.input.setAttribute('maxlength', params.max);
@@ -42,20 +44,42 @@ export default class Input extends Controller {
     if (params.lang)
       this.input.setAttribute('lang', params.lang);
 
+    if (params.decimals) {
+      this.originalDecimals = params.decimals;
+      this.decimals = params.decimals;
+    }
     if (params.disabled)
       this.input.disabled = true;
     if (params.blur)
       this.input.addEventListener('blur', params.blur)
     if (params.focus)
       this.input.addEventListener('focus', params.focus);
+    if (params.dynamicWidth)
+      this.dynamicWidth = true;
+    if (params.onChange)
+      this.onChange = params.onChange;
 
-    this.input.addEventListener('input', onChange);
-    //this.input.addEventListener('keydown', onChange);
+    this.input.addEventListener('change', onChange);
+    this.input.addEventListener('keydown', onKeyDown);
+
+    if (this.label) {
+      this.labelElement = document.createElement('label');
+      this.labelElement.textContent = this.label;
+      this.domElement.append(this.labelElement);
+    }
 
     async function onChange() {
-      logger.log('onChange', self.input.value);
+      logger.log('Input: onChange', self.input.value);
 
-      //const format = self.input.value.replace('#', '');
+      if (self.decimals && self.input.value >= 100) {
+        self.decimals = 0;
+        self.input.setAttribute('step', 1);
+      } else if (!self.decimals && self.input.value < 100) {
+        self.decimals = self.originalDecimals;
+        self.step = self.originalStep;
+        self.input.setAttribute('step', self.step);
+      }
+
       let valid = true;
 
       if (self.validate)
@@ -64,11 +88,35 @@ export default class Input extends Controller {
       if (valid)
         self.setValue(self.input.value);
 
-      self.input.size = self.input.value.length
+      if (self.onChange)
+        await self.onChange(self.getValue());
 
-      if (params.onChange)
-        await params.onChange(self.getValue());
+      self.setNewInputWith();
     }
+
+    function onKeyDown() {
+      logger.log('Input: onKeyDown', self.input.value.toString().length);
+
+      self.setNewInputWith();
+    }
+
+    self.setNewInputWith();
+  }
+
+  setNewInputWith() {
+    logger.log('Input: setNewInputWith', this.input.value.length);
+
+    if (!this.dynamicWidth)
+      return;
+
+    let newWidth = parseFloat(this.input.value.toString().length * 0.73).toFixed(1);
+
+    if (newWidth < 2.5)
+      newWidth = 2.5;
+    else if (newWidth > 3.7)
+      newWidth = 3.7;
+
+    this.input.style.width = `${newWidth}em`;
   }
 
   updateDisplay() {
@@ -76,6 +124,8 @@ export default class Input extends Controller {
 
     if (this.format)
       value = this.format(value);
+    else if (this.decimals > 0)
+      value = parseFloat(value).toFixed(this.decimals);
 
     this.input.value = value;
 

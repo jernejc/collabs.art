@@ -30,12 +30,6 @@ export default class Controller {
       this.domElement.style.width = this.width;
     if (params.elClasses)
       this.domElement.classList.add(...params.elClasses);
-
-    if (this.label) {
-      this.labelElement = document.createElement('label');
-      this.labelElement.textContent = this.label;
-      this.domElement.append(this.labelElement)
-    }
   }
 
   getValue() {
