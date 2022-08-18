@@ -49,17 +49,10 @@ export default class Input extends Controller {
     if (params.focus)
       this.input.addEventListener('focus', params.focus);
 
-    this.input.addEventListener('change', onChange);
-    this.input.addEventListener('keydown', async e => {
-      onChange();
+    this.input.addEventListener('input', onChange);
+    //this.input.addEventListener('keydown', onChange);
 
-      if (params.onChange)
-        await params.onChange()
-    });
-
-    return this.domElement;
-
-    function onChange() {
+    async function onChange() {
       logger.log('onChange', self.input.value);
 
       //const format = self.input.value.replace('#', '');
@@ -70,6 +63,11 @@ export default class Input extends Controller {
 
       if (valid)
         self.setValue(self.input.value);
+
+      self.input.size = self.input.value.length
+
+      if (params.onChange)
+        await params.onChange(self.getValue());
     }
   }
 
@@ -82,5 +80,9 @@ export default class Input extends Controller {
     this.input.value = value;
 
     return super.updateDisplay();
+  }
+
+  destroy() {
+    logger.log('Input: destroy');
   }
 }

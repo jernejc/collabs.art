@@ -355,12 +355,12 @@ export default class ToolsManager {
       max: 6,
       onChange: async () => {
         if (this.menu && this.menu.loaded) {
-          //await this.menu.loadPixels()
+          //await this.menu.loadPixels();
         }
       }
     }));
 
-    this.parent.append(this.domBottomNav);
+    this.parent.append(this.domBottomNav.domElement); 
   }
 
   addHeader() {

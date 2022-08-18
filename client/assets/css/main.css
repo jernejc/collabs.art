@@ -613,6 +613,33 @@ input {
   margin-right: 15px;
 }
 
+#connection-status .colab-info .input,
+#connection-status .colab-info .colab-calc {
+  display: inline-flex;
+  align-items: center;
+}
+
+#connection-status .colab-info .colab-calc {
+  font-size: 1.7em;
+}
+
+#connection-status .colab-info .colab-calc i {
+  margin: 0px 10px;
+}
+
+#connection-status .colab-info .input input {
+  width: 65px;
+  font-size: 1.7em;
+}
+
+#connection-status .colab-info .input input:focus-visible {
+  outline: none;
+}
+
+#connection-status .colab-info input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
 /***
   Alert
 ***/
