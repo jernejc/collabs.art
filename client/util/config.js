@@ -21,7 +21,7 @@ const config = {
   networks: [{
     id: 80001,
     enabled: true,
-    default: true,
+    default: false,
     chainId: Web3.utils.toHex('80001'),
     chainName: 'Polygon Testnet',
     nativeCurrency: {
@@ -29,9 +29,37 @@ const config = {
       name: 'COLAB token',
       decimals: 18,
     },
-    wsUrls: ['wss://ws-nd-903-651-087.p2pify.com/a8f3fb78161994322c1e6d30d8a9dd15'],
+    wsUrls: [],
     rpcUrls: ['https://rpc-mumbai.maticvigil.com/'],
     blockExplorerUrls: ['https://mumbai.polygonscan.com/'],
+  }, {
+    id: 5,
+    enabled: true,
+    default: false,
+    chainId: Web3.utils.toHex('5'),
+    chainName: 'Goerli Test Network',
+    nativeCurrency: {
+      symbol: 'ETH',
+      name: 'Ethereum',
+      decimals: 18,
+    },
+    wsUrls: [dappConfig.wsUrl],
+    rpcUrls: [dappConfig.httpUrl],
+    blockExplorerUrls: ['https://goerli.etherscan.io'],
+  }, {
+    id: 5777,
+    enabled: true,
+    default: true,
+    chainId: Web3.utils.toHex('5777'),
+    chainName: 'Development Test Network',
+    nativeCurrency: {
+      symbol: 'ETH',
+      name: 'Ethereum',
+      decimals: 18,
+    },
+    wsUrls: [],
+    rpcUrls: ['http://127.0.0.1:7545'],
+    blockExplorerUrls: ['https://goerli.etherscan.io'],
   }, {
     id: 137,
     name: 'Polygon Mainnet',

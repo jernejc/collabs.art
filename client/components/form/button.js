@@ -50,15 +50,29 @@ export default class Button {
     if (this.icon) {
       this.setIcon(this.icon)
       return;
+    } else {
+      if (!this.domElement.classList.contains('info-text'))
+        this.domElement.classList.add('info-text');
     }
 
     this.domElement.textContent = this.text;
   }
 
-  setIcon(icon, alertAction) {
+  clearIcon() {
     if (this.icon)
       this.domElement.classList.remove(this.icon.replace('gg-', ''));
-      
+
+    this.domElement.innerHTML = '';
+    this.icon = null;
+  }
+
+  setIcon(icon, alertAction) {
+    if (this.domElement.classList.contains('info-text'))
+        this.domElement.classList.remove('info-text');
+
+    if (this.icon)
+      this.domElement.classList.remove(this.icon.replace('gg-', ''));
+
     this.icon = icon || this.icon;
 
     if (this.icon.search('gg-') > -1) {
@@ -79,7 +93,13 @@ export default class Button {
       this.domElement.innerHTML += this.text;
     }
 
-    this.domElement.classList.add(this.icon.replace('gg-', ''));
+    const dotIndex = this.icon.indexOf('.');
+    let className = this.icon.replace('gg-', '');
+
+    if (dotIndex > -1)
+      className = className.slice(0, dotIndex);
+
+    this.domElement.classList.add(className);
 
     if (alertAction) {
       this.alertIcon = document.createElement('i');

@@ -22,7 +22,11 @@ const HDWalletProvider = require('@truffle/hdwallet-provider');
 
 const fs = require('fs');
 const private_key = fs.readFileSync('.secret').toString().trim();
-const mumbaiURL = 'https://matic-mumbai.chainstacklabs.com';
+const goerliURL = fs.readFileSync('.rpc').toString().trim();
+const goerliWSS = fs.readFileSync('.wss').toString().trim();
+
+console.log('goerliURL', goerliURL);
+console.log('goerliWSS', goerliWSS);
 
 module.exports = {
   /**
@@ -50,9 +54,7 @@ module.exports = {
       network_id: '*',       // Any network (default: none)
     },
 
-    matic: {
-      url: mumbaiURL,
-      websocket: 'wss://ws-matic-mumbai.chainstacklabs.com',
+    /*matic: {
       provider: () => new HDWalletProvider({
         privateKeys: [private_key],
         numberOfAddresses: 1,
@@ -63,6 +65,20 @@ module.exports = {
       confirmations: 2,
       timeoutBlocks: 200,
       skipDryRun: true
+    },*/
+    
+    'goerli': {
+      websocket: goerliWSS,
+      url: goerliURL,
+      provider: () => new HDWalletProvider({
+        privateKeys: [private_key],
+        numberOfAddresses: 1,
+        addressIndex: 0, 
+        providerOrUrl: goerliURL 
+      }),
+      network_id: 5,
+      confirmations: 2,
+      timeoutBlocks: 200
     }
 
     // Another network with more advanced options...

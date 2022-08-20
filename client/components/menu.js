@@ -193,7 +193,7 @@ export default class Menu {
       batchCountElLabel.classList.add('changes-stats')
 
     relevantPixels = pixels //.filter(pixel => pixel.owner === this.game.web3.activeAddress);
-    batchCountElLabel.innerHTML = `<span>${fullBid} $COLAB</span> <i class="gg-arrows-exchange"></i> ${relevantPixels.length} ${(relevantPixels.length > 1) ? 'changes' : 'change'}`;
+    batchCountElLabel.innerHTML = `<span>${fullBid} $COLAB</span> ( ${relevantPixels.length} modified )`; /*${(relevantPixels.length > 1) ? 'changes' : 'change'}*/
 
     this.settings.append(batchCountElLabel);
 
@@ -218,6 +218,13 @@ export default class Menu {
       text: 'Apply',
       //icon: 'gg-check-r',
       clickAction: async e => {
+        console.log('batch apply clickAction');
+
+        if (fullBid > this.game.web3.walletBalance) {
+          this.game.tools.showTokenInfo();
+          return;
+        }
+
         await colorPixels({ scene: this.scene, selection: this.game.selection.pixels })
       }
     });

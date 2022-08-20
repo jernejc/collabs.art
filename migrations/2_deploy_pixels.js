@@ -11,12 +11,13 @@ const PixelsToken = artifacts.require("PixelsToken");
 module.exports = async (deployer, network) => {
 
   console.log("Deploying Pixels on network " + network);
-  const httpUrl = deployer.networks[network].url;
+  const networkName = network.replace('-fork', '');
+  const httpUrl = deployer.networks[networkName].url;
 
   if (!httpUrl)
     throw new Error('No network URL found.');
 
-  const wsUrl = deployer.networks[network].websocket || null;
+  const wsUrl = deployer.networks[networkName].websocket || null;
   const maxPixels = 1000000;
   const conversionRate = 500;
   const developmentRate = 10000000;

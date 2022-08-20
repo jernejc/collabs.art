@@ -1,13 +1,18 @@
 import logger from "@util/logger";
+
+import { creditToken } from "@actions/general"
+
 import Button from "./form/button";
 import Input from "./form/input";
 
 export default class TokenInfo {
 
-  constructor({ parent }) {
-    logger.log('TokenInfo: constructor');
+  constructor({ scene, parent, closed }) {
+    logger.log('TokenInfo: constructor', scene);
 
+    this.scene = scene;
     this.parent = parent;
+    this.closed = closed || false;
 
     this.setupDom();
   }
@@ -18,7 +23,7 @@ export default class TokenInfo {
     const _self = this;
 
     this.domElement = document.createElement('div');
-    this.domElement.classList.add('colab-info');
+    this.domElement.classList.add('info', 'colab-info');
     this.domElement.innerHTML = '$COLAB token is used to draw on the canvas, you can get it <b>FREE mint</b>, by connecting your Twitter account and come say hi on our Discord channel.';
 
     this.twitterButton = new Button({
@@ -28,7 +33,7 @@ export default class TokenInfo {
     })
 
     this.domElement.append(this.twitterButton.domElement)
-    
+
     this.discordButton = new Button({
       icon: 'discord-icon.png',
       text: 'Say "hi"',
@@ -70,22 +75,56 @@ export default class TokenInfo {
       icon: 'gg-arrows-exchange-alt',
       text: 'Exchange',
       elClasses: ['action-button', 'credit-token'],
+      clickAction: async () => {
+        console.log('clickAction', this.supportInput.input.value, this.scene);
+        await creditToken({ scene: this.scene, value: this.supportInput.input.value})
+      }
     });
 
     this.domElement.append(this.creditButton.domElement);
 
+    this.closeBtn = document.createElement('i');
+    this.closeBtn.classList.add('gg-close-r');
+    this.domElement.append(this.closeBtn);
+
+    this.closeListener = this.close.bind(this);
+    this.closeBtn.addEventListener('click', this.closeListener);
+
     this.parent.append(this.domElement);
-    
+
     this.refreshTokenCalc();
   }
 
   refreshTokenCalc() {
-    //console.log('refreshTokenCalc', this.supportInput.input.value, this.supportForm.value)
+    //console.log('refreshTokenCalc', this.supportInput.input.value, this.supportForm.value);
     this.tokenCalc.innerHTML = `<i class="gg-arrows-exchange-alt"></i> ${parseInt(this.supportInput.input.value * 500)} $COLAB`;
+  }
+
+  close() {
+    logger.log('TokenInfo: close')
+
+    if (!this.domElement.classList.contains('hidden'))
+      this.domElement.classList.add('hidden');
+
+    this.closed = true;
+  }
+
+  open() {
+    logger.log('TokenInfo: open')
+
+    if (this.domElement.classList.contains('hidden'))
+      this.domElement.classList.remove('hidden');
+
+    this.closed = false;
   }
 
   destroy() {
     logger.log('TokenInfo: destroy');
+
+    if (this.closeBtn) {
+      this.closeBtn.removeEventListener('click', this.closeListener);
+      this.closeBtn = null;
+    }
 
     this.parent.removeChild(this.domElement);
   }

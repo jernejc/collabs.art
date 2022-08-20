@@ -40,14 +40,14 @@ contract PixelsToken is ERC20, AccessControl {
     }
 
     /**
-     * @dev credit $PXT token for native token
+     * @dev credit $COLAB token for native token
      */
     function credit() public payable {
         uint256 tokensAmount = msg.value * _conversionRate;
 
         require(
             tokensAmount > 1 * 10**uint256(decimals()),
-            "PixelsToken: You must credit at least one $PXT"
+            "PixelsToken: You must credit at least one $COLAB"
         );
 
         _mint(_msgSender(), tokensAmount);

@@ -5,13 +5,13 @@ import InfoBox from '@components/infobox';
 import Menu from '@components/menu';
 import Overlay from '@components/overlay';
 import Timer from '@components/timer';
-
 import Button from '@components/form/button';
 import Input from '@components/form/input';
+import TokenInfo from '@components/tokeninfo';
+import AuctionInfo from '@components/auctioninfo';
 
 import { formatShortAddress } from '@util/helpers';
 import logger from '@util/logger';
-import TokenInfo from '@components/tokeninfo';
 
 export default class ToolsManager {
 
@@ -184,6 +184,16 @@ export default class ToolsManager {
     this.overlay = new Overlay({ parent: this.parent, game: this.game, close: this.clearOverlay.bind(this) });
   }
 
+  showTokenInfo() {
+    if (this.domTokenInfo.closed)
+      this.domTokenInfo.open()
+  }
+
+  hideTokenInfo() {
+    if (!this.domTokenInfo.closed)
+      this.domTokenInfo.close()
+  }
+
   updateActiveChangesCount() {
     logger.log(`ToolsManager: updateActiveChangesCount`);
 
@@ -242,19 +252,23 @@ export default class ToolsManager {
   }
 
   setConnectionStatus() {
-    logger.log('ToolsManager: setConnectionStatus');
+    logger.log('ToolsManager: setConnectionStatus', this.game.web3.currentStateTag);
 
+    let iconText = '';
     let iconClass = null;
     let action = null;
     let alertIcon = true;
 
+    if (this.connectionStatusBtn.domElement.classList.contains('info-text-gray'))
+      this.connectionStatusBtn.domElement.classList.remove('info-text-gray');
+
     switch (this.game.web3.currentStateTag) {
       case 'metamask':
-        iconClass = 'metamask-white';
+        iconClass = 'metamask-white.png';
         action = this.game.web3.onboarding.startOnboarding;
         break;
       case 'network':
-        iconClass = 'polygon';
+        iconClass = 'polygon.svg';
         action = this.game.web3.switchToNetwork.bind(this.game.web3);
         break;
       case 'wallet':
@@ -263,8 +277,19 @@ export default class ToolsManager {
         break;
       case 'address':
         alertIcon = false;
-        iconClass = 'gg-user';
+        iconText = `${this.game.web3.walletBalance} $COLAB`;
+        action = this.domTokenInfo.open.bind(this.domTokenInfo);
         break;
+    }
+
+    if (iconText) {
+      this.connectionStatusBtn.clearIcon();
+      this.connectionStatusBtn.setText(iconText);
+
+      if (this.game.web3.walletBalance == 0) {
+        if (!this.connectionStatusBtn.domElement.classList.contains('info-text-gray'))
+          this.connectionStatusBtn.domElement.classList.add('info-text-gray');
+      }
     }
 
     if (iconClass)
@@ -362,7 +387,7 @@ export default class ToolsManager {
     });
 
     this.domBottomNav.append(this.bottomNavInput.domElement);
-    this.parent.append(this.domBottomNav); 
+    this.parent.append(this.domBottomNav);
   }
 
   addHeader() {
@@ -377,7 +402,10 @@ export default class ToolsManager {
     });
     this.header.append(this.headerIcon.domElement);
 
-    this.headerTimer = new Timer({ parent: this.header, game: this.game })
+    this.headerTimer = new Timer({ parent: this.header, game: this.game });
+
+    this.domAuctionInfo = new AuctionInfo({ parent: this.header });
+
     this.parent.append(this.header);
   }
 
@@ -394,7 +422,7 @@ export default class ToolsManager {
 
     this.domConnectionStatus.append(this.connectionStatusBtn.domElement);
 
-    this.domTokenInfo = new TokenInfo({ parent: this.domConnectionStatus });
+    this.domTokenInfo = new TokenInfo({ scene: this.game.scene.keys['MainScene'], parent: this.domConnectionStatus });
 
     this.parent.append(this.domConnectionStatus);
 

@@ -1,5 +1,6 @@
 
 import _ from 'lodash';
+import Web3 from 'web3';
 
 import { getTileForPointer } from '@actions/pixel';
 import { formatColorNumber } from '@util/helpers';
@@ -178,6 +179,29 @@ export function handleSpaceUp({ scene }) {
     handleSpaceDown({ scene });
   });
 }
+
+export async function creditToken({ scene, value }) {
+  logger.log('Action: creditToken', value)
+
+  if (!scene.game.web3.activeAddress)
+    await scene.game.web3.getActiveAddress();
+
+  if (!scene.game.web3.activeAddress)
+    return false;
+
+  try {
+    await scene.game.web3.tokenContract.methods.credit().send({
+      from: scene.game.web3.activeAddress,
+      value: Web3.utils.toWei(value)
+    });
+  } catch (error) {
+    logger.error('Action creditToken: ', error);
+    return;
+  }
+
+  scene.game.web3.walletBalance += value;
+}
+
 
 export function navigateMinimap({ pointer, scene }) {
   //logger.log('User interactions: navigateMinimap', pointer, scene);

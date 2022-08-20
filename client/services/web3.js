@@ -125,9 +125,9 @@ export default class Web3Manager {
     this.handleAccountsChangedListener = accounts => _self.handleAccountsChanged(accounts);
 
     // Provider events
+    this.RPCinstance.currentProvider.on('accountsChanged', this.handleAccountsChangedListener);
     this.RPCinstance.currentProvider.on('chainChanged', this.handleNewChainListener);
     this.RPCinstance.currentProvider.on('networkChanged', this.handleNewNetworkListener);
-    this.RPCinstance.currentProvider.on('accountsChanged', this.handleAccountsChangedListener);
     //this.RPCinstance.currentProvider.on('message', msg => _self.handleProviderMessage(msg));
   }
 
@@ -175,7 +175,7 @@ export default class Web3Manager {
       this.chainId = chainId;
   }
 
-  handleNewNetwork(networkId) {
+  async handleNewNetwork(networkId) {
     logger.log('Web3Manager: handleNewNetwork', networkId);
 
     const supported = config.networks.find(net => net.id == networkId && net.enabled === true);
@@ -191,19 +191,22 @@ export default class Web3Manager {
     if (this.network) {
       this.connectWebsocket();
       this.initContracts();
-      this.getDefaultPrice();
+      await this.getDefaultPrice();
+      //await this.getWalletBalance();
       this.enableContractEvents();
     }
 
     this.emitter.emit('web3/network', this.network);
   }
 
-  handleAccountsChanged(accounts) {
+  async handleAccountsChanged(accounts) {
     logger.log('Web3Manager: handleAccountsChanged', accounts);
 
     if (accounts.length > 0) {
       this.accounts = accounts;
       this.activeAddress = accounts[0];
+
+      await this.getWalletBalance();
 
       if (this.onboarding)
         this.onboarding.stopOnboarding();
@@ -263,7 +266,7 @@ export default class Web3Manager {
       method: 'eth_requestAccounts',
     });
 
-    this.handleAccountsChanged(accounts);
+    await this.handleAccountsChanged(accounts);
 
     return;
   }
@@ -298,7 +301,7 @@ export default class Web3Manager {
   async switchToNetwork(chainId) {
     logger.log('Web3Manager: switchToNetwork', chainId);
 
-    chainId = chainId || Web3.utils.toHex('80001') // Default to  Polygon testnet
+    chainId = chainId || Web3.utils.toHex('5777') // Default to Development testnet
 
     const networkConfig = config.networks.find(net => net.chainId === chainId && net.enabled === true);
 
@@ -311,10 +314,8 @@ export default class Web3Manager {
         params: [{ chainId: chainId }]
       });
 
-      /*await setTimeout(() => { }, 2000);
-
       if (!this.game.web3.activeAddress)
-        await this.getActiveAddress();*/
+        await this.getActiveAddress();
     } catch (error) {
       if (error.code === 4902) { // Network was not found in Metamask
         logger.warn('Network not found in Metamask, adding new config.')
@@ -345,6 +346,31 @@ export default class Web3Manager {
     }
 
     return this.defaultPrice;
+  }
+
+  async getWalletBalance() {
+    logger.log('Web3Manager: getWalletBalance');
+
+    let balance;
+
+    try {
+      balance = await this.tokenContract.methods.balanceOf(this.activeAddress).call();
+      console.log('RPC balance', balance)
+      this.walletBalance = Web3.utils.fromWei(balance);
+    } catch (error) {
+      logger.error('Failed to fetch RPC balance', error);
+
+      try {
+        balance = await this.eventTokenContract.methods.balanceOf(this.activeAddress).call();
+        console.log('WSS balance', balance)
+        this.walletBalance = Web3.utils.fromWei(balance);
+      } catch (error) {
+        logger.error('Failed to fetch WS balance', error);
+        this.walletBalance = 0;
+      }
+    }
+
+    return this.walletBalance;
   }
 
   async getActiveAddress() {

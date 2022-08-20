@@ -13,8 +13,8 @@
   --active-black: rgb(24, 26, 27);
   --header-white: rgba(255, 255, 255, 0.8);
   --edge-margin: 8px;
-  --bottom-bar-width: 275px;
-  --bottom-bar-height: 250px;
+  --bottom-bar-width: 295px;
+  --bottom-bar-height: 260px;
   --bottom-bar-tabs-height: 38px;
   --bottom-bar-settings-height: 36px;
 }
@@ -60,6 +60,43 @@ input {
   z-index: 1;
 }
 
+/**
+*   Top info
+**/
+
+.info {
+  position: absolute;
+  width: 350px;
+  height: 140px;
+  background: var(--active-black);
+  top: 50px;
+  padding: 20px;
+  font-size: 0.95em;
+}
+
+.info .gg-close-r {
+  position: absolute;
+  top: -10px;
+  left: -8px;
+  color: #FFF;
+  background: var(--active-black);
+  cursor: pointer;
+  opacity: 0.9;
+  transition: 0.1s opacity;
+}
+
+.info a {
+  color: var(--light-green-color);
+}
+
+.info.hidden {
+  display: none;
+}
+
+/**
+*   Header
+**/
+
 #header {
   background: var(--active-black);
   left: var(--edge-margin);
@@ -69,7 +106,7 @@ input {
 }
 
 #header button {
-  background: var(--header-white);
+  background: buttonface;
   border: none;
   color: var(--active-black);
   display: flex;
@@ -79,17 +116,28 @@ input {
   align-items: center;
 }
 
-#header i {
-  --ggs: 1.5;
-}
-
-#header button i {
-  --ggs: 1.2;
-}
-
 #header .timer {
   margin: 5px 17px;
   font-size: 1.12em;
+}
+
+#header .auction-info {
+  height: 140px;
+}
+
+#header .auction-info .gg-close-r {
+  left: auto;
+  right: -8px;
+}
+
+#header .auction-info button {
+  width: 100%;
+  margin-top: 20px;
+}
+
+#header .auction-info button i {
+  margin: 0 15px 0 0;
+  --ggs: 1;
 }
 
 #inspired-by {
@@ -414,6 +462,7 @@ input {
   color: var(--header-white);
   font-size: 1.1em;
   padding: 4px 6px;
+  margin-right: 6px;
 }
 
 #menu-item ul.list {
@@ -549,6 +598,20 @@ input {
   color: var(--light-green-color);
 }
 
+#connection-status button.info-text {
+  background: var(--light-green-color);
+  color: var(--header-white);
+  width: auto;
+  align-items: center;
+  justify-content: center;
+  padding: 0 15px;
+}
+
+#connection-status button.info-text.info-text-gray {
+  background: buttonface;
+  color: var(--active-black);
+}
+
 #connection-status button.link {
   background: var(--blue-color);
 }
@@ -567,14 +630,8 @@ input {
 }
 
 #connection-status .colab-info {
-  position: absolute;
-  background: var(--active-black);
-  width: 350px;
-  height: 260px;
-  padding: 25px;
+  height: 266px;
   right: 0;
-  top: 50px;
-  font-size: 0.95em;
 }
 
 #connection-status .colab-info h3 {
@@ -617,12 +674,19 @@ input {
   border: 1px solid var(--light-green-color); /* #c3a428;*/
   height: 43px;
   width: 100%;
-  margin: 12px 0px 0px;
-  background-color: rgba(43, 135, 28, 0.5) /*rgba(195, 164, 40, 0.6);*/
+  margin: 14px 0px 0px;
+  background-color: rgba(43, 135, 28, 0.5);
+  align-content: center;
+  justify-content: center;
 }
 
 #connection-status .colab-info .credit-token i {
-  margin: auto 13px auto 10px;
+  margin: auto 13px auto 0px;
+  --ggs: 1.1;
+}
+
+#connection-status .colab-info .credit-token i.gg-loadbar-alt {
+  margin: auto;
 }
 
 #connection-status .colab-info .credit-token:hover {
@@ -925,13 +989,14 @@ Info Box
 .action-button:disabled {
   opacity: 0.8;
   background: rgba(100, 100, 100, 0.6) !important;
+  border-color: rgba(100, 100, 100, 1) !important;
   color: #FFF !important;
   cursor: not-allowed;
 }
 
 .action-button.apply,
 .action-button.action-settings {
-  background: var(--header-white);
+  background: buttonface;
   color: var(--active-black);
 }
 

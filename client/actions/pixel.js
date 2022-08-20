@@ -48,15 +48,19 @@ export function getTileForXY({ x, y, scene }) {
 }
 
 export async function colorPixels({ scene, selection }) {
-  logger.log('colorPixels', selection)
+  logger.log('Action colorPixels', selection)
 
   let positions = [], colors = [], bids = [];
 
   selection.forEach(pixel => {
     positions.push(stringToBN(pixel.position));
     colors.push(stringToHex(pixel.HEXcolor));
-    bids.push(stringToBN(pixel.bid.toString()))
+    bids.push(toWei(pixel.bid.toString()).toString());
   })
+
+  console.log('positions', positions)
+  console.log('colors', colors)
+  console.log('bids', bids)
 
   if (!scene.game.web3.activeAddress)
     await scene.game.web3.getActiveAddress();

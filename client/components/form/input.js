@@ -109,7 +109,14 @@ export default class Input extends Controller {
     if (!this.dynamicWidth)
       return;
 
-    let newWidth = parseFloat(this.input.value.toString().length * 0.73).toFixed(1);
+    let newWidth;
+
+    if (this.input.value >= 100)
+      newWidth = this.input.value.toString().length + 0.6; 
+    else
+      newWidth = this.input.value.toString().length;
+
+    newWidth = parseFloat(newWidth * 0.75).toFixed(1);
 
     if (newWidth < 2.5)
       newWidth = 2.5;
