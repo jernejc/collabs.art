@@ -12,7 +12,7 @@
     "@truffle/hdwallet-provider": "^2.0.13",
     "chai": "^4.3.6",
     "clean-webpack-plugin": "^4.0.0",
-    "copy-webpack-plugin": "^4.5.4",
+    "copy-webpack-plugin": "^11.0.0",
     "eth-gas-reporter": "^0.2.20",
     "html-webpack-plugin": "^4.5.2",
     "js-yaml": "^4.1.0",
