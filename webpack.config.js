@@ -20,7 +20,7 @@ const config = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].[contenthash].bundle.js',
-    library: 'autopoietic',
+    library: 'collabs',
     libraryTarget: 'var'
   },
 

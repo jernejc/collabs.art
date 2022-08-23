@@ -55,7 +55,7 @@ export default class Button {
         this.domElement.classList.add('info-text');
     }
 
-    this.domElement.textContent = this.text;
+    this.domElement.innerHTML += this.text;
   }
 
   clearIcon() {
@@ -64,6 +64,7 @@ export default class Button {
 
     this.domElement.innerHTML = '';
     this.icon = null;
+    this.text = null;
   }
 
   setIcon(icon, alertAction) {

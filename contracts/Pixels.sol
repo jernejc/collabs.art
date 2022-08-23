@@ -3,19 +3,23 @@ pragma solidity ^0.8.15;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/token/ERC777/IERC777Recipient.sol";
 
-import "./PixelsToken.sol";
+import "./CollabToken.sol";
 
 /**
  * @title Pixels
  * Pixels - living canvas
  */
 
-contract Pixels is AccessControl {
+contract Pixels is AccessControl, IERC777Recipient {
     using SafeMath for uint256;
     using Address for address;
 
-    PixelsToken private _PixelsTokenContract;
+    IERC1820Registry private _erc1820 = IERC1820Registry(0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24);
+    bytes32 constant private TOKENS_RECIPIENT_INTERFACE_HASH = keccak256("ERC777TokensRecipient");
+
+    CollabToken private _CollabTokenContract;
 
     uint48 private _maxPixels;
 
@@ -43,19 +47,27 @@ contract Pixels is AccessControl {
         address owner,
         uint256 modifiedAt
     );
+    event TokensReceived (
+        address operator, 
+        address from, 
+        address to, 
+        uint256 amount, 
+        bytes userData, 
+        bytes operatorData
+    );
 
     /**
-     * @dev Contract Constructor, sets max pixels and tokens contract
+     * @dev Contract Constructor, sets max pixels
      */
-    constructor(uint48 maxPixels, address pixelsTokenAddress) {
+    constructor(uint48 maxPixels) {
         require(maxPixels > 0, "Pixels: Max pixels must be greater than 0");
 
         // set max pixels limit
         _maxPixels = maxPixels;
-        // initialize token contract
-        _PixelsTokenContract = PixelsToken(pixelsTokenAddress); // $PXT token for bidding
         // assign admin
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+        // register erc 777 reciever
+        _erc1820.setInterfaceImplementer(address(this), TOKENS_RECIPIENT_INTERFACE_HASH, address(this));
     }
 
     /**
@@ -90,8 +102,13 @@ contract Pixels is AccessControl {
             bid > _pixels[position].bid,
             "Pixels: Bid must be higher than existing"
         );
-        require(
-            _PixelsTokenContract.transferFrom(_msgSender(), address(this), bid)
+
+        _CollabTokenContract.operatorSend(
+            _msgSender(),
+            address(this),
+            bid,
+            "",
+            ""
         );
 
         _updatePosition(position, color, bid, _msgSender());
@@ -119,7 +136,6 @@ contract Pixels is AccessControl {
             "Pixels: positions and bids length mismatch"
         );
 
-        //mapping(address => uint256) existingBids;
         uint256 bidsSum = 0;
 
         // Validate bids and colors and prepare existing bids mapping
@@ -138,12 +154,12 @@ contract Pixels is AccessControl {
         }
 
         // Require for full amount to be available and transfered
-        require(
-            _PixelsTokenContract.transferFrom(
-                _msgSender(),
-                address(this),
-                bidsSum
-            )
+        _CollabTokenContract.operatorSend(
+            _msgSender(),
+            address(this),
+            bidsSum,
+            "",
+            ""
         );
 
         for (uint256 i = 0; i < positions.length; i++) {
@@ -164,6 +180,29 @@ contract Pixels is AccessControl {
     }
 
     /**
+     * @dev tokens received
+     * @param operator operator
+     * @param from from
+     * @param to to
+     * @param amount amount
+     * @param userData userData
+     * @param operatorData operatorData
+     */
+
+    function tokensReceived(
+        address operator,
+        address from,
+        address to,
+        uint256 amount,
+        bytes calldata userData,
+        bytes calldata operatorData
+    ) external {
+        require(msg.sender == address(_CollabTokenContract), "Pixels: ERC777Recipient Invalid token");
+
+        //emit TokensReceived(operator, from, to, amount, userData, operatorData);
+    }
+
+    /**
      * @dev update position
      * @param position position in the world
      * @param color new position color
@@ -179,9 +218,10 @@ contract Pixels is AccessControl {
     ) private {
         // Refund if existing bid
         if (_pixels[position].bid > 0) {
-            _PixelsTokenContract.transfer(
+            _CollabTokenContract.send(
                 _pixels[position].owner,
-                _pixels[position].bid
+                _pixels[position].bid,
+                ""
             );
         }
 
@@ -205,6 +245,20 @@ contract Pixels is AccessControl {
         );
 
         _maxPixels = maxPixels;
+    }
+
+    /**
+     * @dev set token contract
+     * @param colabTokenAddress token contract address
+     */
+    function setTokenContract(address colabTokenAddress) public onlyAdmin {
+        require(
+            colabTokenAddress != address(0),
+            "Pixels: token contract zero address"
+        );
+
+        // initialize token contract
+        _CollabTokenContract = CollabToken(colabTokenAddress);
     }
 
     /**

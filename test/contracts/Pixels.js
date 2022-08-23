@@ -2,11 +2,11 @@ const expect = require("chai").expect;
 const BN = require('bn.js');
 
 const Pixels = artifacts.require("Pixels");
-const PixelsToken = artifacts.require("PixelsToken");
+const CollabToken = artifacts.require("CollabToken");
 
 contract("Pixels coloring tests", async accounts => {
   let pixelsInstance;
-  let pixelsTokenInstance;
+  let collabTokenInstance;
 
   // Some general defaults
   const position = web3.utils.utf8ToHex("PT232");
@@ -20,20 +20,16 @@ contract("Pixels coloring tests", async accounts => {
 
   before(async () => {
     pixelsInstance = await Pixels.deployed();
-    pixelsTokenInstance = await PixelsToken.deployed();
+    collabTokenInstance = await CollabToken.deployed();
 
-    // account[0] already has $PXT from constructing the contract
-    // credit account[1] with some $PXT
-    await pixelsTokenInstance.credit({ from: accounts[1], value: web3.utils.toWei('0.5', 'ether') });
-    // give pixels contract allowance to spend in accounts[0] behalve
-    await pixelsTokenInstance.increaseAllowance(pixelsInstance.address, new BN(100))
-    // give pixels contract allowance to spend in accounts[1] behalve
-    await pixelsTokenInstance.increaseAllowance(pixelsInstance.address, new BN(100), { from: accounts[1] })
+    // account[0] already has $COLAB from constructing the contract
+    // credit account[1] with some $COLAB
+    await collabTokenInstance.credit({ from: accounts[1], value: web3.utils.toWei('0.5', 'ether') });
   });
 
   it("set pixel color", async () => {
-    const initialBalanceAccount = await pixelsTokenInstance.balanceOf(accounts[0]);
-    const initialBalanceContract = await pixelsTokenInstance.balanceOf(pixelsInstance.address);
+    const initialBalanceAccount = await collabTokenInstance.balanceOf(accounts[0]);
+    const initialBalanceContract = await collabTokenInstance.balanceOf(pixelsInstance.address);
 
     try {
       await pixelsInstance.setColor(position, color, bid.toString());
@@ -42,10 +38,10 @@ contract("Pixels coloring tests", async accounts => {
       const NewPixelColor = await pixelsInstance.getColor(position);
       expect(NewPixelColor.toString()).to.equal(color.toString());
       // Verify account balance
-      const finalBalanceAccount = await pixelsTokenInstance.balanceOf(accounts[0]);
+      const finalBalanceAccount = await collabTokenInstance.balanceOf(accounts[0]);
       expect(finalBalanceAccount.toString()).to.equal(initialBalanceAccount.sub(bid).toString());
       // Verify contract balance
-      const finalBalanceContract = await pixelsTokenInstance.balanceOf(pixelsInstance.address);
+      const finalBalanceContract = await collabTokenInstance.balanceOf(pixelsInstance.address);
       expect(finalBalanceContract.toString()).to.equal(initialBalanceContract.add(bid).toString());
     } catch (error) {
       console.error(error);
@@ -54,8 +50,8 @@ contract("Pixels coloring tests", async accounts => {
   });
 
   it("set pixels colors", async () => {
-    const initialBalanceAccount = await pixelsTokenInstance.balanceOf(accounts[0]);
-    const initialBalanceContract = await pixelsTokenInstance.balanceOf(pixelsInstance.address);
+    const initialBalanceAccount = await collabTokenInstance.balanceOf(accounts[0]);
+    const initialBalanceContract = await collabTokenInstance.balanceOf(pixelsInstance.address);
 
     try {
       await pixelsInstance.setColors(positions, colors, bids.map(item => item.toString()));
@@ -64,10 +60,10 @@ contract("Pixels coloring tests", async accounts => {
       const NewPixelColor = await pixelsInstance.getColor(positions[0]);
       expect(NewPixelColor.toString()).to.equal(colors[0].toString());
       // Verify account balance
-      const finalBalanceAccount = await pixelsTokenInstance.balanceOf(accounts[0]);
+      const finalBalanceAccount = await collabTokenInstance.balanceOf(accounts[0]);
       expect(finalBalanceAccount.toString()).to.equal(initialBalanceAccount.sub(bidsSum).toString());
       // Verify contract balance
-      const finalBalanceContract = await pixelsTokenInstance.balanceOf(pixelsInstance.address);
+      const finalBalanceContract = await collabTokenInstance.balanceOf(pixelsInstance.address);
       expect(finalBalanceContract.toString()).to.equal(initialBalanceContract.add(bidsSum).toString());
     } catch (error) {
       console.error(error);
@@ -109,17 +105,17 @@ contract("Pixels coloring tests", async accounts => {
     const newBids = bids.map(item => item.add(new BN(1)));
     const newBidsSum = newBids.reduce((a, b) => b.add(a), new BN(0));
 
-    const initialBalanceAccount0 = await pixelsTokenInstance.balanceOf(accounts[0]);
-    const initialBalanceAccount1 = await pixelsTokenInstance.balanceOf(accounts[1]);
+    const initialBalanceAccount0 = await collabTokenInstance.balanceOf(accounts[0]);
+    const initialBalanceAccount1 = await collabTokenInstance.balanceOf(accounts[1]);
 
     try {
       await pixelsInstance.setColors(positions, colors, newBids.map(item => item.toString()), { from: accounts[1] });
 
-      const finalBalanceAccount0 = await pixelsTokenInstance.balanceOf(accounts[0]);
+      const finalBalanceAccount0 = await collabTokenInstance.balanceOf(accounts[0]);
       expect(finalBalanceAccount0.toString()).to.equal(initialBalanceAccount0.add(bidsSum).toString());
-      const finalBalanceAccount1 = await pixelsTokenInstance.balanceOf(accounts[1]);
+      const finalBalanceAccount1 = await collabTokenInstance.balanceOf(accounts[1]);
       expect(finalBalanceAccount1.toString()).to.equal(initialBalanceAccount1.sub(newBidsSum).toString());
-      const finalBalanceContract = await pixelsTokenInstance.balanceOf(pixelsInstance.address);
+      const finalBalanceContract = await collabTokenInstance.balanceOf(pixelsInstance.address);
       expect(finalBalanceContract.toString()).to.equal('65'); // we know the value based on previous tests, needs re-factor
     } catch (error) {
       console.error(error);

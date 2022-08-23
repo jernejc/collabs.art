@@ -88,7 +88,7 @@ export async function colorPixels({ scene, selection }) {
 }
 
 export function updateWorldImagePixelColors({ pixels, scene, updateTile }) {
-  logger.log('updateWorldImagePixelColors', pixels, scene);
+  logger.log('updateWorldImagePixelColors');
 
   pixels.forEach(pixel => {
     scene.worldmap.setPixel(

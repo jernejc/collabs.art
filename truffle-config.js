@@ -25,9 +25,6 @@ const private_key = fs.readFileSync('.secret').toString().trim();
 const goerliURL = fs.readFileSync('.rpc').toString().trim();
 const goerliWSS = fs.readFileSync('.wss').toString().trim();
 
-console.log('goerliURL', goerliURL);
-console.log('goerliWSS', goerliWSS);
-
 module.exports = {
   /**
    * Networks define how you connect to your ethereum client and let you set the

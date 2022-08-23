@@ -536,6 +536,8 @@ input {
   z-index: 1;
   display: flex;
   position: relative;
+  align-items: center;
+  justify-content: center;
 }
 
 #connection-status button.active {
@@ -584,6 +586,19 @@ input {
 #connection-status button.polygon img {
   width: 87%;
   margin: auto;
+}
+
+#connection-status button.ethereum-logo {
+  background: buttonface;
+  color: var(--active-black);
+}
+
+#connection-status button.ethereum-logo img {
+  width: 18px;
+}
+
+#connection-status button.ethereum-logo .gg-chevron-double-up {
+  color: buttonface;
 }
 
 #connection-status button.polygon i.gg-chevron-double-up {
@@ -671,7 +686,8 @@ input {
 
 #connection-status .colab-info .credit-token {
   color: var(--header-white);
-  border: 1px solid var(--light-green-color); /* #c3a428;*/
+  border: 1px solid var(--light-green-color);
+  /* #c3a428;*/
   height: 43px;
   width: 100%;
   margin: 14px 0px 0px;

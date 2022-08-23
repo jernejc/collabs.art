@@ -1,10 +1,10 @@
 pragma solidity ^0.8.15;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC777/ERC777.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract PixelsToken is ERC20, AccessControl {
+contract CollabToken is ERC777, AccessControl {
     using SafeMath for uint256;
 
     uint256 private _conversionRate;
@@ -19,22 +19,23 @@ contract PixelsToken is ERC20, AccessControl {
     constructor(
         string memory name,
         string memory symbol,
+        address[] memory defaultOperators,
         uint256 conversionRate,
         uint256 developmentRate
-    ) ERC20(name, symbol) {
+    ) ERC777(name, symbol, defaultOperators) {
         require(
             conversionRate > 0,
-            "PixelsToken: Conversion rate must be greater than 0"
+            "CollabToken: Conversion rate must be greater than 0"
         );
         require(
             developmentRate > 0,
-            "PixelsToken: Development rate must be greater than 0"
+            "CollabToken: Development rate must be greater than 0"
         );
 
         // set conversion rate
         _conversionRate = conversionRate;
         // mint development tokens to sender
-        _mint(_msgSender(), developmentRate * 10**uint256(decimals()));
+        _mint(_msgSender(), developmentRate * 10**uint256(decimals()), "", "");
         // assign admin
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
@@ -47,10 +48,10 @@ contract PixelsToken is ERC20, AccessControl {
 
         require(
             tokensAmount > 1 * 10**uint256(decimals()),
-            "PixelsToken: You must credit at least one $COLAB"
+            "CollabToken: You must credit at least one $COLAB"
         );
 
-        _mint(_msgSender(), tokensAmount);
+        _mint(_msgSender(), tokensAmount, "", "");
     }
 
     /**
@@ -60,7 +61,7 @@ contract PixelsToken is ERC20, AccessControl {
     function setConversionRate(uint48 conversionRate) public onlyAdmin {
         require(
             conversionRate > 0,
-            "PixelsToken: Conversion rate must be greater than 0"
+            "CollabToken: Conversion rate must be greater than 0"
         );
 
         _conversionRate = conversionRate;
@@ -71,10 +72,10 @@ contract PixelsToken is ERC20, AccessControl {
      * @param amount withdraw amount
      */
     function withdraw(uint256 amount) public onlyAdmin {
-        require(amount > 0, "PixelsToken: Amount must be greater than 0");
+        require(amount > 0, "CollabToken: Amount must be greater than 0");
         require(
             address(this).balance >= amount,
-            "PixelsToken: Enough funds must be available"
+            "CollabToken: Enough funds must be available"
         );
 
         payable(_msgSender()).transfer(amount);
@@ -106,7 +107,7 @@ contract PixelsToken is ERC20, AccessControl {
     modifier onlyAdmin() {
         require(
             hasRole(DEFAULT_ADMIN_ROLE, _msgSender()),
-            "PixelsToken: Restricted to admins."
+            "CollabToken: Restricted to admins."
         );
         _;
     }

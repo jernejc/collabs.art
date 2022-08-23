@@ -3,6 +3,7 @@ import _ from 'lodash';
 import Web3 from 'web3';
 
 import { getTileForPointer } from '@actions/pixel';
+
 import { formatColorNumber } from '@util/helpers';
 import logger from '@util/logger';
 
@@ -71,7 +72,7 @@ export async function handleMouseDown({ pointer, scene }) {
       /*if (scene.game.selection.isSelected(tile.cx, tile.cy))
         scene.game.selection.removeSelected({ tile, scene });
       else*/
-        await scene.game.selection.addSelected({ tiles: [tile], scene });
+      await scene.game.selection.addSelected({ tiles: [tile], scene });
       break;
     case 'mininav':
       navigateMinimap({ pointer, scene: scene.minimap })
@@ -141,7 +142,7 @@ export function handleMouseWheel({ scene, dx, dy, dz }) {
 }
 
 export function handleShiftDown({ scene }) {
- // logger.log('User interactions: handleShiftDown');
+  // logger.log('User interactions: handleShiftDown');
 
   if (scene.game.mode === 'select')
     setGameMode({ scene, mode: 'multiselect' });
@@ -198,10 +199,7 @@ export async function creditToken({ scene, value }) {
     logger.error('Action creditToken: ', error);
     return;
   }
-
-  scene.game.web3.walletBalance += value;
 }
-
 
 export function navigateMinimap({ pointer, scene }) {
   //logger.log('User interactions: navigateMinimap', pointer, scene);

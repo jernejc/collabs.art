@@ -79,7 +79,7 @@ export default class ToolsManager {
     });
 
     this.emitter.on('web3/purchase', async address => {
-      logger.log('ToolsManager: on web3/purchase');
+      logger.log('ToolsManager: on web3/purchase', address);
 
       if (this.menu && this.menu.activeTab === 'selection')
         this.menu.createSettings();
@@ -89,8 +89,14 @@ export default class ToolsManager {
         await this.infobox.setUI();
     });
 
+    this.emitter.on('web3/balance', async balance => {
+      logger.log('ToolsManager: on web3/balance', balance);
+
+      this.setConnectionStatus();
+    });
+
     this.emitter.on('selection/update', async update => {
-      logger.log('ToolsManager: on selection/update', update);
+      logger.log('ToolsManager: on selection/update');
 
       const pixels = this.game.selection.pixels;
       const pixel = (update && update[0] && update[0].position) ? update[0] : pixels[0];
@@ -111,7 +117,7 @@ export default class ToolsManager {
           if (!this.infobox)
             await this.openInfoBox({ pixel: pixel, scene: this.game.scene });
           else {
-            if (!this.infobox.pixel || pixel.position !== this.infobox.pixel.position) {
+            if (!this.infobox.domElement || !this.infobox.pixel || pixel.position !== this.infobox.pixel.position) {
               await this.openInfoBox({ pixel: pixel, scene: this.game.scene });
             } else { // only refresh ui, if it's same pixel
               await this.infobox.setUI();
@@ -268,7 +274,7 @@ export default class ToolsManager {
         action = this.game.web3.onboarding.startOnboarding;
         break;
       case 'network':
-        iconClass = 'polygon.svg';
+        iconClass = 'ethereum-logo.png';
         action = this.game.web3.switchToNetwork.bind(this.game.web3);
         break;
       case 'wallet':
@@ -277,13 +283,18 @@ export default class ToolsManager {
         break;
       case 'address':
         alertIcon = false;
-        iconText = `${this.game.web3.walletBalance} $COLAB`;
+        iconText = `${this.game.web3.walletBalance || 0} $COLAB`;
         action = this.domTokenInfo.open.bind(this.domTokenInfo);
+        break;
+      case 'permit':
+        iconClass = 'gg-extension';
+        action = this.game.web3.permitContractAllowance.bind(this.game.web3);
         break;
     }
 
+    this.connectionStatusBtn.clearIcon();
+
     if (iconText) {
-      this.connectionStatusBtn.clearIcon();
       this.connectionStatusBtn.setText(iconText);
 
       if (this.game.web3.walletBalance == 0) {
@@ -315,6 +326,9 @@ export default class ToolsManager {
         break;
       case 'address':
         text = formatShortAddress(this.game.web3.activeAddress);
+        break;
+      case 'permit':
+        text = 'Increase allowance';
         break;
     }
 

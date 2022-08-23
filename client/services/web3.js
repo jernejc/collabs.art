@@ -58,7 +58,7 @@ export default class Web3Manager {
   }
 
   get currentSymbol() {
-    return (this.network && this.network.nativeCurrency) ? this.network.nativeCurrency.symbol : 'MATIC';
+    return (this.network && this.network.nativeCurrency) ? this.network.nativeCurrency.symbol : 'ETH';
   }
 
   async initProviders() {
@@ -132,13 +132,15 @@ export default class Web3Manager {
   }
 
   enableContractEvents() {
-    logger.log('Web3Manager: enableContractEvents', this.pixelContract.events.ColorPixels());
+    logger.log('Web3Manager: enableContractEvents');
+
+    const _self = this;
 
     // Contract events
     if (this.websocketInstance) {
       this.socketColorPixelsListener = this.eventPixelContract.events.ColorPixels({ fromBlock: 'latest' })
         .on('data', (e) => {
-          logger.log('ColorPixels', e)
+          logger.log('Web3Manager: ColorPixels')
           const _positions = e.returnValues.positions;
           const _colors = e.returnValues.colors;
           const _bids = e.returnValues.bids;
@@ -151,6 +153,25 @@ export default class Web3Manager {
           });
 
           updateWorldImagePixelColors({ pixels, scene: this.game.scene.keys["MainScene"], updateTile: true })
+        });
+
+
+      this.transferTokenListener = this.eventTokenContract.events.Transfer({ fromBlock: 'latest' })
+        .on('data', async (e) => {
+          logger.log('Web3Manager: TransferToken');
+
+          if (!e.returnValues || !e.returnValues.to || !e.returnValues.from || !e.returnValues.value) {
+            console.warn('Web3Manager: No return values found in event');
+            return;
+          }
+
+          if (e.returnValues.to.toLowerCase() === this.activeAddress) {
+            this.walletBalance += parseInt(Web3.utils.fromWei(e.returnValues.value));
+            this.emitter.emit('web3/balance', this.walletBalance);
+          } else if (e.returnValues.from.toLowerCase() === this.activeAddress) {
+            this.walletBalance -= parseInt(Web3.utils.fromWei(e.returnValues.value));
+            this.emitter.emit('web3/balance', this.walletBalance);
+          }
         });
     }
   }
@@ -191,8 +212,10 @@ export default class Web3Manager {
     if (this.network) {
       this.connectWebsocket();
       this.initContracts();
+
       await this.getDefaultPrice();
-      //await this.getWalletBalance();
+      await this.getWalletBalance();
+
       this.enableContractEvents();
     }
 
@@ -200,7 +223,7 @@ export default class Web3Manager {
   }
 
   async handleAccountsChanged(accounts) {
-    logger.log('Web3Manager: handleAccountsChanged', accounts);
+    logger.log('Web3Manager: handleAccountsChanged');
 
     if (accounts.length > 0) {
       this.accounts = accounts;
@@ -314,7 +337,7 @@ export default class Web3Manager {
         params: [{ chainId: chainId }]
       });
 
-      if (!this.game.web3.activeAddress)
+      if (!this.activeAddress)
         await this.getActiveAddress();
     } catch (error) {
       if (error.code === 4902) { // Network was not found in Metamask
@@ -351,25 +374,27 @@ export default class Web3Manager {
   async getWalletBalance() {
     logger.log('Web3Manager: getWalletBalance');
 
+    if (!this.activeAddress || !this.tokenContract)
+      return;
+
     let balance;
 
     try {
       balance = await this.tokenContract.methods.balanceOf(this.activeAddress).call();
-      console.log('RPC balance', balance)
-      this.walletBalance = Web3.utils.fromWei(balance);
+      this.walletBalance = parseInt(Web3.utils.fromWei(balance));
     } catch (error) {
       logger.error('Failed to fetch RPC balance', error);
 
       try {
         balance = await this.eventTokenContract.methods.balanceOf(this.activeAddress).call();
-        console.log('WSS balance', balance)
-        this.walletBalance = Web3.utils.fromWei(balance);
+        this.walletBalance = parseInt(Web3.utils.fromWei(balance));
       } catch (error) {
         logger.error('Failed to fetch WS balance', error);
         this.walletBalance = 0;
       }
     }
 
+    console.log('walletBalance', this.walletBalance)
     return this.walletBalance;
   }
 

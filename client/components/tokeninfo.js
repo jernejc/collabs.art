@@ -1,4 +1,5 @@
 import logger from "@util/logger";
+import config from "@util/config";
 
 import { creditToken } from "@actions/general"
 
@@ -8,7 +9,7 @@ import Input from "./form/input";
 export default class TokenInfo {
 
   constructor({ scene, parent, closed }) {
-    logger.log('TokenInfo: constructor', scene);
+    logger.log('TokenInfo: constructor');
 
     this.scene = scene;
     this.parent = parent;
@@ -37,7 +38,10 @@ export default class TokenInfo {
     this.discordButton = new Button({
       icon: 'discord-icon.png',
       text: 'Say "hi"',
-      elClasses: ['action-button', 'social-connect', 'discord']
+      elClasses: ['action-button', 'social-connect', 'discord'],
+      clickAction: async () => {
+        window.open(config.slideshow.discordLink, '_blank').focus();
+      }
     });
 
     this.domElement.append(this.discordButton.domElement);
@@ -75,9 +79,8 @@ export default class TokenInfo {
       icon: 'gg-arrows-exchange-alt',
       text: 'Exchange',
       elClasses: ['action-button', 'credit-token'],
-      clickAction: async () => {
-        console.log('clickAction', this.supportInput.input.value, this.scene);
-        await creditToken({ scene: this.scene, value: this.supportInput.input.value})
+      clickAction: () => {
+        return creditToken({ scene: this.scene, value: this.supportInput.input.value})
       }
     });
 
