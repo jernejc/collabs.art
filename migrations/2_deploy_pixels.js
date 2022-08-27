@@ -28,18 +28,27 @@ module.exports = async (deployer, network, accounts) => {
 
   const wsUrl = deployer.networks[networkName].websocket || null;
   const maxPixels = 1000000;
+  const minUnit = 1;
   const conversionRate = 500;
   const developmentRate = 10000000;
+  const supportedColors = [
+    '93002c', 'c33502', 'c48100', 'c3a428', '027d4e', '029d5d',
+    '60b640', '005a54', '007a81', '1a3f7e', '2a6fb5', '3fb4bd',
+    '382d95', '5347c4', '63177b', '883992', 'c32b62', 'c47583',
+    '553722', '77501c', '000000', '6a6c70', 'a2a3a6', 'c3c3c3']
+    .map(item => web3.utils.stringToHex(item));
 
   // Deploy contracts
-  await deployer.deploy(Pixels, maxPixels);
+  await deployer.deploy(Pixels, maxPixels, minUnit);
   console.log("Pixels.address", Pixels.address);
 
   await deployer.deploy(CollabToken, "CollabToken", "COLAB", [Pixels.address], conversionRate, developmentRate);
   console.log("CollabToken.address", CollabToken.address);
 
   const PixelsInstance = await Pixels.deployed();
+
   await PixelsInstance.setTokenContract(CollabToken.address);
+  await PixelsInstance.setSupportedColors(supportedColors);
 
   // Create dapp config with new addresses
   const config = {

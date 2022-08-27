@@ -37,12 +37,12 @@ export default class TokenInfo {
 
     this.discordButton = new Button({
       icon: 'discord-icon.png',
-      text: 'Say "hi"',
+      text: 'Channel',
       elClasses: ['action-button', 'social-connect', 'discord'],
       clickAction: async () => {
         window.open(config.slideshow.discordLink, '_blank').focus();
       }
-    });
+    })
 
     this.domElement.append(this.discordButton.domElement);
 

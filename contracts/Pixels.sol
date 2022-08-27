@@ -16,58 +16,62 @@ contract Pixels is AccessControl, IERC777Recipient {
     using SafeMath for uint256;
     using Address for address;
 
-    IERC1820Registry private _erc1820 = IERC1820Registry(0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24);
-    bytes32 constant private TOKENS_RECIPIENT_INTERFACE_HASH = keccak256("ERC777TokensRecipient");
+    IERC1820Registry private _erc1820 =
+        IERC1820Registry(0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24);
+    bytes32 private constant TOKENS_RECIPIENT_INTERFACE_HASH =
+        keccak256("ERC777TokensRecipient");
 
     CollabToken private _CollabTokenContract;
 
-    uint48 private _maxPixels;
+    uint256 private _maxPixels;
+    uint256 private _minUnit;
 
-    struct Pixel {
-        bool exists;
-        address owner;
-        bytes6 color;
-        uint256 bid;
-        uint256 modifiedAt;
-    }
+    mapping(bytes6 => bool) private _supportedColors;
 
-    mapping(uint256 => Pixel) private _pixels;
+    mapping(uint256 => address) private _owners;
+    mapping(uint256 => bytes6) private _colors;
+    mapping(uint256 => uint256) private _bids;
 
     event ColorPixel(
         uint256 position,
         bytes6 color,
         uint256 bid,
-        address owner,
-        uint256 modifiedAt
+        address owner
     );
     event ColorPixels(
         uint256[] positions,
         bytes6[] colors,
         uint256[] bids,
-        address owner,
-        uint256 modifiedAt
+        address owner
     );
-    event TokensReceived (
-        address operator, 
-        address from, 
-        address to, 
-        uint256 amount, 
-        bytes userData, 
+    event TokensReceived(
+        address operator,
+        address from,
+        address to,
+        uint256 amount,
+        bytes userData,
         bytes operatorData
     );
 
     /**
      * @dev Contract Constructor, sets max pixels
      */
-    constructor(uint48 maxPixels) {
+    constructor(uint256 maxPixels, uint256 minUnit) {
         require(maxPixels > 0, "Pixels: Max pixels must be greater than 0");
+        require(minUnit > 0, "Pixels: Min unit must be greater than 0");
 
         // set max pixels limit
         _maxPixels = maxPixels;
+        // set min unit
+        _minUnit = minUnit;
         // assign admin
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
         // register erc 777 reciever
-        _erc1820.setInterfaceImplementer(address(this), TOKENS_RECIPIENT_INTERFACE_HASH, address(this));
+        _erc1820.setInterfaceImplementer(
+            address(this),
+            TOKENS_RECIPIENT_INTERFACE_HASH,
+            address(this)
+        );
     }
 
     /**
@@ -80,7 +84,7 @@ contract Pixels is AccessControl, IERC777Recipient {
             "Pixels: Make sure position exists before returning color"
         );
 
-        return _pixels[position].color;
+        return _colors[position];
     }
 
     /**
@@ -95,11 +99,11 @@ contract Pixels is AccessControl, IERC777Recipient {
         uint256 bid
     ) public {
         require(
-            _validateColor(color),
+            _supportedColor(color),
             "Pixels: Must be a valid HEX color value"
         );
         require(
-            bid > _pixels[position].bid,
+            bid >= (_bids[position] + _minUnit),
             "Pixels: Bid must be higher than existing"
         );
 
@@ -113,7 +117,7 @@ contract Pixels is AccessControl, IERC777Recipient {
 
         _updatePosition(position, color, bid, _msgSender());
 
-        emit ColorPixel(position, color, bid, _msgSender(), block.timestamp);
+        emit ColorPixel(position, color, bid, _msgSender());
     }
 
     /**
@@ -141,11 +145,11 @@ contract Pixels is AccessControl, IERC777Recipient {
         // Validate bids and colors and prepare existing bids mapping
         for (uint256 i = 0; i < bids.length; i++) {
             require(
-                bids[i] > _pixels[positions[i]].bid,
+                bids[i] >= (_bids[positions[i]] + _minUnit),
                 "Pixels: All bids must be higher than existing"
             );
             require(
-                _validateColor(colors[i]),
+                _supportedColor(colors[i]),
                 "Pixels: Must be a valid HEX color value"
             );
 
@@ -164,19 +168,13 @@ contract Pixels is AccessControl, IERC777Recipient {
 
         for (uint256 i = 0; i < positions.length; i++) {
             uint256 position = positions[i];
-            uint256 bid = bids[i];
             bytes6 color = colors[i];
+            uint256 bid = bids[i];
 
             _updatePosition(position, color, bid, _msgSender());
         }
 
-        emit ColorPixels(
-            positions,
-            colors,
-            bids,
-            _msgSender(),
-            block.timestamp
-        );
+        emit ColorPixels(positions, colors, bids, _msgSender());
     }
 
     /**
@@ -197,7 +195,10 @@ contract Pixels is AccessControl, IERC777Recipient {
         bytes calldata userData,
         bytes calldata operatorData
     ) external {
-        require(msg.sender == address(_CollabTokenContract), "Pixels: ERC777Recipient Invalid token");
+        require(
+            msg.sender == address(_CollabTokenContract),
+            "Pixels: ERC777Recipient Invalid token"
+        );
 
         //emit TokensReceived(operator, from, to, amount, userData, operatorData);
     }
@@ -217,34 +218,39 @@ contract Pixels is AccessControl, IERC777Recipient {
         address owner
     ) private {
         // Refund if existing bid
-        if (_pixels[position].bid > 0) {
-            _CollabTokenContract.send(
-                _pixels[position].owner,
-                _pixels[position].bid,
-                ""
-            );
+        if (_bids[position] > 0) {
+            _CollabTokenContract.send(_owners[position], _bids[position], "");
         }
 
-        _pixels[position] = Pixel({
-            exists: true,
-            owner: owner,
-            color: color,
-            bid: bid,
-            modifiedAt: block.timestamp
-        });
+        _owners[position] = owner;
+        _colors[position] = color;
+        _bids[position] = bid;
     }
 
     /**
      * @dev set maxPixels
      * @param maxPixels new maximum number of pixels
      */
-    function setMaxPixels(uint48 maxPixels) public onlyAdmin {
+    function setMaxPixels(uint256 maxPixels) public onlyAdmin {
         require(
             maxPixels > 0,
             "Pixels: Max pixels must be greater than 0 and total current supply"
         );
 
         _maxPixels = maxPixels;
+    }
+    
+    /**
+     * @dev set minUnit
+     * @param minUnit min bid unit
+     */
+    function setMinUnit(uint256 minUnit) public onlyAdmin {
+        require(
+            minUnit > 0,
+            "Pixels: Min unit for bid increase"
+        );
+
+        _minUnit = minUnit;
     }
 
     /**
@@ -253,8 +259,8 @@ contract Pixels is AccessControl, IERC777Recipient {
      */
     function setTokenContract(address colabTokenAddress) public onlyAdmin {
         require(
-            colabTokenAddress != address(0),
-            "Pixels: token contract zero address"
+            colabTokenAddress.isContract(),
+            "Pixels: token address is not contract"
         );
 
         // initialize token contract
@@ -262,8 +268,34 @@ contract Pixels is AccessControl, IERC777Recipient {
     }
 
     /**
+     * @dev set token contract
+     * @param supportedColors array of hex format colors (without #)
+     */
+    function setSupportedColors(bytes6[] memory supportedColors)
+        public
+        onlyAdmin
+    {
+        for (uint8 i = 0; i < supportedColors.length; i++) {
+            require(
+                _validateColor(supportedColors[i]),
+                "Pixels: must be valid HEX color"
+            );
+
+            _supportedColors[supportedColors[i]] = true;
+        }
+    }
+
+    /**
+     * @dev check if supported color
+     * @param color value to validate
+     */
+    function _supportedColor(bytes6 color) private view returns (bool) {
+        return _supportedColors[color] == true;
+    }
+
+    /**
      * @dev validate hex color - https://ethereum.stackexchange.com/questions/50369/string-validation-solidity-alpha-numeric-and-length
-     * @param color color value to validate
+     * @param color value to validate
      */
     function _validateColor(bytes6 color) private pure returns (bool) {
         for (uint8 i; i < color.length; i++) {
@@ -284,7 +316,7 @@ contract Pixels is AccessControl, IERC777Recipient {
      * @param position pixel position
      */
     function _exists(uint256 position) private view returns (bool) {
-        return _pixels[position].exists;
+        return _bids[position] > 0;
     }
 
     /********

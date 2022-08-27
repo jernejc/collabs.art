@@ -142,14 +142,14 @@ input {
 
 #inspired-by {
   opacity: 0.9;
-  z-index: 3;
   position: absolute;
-  bottom: -28px;
+  bottom: -29px;
   right: 0;
   color: rgba(255, 255, 255, 0.7);
-  font-size: 0.6em;
+  font-size: 0.54em;
   background: rgba(0, 0, 0, 0.95);
-  padding: 8px;
+  padding: 8px 8px 10px;
+  border-top: 1px solid #333;
 }
 
 #inspired-by a {
@@ -1306,6 +1306,7 @@ Info Box
 
 #slideshow {
   background: rgba(0, 0, 0, 0.85);
+  border-bottom: 1px solid #333;
   color: #FFF;
   position: absolute;
   top: 50%;

@@ -10,11 +10,12 @@ contract("Pixels coloring tests", async accounts => {
 
   // Some general defaults
   const position = web3.utils.utf8ToHex("PT232");
-  const color = web3.utils.stringToHex("FFFAAA");
+  const color = web3.utils.utf8ToHex("883992");
+  const unsupportedColor = web3.utils.utf8ToHex("183992");
   const bid = new BN(10);
 
   const positions = ["PT233", "PT234", "PT235", "PT236", "PT237"].map(item => web3.utils.utf8ToHex(item));
-  const colors = ["FFFAAA", "FFFAAA", "FFFAAA", "FFFAAA", "FFFAAA"].map(item => web3.utils.stringToHex(item));
+  const colors = ["883992", "883992", "883992", "883992", "883992"].map(item => web3.utils.stringToHex(item));
   const bids = [bid, bid, bid, bid, bid];
   const bidsSum = bids.reduce((a, b) => b.add(a), new BN(0)); // sum all bids, returns BN
 
@@ -36,7 +37,7 @@ contract("Pixels coloring tests", async accounts => {
 
       // Verfiy color is set
       const NewPixelColor = await pixelsInstance.getColor(position);
-      expect(NewPixelColor.toString()).to.equal(color.toString());
+      expect(web3.utils.numberToHex(NewPixelColor)).to.equal(color);
       // Verify account balance
       const finalBalanceAccount = await collabTokenInstance.balanceOf(accounts[0]);
       expect(finalBalanceAccount.toString()).to.equal(initialBalanceAccount.sub(bid).toString());
@@ -58,7 +59,7 @@ contract("Pixels coloring tests", async accounts => {
 
       // Verfiy color is set
       const NewPixelColor = await pixelsInstance.getColor(positions[0]);
-      expect(NewPixelColor.toString()).to.equal(colors[0].toString());
+      expect(web3.utils.numberToHex(NewPixelColor)).to.equal(colors[0]);
       // Verify account balance
       const finalBalanceAccount = await collabTokenInstance.balanceOf(accounts[0]);
       expect(finalBalanceAccount.toString()).to.equal(initialBalanceAccount.sub(bidsSum).toString());

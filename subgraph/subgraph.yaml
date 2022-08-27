@@ -8,7 +8,7 @@ dataSources:
     name: Pixels
     network: mumbai
     source:
-      address: '0xF1DAC18fd930a1904BDc0a0FF22eeF074acc72a5'
+      address: '0xDd002F05cF1fBd6c61aF6cB52Bc231B1e36864d9'
       abi: Pixels
     mapping:
       kind: ethereum/events
