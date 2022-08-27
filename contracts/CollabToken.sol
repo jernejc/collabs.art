@@ -1,11 +1,9 @@
 pragma solidity ^0.8.15;
 
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC777/ERC777.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract CollabToken is ERC777, AccessControl {
-    using SafeMath for uint256;
 
     uint256 private _conversionRate;
 

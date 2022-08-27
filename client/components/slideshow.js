@@ -1,14 +1,17 @@
 import config from '@util/config';
 import logger from '@util/logger';
+import Button from './form/button';
 
 export default class Slideshow {
-  constructor({ parent, buttonAction }) {
+  constructor({ parent, overlay, buttonAction }) {
     logger.log('Slideshow: constructor');
 
     if (parent)
       this.parent = parent;
     if (buttonAction)
       this.buttonAction = buttonAction;
+    if (overlay)
+      this.overlay = overlay;
 
     this.domElement = document.createElement('div');
     this.domElement.setAttribute('id', 'slideshow');
@@ -139,6 +142,14 @@ export default class Slideshow {
       and 
       <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life" target="_blank">Game of Life</a>
     `
+
+    this.gameOfLifeButton = new Button({
+      elClasses: ['game-of-life-toggle'],
+      icon: 'gg-play-button',
+      clickAction: this.overlay.toggleGameOfLife.bind(this.overlay)
+    });
+
+    this.insipredBy.append(this.gameOfLifeButton.domElement);
 
     this.domElement.append(this.insipredBy);
 

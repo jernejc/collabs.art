@@ -33,7 +33,7 @@ export default class TokenInfo {
       elClasses: ['action-button', 'social-connect', 'twitter']
     })
 
-    this.domElement.append(this.twitterButton.domElement)
+    this.domElement.append(this.twitterButton.domElement);
 
     this.discordButton = new Button({
       icon: 'discord-icon.png',
@@ -42,9 +42,9 @@ export default class TokenInfo {
       clickAction: async () => {
         window.open(config.slideshow.discordLink, '_blank').focus();
       }
-    })
+    });
 
-    this.domElement.append(this.discordButton.domElement);
+    this.domElement.append(this.discordButton.domElement)
 
     this.supportForm = {
       value: 0.2

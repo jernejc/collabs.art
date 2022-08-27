@@ -27,7 +27,7 @@ export default class Overlay {
   }
 
   setupDom() {
-    this.slideshow = new Slideshow({ parent: this.domElement, game: this.game, buttonAction: this.close });
+    this.slideshow = new Slideshow({ parent: this.domElement, game: this.game, overlay: this, buttonAction: this.close });
     this.parent.append(this.domElement);
   }
 
@@ -44,9 +44,20 @@ export default class Overlay {
       this.parent.removeChild(this.domElement);
   }
 
+  toggleGameOfLife() {
+    if (this.game.mode === 'gameoflife') {
+      this.stopGameOfLife();
+      this.slideshow.gameOfLifeButton.setIcon('gg-play-button');
+    } else {
+      this.startGameOfLife();
+      this.slideshow.gameOfLifeButton.setIcon('gg-play-pause');
+    }
+  }
+
   startGameOfLife() {
     logger.log("Overlay: startGameOfLife");
 
+    this.scene.currentState = config.intialGameState['contribute'];
     this.scene.initialShapes = Object.keys(config.intialShapes);
 
     const halfWidth = Math.floor(this.scene.gridWidth * 0.5);
@@ -54,6 +65,8 @@ export default class Overlay {
 
     this.scene.xPadding = parseInt((halfWidth - this.scene.currentState['max-length']) * 0.6);
     this.scene.middleY = halfHeight;
+
+    this.game.tools.hideTools();
 
     for (let y = 0; y < this.scene.gridHeight; y++) {
       for (let x = 0; x < this.scene.gridWidth; x++) {
@@ -87,12 +100,15 @@ export default class Overlay {
 
     this.timer = this.scene.time.addEvent({
       delay: 170,
-      callback: this.scene.nextGeneration,
+      callback: this.nextGeneration,
       callbackScope: this,
       loop: true
     });
 
     setGameMode({ scene: this.scene, mode: 'gameoflife' });
+
+    if (!this.domElement.classList.contains('gameoflife'))
+      this.domElement.classList.add('gameoflife')
   }
 
   stopGameOfLife() {
@@ -106,10 +122,16 @@ export default class Overlay {
       this.scene.time.removeEvent(this.timer);
 
     setGameMode({ scene: this.scene, mode: this.scene.appConfig.defaultMode });
+
+    this.scene.updateTiles();
+    this.game.tools.showTools();
+
+    if (this.domElement.classList.contains('gameoflife'))
+      this.domElement.classList.remove('gameoflife');
   }
 
   isAlive(x, y) {
-    logger.log("Overlay: isAlive");
+    //logger.log("Overlay: isAlive");
 
     if (x < 0 || x >= this.scene.gridWidth || y < 0 || y >= this.scene.gridHeight)
       return false;

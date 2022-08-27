@@ -1,6 +1,5 @@
 pragma solidity ^0.8.15;
 
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC777/IERC777Recipient.sol";
@@ -13,7 +12,6 @@ import "./CollabToken.sol";
  */
 
 contract Pixels is AccessControl, IERC777Recipient {
-    using SafeMath for uint256;
     using Address for address;
 
     IERC1820Registry private _erc1820 =
@@ -26,11 +24,16 @@ contract Pixels is AccessControl, IERC777Recipient {
     uint256 private _maxPixels;
     uint256 private _minUnit;
 
+    mapping(address => uint256) private _existingBids;
     mapping(bytes6 => bool) private _supportedColors;
 
-    mapping(uint256 => address) private _owners;
-    mapping(uint256 => bytes6) private _colors;
-    mapping(uint256 => uint256) private _bids;
+    struct Pixel {
+        address owner;
+        bytes6 color;
+        uint256 bid;
+    }
+
+    mapping(uint256 => Pixel) private _pixels;
 
     event ColorPixel(
         uint256 position,
@@ -84,7 +87,7 @@ contract Pixels is AccessControl, IERC777Recipient {
             "Pixels: Make sure position exists before returning color"
         );
 
-        return _colors[position];
+        return _pixels[position].color;
     }
 
     /**
@@ -103,7 +106,7 @@ contract Pixels is AccessControl, IERC777Recipient {
             "Pixels: Must be a valid HEX color value"
         );
         require(
-            bid >= (_bids[position] + _minUnit),
+            bid >= (_pixels[position].bid + _minUnit),
             "Pixels: Bid must be higher than existing"
         );
 
@@ -115,7 +118,21 @@ contract Pixels is AccessControl, IERC777Recipient {
             ""
         );
 
-        _updatePosition(position, color, bid, _msgSender());
+        if (_pixels[position].bid > 0) {
+            _CollabTokenContract.send(
+                _pixels[position].owner,
+                _pixels[position].bid,
+                ""
+            );
+
+            delete _pixels[position];
+        }
+
+        _pixels[position] = Pixel({
+            owner: _msgSender(),
+            color: color,
+            bid: bid
+        });
 
         emit ColorPixel(position, color, bid, _msgSender());
     }
@@ -127,9 +144,9 @@ contract Pixels is AccessControl, IERC777Recipient {
      * @param bids array of bid amounts
      */
     function setColors(
-        uint256[] memory positions,
-        bytes6[] memory colors,
-        uint256[] memory bids
+        uint256[] calldata positions,
+        bytes6[] calldata colors,
+        uint256[] calldata bids
     ) public {
         require(
             positions.length == colors.length,
@@ -145,7 +162,7 @@ contract Pixels is AccessControl, IERC777Recipient {
         // Validate bids and colors and prepare existing bids mapping
         for (uint256 i = 0; i < bids.length; i++) {
             require(
-                bids[i] >= (_bids[positions[i]] + _minUnit),
+                bids[i] >= (_pixels[positions[i]].bid + _minUnit),
                 "Pixels: All bids must be higher than existing"
             );
             require(
@@ -154,7 +171,7 @@ contract Pixels is AccessControl, IERC777Recipient {
             );
 
             // sum all bid values
-            bidsSum = bidsSum + bids[i];
+            bidsSum += bids[i];
         }
 
         // Require for full amount to be available and transfered
@@ -166,12 +183,42 @@ contract Pixels is AccessControl, IERC777Recipient {
             ""
         );
 
-        for (uint256 i = 0; i < positions.length; i++) {
-            uint256 position = positions[i];
-            bytes6 color = colors[i];
-            uint256 bid = bids[i];
+        address[] memory existingOwners = new address[](positions.length);
 
-            _updatePosition(position, color, bid, _msgSender());
+        for (uint256 i = 0; i < positions.length; i++) {
+            Pixel memory pixel = _pixels[positions[i]];
+
+            if (pixel.bid > 0) {
+                if (_existingBids[pixel.owner] == 0) {
+                    existingOwners[i] = pixel.owner;
+                }
+
+                _existingBids[pixel.owner] += pixel.bid;
+
+                delete _pixels[positions[i]];
+            }
+
+            _pixels[positions[i]] = Pixel({
+                owner: _msgSender(),
+                color: colors[i],
+                bid: bids[i]
+            });
+        }
+
+        if (existingOwners.length > 0) {
+            for (uint256 i = 0; i < existingOwners.length; i++) {
+                address existingOwner = existingOwners[i];
+
+                if (_existingBids[existingOwner] > 0) {
+                    _CollabTokenContract.send(
+                        existingOwner,
+                        _existingBids[existingOwner],
+                        ""
+                    );
+
+                    delete _existingBids[existingOwner];
+                }
+            }
         }
 
         emit ColorPixels(positions, colors, bids, _msgSender());
@@ -204,30 +251,6 @@ contract Pixels is AccessControl, IERC777Recipient {
     }
 
     /**
-     * @dev update position
-     * @param position position in the world
-     * @param color new position color
-     * @param bid bid amount
-     * @param owner new owner
-     */
-
-    function _updatePosition(
-        uint256 position,
-        bytes6 color,
-        uint256 bid,
-        address owner
-    ) private {
-        // Refund if existing bid
-        if (_bids[position] > 0) {
-            _CollabTokenContract.send(_owners[position], _bids[position], "");
-        }
-
-        _owners[position] = owner;
-        _colors[position] = color;
-        _bids[position] = bid;
-    }
-
-    /**
      * @dev set maxPixels
      * @param maxPixels new maximum number of pixels
      */
@@ -239,16 +262,13 @@ contract Pixels is AccessControl, IERC777Recipient {
 
         _maxPixels = maxPixels;
     }
-    
+
     /**
      * @dev set minUnit
      * @param minUnit min bid unit
      */
     function setMinUnit(uint256 minUnit) public onlyAdmin {
-        require(
-            minUnit > 0,
-            "Pixels: Min unit for bid increase"
-        );
+        require(minUnit > 0, "Pixels: Min unit for bid increase");
 
         _minUnit = minUnit;
     }
@@ -271,7 +291,7 @@ contract Pixels is AccessControl, IERC777Recipient {
      * @dev set token contract
      * @param supportedColors array of hex format colors (without #)
      */
-    function setSupportedColors(bytes6[] memory supportedColors)
+    function setSupportedColors(bytes6[] calldata supportedColors)
         public
         onlyAdmin
     {
@@ -316,7 +336,7 @@ contract Pixels is AccessControl, IERC777Recipient {
      * @param position pixel position
      */
     function _exists(uint256 position) private view returns (bool) {
-        return _bids[position] > 0;
+        return _pixels[position].bid > 0;
     }
 
     /********

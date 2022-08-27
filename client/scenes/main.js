@@ -26,7 +26,7 @@ export default class MainScene extends ApplicationScene {
   }
 
   preload() {
-    this.load.image('worldimage', 'assets/images/place.png'); //this.load.image('worldimage', `${config.events.url}/image`);
+    this.load.image('worldimage', 'assets/images/world.png'); //this.load.image('worldimage', `${config.events.url}/image`);
   }
 
   create(data) {
@@ -96,9 +96,9 @@ export default class MainScene extends ApplicationScene {
 
     this.input.keyboard.on('keyup-G', (event) => {
       if (!this.game.tools.overlay)
-        this.openOverlay();
+        this.game.tools.openOverlay();
       else
-        this.closeOverlay();
+        this.game.tools.clearOverlay();
     });
 
     /**
@@ -123,6 +123,7 @@ export default class MainScene extends ApplicationScene {
     }
 
     //window.addEventListener('resize', this.resize.bind(this));
+    this.game.tools.openOverlay();
   }
 
   resize() {
@@ -175,7 +176,7 @@ export default class MainScene extends ApplicationScene {
   updateTile(x, y) {
     //logger.log("MainScene: updateTile");
 
-    /*if (this.gameOfLife) {
+    if (this.game.mode === 'gameoflife') {
       const randomPixelColor = hexStringToColor(this.appConfig.defaultTileColors[Phaser.Math.Between(0, this.appConfig.defaultTileColors.length - 1)])
       let fillColor = this.appConfig.fillColor;
 
@@ -184,7 +185,7 @@ export default class MainScene extends ApplicationScene {
 
       this.tiles[y][x].setFillStyle(fillColor.color);
       return;
-    }*/
+    }
 
     const mapPixel = getColorForXY({ x, y, color: this.color, scene: this });
 
@@ -219,25 +220,5 @@ export default class MainScene extends ApplicationScene {
     this.tiles = [];
 
     return;
-  }
-
-  /**
-   * Game of life
-   * Will probably need a new scene
-   * Need to refractor "tiles" and move them to a new service
-   */
-
-  openOverlay() {
-    logger.log("MainScene: openOverlay");
-
-    this.currentState = config.intialGameState['contribute'];
-
-    this.game.tools.openOverlay();
-  }
-
-  closeOverlay() {
-    logger.log("MainScene: closeOverlay");
-
-    this.game.tools.clearOverlay();
   }
 }

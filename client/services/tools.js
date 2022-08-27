@@ -521,6 +521,7 @@ export default class ToolsManager {
     logger.log('ToolsManager: hideTools');
 
     this.networkAlert.style.display = 'none';
+    this.domConnectionStatus.style.overflow = 'hidden';
     this.connectionStatusBtn.domElement.style.display = 'none';
     this.domBottomNav.style.display = 'none';
     this.header.style.display = 'none';
@@ -529,8 +530,6 @@ export default class ToolsManager {
     this.minimapBackground.setVisible(false);
     this.game.scene.stop("MinimapScene");
 
-    if (this.overlay)
-      this.clearOverlay();
     if (this.infobox)
       this.clearInfoBox();
     if (this.menu)
@@ -541,6 +540,7 @@ export default class ToolsManager {
     logger.log('ToolsManager: showTools');
 
     this.networkAlert.style.display = 'flex';
+    this.domConnectionStatus.style.overflow = 'visible';
     this.connectionStatusBtn.domElement.style.display = 'flex';
     this.domBottomNav.style.display = 'flex';
     this.header.style.display = 'flex';
