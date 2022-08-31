@@ -53,7 +53,7 @@ module.exports = async (deployer, network, accounts) => {
   // Create dapp config with new addresses
   const config = {
     httpUrl: httpUrl,
-    wsUrl: wsUrl,
+    wsUrl: wsUrl || null,
     CollabCanvasAddress: CollabCanvas.address,
     CollabTokenAddress: CollabToken.address,
     ipfs: {

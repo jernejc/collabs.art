@@ -188,30 +188,12 @@ export default class Menu {
         bid: fullBid
       }
 
-    let relevantPixels = [],
-      batchCountElLabel = document.createElement('div');
-      batchCountElLabel.classList.add('changes-stats')
+    let batchCountElLabel = document.createElement('div');
+        batchCountElLabel.classList.add('changes-stats')
 
-    relevantPixels = pixels //.filter(pixel => pixel.owner === this.game.web3.activeAddress);
-    batchCountElLabel.innerHTML = `<span>${fullBid} $COLAB</span> ( ${relevantPixels.length} modified )`; /*${(relevantPixels.length > 1) ? 'changes' : 'change'}*/
+    batchCountElLabel.innerHTML = `<span>${fullBid} $COLAB</span> ( ${pixels.length} modified )`;
 
     this.settings.append(batchCountElLabel);
-
-    /*this.settings.colorPicker = new ColorPicker(batchSettings, 'color', {
-      scene: this.scene,
-      type: 'color',
-      //label: 'Color',
-      elClasses: ['setting'],
-      format: (value) => '#' + formatColorNumber(value),
-      validate: (value) => !isNaN(value) && value.length === 6,
-      update: (value) => {
-        relevantPixels.forEach(pixel => pixel.changeToColorNumber(value))
-
-        if (_self.settings.batchApplyBtn)
-          _self.settings.batchApplyBtn.domElement.disabled = false;
-      }
-    });
-    this.settings.append(this.settings.colorPicker.domElement);*/
 
     this.settings.batchApplyBtn = new Button({
       elClasses: ['action-button', 'action-settings'],

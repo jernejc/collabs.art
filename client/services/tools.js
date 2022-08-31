@@ -369,26 +369,6 @@ export default class ToolsManager {
     this.domBottomNav.setAttribute('id', 'bottom-nav');
     this.domBottomNav.classList.add('hidden');
 
-    /*this.bottonNavMenuBtn = new Button({
-      elClasses: ['pixels', 'menu-btn'],
-      icon: 'gg-row-last',
-      clickAction: async () => {
-        if (!this.menu || !this.menu.loaded) {
-          if (this.infobox)
-            this.clearInfoBox()
-
-          await this.openMenu(this.game.selection.pixels.length > 0 ? 'selection' : null);
-        } else if (this.menu && this.menu.closed) {
-          if (this.infobox)
-            this.clearInfoBox()
-
-          this.menu.open();
-        } else
-          await this.menu.loadPixels()
-      }
-    });
-    this.domBottomNav.append(this.bottonNavMenuBtn.domElement); */
-
     this.bottomNavChangesCount = document.createElement('div');
     this.bottomNavChangesCount.classList.add('changes-count', 'hidden');
 
@@ -397,6 +377,7 @@ export default class ToolsManager {
     this.bottomNavClearSelection = new Button({
       elClasses: ['clear-selection', 'hidden'],
       icon: 'gg-trash',
+      tooltip: 'Clear changes',
       clickAction: this.game.selection.clearAllSelection.bind(this.game.selection)
     });
 
