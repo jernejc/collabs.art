@@ -96,6 +96,9 @@ export default class TokenInfo {
     this.parent.append(this.domElement);
 
     this.refreshTokenCalc();
+
+    if (this.closed) 
+      this.close();
   }
 
   refreshTokenCalc() {

@@ -10,7 +10,7 @@ import Input from '@components/form/input';
 import TokenInfo from '@components/tokeninfo';
 import AuctionInfo from '@components/auctioninfo';
 
-import { formatShortAddress } from '@util/helpers';
+import { formatShortAddress, getCookie } from '@util/helpers';
 import logger from '@util/logger';
 
 export default class ToolsManager {
@@ -33,6 +33,11 @@ export default class ToolsManager {
       this.addNetworkAlert();
       this.addBottomNav();
       this.addEventListeners();
+
+      const overlayCookie = getCookie('no_overlay');
+      
+      if (!overlayCookie)
+        this.openOverlay();
     });
   }
 
@@ -418,7 +423,7 @@ export default class ToolsManager {
 
     this.headerTimer = new Timer({ parent: this.header, game: this.game });
 
-    this.domAuctionInfo = new AuctionInfo({ parent: this.header });
+    this.domAuctionInfo = new AuctionInfo({ parent: this.header, closed: true });
 
     this.parent.append(this.header);
   }
@@ -436,7 +441,11 @@ export default class ToolsManager {
 
     this.domConnectionStatus.append(this.connectionStatusBtn.domElement);
 
-    this.domTokenInfo = new TokenInfo({ scene: this.game.scene.keys['MainScene'], parent: this.domConnectionStatus });
+    this.domTokenInfo = new TokenInfo({
+      scene: this.game.scene.keys['MainScene'],
+      parent: this.domConnectionStatus,
+      closed: true
+    });
 
     this.parent.append(this.domConnectionStatus);
 

@@ -4,22 +4,22 @@ const BN = require('bn.js');
 const CollabToken = artifacts.require("CollabToken");
 
 contract("CollabToken tests", async accounts => {
-  let collabTokenInstance;
+  let tokenInstance;
 
   before(async () => {
-    collabTokenInstance = await CollabToken.deployed();
+    tokenInstance = await CollabToken.deployed();
   });
 
   it("should credit 1 ETH", async () => {
     try {
       // credit account[1] with some $PXT
-      await collabTokenInstance.credit({ from: accounts[1], value: web3.utils.toWei('1', 'ether') });
+      await tokenInstance.credit({ from: accounts[1], value: web3.utils.toWei('1', 'ether') });
 
       // Verify account balance
-      const finalBalanceAccount1 = await collabTokenInstance.balanceOf(accounts[1]);
+      const finalBalanceAccount1 = await tokenInstance.balanceOf(accounts[1]);
       expect(finalBalanceAccount1.toString()).to.equal(web3.utils.toWei('500', 'ether')); // $PXT tokens use the same decimals as ETH
       // Verify contract balance
-      const finalBalanceContract = await web3.eth.getBalance(collabTokenInstance.address);
+      const finalBalanceContract = await web3.eth.getBalance(tokenInstance.address);
       expect(finalBalanceContract.toString()).to.equal(web3.utils.toWei('1', 'ether'));
     } catch (error) {
       console.error(error);
@@ -29,11 +29,11 @@ contract("CollabToken tests", async accounts => {
 
   it("should withdraw 0.5 ETH", async () => {
     try {
-      const initialBalanceContract = new BN(await web3.eth.getBalance(collabTokenInstance.address));
+      const initialBalanceContract = new BN(await web3.eth.getBalance(tokenInstance.address));
       const initialBalanceAccount0 = new BN(await web3.eth.getBalance(accounts[0]));
 
       // credit account[1] with some $PXT
-      const response = await collabTokenInstance.withdraw(web3.utils.toWei('0.5', 'ether'));
+      const response = await tokenInstance.withdraw(web3.utils.toWei('0.5', 'ether'));
 
       // get gas used
       const gasUsed = new BN(response.receipt.gasUsed);
@@ -48,7 +48,7 @@ contract("CollabToken tests", async accounts => {
       expect(finalBalanceAccount0.toString()).to.equal(adjustedInitialBalanceAccount0.add(new BN(web3.utils.toWei('0.5', 'ether'))).toString());
 
       // Verify contract balance
-      const finalBalanceContract = await web3.eth.getBalance(collabTokenInstance.address);
+      const finalBalanceContract = await web3.eth.getBalance(tokenInstance.address);
       expect(finalBalanceContract.toString()).to.equal(initialBalanceContract.sub(new BN(web3.utils.toWei('0.5', 'ether'))).toString());
     } catch (error) {
       console.error(error);

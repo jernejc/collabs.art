@@ -12,14 +12,14 @@ const { CORSconfig } = require('./helpers');
 // Routes
 const { getImage, joinWaitlist, validateAccess } = require('./routes');
 // Listeners
-const { pixelsContractListeners } = require('./listeners');
+const { canvasContractListeners } = require('./listeners');
 
 // Start listening for network events
 (async () => {
   console.log('Init Event Listeners!');
   try {
     // Init web3 and contract(s)
-    await pixelsContractListeners()
+    await canvasContractListeners()
   } catch (error) {
     console.error('Failed to init Pixels contract', error);
     return;

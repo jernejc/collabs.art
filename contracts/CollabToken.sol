@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract CollabToken is ERC777, AccessControl {
 
-    uint256 private _conversionRate;
+    uint private _conversionRate;
 
     /**
      * @dev constructor, inits erc20 and does the basic setup
@@ -18,8 +18,8 @@ contract CollabToken is ERC777, AccessControl {
         string memory name,
         string memory symbol,
         address[] memory defaultOperators,
-        uint256 conversionRate,
-        uint256 developmentRate
+        uint conversionRate,
+        uint developmentRate
     ) ERC777(name, symbol, defaultOperators) {
         require(
             conversionRate > 0,
@@ -33,7 +33,7 @@ contract CollabToken is ERC777, AccessControl {
         // set conversion rate
         _conversionRate = conversionRate;
         // mint development tokens to sender
-        _mint(_msgSender(), developmentRate * 10**uint256(decimals()), "", "");
+        _mint(_msgSender(), developmentRate * 10**uint(decimals()), "", "");
         // assign admin
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
@@ -42,10 +42,10 @@ contract CollabToken is ERC777, AccessControl {
      * @dev credit $COLAB token for native token
      */
     function credit() public payable {
-        uint256 tokensAmount = msg.value * _conversionRate;
+        uint tokensAmount = msg.value * _conversionRate;
 
         require(
-            tokensAmount > 1 * 10**uint256(decimals()),
+            tokensAmount > 1 * 10**uint(decimals()),
             "CollabToken: You must credit at least one $COLAB"
         );
 
@@ -69,7 +69,7 @@ contract CollabToken is ERC777, AccessControl {
      * @dev withdraw funds
      * @param amount withdraw amount
      */
-    function withdraw(uint256 amount) public onlyAdmin {
+    function withdraw(uint amount) public onlyAdmin {
         require(amount > 0, "CollabToken: Amount must be greater than 0");
         require(
             address(this).balance >= amount,

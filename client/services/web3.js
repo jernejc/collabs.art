@@ -19,7 +19,7 @@ export default class Web3Manager {
     this.onboarding = new MetaMaskOnboarding();
     this.RPCinstance = null;
     this.tokenContract = null;
-    this.pixelContract = null;
+    this.canvasContract = null;
     this.defaultPrice = null;
     this.hasMetamask = false;
     this.accounts = [];
@@ -91,9 +91,9 @@ export default class Web3Manager {
         config.contracts.token.address
       );
 
-      this.pixelContract = new this.RPCinstance.eth.Contract(
-        config.contracts.pixels.abi,
-        config.contracts.pixels.address
+      this.canvasContract = new this.RPCinstance.eth.Contract(
+        config.contracts.canvas.abi,
+        config.contracts.canvas.address
       );
     }
 
@@ -103,9 +103,9 @@ export default class Web3Manager {
         config.contracts.token.address
       );
 
-      this.eventPixelContract = new this.websocketInstance.eth.Contract(
-        config.contracts.pixels.abi,
-        config.contracts.pixels.address
+      this.eventcanvasContract = new this.websocketInstance.eth.Contract(
+        config.contracts.canvas.abi,
+        config.contracts.canvas.address
       );
     }
   }
@@ -138,7 +138,7 @@ export default class Web3Manager {
 
     // Contract events
     if (this.websocketInstance) {
-      this.socketColorPixelsListener = this.eventPixelContract.events.ColorPixels({ fromBlock: 'latest' })
+      this.socketColorPixelsListener = this.eventcanvasContract.events.ColorPixels({ fromBlock: 'latest' })
         .on('data', (e) => {
           logger.log('Web3Manager: ColorPixels')
           const _positions = e.returnValues.positions;
@@ -254,7 +254,7 @@ export default class Web3Manager {
     let owner = null;
 
     try {
-      owner = await this.pixelContract.methods.ownerOf(_position).call();
+      owner = await this.canvasContract.methods.ownerOf(_position).call();
     } catch (error) {
       logger.warn('No owner found', error);
     }

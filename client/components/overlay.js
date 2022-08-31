@@ -34,6 +34,9 @@ export default class Overlay {
   destroy() {
     logger.log("Overlay: destroy");
 
+    if (this.game.mode === 'gameoflife') 
+      this.stopGameOfLife();
+
     if (this.slideshow)
       this.slideshow.destroy();
 

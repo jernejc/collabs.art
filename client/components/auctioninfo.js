@@ -36,6 +36,9 @@ export default class AuctionInfo {
     this.closeBtn.addEventListener('click', this.closeListener);
 
     this.parent.append(this.domElement);
+
+    if (this.closed) 
+      this.close();
   }
 
   close() {
@@ -60,7 +63,7 @@ export default class AuctionInfo {
       this.closeBtn = null;
     }
 
-    this.parent.removeChild(this.domElement)
+    this.parent.removeChild(this.domElement);
   }
 
 }

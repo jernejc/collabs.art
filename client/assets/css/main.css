@@ -38,6 +38,16 @@ input {
   color: #FFF;
 }
 
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
 #app {
   top: 0;
   left: 0;
@@ -188,6 +198,26 @@ input {
   top: -1px;
   left: 1px;
   --ggs: 0.65;
+}
+
+@-moz-document url-prefix() {
+  #inspired-by .game-of-life-toggle {
+    border: none;
+  }
+
+  #inspired-by .game-of-life-toggle i {
+    top: -3px;
+    left: -4px;
+  }
+
+  #inspired-by .game-of-life-toggle.play-pause {
+    width: 9px;
+  }
+
+  #inspired-by .game-of-life-toggle.play-pause i {
+    top: 1px;
+    left: 1px;
+  }
 }
 
 #bottom-nav {
@@ -1348,10 +1378,10 @@ Info Box
   color: #FFF;
   position: absolute;
   top: 50%;
-  width: 60vw;
+  width: 65vw;
   height: 290px;
   padding: 30px 20px 40px;
-  max-width: 590px;
+  max-width: 630px;
   margin: -180px 0 0 52%;
 }
 
@@ -1413,7 +1443,7 @@ Info Box
 
 .slides-nav {
   position: absolute;
-  bottom: 10px;
+  bottom: 16px;
   left: 5px;
   height: 60px;
   display: flex;
@@ -1451,7 +1481,7 @@ Info Box
 }
 
 .slides-nav .nav-item span {
-  background: var(--active-black);
+  background: #333;
   color: var(--active-black);
   padding: 9px;
   transition: background-color linear 300ms;
@@ -1512,7 +1542,7 @@ Info Box
   --ggs: 1.8;
   cursor: pointer;
   margin: 0px;
-  color: var(--active-black);
+  color: #333;
 }
 
 .slides-nav .gg-play-button.left {
@@ -1529,7 +1559,7 @@ Info Box
   margin: 0;
   display: flex;
   position: absolute;
-  bottom: 16px;
+  bottom: 25px;
   left: 120px;
 }
 
@@ -1611,7 +1641,7 @@ Info Box
 .action-bar .key-note {
   position: absolute;
   bottom: -21.5px;
-  font-size: 0.8em;
+  font-size: 0.7em;
   color: rgba(245, 240, 255, 0.6);
   opacity: 0.9;
   cursor: pointer;
@@ -1620,10 +1650,7 @@ Info Box
   align-items: center;
   padding-right: 15px;
   --ggs: 0.9;
-}
-
-.action-bar .key-note:hover {
-  text-decoration: underline;
+  margin-left: 3px;
 }
 
 .action-bar .key-note::after {
@@ -1687,6 +1714,27 @@ Info Box
   width: 30px;
   padding: 8px;
   border-radius: 5px;
+}
+
+.action-bar .docs-action {
+  background: transparent;
+  border: 0;
+  margin-left: 5px;
+  padding: 2px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--blue-color);
+  color: white;
+  background: rgba(37, 94, 190, 0.5);
+}
+
+.action-bar .docs-action:hover {
+  background: var(--blue-color);
+}
+
+.action-bar .docs-action i {
+  margin-right: 10px;
 }
 
 /* Animations */

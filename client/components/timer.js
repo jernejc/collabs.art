@@ -35,6 +35,8 @@ export default class Timer {
     // Get today's date and time
     const now = new Date().getTime();
 
+    //console.log(this.lastDayOfMonth);
+    //console.log(now)
     // Find the distance between now and the count down date
     const distance = this.lastDayOfMonth - now;
 
@@ -50,7 +52,7 @@ export default class Timer {
 
     // If the count down is finished, write some text
     if (distance < 0) {
-      this.domElement.innerHTML = "EXPIRED";
+      this.domElement.innerHTML = "AUCTION STARTING";
     }
   }
 

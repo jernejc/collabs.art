@@ -1,9 +1,10 @@
 import config from '@util/config';
+import { deleteCookie, setCookie, getCookie } from '@util/helpers';
 import logger from '@util/logger';
 import Button from './form/button';
 
 export default class Slideshow {
-  constructor({ parent, overlay, buttonAction }) {
+  constructor({ game, parent, overlay, buttonAction }) {
     logger.log('Slideshow: constructor');
 
     if (parent)
@@ -12,6 +13,8 @@ export default class Slideshow {
       this.buttonAction = buttonAction;
     if (overlay)
       this.overlay = overlay;
+    if (game)
+      this.game = game;
 
     this.domElement = document.createElement('div');
     this.domElement.setAttribute('id', 'slideshow');
@@ -20,10 +23,7 @@ export default class Slideshow {
 
     this.bindNavAction = this.navAction.bind(this);
     this.bindNextPrevAction = this.nextPrevAction.bind(this);
-    this.bindDiscordAction = this.discordAction.bind(this);
-    this.bindToggleActionBar = this.toggleActionBar.bind(this);
-    this.bindFormAction = this.formAction.bind(this);
-    this.bindActionTextInputChangeAction = this.actionTextInputChangeAction.bind(this);
+    this.bindToggleCookie = this.toggleCookie.bind(this);
 
     this.setupDom();
   }
@@ -36,11 +36,9 @@ export default class Slideshow {
     this.slides = [];
     this.navItems = [];
 
-    // Slide article 
     this.slidesWrapper = document.createElement('div');
     this.slidesWrapper.classList.add('slides-wrapper');
 
-    // Navigation
     this.navWrapper = document.createElement('div');
     this.navWrapper.classList.add('slides-nav');
 
@@ -49,7 +47,6 @@ export default class Slideshow {
 
     this.navItemsWrapper.addEventListener('click', this.bindNavAction);
 
-    // Navigation buttons
     this.leftIcon = document.createElement('i')
     this.leftIcon.classList.add('gg-play-button', 'left', 'disabled');
 
@@ -59,51 +56,51 @@ export default class Slideshow {
     this.leftIcon.addEventListener('click', this.bindNextPrevAction);
     this.rightIcon.addEventListener('click', this.bindNextPrevAction);
 
-    // Action bar
-    this.actionBarForm = document.createElement('form');
+    this.actionBarForm = document.createElement('div');
     this.actionBarForm.classList.add('action-bar');
 
-    this.actionBarForm.addEventListener('submit', this.bindFormAction);
+    this.slideActionButton = new Button({
+      elClasses: ['slide-action'],
+      text: 'Launch app',
+      clickAction: this.game.tools.clearOverlay.bind(this.game.tools)
+    });
+    this.actionBarForm.append(this.slideActionButton.domElement);
 
-    this.actionTextInputWrapper = document.createElement('div');
-    this.actionTextInputWrapper.classList.add('action-text-wrapper');
+    this.docsIcon = new Button({
+      elClasses: ['docs-action'],
+      icon: 'gg-file-document',
+      text: 'Docs',
+      clickAction: async () => {
+        this.docsAction();
+      }
+    });
+    this.actionBarForm.append(this.docsIcon.domElement);
 
-    this.actionTextInput = document.createElement('input');
-    this.actionTextInput.type = 'text';
-    this.actionTextInput.classList.add('text-input');
+    this.discordButton = new Button({
+      elClasses: ['discord-action'],
+      icon: 'discord-icon.png',
+      clickAction: async () => {
+        this.discordAction();
+      }
+    });
+    this.actionBarForm.append(this.discordButton.domElement)
 
-    this.actionTextInput.addEventListener('keydown', this.bindActionTextInputChangeAction);
-    this.actionTextInputWrapper.append(this.actionTextInput);
-
-    this.inputIcon = document.createElement('i');
-    this.inputIcon.classList.add('text-input-icon');
-    this.actionTextInputWrapper.append(this.inputIcon);
-
-    this.slideActionButton = document.createElement('button');
-    this.slideActionButton.type = 'submit';
-    this.slideActionButton.classList.add('slide-action');
+    const overlayCookie = getCookie('no_overlay');
 
     this.keyNoteWrapper = document.createElement('span');
-    this.keyNoteWrapper.classList.add('key-note');
+    this.keyNoteWrapper.classList.add('key-note', 'noselect');
+    this.keyNoteWrapper.addEventListener('click', this.bindToggleCookie);
 
-    this.keyNoteWrapper.addEventListener('click', this.bindToggleActionBar);
-    this.keyNoteWrapper.setAttribute('flow', 'down');
-    this.keyNoteWrapper.setAttribute('color', 'green');
+    this.cookieToggleInput = document.createElement('input');
+    this.cookieToggleInput.type = 'checkbox';
 
-    this.discordButton = document.createElement('button')
-    this.discordButton.classList.add('discord-action');
-    this.discordButton.innerHTML = '<img src="assets/images/icons/discord-icon.png" />';
+    if (overlayCookie)
+      this.cookieToggleInput.setAttribute('checked', true);
 
-    this.discordButton.addEventListener('click', this.bindDiscordAction);
-
-    this.actionBarForm.append(this.actionTextInputWrapper);
-    this.actionBarForm.append(this.slideActionButton);
-    this.actionBarForm.append(this.discordButton);
+    this.keyNoteWrapper.append(this.cookieToggleInput);
+    this.keyNoteWrapper.innerHTML += '&nbsp;Don\'t show again';
     this.actionBarForm.append(this.keyNoteWrapper);
 
-    this.setActionBarAction('email');
-
-    // Load articles
     this.articles.forEach((article, i) => {
       let active = false;
 
@@ -124,14 +121,13 @@ export default class Slideshow {
       }
     });
 
-    // Assemble DOM
     this.navWrapper.append(this.navItemsWrapper);
     this.navWrapper.prepend(this.leftIcon);
     this.navWrapper.append(this.rightIcon);
 
     this.slidesWrapper.append(this.navWrapper);
     this.slidesWrapper.append(this.actionBarForm);
-    
+
     this.domElement.append(this.slidesWrapper);
 
     this.insipredBy = document.createElement('div');
@@ -212,170 +208,29 @@ export default class Slideshow {
     return slide;
   }
 
-  setActionBarAction(action) {
-    logger.log('Slideshow: setActionBarAction', action);
-
-    this.actionBarAction = action;
-    this.actionTextInput.value = '';
-
-    switch (this.actionBarAction) {
-      case 'email':
-        this.slideActionButton.innerHTML = config.slideshow.emailActionText;
-        this.actionTextInput.placeholder = 'join the waitlist';
-
-        this.inputIcon.classList.remove('gg-key');
-        this.inputIcon.classList.add('gg-mail');
-        break;
-      case 'key':
-        this.slideActionButton.innerHTML = config.slideshow.keyActionText;
-        this.actionTextInput.placeholder = 'enter access key';
-
-        this.inputIcon.classList.remove('gg-mail');
-        this.inputIcon.classList.add('gg-key');
-        break;
-    }
-
-    this.resetInputState();
-  }
-
-  toggleActionBar() {
-    logger.log('Slideshow: toggleActionBar');
-
-    if (
-      this.keyNoteWrapper.classList.contains('error') ||
-      this.keyNoteWrapper.classList.contains('success')
-    ) {
-      this.actionTextInput.value = '';
-      this.resetInputState();
-      return;
-    }
-
-    if (this.actionBarAction === 'email')
-      this.setActionBarAction('key');
-    else
-      this.setActionBarAction('email');
-  }
-
-  setInputErrorState() {
-    logger.log('Slideshow: setInputErrorState');
-
-    this.actionTextInputWrapper.classList.add('error');
-    this.keyNoteWrapper.classList.add('error');
-
-    switch (this.actionBarAction) {
-      case 'email':
-        this.keyNoteWrapper.innerHTML = 'invalid e-mail <span> - clear</span>';
-        this.slideActionButton.innerHTML = config.slideshow.emailActionText;
-        break;
-      case 'key':
-        this.keyNoteWrapper.innerHTML = 'invalid access key <span> - clear</span>';
-        this.slideActionButton.innerHTML = config.slideshow.keyActionText;
-        break;
-    }
-
-    this.keyNoteWrapper.setAttribute('tooltip', '');
-  }
-
-  setInputSuccessState() {
-    logger.log('Slideshow: setInputSuccessState');
-
-    this.actionTextInputWrapper.classList.add('success');
-    this.keyNoteWrapper.classList.add('success');
-    this.slideActionButton.classList.add('success');
-
-    switch (this.actionBarAction) {
-      case 'key':
-      case 'email':
-        this.keyNoteWrapper.innerHTML = 'we\'ll be in touch <span> - clear</span>';
-        this.slideActionButton.innerHTML = '<i class="gg-check"></i>';
-        break;
-    }
-
-    this.keyNoteWrapper.setAttribute('tooltip', '');
-  }
-
-  resetInputState() {
-    logger.log('Slideshow: resetInputState');
-
-    if (this.actionTextInputWrapper.classList.contains('success'))
-      this.actionTextInputWrapper.classList.remove('success');
-    if (this.actionTextInputWrapper.classList.contains('error'))
-      this.actionTextInputWrapper.classList.remove('error');
-    if (this.keyNoteWrapper.classList.contains('success'))
-      this.keyNoteWrapper.classList.remove('success');
-    if (this.keyNoteWrapper.classList.contains('error'))
-      this.keyNoteWrapper.classList.remove('error');
-    if (this.slideActionButton.classList.contains('success'))
-      this.slideActionButton.classList.remove('success');
-
-    switch (this.actionBarAction) {
-      case 'email':
-        this.keyNoteWrapper.setAttribute('tooltip', 'While in private beta, access key is required.');
-        this.keyNoteWrapper.innerHTML = 'use a key <i class="gg-key"></i>';
-        this.slideActionButton.innerHTML = config.slideshow.emailActionText;
-        break;
-      case 'key':
-        this.keyNoteWrapper.setAttribute('tooltip', 'Access key will be sent to your e-mail.');
-        this.keyNoteWrapper.innerHTML = 'join the waitlist <i class="gg-mail"></i>';
-        this.slideActionButton.innerHTML = config.slideshow.keyActionText;
-        break;
-    }
-  }
-
-  formValid() {
-    logger.log('Slideshow: formValid');
-
-    if (this.actionTextInput.value === '')
-      return false;
-
-    if (
-      this.actionBarAction === 'email' &&
-      !config.slideshow.emailRegex.test(this.actionTextInput.value)
-    )
-      return false;
-
-    return true;
-  }
-
-  async formAction(e) {
-    logger.log('Slideshow: formAction', e, this.actionBarAction);
+  toggleCookie(e) {
+    logger.log('Slideshow: toggleCookie');
 
     e.preventDefault();
+    e.stopImmediatePropagation();
+    // set cookie for overlay
 
-    if (this.slideActionButton.classList.contains('success'))
-      return;
+    const cookieInput = this.keyNoteWrapper.querySelector('input');
+    cookieInput.checked = !cookieInput.checked;
 
-    if (!this.formValid())
-      return this.setInputErrorState();
-
-    this.slideActionButton.innerHTML = '<i class="gg-loadbar-alt"></i>';
-
-    try {
-      const action = (this.actionBarAction === 'email') ? 'join' : 'access';
-      const url = `${config.events.url}/${action}`
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          'email': this.actionTextInput.value
-        })
-      });
-
-      if (response.ok)
-        return this.setInputSuccessState();
-      else
-        throw new Error(`Failed to get response (${response.status})`);
-    } catch (error) {
-      return this.setInputErrorState();
+    if (cookieInput.checked) {
+      setCookie('no_overlay', true, 9999);
+    } else {
+      deleteCookie('no_overlay');
     }
   }
 
-  actionTextInputChangeAction(e) {
-    logger.log('Slideshow: actionTextInputChangeAction', e);
+  formAction(e) {
+    logger.log('Slideshow: formAction', e);
 
-    this.resetInputState();
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    // close overlay
   }
 
   navAction(e) {
@@ -425,6 +280,12 @@ export default class Slideshow {
     window.open(config.slideshow.discordLink, '_blank').focus();
   }
 
+  docsAction() {
+    logger.log('Slideshow: docsAction');
+
+    window.open(config.slideshow.docsLink, '_blank').focus();
+  }
+
   navigateSlideshow(toIndex) {
     logger.log('Slideshow: navigateSlideshow', toIndex);
 
@@ -449,9 +310,9 @@ export default class Slideshow {
       }
     });
 
-    if (this.slideIndex === this.slides.length - 1) 
+    if (this.slideIndex === this.slides.length - 1)
       this.rightIcon.classList.add('disabled');
-    else 
+    else
       this.rightIcon.classList.remove('disabled');
 
     if (this.slideIndex === 0)
@@ -481,12 +342,9 @@ export default class Slideshow {
     this.navWrapper.removeEventListener('click', this.bindNavAction);
     this.leftIcon.removeEventListener('click', this.bindNextPrevAction);
     this.rightIcon.removeEventListener('click', this.bindNextPrevAction);
-    this.discordButton.removeEventListener('click', this.bindDiscordAction);
-    this.actionBarForm.removeEventListener('submit', this.bindFormAction);
-    this.actionTextInput.removeEventListener('keydown', this.bindActionTextInputChangeAction);
-    this.keyNoteWrapper.removeEventListener('click', this.bindToggleActionBar);
+    this.keyNoteWrapper.removeEventListener('click', this.bindToggleCookie);
 
-    if (this.parent) 
+    if (this.parent)
       this.parent.removeChild(this.domElement);
   }
 }

@@ -69,7 +69,7 @@ export async function colorPixels({ scene, selection }) {
     return false;
 
   try {
-    await scene.game.web3.pixelContract.methods.setColors(
+    await scene.game.web3.canvasContract.methods.setColors(
       positions,
       colors,
       bids

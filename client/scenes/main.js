@@ -26,7 +26,7 @@ export default class MainScene extends ApplicationScene {
   }
 
   preload() {
-    this.load.image('worldimage', 'assets/images/world.png'); //this.load.image('worldimage', `${config.events.url}/image`);
+    this.load.image('worldimage', 'assets/images/world.png');  //this.load.image('worldimage', `${config.events.url}/image`);
   }
 
   create(data) {
@@ -123,7 +123,6 @@ export default class MainScene extends ApplicationScene {
     }
 
     //window.addEventListener('resize', this.resize.bind(this));
-    this.game.tools.openOverlay();
   }
 
   resize() {

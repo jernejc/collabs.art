@@ -8,5 +8,6 @@ dapp-config.json
 .rpc
 .wss
 .env
+.ideas
 app.yaml
 events/env

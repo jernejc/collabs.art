@@ -77,7 +77,7 @@ export default class Pixel {
     logger.log("setColor", this.cx, this.cy, this.HEXcolor);
 
     try {
-      await this.scene.game.web3.pixelContract.methods
+      await this.scene.game.web3.canvasContract.methods
         .setColor(
           stringToBN(this.position), // pixel position
           stringToHex(this.HEXcolor) // pixel color

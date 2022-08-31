@@ -6,7 +6,7 @@ require('@openzeppelin/test-helpers/configure')({ provider: web3.currentProvider
 
 const { singletons } = require('@openzeppelin/test-helpers');
 
-const Pixels = artifacts.require("Pixels");
+const CollabCanvas = artifacts.require("CollabCanvas");
 const CollabToken = artifacts.require("CollabToken");
 
 const subgraphYAML = `${__dirname}/../subgraph/subgraph.yaml`;
@@ -14,7 +14,7 @@ const eventsYAML = `${__dirname}/../events/app.yaml`;
 
 module.exports = async (deployer, network, accounts) => {
 
-  console.log("Deploying Pixels on network " + network);
+  console.log("Deploying CollabCanvas on network " + network);
   const networkName = network.replace('-fork', '');
   const httpUrl = deployer.networks[networkName].url;
 
@@ -39,22 +39,22 @@ module.exports = async (deployer, network, accounts) => {
     .map(item => web3.utils.stringToHex(item));
 
   // Deploy contracts
-  await deployer.deploy(Pixels, maxPixels, minUnit);
-  console.log("Pixels.address", Pixels.address);
+  await deployer.deploy(CollabCanvas, maxPixels, minUnit);
+  console.log("CollabCanvas.address", CollabCanvas.address);
 
-  await deployer.deploy(CollabToken, "CollabToken", "COLAB", [Pixels.address], conversionRate, developmentRate);
+  await deployer.deploy(CollabToken, "CollabToken", "COLAB", [CollabCanvas.address], conversionRate, developmentRate);
   console.log("CollabToken.address", CollabToken.address);
 
-  const PixelsInstance = await Pixels.deployed();
+  const CollabCanvasInstance = await CollabCanvas.deployed();
 
-  await PixelsInstance.setTokenContract(CollabToken.address);
-  await PixelsInstance.setSupportedColors(supportedColors);
+  await CollabCanvasInstance.setTokenContract(CollabToken.address);
+  await CollabCanvasInstance.setSupportedColors(supportedColors);
 
   // Create dapp config with new addresses
   const config = {
     httpUrl: httpUrl,
     wsUrl: wsUrl,
-    PixelsAddress: Pixels.address,
+    CollabCanvasAddress: CollabCanvas.address,
     CollabTokenAddress: CollabToken.address,
     ipfs: {
       host: 'ipfs.infura.io',
@@ -71,8 +71,8 @@ module.exports = async (deployer, network, accounts) => {
   // Loop through data sources
   subgraphConf.dataSources.forEach(data => {
     switch (data.source.abi) {
-      case 'Pixels':
-        data.source.address = Pixels.address;
+      case 'CollabCanvas':
+        data.source.address = CollabCanvas.address;
         break;
     }
   });
@@ -84,7 +84,7 @@ module.exports = async (deployer, network, accounts) => {
   const eventsConf = yaml.load(fs.readFileSync(eventsYAML, 'utf8'));
 
   // Update ENV vars
-  eventsConf.env_variables.PIXELS_ADDRESS = Pixels.address;
+  eventsConf.env_variables.PIXELS_ADDRESS = CollabCanvas.address;
   eventsConf.env_variables.TOKEN_ADDRESS = CollabToken.address;
   eventsConf.env_variables.WSURL = wsUrl;
 
@@ -92,7 +92,7 @@ module.exports = async (deployer, network, accounts) => {
   fs.writeFileSync(eventsYAML, newEventsYAML, 'utf8');
 
   // Copy ABIs to events
-  fs.writeFileSync(`${__dirname}/../events/abis/Pixels.json`, JSON.stringify(Pixels.abi), { flag: 'w' });
+  fs.writeFileSync(`${__dirname}/../events/abis/CollabCanvas.json`, JSON.stringify(CollabCanvas.abi), { flag: 'w' });
   fs.writeFileSync(`${__dirname}/../events/abis/CollabToken.json`, JSON.stringify(CollabToken.abi), { flag: 'w' });
 
   return;
