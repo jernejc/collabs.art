@@ -1,5 +1,6 @@
 import { toWei, stringToBN, stringToHex } from '@util/helpers';
 import logger from '@util/logger';
+import config from '@util/config';
 
 export function getColorForXY({ x, y, color, scene }) {
   //logger.log('getColorForXY', x, y, color, scene);
@@ -56,11 +57,9 @@ export async function colorPixels({ scene, selection }) {
     positions.push(stringToBN(pixel.position));
     colors.push(stringToHex(pixel.HEXcolor));
     bids.push(toWei(pixel.bid.toString()).toString());
-  })
-
-  console.log('positions', positions)
-  console.log('colors', colors)
-  console.log('bids', bids)
+  });
+  
+  scene.game.tools.setNetworkAlert(config.appConfig.processingMsg);
 
   if (!scene.game.web3.activeAddress)
     await scene.game.web3.getActiveAddress();
@@ -78,6 +77,7 @@ export async function colorPixels({ scene, selection }) {
     });
   } catch (error) {
     logger.error('Action colorPixels: ', error);
+    scene.game.tools.setNetworkAlert();
     return;
   }
 
@@ -85,6 +85,7 @@ export async function colorPixels({ scene, selection }) {
   updateWorldImagePixelColors({ pixels: selection, scene });
   // clear selection
   scene.game.selection.clearAllSelection();
+  scene.game.tools.setNetworkAlert()
 }
 
 export function updateWorldImagePixelColors({ pixels, scene, updateTile }) {

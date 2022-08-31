@@ -25,7 +25,7 @@ export default class TokenInfo {
 
     this.domElement = document.createElement('div');
     this.domElement.classList.add('info', 'colab-info');
-    this.domElement.innerHTML = '$COLAB token is used to draw on the canvas, you can get it <b>FREE mint</b>, by connecting your Twitter account and come say hi on our Discord channel.';
+    this.domElement.innerHTML = 'Get $COLAB by connecting your Twitter account and come say hi on our Discord channel.';
 
     this.twitterButton = new Button({
       icon: 'twitter-logo.png',
@@ -61,7 +61,7 @@ export default class TokenInfo {
       step: 0.2,
       min: 0.2,
       max: 9999,
-      label: 'ETH',
+      label: this.scene.game.web3.network.nativeCurrency.symbol,
       dynamicWidth: true,
       decimals: 1,
       onChange: async () => {

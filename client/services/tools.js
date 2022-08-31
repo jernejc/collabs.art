@@ -6,12 +6,13 @@ import Menu from '@components/menu';
 import Overlay from '@components/overlay';
 import Timer from '@components/timer';
 import Button from '@components/form/button';
-import Input from '@components/form/input';
 import TokenInfo from '@components/tokeninfo';
 import AuctionInfo from '@components/auctioninfo';
 
 import { formatShortAddress, getCookie } from '@util/helpers';
 import logger from '@util/logger';
+
+import { colorPixels } from '@actions/pixel';
 
 export default class ToolsManager {
 
@@ -22,9 +23,6 @@ export default class ToolsManager {
     this.emitter = emitter;
     this.infobox = null;
     this.changesBounceTimer = null;
-    this.search = {
-      text: ''
-    }
 
     setTimeout(() => { // canvas null in Firefox -_-
       this.parent = this.game.canvas.parentNode;
@@ -35,9 +33,9 @@ export default class ToolsManager {
       this.addEventListeners();
 
       const overlayCookie = getCookie('no_overlay');
-      
+
       if (!overlayCookie)
-        this.openOverlay();
+        this.openOverlay()
     });
   }
 
@@ -202,7 +200,7 @@ export default class ToolsManager {
 
   hideTokenInfo() {
     if (!this.domTokenInfo.closed)
-      this.domTokenInfo.close()
+      this.domTokenInfo.close();
   }
 
   updateActiveChangesCount() {
@@ -214,22 +212,35 @@ export default class ToolsManager {
       this.bottomNavChangesCount.classList.remove('bounce7');
     }
 
-    const activePixelsCount = this.game.selection.pixels.filter(pixel => pixel.hasChanges).length;
-    this.bottomNavChangesCount.innerHTML = `<span>${activePixelsCount}</span>`;
+    const activePixelsCount = this.game.selection.activeChangesCount;
 
-    if (this.menu && !this.menu.closed) {
-      this.hideActiveChanges();
-      return;
-    }
+    if (activePixelsCount > 0) {
+      this.bottomNavChangesCount.innerHTML = `<span>${activePixelsCount}</span>`;
+      this.bottomNavChangesStatus.innerHTML = `<span>${activePixelsCount} $COLAB</span> ( ${activePixelsCount} modified )`;
 
-    if (activePixelsCount > 0)
       this.showActiveChanges();
-    else
+
+      if (!this.bottomNavClearSelection.domElement.classList.contains('visible')) {
+        this.bottomNavClearSelection.domElement.classList.add('visible');
+        this.bottomNavClearSelection.domElement.classList.remove('hidden');
+      }
+    } else {
       this.hideActiveChanges();
+
+      if (!this.bottomNavClearSelection.domElement.classList.contains('hidden')) {
+        this.bottomNavClearSelection.domElement.classList.add('hidden');
+        this.bottomNavClearSelection.domElement.classList.remove('visible');
+      }
+    }
   }
 
   showActiveChanges() {
     const _self = this;
+
+    if (!this.domBottomNav.classList.contains('visible')) {
+      this.domBottomNav.classList.add('visible');
+      this.domBottomNav.classList.remove('hidden');
+    }
 
     if (!this.bottomNavChangesCount.classList.contains('visible')) {
       this.bottomNavChangesCount.classList.add('visible', 'bounce7');
@@ -244,21 +255,17 @@ export default class ToolsManager {
         _self.bottomNavChangesCount.classList.remove('bounce7');
       }, 1000);
     }
-
-    if (!this.bottomNavClearSelection.domElement.classList.contains('visible')) {
-      this.bottomNavClearSelection.domElement.classList.add('visible');
-      this.bottomNavClearSelection.domElement.classList.remove('hidden');
-    }
   }
 
   hideActiveChanges() {
+    if (!this.domBottomNav.classList.contains('hidden')) {
+      this.domBottomNav.classList.add('hidden');
+      this.domBottomNav.classList.remove('visible');
+    }
+
     if (!this.bottomNavChangesCount.classList.contains('hidden')) {
       this.bottomNavChangesCount.classList.add('hidden');
       this.bottomNavChangesCount.classList.remove('visible');
-    }
-    if (!this.bottomNavClearSelection.domElement.classList.contains('hidden')) {
-      this.bottomNavClearSelection.domElement.classList.add('hidden');
-      this.bottomNavClearSelection.domElement.classList.remove('visible');
     }
   }
 
@@ -314,31 +321,33 @@ export default class ToolsManager {
       this.connectionStatusBtn.setClickAction(action);
   }
 
-  setNetworkAlert() {
+  setNetworkAlert(text) {
     logger.log('ToolsManager: setNetworkAlert');
 
-    let text = null;
+    text = text || null;
 
-    switch (this.game.web3.currentStateTag) {
-      case 'metamask':
-        text = 'Install Metamask';
-        break;
-      case 'network':
-        text = 'Switch to Network';
-        break;
-      case 'wallet':
-        text = 'Connect to Wallet';
-        break;
-      case 'address':
-        text = formatShortAddress(this.game.web3.activeAddress);
-        break;
-      case 'permit':
-        text = 'Increase allowance';
-        break;
+    if (!text) {
+      switch (this.game.web3.currentStateTag) {
+        case 'metamask':
+          text = 'Install Metamask';
+          break;
+        case 'network':
+          text = `Switch to Network&nbsp;<b>${this.game.web3.network.nativeCurrency.symbol}</b>`;
+          break;
+        case 'wallet':
+          text = 'Connect to Wallet';
+          break;
+        case 'address':
+          text = formatShortAddress(this.game.web3.activeAddress);
+          break;
+        case 'permit':
+          text = 'Increase allowance';
+          break;
+      }
     }
 
     if (text) {
-      this.networkAlert.innerHTML = text;
+      this.networkAlert.innerHTML = text
       this.networkAlert.classList.add('show');
 
       if (this.networkAlert.classList.contains('hide'))
@@ -358,8 +367,9 @@ export default class ToolsManager {
 
     this.domBottomNav = document.createElement('div');
     this.domBottomNav.setAttribute('id', 'bottom-nav');
+    this.domBottomNav.classList.add('hidden');
 
-    this.bottonNavMenuBtn = new Button({
+    /*this.bottonNavMenuBtn = new Button({
       elClasses: ['pixels', 'menu-btn'],
       icon: 'gg-row-last',
       clickAction: async () => {
@@ -377,7 +387,7 @@ export default class ToolsManager {
           await this.menu.loadPixels()
       }
     });
-    this.domBottomNav.append(this.bottonNavMenuBtn.domElement);
+    this.domBottomNav.append(this.bottonNavMenuBtn.domElement); */
 
     this.bottomNavChangesCount = document.createElement('div');
     this.bottomNavChangesCount.classList.add('changes-count', 'hidden');
@@ -387,25 +397,32 @@ export default class ToolsManager {
     this.bottomNavClearSelection = new Button({
       elClasses: ['clear-selection', 'hidden'],
       icon: 'gg-trash',
-      text: 'Clear changes',
       clickAction: this.game.selection.clearAllSelection.bind(this.game.selection)
     });
 
     this.domBottomNav.append(this.bottomNavClearSelection.domElement);
 
-    this.bottomNavInput = new Input(this.search, 'text', {
-      scene: this.game.scene,
-      type: 'text',
-      placeholder: 'Find pixel.. (eg. RK438)',
-      max: 6,
-      onChange: async () => {
-        if (this.menu && this.menu.loaded) {
-          //await this.menu.loadPixels();
+    this.bottomNavChangesStatus = document.createElement('div');
+    this.bottomNavChangesStatus.classList.add('changes-stats');
+
+    this.domBottomNav.append(this.bottomNavChangesStatus);
+
+    this.bottomNavApplyBtn = new Button({
+      elClasses: ['action-button', 'apply'],
+      text: 'Apply',
+      clickAction: async e => {
+        console.log('batch apply clickAction');
+
+        if (this.game.selection.activeFullBid > this.game.web3.walletBalance) {
+          this.game.tools.showTokenInfo();
+          return;
         }
+
+        await colorPixels({ scene: this.game.scene.keys['MainScene'], selection: this.game.selection.pixels })
       }
     });
+    this.domBottomNav.append(this.bottomNavApplyBtn.domElement);
 
-    this.domBottomNav.append(this.bottomNavInput.domElement);
     this.parent.append(this.domBottomNav);
   }
 
@@ -532,8 +549,9 @@ export default class ToolsManager {
     this.networkAlert.style.display = 'none';
     this.domConnectionStatus.style.overflow = 'hidden';
     this.connectionStatusBtn.domElement.style.display = 'none';
-    this.domBottomNav.style.display = 'none';
     this.header.style.display = 'none';
+
+    this.domBottomNav.classList.add('hidden')
 
     this.minimapWrapper.setVisible(false);
     this.minimapBackground.setVisible(false);
@@ -551,12 +569,13 @@ export default class ToolsManager {
     this.networkAlert.style.display = 'flex';
     this.domConnectionStatus.style.overflow = 'visible';
     this.connectionStatusBtn.domElement.style.display = 'flex';
-    this.domBottomNav.style.display = 'flex';
     this.header.style.display = 'flex';
 
     this.minimapWrapper.setVisible(true);
     this.minimapBackground.setVisible(true);
     this.game.scene.start("MinimapScene");
+
+    this.updateActiveChangesCount();
   }
 
   clearOverlay() {

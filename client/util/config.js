@@ -23,7 +23,7 @@ const config = {
     enabled: false,
     default: false,
     chainId: Web3.utils.toHex('5'),
-    chainName: 'Goerli Test Network',
+    chainName: 'Goerli Testnet',
     nativeCurrency: {
       symbol: 'GöETH',
       name: 'Ethereum',
@@ -37,9 +37,9 @@ const config = {
     enabled: true,
     default: true,
     chainId: Web3.utils.toHex('5777'),
-    chainName: 'Development Test Network',
+    chainName: 'Development Testnet',
     nativeCurrency: {
-      symbol: 'ETH',
+      symbol: 'DevETH',
       name: 'Ethereum',
       decimals: 18,
     },
@@ -69,7 +69,8 @@ const config = {
     supportedColors: ['#93002c', '#c33502', '#c48100', '#c3a428', '#027d4e', '#029d5d', '#60b640', '#005a54', '#007a81', '#1a3f7e', '#2a6fb5', '#3fb4bd', '#382d95', '#5347c4', '#63177b', '#883992', '#c32b62', '#c47583', '#553722', '#77501c', '#000000', '#6a6c70', '#a2a3a6', '#c3c3c3'],
     fps: 30,
     pixelColor: hexStringToColor('#168A33'),
-    fillColor: hexStringToColor('#000000')
+    fillColor: hexStringToColor('#000000'),
+    processingMsg: '<i class="gg-loadbar-alt"></i>&nbsp;&nbsp; Processing Tx ..'
   },
   slideshow: {
     emailActionText: 'Join',

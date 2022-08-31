@@ -3,17 +3,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@700&display=swap');
 
 :root {
-  --light-green-color: #2b871c;
+  --light-green-color: #339900;
   --dark-green-color: #19610D;
   --activebid-color: #e5d900;
   --metamask-color: #e7893c;
   --polygon-color: #8247e5;
-  --notification-red-color: #fa3e3e;
+  --notification-red-color: #f02c2d;
   --blue-color: #255ebe;
   --active-black: rgb(24, 26, 27);
   --header-white: rgba(255, 255, 255, 0.8);
   --edge-margin: 8px;
-  --bottom-bar-width: 295px;
+  --bottom-bar-width: 280px;
   --bottom-bar-height: 260px;
   --bottom-bar-tabs-height: 38px;
   --bottom-bar-settings-height: 36px;
@@ -39,13 +39,27 @@ input {
 }
 
 .noselect {
-  -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-     -khtml-user-select: none; /* Konqueror HTML */
-       -moz-user-select: none; /* Old versions of Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Old versions of Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
                                   supported by Chrome, Edge, Opera and Firefox */
+}
+
+.visible {
+  display: flex;
+}
+
+.hidden {
+  display: none;
 }
 
 #app {
@@ -226,11 +240,22 @@ input {
   right: var(--edge-margin);
   display: flex;
   flex-direction: row;
-  padding: 0;
   background: var(--active-black);
-  width: var(--bottom-bar-width);
+  padding: 0px 11px;
+  height: 50px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--header-white);
+  justify-content: center;
+  align-items: center;
+}
+
+/* Otherwise id definition overwrites class..*/
+#bottom-nav.hidden {
+  display: none;
+}
+
+#bottom-nav.visible {
+  display: flex;
 }
 
 #bottom-nav input {
@@ -243,7 +268,7 @@ input {
 #bottom-nav .changes-count {
   position: absolute;
   top: -7px;
-  left: -7px;
+  left: -57px;
   z-index: 2;
   background-color: var(--notification-red-color);
   display: flex;
@@ -269,29 +294,39 @@ input {
   position: absolute;
   border: 0;
   right: 0px;
-  top: -27px;
+  top: -1px;
+  left: -50px;
   display: flex;
   background: var(--active-black);
-  font-size: 0.6em;
-  padding: 8px 10px;
+  font-size: 1.5em;
   color: #757575;
   cursor: pointer;
   align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 51px;
+  border-right: 1px solid;
 }
 
-#bottom-nav .clear-selection i {
-  --ggs: 0.7;
-  margin: 1px 7px 0px 0px;
-}
-
-#bottom-nav .clear-selection.visible,
-#bottom-nav .changes-count.visible {
+.changes-stats {
   display: flex;
+  align-items: center;
+  font-size: 0.7em;
+  color: #999;
+  margin: 0 10px 0 0;
 }
 
-#bottom-nav .clear-selection.hidden,
-#bottom-nav .changes-count.hidden {
-  display: none;
+.changes-stats i {
+  margin: 0 3px;
+  --ggs: 0.6;
+}
+
+.changes-stats span {
+  background: var(--blue-color);
+  color: var(--header-white);
+  font-size: 1.3em;
+  padding: 4px 6px;
+  margin-right: 8px;
 }
 
 .menu-btn {
@@ -300,7 +335,7 @@ input {
   margin: 0;
   background: none;
   border: 0;
-  color: var(--active-black);
+  color: var(--header-white);
   position: relative;
   cursor: pointer;
   outline: none;
@@ -308,8 +343,7 @@ input {
 
 .menu-btn:before {
   content: " ";
-  border: 2px solidvar(--active-black);
-  background-color: var(--header-white);
+  background-color: var(--active-black);
   position: absolute;
   top: 10px;
   bottom: 10px;
@@ -320,6 +354,10 @@ input {
 
 .menu-btn i {
   margin: 20px auto;
+}
+
+.menu-btn:hover {
+  color: var(--active-black);
 }
 
 .menu-btn:hover:before {
@@ -509,26 +547,6 @@ input {
   border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
-.settings.batch .changes-stats {
-  margin: 0px 10px 0px 3px;
-  display: flex;
-  align-items: center;
-  font-size: 0.95em;
-}
-
-.settings.batch .changes-stats i {
-  margin: 0 3px;
-  --ggs: 0.6;
-}
-
-.settings.batch .changes-stats span {
-  background: var(--blue-color);
-  color: var(--header-white);
-  font-size: 1.1em;
-  padding: 4px 6px;
-  margin-right: 6px;
-}
-
 #menu-item ul.list {
   position: relative;
   overflow: scroll;
@@ -709,7 +727,7 @@ input {
 }
 
 #connection-status .colab-info {
-  height: 266px;
+  height: 251px;
   right: 0;
 }
 
@@ -755,7 +773,7 @@ input {
   height: 43px;
   width: 100%;
   margin: 14px 0px 0px;
-  background-color: rgba(43, 135, 28, 0.5);
+  background-color: rgba(51, 153, 0, 0.5);
   align-content: center;
   justify-content: center;
 }
@@ -872,7 +890,7 @@ Info Box
   color: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: rgba(255, 255, 255, 0.1);
-  padding: 10px;
+  padding: 8px;
   border: 2px solid transparent;
   z-index: 1;
 }
@@ -883,6 +901,7 @@ Info Box
   color: white;
   padding-left: 10px;
   align-items: center;
+  margin-top: 2px;
 }
 
 .info-box .position i {
@@ -894,6 +913,18 @@ Info Box
   color: #999;
   margin: 0px 5px;
   font-size: 0.55em;
+}
+
+.info-box .apply {
+  width: 40%;
+  font-size: 11px;
+  margin: 3px 7px 3px 5px;
+  line-height: 16px;
+}
+
+.info-box .changes-info {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 10px;
 }
 
 /**
@@ -1052,14 +1083,17 @@ Info Box
 .action-button {
   border: 0;
   font-size: 14px;
-  line-height: 25px;
-  min-height: 25px;
   font-family: inherit;
-  width: 100%;
   background: var(--active-black);
   color: #FFF;
   cursor: pointer;
   transition: all 0.3s linear;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  min-width: 75px;
+  margin: auto 0;
 }
 
 .action-button i {

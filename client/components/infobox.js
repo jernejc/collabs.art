@@ -3,6 +3,7 @@ import ColorPicker from '@components/color/picker';
 import LoadingBar from '@components/loading';
 
 import logger from '@util/logger';
+import Button from './form/button';
 
 
 /**
@@ -94,10 +95,43 @@ export default class InfoBox {
         _self.pixel.changeToColorNumber(value);
         _self.pixel.setActivePixel();
         _self.game.tools.updateActiveChangesCount();
+        //_self.setActiveChanges();
       }
     });
 
     this.domElement.append(this.colorPicker.domElement);
+
+    //this.setActiveChanges();
+    this.setPosition();
+  }
+
+  setActiveChanges() {
+    const activeChangesCount = this.game.selection.pixels.filter(pixel => pixel.hasChanges).length;
+
+    if (this.changesInfo) {
+      this.applyBtn.destroy();
+      this.domElement.removeChild(this.changesWrapper);
+    }
+
+    if (activeChangesCount > 0) {
+      this.changesWrapper = document.createElement('div');
+      this.changesWrapper.classList.add('changes-wrapper');
+
+      this.applyBtn = new Button({
+        elClasses:['action-button', 'apply'],
+        text: 'Apply'
+      });
+
+      this.changesWrapper.append(this.applyBtn.domElement);
+    
+      this.changesInfo = document.createElement('span');
+      this.changesInfo.classList.add('changes-info');
+      this.changesInfo.innerHTML = `${activeChangesCount} $COLAB`;
+
+      this.changesWrapper.append(this.changesInfo);
+
+      this.domElement.append(this.changesWrapper);
+    }
 
     this.setPosition();
   }

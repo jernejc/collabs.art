@@ -6,6 +6,7 @@ import { getTileForPointer } from '@actions/pixel';
 
 import { formatColorNumber } from '@util/helpers';
 import logger from '@util/logger';
+import config from '@util/config';
 
 // Fired when user moves pointer through the grid
 export function handleMouseMove({ pointer, scene }) {
@@ -190,6 +191,8 @@ export async function creditToken({ scene, value }) {
   if (!scene.game.web3.activeAddress)
     return false;
 
+  scene.game.tools.setNetworkAlert(config.appConfig.processingMsg);
+
   try {
     await scene.game.web3.tokenContract.methods.credit().send({
       from: scene.game.web3.activeAddress,
@@ -197,8 +200,9 @@ export async function creditToken({ scene, value }) {
     });
   } catch (error) {
     logger.error('Action creditToken: ', error);
-    return;
   }
+
+  scene.game.tools.setNetworkAlert();
 }
 
 export function navigateMinimap({ pointer, scene }) {

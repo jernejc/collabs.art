@@ -16,6 +16,17 @@ export default class SelectionManager {
     this.pixels = [];
   }
 
+  get activeChangesCount() {
+    return this.pixels.filter(pixel => pixel.hasChanges).length;
+  }
+
+  get activeFullBid() {
+    return this.pixels.reduce((aggregator, pixel) => {
+      aggregator += pixel.bid;
+      return aggregator;
+    }, 0)
+  }
+
   highlightTile({ pointer, scene }) {
     //logger.log("SelectionManager: highlightTile")
 
