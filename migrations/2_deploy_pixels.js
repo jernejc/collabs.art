@@ -84,7 +84,7 @@ module.exports = async (deployer, network, accounts) => {
   const eventsConf = yaml.load(fs.readFileSync(eventsYAML, 'utf8'));
 
   // Update ENV vars
-  eventsConf.env_variables.PIXELS_ADDRESS = CollabCanvas.address;
+  eventsConf.env_variables.CANVAS_ADDRESS = CollabCanvas.address;
   eventsConf.env_variables.TOKEN_ADDRESS = CollabToken.address;
   eventsConf.env_variables.WSURL = wsUrl;
 

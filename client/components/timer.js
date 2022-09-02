@@ -35,8 +35,6 @@ export default class Timer {
     // Get today's date and time
     const now = new Date().getTime();
 
-    //console.log(this.lastDayOfMonth);
-    //console.log(now)
     // Find the distance between now and the count down date
     const distance = this.lastDayOfMonth - now;
 

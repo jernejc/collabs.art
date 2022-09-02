@@ -78,7 +78,7 @@ const config = {
     emailRegex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     subtitle: '<span>Contribute to a living</span> canvas.<br /><span>Become a</span> Creator.', // is HTML
     discordLink: 'https://discord.gg/DKZkG4CnrC',
-    docsLink: 'https://discord.gg/DKZkG4CnrC',
+    docsLink: 'https://unexpected-jupiter-4e2.notion.site/About-collabs-art-0c8e5af1deee4b6982b1c70fd354c9fc',
     articles: [{ // This goes async from server
       icon: 'about.svg',
       title: 'About',

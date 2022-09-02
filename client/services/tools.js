@@ -392,8 +392,6 @@ export default class ToolsManager {
       elClasses: ['action-button', 'apply'],
       text: 'Apply',
       clickAction: async e => {
-        console.log('batch apply clickAction');
-
         if (this.game.selection.activeFullBid > this.game.web3.walletBalance) {
           this.game.tools.showTokenInfo();
           return;
@@ -424,6 +422,10 @@ export default class ToolsManager {
     this.domAuctionInfo = new AuctionInfo({ parent: this.header, closed: true });
 
     this.parent.append(this.header);
+
+    this.header.addEventListener('click', (e) => {
+      this.domAuctionInfo.open();
+    });
   }
 
   addConnectionStatus() {

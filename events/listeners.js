@@ -12,8 +12,8 @@ const config = require('./config');
 
 const web3Instance = new Web3(config.wsUrl);
 const canvasContract = new web3Instance.eth.Contract(
-  PixelsABI,
-  config.PixelsAddress
+  CollabCanvasABI,
+  config.canvasAddress
 );
 
 let emitter = null;
@@ -36,12 +36,12 @@ async function canvasContractListeners() {
 
   emitter = canvasContract.events.ColorPixels({ fromBlock: 'earliest' })
     .on('data', async e => {
-      console.log('ColorPixels event triggered.');
+      console.log('ColorPixels event triggered.', JSON.stringify(e));
       const worldImage = await loadWorldImage();
 
       try {
-        const positions = e.returnValues._positions;
-        const colors = e.returnValues._colors;
+        const positions = e.returnValues.positions;
+        const colors = e.returnValues.colors;
 
         let updateWorld = false;
 

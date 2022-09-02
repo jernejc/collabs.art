@@ -10,7 +10,7 @@ require('dotenv').config()
 // Local helpers
 const { CORSconfig } = require('./helpers');
 // Routes
-const { getImage, joinWaitlist, validateAccess } = require('./routes');
+const { getImage } = require('./routes');
 // Listeners
 const { canvasContractListeners } = require('./listeners');
 
@@ -36,10 +36,6 @@ app.use(cors(CORSconfig));
 
 // Return latest world image
 app.get('/image', getImage);
-// Join waitlist
-app.post('/join', joinWaitlist);
-// Validate access key
-app.post('/access', validateAccess);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {

@@ -127,6 +127,8 @@ input {
   display: flex;
   align-items: center;
   height: 50px;
+  cursor: pointer;
+  user-select: none;
 }
 
 #header button {
@@ -753,7 +755,8 @@ input {
 }
 
 #connection-status .colab-info .social-connect.twitter:hover {
-  background: #1d9bf0;
+  background: #999; /* #1d9bf0; */
+  border: 1px solid #999;
 }
 
 #connection-status .colab-info .social-connect.discord {

@@ -393,8 +393,7 @@ export default class Web3Manager {
         this.walletBalance = 0;
       }
     }
-
-    console.log('walletBalance', this.walletBalance)
+    
     return this.walletBalance;
   }
 

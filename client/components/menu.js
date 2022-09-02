@@ -200,8 +200,6 @@ export default class Menu {
       text: 'Apply',
       //icon: 'gg-check-r',
       clickAction: async e => {
-        console.log('batch apply clickAction');
-
         if (fullBid > this.game.web3.walletBalance) {
           this.game.tools.showTokenInfo();
           return;

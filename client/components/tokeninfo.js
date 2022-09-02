@@ -30,8 +30,9 @@ export default class TokenInfo {
     this.twitterButton = new Button({
       icon: 'twitter-logo.png',
       text: 'Connect',
+      tooltip: 'Available Soon!',
       elClasses: ['action-button', 'social-connect', 'twitter']
-    })
+    });
 
     this.domElement.append(this.twitterButton.domElement);
 
@@ -102,7 +103,6 @@ export default class TokenInfo {
   }
 
   refreshTokenCalc() {
-    //console.log('refreshTokenCalc', this.supportInput.input.value, this.supportForm.value);
     this.tokenCalc.innerHTML = `<i class="gg-arrows-exchange-alt"></i> ${parseInt(this.supportInput.input.value * 500)} $COLAB`;
   }
 
