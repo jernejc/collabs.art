@@ -1,35 +1,10 @@
+![Vercel](http://therealsujitk-vercel-badge.vercel.app/?app=therealsujitk-vercel-badge)
+
 # Idea and concept
 
 Better described here:
-<a href="https://gist.github.com/jernejc/b0e192aa80d6efd307e423397ae405db" target="_blank">https://gist.github.com/jernejc/b0e192aa80d6efd307e423397ae405db</a>
+<a href="https://unexpected-jupiter-4e2.notion.site/About-collabs-art-0c8e5af1deee4b6982b1c70fd354c9fc" target="_blank">Docs</a>
 
-A grid of 1.000.000 pixels, where each pixel is represented by a non-fungible token (NFT) on the Ethereum network. Ownership is stored and transfered based on the <a href="https://eips.ethereum.org/EIPS/eip-721" target="_blank">ERC-721 standard</a> as most digital art and collectibles. It cannot be taken away or destroyed. 
-
-Each position has unique identifier within the grid:
-
-<pre>
-    0 →              999
-  A ┌──────────────────┐  
-  ↓ │                  │  Horizontal axis are numbers from 0 to 999.
-    │    TN220         │  Vertical axis are letters from A to ALK.
-    │     ┌─┐          │  
-    │     └─┘          │  Example ID: <b>TN220</b>
-    │                  │  Vertical: <b>TN</b> Horizontal: <b>220</b>
-    │                  │  
-ALK └──────────────────┘ 
-</pre>
-
-Within the same <a href="https://en.wikipedia.org/wiki/Smart_contract" target="_blank">smart contract</a> owners can set colors to their pixels and thus contribute to the ever emerging image.
-
-## ERC721Batch
-
-The application is using a modified version of ERC-721 with additional batch support. It's based on OpenZeppelins ERC-721 with three additional methods:
-
-- _mintBatch
-- _transferBatch
-- _burnBatch
-
-The new functionallity allows you to create, transfer and destroy more than one token at a time. Inspired by <a href="https://eips.ethereum.org/EIPS/eip-1155" target="_blank">ERC-1155 Multi Token Standard</a>, the goal is to reduce gas cost when operating with large numbers of tokens.
 
 ## Client app
 
