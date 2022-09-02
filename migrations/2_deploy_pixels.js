@@ -91,6 +91,10 @@ module.exports = async (deployer, network, accounts) => {
   const newEventsYAML = yaml.dump(eventsConf);
   fs.writeFileSync(eventsYAML, newEventsYAML, 'utf8');
 
+  // Copy ABIs to client
+  fs.writeFileSync(`${__dirname}/../client/abis/CollabCanvas.json`, JSON.stringify(CollabCanvas.abi), { flag: 'w' });
+  fs.writeFileSync(`${__dirname}/../client/abis/CollabToken.json`, JSON.stringify(CollabToken.abi), { flag: 'w' });
+
   // Copy ABIs to events
   fs.writeFileSync(`${__dirname}/../events/abis/CollabCanvas.json`, JSON.stringify(CollabCanvas.abi), { flag: 'w' });
   fs.writeFileSync(`${__dirname}/../events/abis/CollabToken.json`, JSON.stringify(CollabToken.abi), { flag: 'w' });

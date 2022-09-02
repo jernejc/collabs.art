@@ -50,6 +50,14 @@ const config = {
       from: path.resolve(__dirname, 'client/assets'),
       to: path.resolve(__dirname, 'dist/assets')
     }]),
+    new CopyPlugin([{
+      from: path.resolve(__dirname, 'client/abis'),
+      to: path.resolve(__dirname, 'dist/abis')
+    }]),
+    new CopyPlugin([{
+      from: path.resolve(__dirname, 'client/config.json'),
+      to: path.resolve(__dirname, 'dist/config.json')
+    }]),
     new webpack.DefinePlugin({
       PRODUCTION: PROD,
       VERSION: "0.1.1",

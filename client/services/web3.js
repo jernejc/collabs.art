@@ -103,7 +103,7 @@ export default class Web3Manager {
         config.contracts.token.address
       );
 
-      this.eventcanvasContract = new this.websocketInstance.eth.Contract(
+      this.eventCanvasContract = new this.websocketInstance.eth.Contract(
         config.contracts.canvas.abi,
         config.contracts.canvas.address
       );
@@ -138,7 +138,7 @@ export default class Web3Manager {
 
     // Contract events
     if (this.websocketInstance) {
-      this.socketColorPixelsListener = this.eventcanvasContract.events.ColorPixels({ fromBlock: 'latest' })
+      this.socketColorPixelsListener = this.eventCanvasContract.events.ColorPixels({ fromBlock: 'latest' })
         .on('data', (e) => {
           logger.log('Web3Manager: ColorPixels')
           const _positions = e.returnValues.positions;
@@ -321,12 +321,12 @@ export default class Web3Manager {
     }
   }
 
-  async switchToNetwork(chainId) {
-    logger.log('Web3Manager: switchToNetwork', chainId);
+  async switchToNetwork() {
+    logger.log('Web3Manager: switchToNetwork');
 
-    chainId = chainId || Web3.utils.toHex('5777') // Default to Development testnet
+    //chainId = chainId || Web3.utils.toHex('5777') // Default to Development testnet
 
-    const networkConfig = config.networks.find(net => net.chainId === chainId && net.enabled === true);
+    const networkConfig = config.networks.find(net => net.default === true);
 
     if (!networkConfig)
       throw new Error('Unsupported network.');
@@ -334,7 +334,7 @@ export default class Web3Manager {
     try {
       await this.RPCinstance.currentProvider.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId: chainId }]
+        params: [{ chainId: networkConfig.chainId }]
       });
 
       if (!this.activeAddress)

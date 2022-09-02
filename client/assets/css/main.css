@@ -680,7 +680,7 @@ input {
 }
 
 #connection-status button.ethereum-logo .gg-chevron-double-up {
-  color: buttonface;
+  color: var(--active-black);
 }
 
 #connection-status button.polygon i.gg-chevron-double-up {
