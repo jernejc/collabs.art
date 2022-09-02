@@ -1,15 +1,15 @@
-specVersion: 0.0.4
-description: Pixels for Ethereum
+specVersion: 0.1.0
+description: Art Collabs
 repository: https://github.com/graphprotocol/example-subgraph
 schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: Pixels
-    network: mumbai
+    name: Collab
+    network: goerli
     source:
-      address: '0xF473539e9c49A087dc413C821FfD84E665690C3c'
-      abi: Pixels
+      address: '0x57AB8C10Bf5c5Ba3AB322a7246aAA693835E9363'
+      abi: CollabCanvas
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -17,8 +17,8 @@ dataSources:
       entities:
         - Pixel
       abis:
-        - name: Pixels
-          file: ../build/contracts/Pixels.json
+        - name: CollabCanvas
+          file: ../build/contracts/CollabCanvas.json
       eventHandlers:
         - event: ColorPixel(uint256,bytes6,uint256,address,uint256)
           handler: handleColorPixel

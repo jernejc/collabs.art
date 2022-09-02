@@ -56,7 +56,7 @@ const config = {
   subgraph: {
     url: 'https://api.thegraph.com/subgraphs/id/QmRcGm2sWmcXvuUvySGxWpjDb9D3DMgi5LwkxoyeBqawRj'
   },
-  events: {
+  api: {
     url: 'https://pixelworld-2e64c.uc.r.appspot.com'
   },
   appConfig: {
