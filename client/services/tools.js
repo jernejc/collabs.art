@@ -36,7 +36,7 @@ export default class ToolsManager {
 
       if (!overlayCookie)
         this.openOverlay()
-    });
+    }, 10);
   }
 
   get metamaskURL() {
@@ -332,7 +332,7 @@ export default class ToolsManager {
           text = 'Install Metamask';
           break;
         case 'network':
-          text = `Switch to Network&nbsp;<b>${this.game.web3.network.nativeCurrency.symbol}</b>`;
+          text = `Switch to Network`;
           break;
         case 'wallet':
           text = 'Connect to Wallet';
