@@ -1,4 +1,5 @@
 import logger from "@util/logger";
+import config from "@util/config";
 import Button from "./form/button";
 
 export default class AuctionInfo {
@@ -17,7 +18,9 @@ export default class AuctionInfo {
 
     this.domElement = document.createElement('div');
     this.domElement.classList.add('info', 'auction-info');
-    this.domElement.innerHTML = 'Every month a snapshot of the canvas is taken and auctioned off as an NFT. The collected funds are split between $COLAB owners used to color the final image. Canvas resets each time. <a href="#">(more)</a>';
+    this.domElement.innerHTML = `Every last day of the month a snapshot of the canvas is auctioned as a
+                                 non-fungible token (NFT). The proceeds are converted 
+                                 to $COLAB and distributed between the participants. <a href="${config.slideshow.docsLink}" target="_blank">(more)</a>`;
 
     this.auctionPageButton = new Button({
       icon: 'gg-today',
@@ -37,12 +40,17 @@ export default class AuctionInfo {
 
     this.parent.append(this.domElement);
 
-    if (this.closed) 
+    if (this.closed)
       this.close();
   }
 
-  close() {
+  close(e) {
     logger.log('AuctionInfo: close');
+
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
 
     if (!this.domElement.classList.contains('hidden'))
       this.domElement.classList.add('hidden');

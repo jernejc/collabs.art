@@ -1,4 +1,4 @@
-specVersion: 0.1.0
+specVersion: 0.0.6
 description: Art Collabs
 repository: https://github.com/graphprotocol/example-subgraph
 schema:
@@ -20,8 +20,8 @@ dataSources:
         - name: CollabCanvas
           file: ../build/contracts/CollabCanvas.json
       eventHandlers:
-        - event: ColorPixel(uint256,bytes6,uint256,address,uint256)
+        - event: ColorPixel(uint256,bytes6,uint256,address)
           handler: handleColorPixel
-        - event: ColorPixels(uint256[],bytes6[],uint256[],address,uint256)
+        - event: ColorPixels(uint256[],bytes6[],uint256[],address)
           handler: handleColorPixels
       file: ./mappings/pixels.ts

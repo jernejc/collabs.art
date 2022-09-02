@@ -25,12 +25,13 @@ export default class TokenInfo {
 
     this.domElement = document.createElement('div');
     this.domElement.classList.add('info', 'colab-info');
-    this.domElement.innerHTML = 'Get $COLAB by connecting your Twitter account and come say hi on our Discord channel.';
+    this.domElement.innerHTML = `Get $COLAB by connecting your Twitter account and come say hi on our Discord channel. <a href="${config.slideshow.docsLink}" target="_blank">(more)</a>`;
 
     this.twitterButton = new Button({
       icon: 'twitter-logo.png',
       text: 'Connect',
       tooltip: 'Available Soon!',
+      tooltipFlow: 'down',
       elClasses: ['action-button', 'social-connect', 'twitter']
     });
 

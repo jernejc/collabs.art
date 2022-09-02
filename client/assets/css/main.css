@@ -149,6 +149,7 @@ input {
 
 #header .auction-info {
   height: 140px;
+  cursor: default;
 }
 
 #header .auction-info .gg-close-r {

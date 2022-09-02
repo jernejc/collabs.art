@@ -63,7 +63,7 @@ export default class ToolsManager {
         await this.menu.loadPixels();
 
       // Update infobox UI if user address changes
-      if (this.infobox && !this.infobox.preventRefresh)
+      if (this.infobox && this.infobox.domElement && !this.infobox.preventRefresh)
         await this.infobox.setUI();
     });
 
@@ -77,7 +77,7 @@ export default class ToolsManager {
         await this.menu.loadPixels();
 
       // Update infobox UI if user address changes
-      if (this.infobox && !this.infobox.preventRefresh)
+      if (this.infobox && this.infobox.domElement && !this.infobox.preventRefresh)
         await this.infobox.setUI();
     });
 
@@ -88,7 +88,7 @@ export default class ToolsManager {
         this.menu.createSettings();
 
       // Update infobox UI if user address changes
-      if (this.infobox && !this.infobox.preventRefresh)
+      if (this.infobox && this.infobox.domElement && !this.infobox.preventRefresh)
         await this.infobox.setUI();
     });
 
@@ -213,10 +213,11 @@ export default class ToolsManager {
     }
 
     const activePixelsCount = this.game.selection.activeChangesCount;
+    const activeFullBid = this.game.selection.activeFullBid;
 
     if (activePixelsCount > 0) {
       this.bottomNavChangesCount.innerHTML = `<span>${activePixelsCount}</span>`;
-      this.bottomNavChangesStatus.innerHTML = `<span>${activePixelsCount} $COLAB</span> ( ${activePixelsCount} modified )`;
+      this.bottomNavChangesStatus.innerHTML = `<span>${activeFullBid} $COLAB</span> ( ${activePixelsCount} modified )`;
 
       this.showActiveChanges();
 

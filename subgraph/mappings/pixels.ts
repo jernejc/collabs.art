@@ -6,7 +6,6 @@ export function handleColorPixel(event: ColorPixel): void {
   const color = event.params.color;
   const bid = event.params.bid;
   const owner = event.params.owner;
-  const modifiedAt = event.params.modifiedAt;
 
   let pixel = Pixel.load(position.toHex());
 
@@ -17,7 +16,6 @@ export function handleColorPixel(event: ColorPixel): void {
   pixel.color = color;
   pixel.owner = owner;
   pixel.bid = bid;
-  pixel.modifiedAt = modifiedAt;
 
   pixel.save();
 }
@@ -27,7 +25,6 @@ export function handleColorPixels(event: ColorPixels): void {
   const colors = event.params.colors;
   const bids = event.params.bids;
   const owner = event.params.owner;
-  const modifiedAt = event.params.modifiedAt;
 
   for (let i = 0; i < positions.length; i++) {
     if (positions[i] !== null && colors[i] !== null) {
@@ -40,7 +37,6 @@ export function handleColorPixels(event: ColorPixels): void {
       pixel.color = colors[i];
       pixel.owner = owner;
       pixel.bid = bids[i];
-      pixel.modifiedAt = modifiedAt;
 
       pixel.save();
     }

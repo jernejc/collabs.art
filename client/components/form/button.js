@@ -2,7 +2,7 @@
 import logger from '@util/logger';
 
 export default class Button {
-  constructor({ elClasses, text, icon, disabled, tooltip, clickAction }) {
+  constructor({ elClasses, text, icon, disabled, tooltip, tooltipFlow, clickAction }) {
     this.loadingUI = document.createElement('i');
     this.loadingUI.classList.add('gg-loadbar-alt');
 
@@ -22,7 +22,7 @@ export default class Button {
     if (text)
       this.setText(text);
     if (tooltip)
-      this.setToolTip(tooltip)
+      this.setToolTip(tooltip, tooltipFlow)
   }
 
   loading() {
@@ -60,8 +60,11 @@ export default class Button {
     this.domElement.innerHTML += this.text;
   }
 
-  setToolTip(tooltip) {
+  setToolTip(tooltip, tooltipFlow) {
     this.domElement.setAttribute('tooltip', tooltip);
+
+    if (tooltipFlow)
+      this.domElement.setAttribute('flow', tooltipFlow);
   }
 
   clearIcon() {

@@ -1,3 +1,4 @@
+import Web3 from 'web3';
 import {
   numberToLetterColumn,
   formatColorNumber,
@@ -128,12 +129,10 @@ export default class Pixel {
     logger.log('Pixel: setGraphData');
 
     if (data) {
-      if (!this.bid)
-        this.bid = this.scene.game.web3.defaultPrice;
+      if (data.bid)
+        this.bid = parseInt(Web3.utils.fromWei(data.bid)) + 1;
       if (data.color)
         this.changeToColorHex(data.color);
-      if (data.modifiedAt)
-        this.modifiedAt = data.modifiedAt;
 
       this.owner = data.owner.toLowerCase();
     }

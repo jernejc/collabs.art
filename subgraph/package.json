@@ -4,7 +4,7 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --product hosted-service jernejc/apoietic",
+    "deploy": "graph deploy --product hosted-service jernejc/collabsart",
     "create-local": "graph create --node http://localhost:8020/ autopoietic.art",
     "remove-local": "graph remove --node http://localhost:8020/ autopoietic.art",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 autopoietic.art"

@@ -54,7 +54,7 @@ const config = {
   }],
   defaultPrice: 1,
   subgraph: {
-    url: 'https://api.thegraph.com/subgraphs/id/QmRcGm2sWmcXvuUvySGxWpjDb9D3DMgi5LwkxoyeBqawRj'
+    url: 'https://api.thegraph.com/subgraphs/name/jernejc/collabsart'
   },
   api: {
     url: 'https://pixelworld-2e64c.uc.r.appspot.com'
