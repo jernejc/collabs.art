@@ -20,7 +20,7 @@ export default class Web3Manager {
     this.RPCinstance = null;
     this.tokenContract = null;
     this.canvasContract = null;
-    this.defaultPrice = null;
+    this.minUnit = null;
     this.hasMetamask = false;
     this.accounts = [];
     this.activeAddress = null;
@@ -111,8 +111,18 @@ export default class Web3Manager {
   }
 
   connectWebsocket() {
-    if (this.network.wsUrls && this.network.wsUrls.length > 0)
-      this.websocketInstance = new Web3(this.network.wsUrls[0]);
+    if (this.network.wsUrls && this.network.wsUrls.length > 0) {
+      const options = {
+        reconnect: {
+          auto: true,
+          delay: 5000, // ms
+          maxAttempts: 5,
+          onTimeout: true
+        }
+      };
+
+      this.websocketInstance = new Web3(new Web3.providers.WebsocketProvider(this.network.wsUrls[0], options));
+    }
   }
 
   enableProviderEvents() {
@@ -161,7 +171,7 @@ export default class Web3Manager {
           logger.log('Web3Manager: TransferToken');
 
           if (!e.returnValues || !e.returnValues.to || !e.returnValues.from || !e.returnValues.value) {
-            console.warn('Web3Manager: No return values found in event');
+            logger.warn('Web3Manager: No return values found in event');
             return;
           }
 
@@ -182,7 +192,7 @@ export default class Web3Manager {
 
     this.connectWebsocket();
     this.initContracts();
-    this.getDefaultPrice();
+    this.getMinUnit();
   }
 
   handleNewChain(chainId) {
@@ -213,7 +223,7 @@ export default class Web3Manager {
       this.connectWebsocket();
       this.initContracts();
 
-      await this.getDefaultPrice();
+      await this.getMinUnit();
       await this.getWalletBalance();
 
       this.enableContractEvents();
@@ -348,27 +358,27 @@ export default class Web3Manager {
     }
   }
 
-  async getDefaultPrice() {
-    logger.log('Web3Manager: getDefaultPrice');
+  async getMinUnit() {
+    logger.log('Web3Manager: getMinUnit');
 
-    let defaultPrice;
+    let minUnit;
 
     try {
-      defaultPrice = await this.tokenContract.methods.defaultPrice().call();
-      this.defaultPrice = Web3.utils.fromWei(defaultPrice);
+      minUnit = await this.canvasContract.methods.getMinUnit().call();
+      this.minUnit = Web3.utils.fromWei(minUnit);
     } catch (error) {
-      logger.warn('Failed to fetch RPC default price');
+      logger.warn('Failed to fetch RPC minUnit');
 
       try {
-        defaultPrice = await this.eventTokenContract.methods.defaultPrice().call();
-        this.defaultPrice = Web3.utils.fromWei(defaultPrice);
+        minUnit = await this.eventCanvasContract.methods.getMinUnit().call();
+        this.minUnit = Web3.utils.fromWei(minUnit);
       } catch (error) {
-        logger.warn('Failed to fetch WS default price');
-        this.defaultPrice = config.defaultPrice;
+        logger.warn('Failed to fetch WS minUnit');
+        this.minUnit = config.defaultMinUnit;
       }
     }
 
-    return this.defaultPrice;
+    return this.minUnit;
   }
 
   async getWalletBalance() {
@@ -393,7 +403,7 @@ export default class Web3Manager {
         this.walletBalance = 0;
       }
     }
-    
+
     return this.walletBalance;
   }
 

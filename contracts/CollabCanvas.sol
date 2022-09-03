@@ -21,37 +21,37 @@ contract CollabCanvas is AccessControl, IERC777Recipient {
 
     CollabToken private _CollabTokenContract;
 
-    uint private _maxPixels;
-    uint private _minUnit;
+    uint256 private _maxPixels;
+    uint256 private _minUnit;
 
-    mapping(address => uint) private _existingBids;
+    mapping(address => uint256) private _existingBids;
     mapping(bytes6 => bool) private _supportedColors;
 
     struct Pixel {
         address owner;
         bytes6 color;
-        uint bid;
+        uint256 bid;
     }
 
-    mapping(uint => Pixel) private _pixels;
+    mapping(uint256 => Pixel) private _pixels;
 
     event ColorPixel(
-        uint position,
+        uint256 position,
         bytes6 color,
-        uint bid,
+        uint256 bid,
         address owner
     );
     event ColorPixels(
-        uint[] positions,
+        uint256[] positions,
         bytes6[] colors,
-        uint[] bids,
+        uint256[] bids,
         address owner
     );
     event TokensReceived(
         address operator,
         address from,
         address to,
-        uint amount,
+        uint256 amount,
         bytes userData,
         bytes operatorData
     );
@@ -59,8 +59,11 @@ contract CollabCanvas is AccessControl, IERC777Recipient {
     /**
      * @dev Contract Constructor, sets max pixels
      */
-    constructor(uint maxPixels, uint minUnit) {
-        require(maxPixels > 0, "CollabCanvas: Max pixels must be greater than 0");
+    constructor(uint256 maxPixels, uint256 minUnit) {
+        require(
+            maxPixels > 0,
+            "CollabCanvas: Max pixels must be greater than 0"
+        );
         require(minUnit > 0, "CollabCanvas: Min unit must be greater than 0");
 
         // set max pixels limit
@@ -81,7 +84,7 @@ contract CollabCanvas is AccessControl, IERC777Recipient {
      * @dev Get pixel color
      * @param position pixel position in the world / id
      */
-    function getColor(uint position) public view returns (bytes6) {
+    function getColor(uint256 position) public view returns (bytes6) {
         require(
             _exists(position),
             "CollabCanvas: Make sure position exists before returning color"
@@ -97,9 +100,9 @@ contract CollabCanvas is AccessControl, IERC777Recipient {
      * @param bid pixel bid amount
      */
     function setColor(
-        uint position,
+        uint256 position,
         bytes6 color,
-        uint bid
+        uint256 bid
     ) public {
         require(
             _supportedColor(color),
@@ -144,9 +147,9 @@ contract CollabCanvas is AccessControl, IERC777Recipient {
      * @param bids array of bid amounts
      */
     function setColors(
-        uint[] calldata positions,
+        uint256[] calldata positions,
         bytes6[] calldata colors,
-        uint[] calldata bids
+        uint256[] calldata bids
     ) public {
         require(
             positions.length == colors.length,
@@ -157,10 +160,10 @@ contract CollabCanvas is AccessControl, IERC777Recipient {
             "CollabCanvas: positions and bids length mismatch"
         );
 
-        uint bidsSum = 0;
+        uint256 bidsSum = 0;
 
         // Validate bids and colors and prepare existing bids mapping
-        for (uint i = 0; i < bids.length; i++) {
+        for (uint256 i = 0; i < bids.length; i++) {
             require(
                 bids[i] >= (_pixels[positions[i]].bid + _minUnit),
                 "CollabCanvas: All bids must be higher than existing"
@@ -185,7 +188,7 @@ contract CollabCanvas is AccessControl, IERC777Recipient {
 
         address[] memory existingOwners = new address[](positions.length);
 
-        for (uint i = 0; i < positions.length; i++) {
+        for (uint256 i = 0; i < positions.length; i++) {
             Pixel memory pixel = _pixels[positions[i]];
 
             if (pixel.bid > 0) {
@@ -206,7 +209,7 @@ contract CollabCanvas is AccessControl, IERC777Recipient {
         }
 
         if (existingOwners.length > 0) {
-            for (uint i = 0; i < existingOwners.length; i++) {
+            for (uint256 i = 0; i < existingOwners.length; i++) {
                 address existingOwner = existingOwners[i];
 
                 if (_existingBids[existingOwner] > 0) {
@@ -238,7 +241,7 @@ contract CollabCanvas is AccessControl, IERC777Recipient {
         address operator,
         address from,
         address to,
-        uint amount,
+        uint256 amount,
         bytes calldata userData,
         bytes calldata operatorData
     ) external {
@@ -254,7 +257,7 @@ contract CollabCanvas is AccessControl, IERC777Recipient {
      * @dev set maxPixels
      * @param maxPixels new maximum number of pixels
      */
-    function setMaxPixels(uint maxPixels) public onlyAdmin {
+    function setMaxPixels(uint256 maxPixels) public onlyAdmin {
         require(
             maxPixels > 0,
             "CollabCanvas: Max pixels must be greater than 0 and total current supply"
@@ -264,13 +267,27 @@ contract CollabCanvas is AccessControl, IERC777Recipient {
     }
 
     /**
+     * @dev Get max pixels
+     */
+    function getMaxPixels() public view returns (uint256) {
+        return _maxPixels;
+    }
+
+    /**
      * @dev set minUnit
      * @param minUnit min bid unit
      */
-    function setMinUnit(uint minUnit) public onlyAdmin {
+    function setMinUnit(uint256 minUnit) public onlyAdmin {
         require(minUnit > 0, "CollabCanvas: Min unit for bid increase");
 
         _minUnit = minUnit;
+    }
+
+    /**
+     * @dev Get max pixels
+     */
+    function getMinUnit() public view returns (uint256) {
+        return _minUnit;
     }
 
     /**
@@ -335,7 +352,7 @@ contract CollabCanvas is AccessControl, IERC777Recipient {
      * @dev Returns whether position exists
      * @param position pixel position
      */
-    function _exists(uint position) private view returns (bool) {
+    function _exists(uint256 position) private view returns (bool) {
         return _pixels[position].bid > 0;
     }
 

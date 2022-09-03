@@ -52,7 +52,7 @@ const config = {
     symbol: 'Ξ',
     enabled: false
   }],
-  defaultPrice: 1,
+  defaultMinUnit: 1,
   subgraph: {
     url: 'https://api.thegraph.com/subgraphs/name/jernejc/collabsart'
   },
@@ -83,7 +83,7 @@ const config = {
       icon: 'about.svg',
       title: 'About',
       shortTitle: 'about',
-      body: 'A social experiment where players collectively draw on a shared canvas by changing the color of individual pixels and thus continuously contribute to the emerging global image. The goal is to illustrate the process of self-organization within a community of random players with the help of blockchain technology.'
+      body: 'A social experiment where artists have to collaborate on a shared canvas by changing the color of individual pixels. The goal is to illustrate the process of self-organization within a community of random players with the help of blockchain technology.' // A social experiment where players collectively draw on a shared canvas by changing the color of individual pixels and thus continuously contribute to the emerging global image. 
     }, {
       icon: 'ownership.svg',
       title: 'Ownership',
@@ -93,7 +93,7 @@ const config = {
       icon: 'social-dynamic.svg',
       title: 'Social Dynamic',
       shortTitle: 'social',
-      body: 'Every last day of the month a snapshot of the canvas is packaged as a non-fungible token (NFT) and auctioned off. Auction proceeds are distributed between all the participants based on how much $COLAB they had invested. Canvas resets and the game starts all over again.'
+      body: 'Every month a snapshot of the canvas is auctioned as a non-fungible token (NFT). The proceeds are converted to $COLAB and distributed between the participants based on how much tokens they have staked.'
     }]
   },
 

@@ -220,8 +220,8 @@ export function navigateMinimap({ pointer, scene }) {
   const cx = (x * scene.sceneConfig.sizeRatio) - (fieldWidth / 2);
   const cy = (y * scene.sceneConfig.sizeRatio) - (fieldHeight / 2);
 
-  if (scene.game.selection.pixels.length > 0)
-    scene.game.selection.reset();
+  /*if (scene.game.selection.pixels.length > 0)
+    scene.game.selection.reset();*/
 
   moveToPosition({ scene: scene.mainscene, x: cx, y: cy, save: true });
 }

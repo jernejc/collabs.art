@@ -1417,7 +1417,7 @@ Info Box
   position: absolute;
   top: 50%;
   width: 65vw;
-  height: 290px;
+  height: 280px;
   padding: 30px 20px 40px;
   max-width: 630px;
   margin: -180px 0 0 52%;
@@ -1481,7 +1481,7 @@ Info Box
 
 .slides-nav {
   position: absolute;
-  bottom: 16px;
+  bottom: 26px;
   left: 5px;
   height: 60px;
   display: flex;
@@ -1597,7 +1597,7 @@ Info Box
   margin: 0;
   display: flex;
   position: absolute;
-  bottom: 25px;
+  bottom: 35px;
   left: 120px;
 }
 

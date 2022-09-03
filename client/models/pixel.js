@@ -166,7 +166,7 @@ export default class Pixel {
     const color = tile.fillColor;
     const pixel = new Pixel({ tile, scene, color, cx: tile.cx, cy: tile.cy });
 
-    if (!pixel.bid) pixel.bid = scene.game.web3.defaultPrice;
+    if (!pixel.bid) pixel.bid = scene.game.web3.minUnit;
 
     return pixel;
   }

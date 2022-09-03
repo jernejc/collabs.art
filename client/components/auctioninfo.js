@@ -18,7 +18,7 @@ export default class AuctionInfo {
 
     this.domElement = document.createElement('div');
     this.domElement.classList.add('info', 'auction-info');
-    this.domElement.innerHTML = `Every last day of the month a snapshot of the canvas is auctioned as a
+    this.domElement.innerHTML = `Every month a snapshot of the canvas is auctioned as a
                                  non-fungible token (NFT). The proceeds are converted 
                                  to $COLAB and distributed between the participants. <a href="${config.slideshow.docsLink}" target="_blank">(more)</a>`;
 
