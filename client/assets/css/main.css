@@ -193,6 +193,7 @@ input {
   width: 13px;
   --ggs: 0.9;
   cursor: pointer;
+  border-color: transparent;
 }
 
 #inspired-by .game-of-life-toggle i {

@@ -72,7 +72,7 @@ export default class SelectionManager {
 
         const previous = this.pixels[0];
 
-        if (previous && !previous.hasChanges && this.game.mode !== 'multiselect') {
+        if (previous && !previous.hasChanges && this.game.mode !== 'shiftdown') {
           previous.clearActivePixel();
           this.pixels.shift();
         }
@@ -131,18 +131,20 @@ export default class SelectionManager {
 
     const pixel = this.isSelected(tile.cx, tile.cy);
 
-    this.pixels = this.pixels.filter((p) => {
-      return !(p.cx === tile.cx && p.cy === tile.cy);
-    });
+    if (pixel) {
+      this.pixels = this.pixels.filter((p) => {
+        return !(p.cx === tile.cx && p.cy === tile.cy);
+      });
 
-    pixel.clearActivePixel();
-    pixel.resetColor();
+      pixel.clearActivePixel();
+      pixel.resetColor();
 
-    if (pixel.infobox) {
-      this.game.tools.clearInfoBox();
+      if (pixel.infobox) {
+        this.game.tools.clearInfoBox();
+      }
+
+      this.emitter.emit("selection/update");
     }
-
-    this.emitter.emit("selection/update");
   }
 
   isSelected(cx, cy) {
@@ -229,7 +231,18 @@ export default class SelectionManager {
     this.rectangleSelection.updateData();
   }
 
+  refreshSelection() {
+    this.pixels.forEach((pixel) => {
+      pixel.refreshColor();
+      pixel.setActivePixel();
+    });
+  }
+
   /* Clear selection(s) */
+
+  clearBorders() {
+    this.pixels.forEach((pixel) => pixel.clearActivePixel());
+  }
 
   clearRectangleSelection() {
     if (!this.rectangleSelection) return;

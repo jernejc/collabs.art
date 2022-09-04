@@ -10,6 +10,7 @@ import {
 import logger from '@util/logger';
 
 import { setInvertedStroke, resetStrokeStyle } from "@actions/general";
+import { getRelativeTile } from "@actions/pixel";
 
 export default class Pixel {
   constructor({ tile, scene, color, cx, cy }) {
@@ -72,6 +73,19 @@ export default class Pixel {
     if (this.tile) this.tile.setFillStyle(this.color.color);
 
     //this.setActivePixel();
+  }
+
+  getTile() {
+    this.tile = getRelativeTile({ cx: this.cx, cy: this.cy, scene: this.scene });
+  }
+
+  refreshColor() {
+    logger.log("Pixel: refreshColor");
+
+    if (!this.tile)
+      this.getTile();
+
+    this.tile.setFillStyle(this.color.color);
   }
 
   async setColor() {
@@ -150,9 +164,12 @@ export default class Pixel {
   clearActivePixel() {
     logger.log('Pixel: clearActivePixel');
 
-    if (this.tile) resetStrokeStyle({ tile: this.tile, scene: this.scene });
+    if (this.tile) {
+      resetStrokeStyle({ tile: this.tile, scene: this.scene });
+      this.tile = null;
+    }
 
-    this.scene.game.selection.clearRectangleSelection();
+    //this.scene.game.selection.clearRectangleSelection();
   }
 
   removeFromSelection() {

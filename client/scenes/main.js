@@ -63,7 +63,7 @@ export default class MainScene extends ApplicationScene {
     });
 
     this.input.on('pointerdown', async (pointer) => {
-      await handleMouseDown({ pointer, scene: this });
+      handleMouseDown({ pointer, scene: this });
     });
 
     this.input.on('pointerup', (pointer) => {
@@ -78,13 +78,13 @@ export default class MainScene extends ApplicationScene {
      * Keyboard events
      */
 
-    /*this.input.keyboard.on('keydown-SHIFT', (event) => {
+    this.input.keyboard.on('keydown-SHIFT', (event) => {
       handleShiftDown({ scene: _self })
     });
 
     this.input.keyboard.on('keyup-SHIFT', (event) => {
       handleShiftUp({ scene: _self })
-    });*/
+    });
 
     this.input.keyboard.on('keydown-SPACE', (event) => {
       handleSpaceDown({ scene: _self })

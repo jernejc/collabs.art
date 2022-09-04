@@ -129,8 +129,7 @@ export default class ToolsManager {
         }
       }
 
-      if (update[0] && update[0].hasChanges)
-        this.updateActiveChangesCount();
+      this.updateActiveChangesCount();
     })
 
     this.emitter.on('selection/clear', async () => {

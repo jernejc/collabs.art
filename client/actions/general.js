@@ -13,13 +13,10 @@ export function handleMouseMove({ pointer, scene }) {
   //logger.log('User interactions: handleMove');
 
   switch (scene.game.mode) {
-    case 'move':
-      if (pointer.isDown) {
-        panDragMap({ pointer, scene });
-      } else
-        scene.game.origDragPoint = null;
+    /*case 'move':
+      
       break;
-    case 'multiselect':
+    case 'shiftdown':
       const tile = getTileForPointer({ pointer, scene });
 
       if (scene.game.selection.isSelected(tile.cx, tile.cy))
@@ -35,27 +32,28 @@ export function handleMouseMove({ pointer, scene }) {
     case 'gameoflife':
     case 'select':
       positionSelectionBlock({ pointer, scene });
-      break;
+      break;*/
     case 'mininav':
       if (pointer.isDown)
         navigateMinimap({ pointer, scene: scene.minimap })
       break;
+    default:
+      if (pointer.isDown)
+        panDragMap({ pointer, scene });
+      else
+        scene.game.origDragPoint = null;
+      break;
   }
 }
 
-export async function handleMouseDown({ pointer, scene }) {
+export function handleMouseDown({ pointer, scene }) {
   //logger.log('User interactions: handleMouseDown', scene.game.mode);
 
   let tile;
 
   switch (scene.game.mode) {
-    case 'multiselect':
-      if (pointer.button === 2) { // Detect right click
-        //scene.game.selection.reset();
-        return;
-      }
-
-      scene.game.selection.createRectangleSelection({ pointer, scene });
+    case 'shiftdown':
+      //scene.game.selection.createRectangleSelection({ pointer, scene });
       break;
     case 'gameoflife':
       tile = getTileForPointer({ pointer, scene });
@@ -67,27 +65,33 @@ export async function handleMouseDown({ pointer, scene }) {
       scene.tiles[tile.cy - 1][tile.cx].alive = true;
       scene.tiles[tile.cy + 1][tile.cx].alive = true;
       break;
-    case 'select':
-      tile = getTileForPointer({ pointer, scene });
-
-      /*if (scene.game.selection.isSelected(tile.cx, tile.cy))
-        scene.game.selection.removeSelected({ tile, scene });
-      else*/
-      await scene.game.selection.addSelected({ tiles: [tile], scene });
-      break;
-    case 'mininav':
-      navigateMinimap({ pointer, scene: scene.minimap })
-      break;
   }
 }
 
 export async function handleMouseUp({ pointer, scene }) {
   //logger.log('User interactions: handleMouseUp', pointer, scene);
 
+  let tile;
   const selection = scene.game.selection;
 
   switch (scene.game.mode) {
-    case 'multiselect':
+    case 'mininav':
+      navigateMinimap({ pointer, scene: scene.minimap })
+      break;
+    case 'select':
+      if (!scene.game.origDragPoint) {
+        tile = getTileForPointer({ pointer, scene });
+        await scene.game.selection.addSelected({ tiles: [tile], scene });
+      }
+      break;
+    case 'shiftdown':
+      //scene.game.selection.createRectangleSelection({ pointer, scene });
+      if (!scene.game.origDragPoint) {
+        tile = getTileForPointer({ pointer, scene });
+        scene.game.selection.removeSelected({ tile });
+      }
+      break;
+    /*case 'shiftdown':
       if (
         !selection.rectangleSelectionBeginPixel ||
         !selection.rectangleSelectionEndPixel ||
@@ -123,8 +127,11 @@ export async function handleMouseUp({ pointer, scene }) {
       });
 
       selection.clearRectangleSelection();
-      break;
+      break;*/
   }
+
+  scene.game.selection.refreshSelection();
+  scene.game.origDragPoint = null;
 }
 
 export function handleMouseWheel({ scene, dx, dy, dz }) {
@@ -146,7 +153,7 @@ export function handleShiftDown({ scene }) {
   // logger.log('User interactions: handleShiftDown');
 
   if (scene.game.mode === 'select')
-    setGameMode({ scene, mode: 'multiselect' });
+    setGameMode({ scene, mode: 'shiftdown' });
 
   scene.input.keyboard.off('keydown_SHIFT'); // Event repeats as longs as the button is pressed, we only want it to trigger once.
 }
@@ -154,7 +161,7 @@ export function handleShiftDown({ scene }) {
 export function handleShiftUp({ scene }) {
   //logger.log('User interactions: handleShiftUp');
 
-  if (scene.game.mode === 'multiselect')
+  if (scene.game.mode === 'shiftdown')
     setGameMode({ scene, mode: 'select' });
 
   scene.input.keyboard.on('keydown_SHIFT', (event) => {
@@ -227,7 +234,7 @@ export function navigateMinimap({ pointer, scene }) {
 }
 
 export function panDragMap({ pointer, scene }) {
-  //logger.log('User interactions: panDragMap');
+  logger.log('User interactions: panDragMap');
 
   if (scene.game.origDragPoint) {
     // move the camera by the amount the mouse has moved since last update
@@ -235,6 +242,11 @@ export function panDragMap({ pointer, scene }) {
     const newY = scene.cameraY + (scene.game.origDragPoint.y - pointer.position.y);
 
     moveToPosition({ scene, x: newX, y: newY, save: true });
+  } else {
+    scene.game.selection.clearBorders();
+    
+    if (scene.game.tools.infobox)
+      scene.game.tools.clearInfoBox();
   }
 
   // set new drag origin to current position
@@ -331,9 +343,9 @@ export function setGameMode({ scene, mode }) {
 
       generalResetStrokeStyle({ scene, selection: true });
       break;
-    case 'multiselect':
-      scene.input.setDefaultCursor('copy');
-      scene.game.mode = 'multiselect';
+    case 'shiftdown':
+      scene.input.setDefaultCursor('cell');
+      scene.game.mode = 'shiftdown';
 
       generalResetStrokeStyle({ scene, selection: true });
       break;
