@@ -1,4 +1,4 @@
-![Vercel](http://therealsujitk-vercel-badge.vercel.app/?app=therealsujitk-vercel-badge)
+![Vercel](https://vercelbadge.vercel.app/api/jernejc/collabs.art)
 
 # Idea and concept
 
