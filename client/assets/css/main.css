@@ -1423,24 +1423,38 @@ Info Box
   background: var(--active-black);
   color: white;
   width: auto;
-  margin: 0 0 0 -116px;
+  margin: 0 0 0 -120px;
   left: 50%;
   top: 10px;
   display: flex;
   align-items: center;
-  padding: 0 18px 0 0;
 }
 
-.notification a.etherscan {
+.notification .etherscan {
   align-items: center;
-  margin: 0 0 0 20px;
+  margin: 0 0 0 17px;
   display: flex;
   transition: 0.2s opacity;
+  background: transparent;
+  border-color: transparent;
+  cursor: pointer;
 }
 
-.notification a.etherscan.disabled {
+.notification .etherscan img {
+  width: 25px;
+}
+
+.notification .etherscan.disabled {
   opacity: 0.3;
   cursor: not-allowed;
+}
+
+.notification .close {
+  background: transparent;
+  border-color: transparent;
+  color: white;
+  margin: 0 15px;
+  cursor: pointer;
 }
 
 .notification .icon {
@@ -1454,6 +1468,10 @@ Info Box
   justify-content: center;
 }
 
+.notification.processing {
+  padding-right: 19px;
+}
+
 .notification.processing i.gg-loadbar-alt {
   background: var(--light-green-color);
 }
@@ -1463,7 +1481,7 @@ Info Box
 }
 
 .notification.success {
-  margin: 0 0 0 -95px;
+  margin: 0 0 0 -115px;
 }
 
 .notification.success .icon {
@@ -1472,7 +1490,7 @@ Info Box
 }
 
 .notification.error {
-  margin: 0 0 0 -85px;
+  margin: 0 0 0 -104px;
 }
 
 .notification.error .icon {

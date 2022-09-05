@@ -88,15 +88,14 @@ export async function colorPixels({ scene, selection }) {
       return;
     }
 
-    scene.game.tools.setNotification(3000, 'error', txHash);
+    scene.game.tools.setNotification(10000, 'error', txHash);
     return;
   }
 
-  // Set colors on the image
   updateWorldImagePixelColors({ pixels: selection, scene });
-  // clear selection
+
   scene.game.selection.clearAllSelection();
-  scene.game.tools.setNotification(3000, 'success', txHash);
+  scene.game.tools.setNotification(6500, 'success', txHash);
 }
 
 export function updateWorldImagePixelColors({ pixels, scene, updateTile }) {

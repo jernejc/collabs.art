@@ -1,4 +1,5 @@
 import logger from "@util/logger";
+import Button from "./form/button";
 
 export default class Notification {
 
@@ -20,29 +21,44 @@ export default class Notification {
     this.domElement = document.createElement('div');
     this.domElement.classList.add('notification', this.type);
 
-    const hashLink = (this.hash) ? this.getTxURL(this.hash) : '#';
-
     switch (this.type) {
       case 'processing':
-        this.domElement.innerHTML = `<span class="icon"><i class="gg-loadbar-alt"></i></span>&nbsp;&nbsp; Processing Tx .. 
-          <a class="etherscan disabled" target="_blank" tooltip="View on Etherscan" flow="down">
-            <img src="assets/images/icons/etherscan-logo.svg" width="25">
-          </a>`;
+        this.domElement.innerHTML = `<span class="icon"><i class="gg-loadbar-alt"></i></span>&nbsp;&nbsp; Processing Tx ..`;
         break;
       case 'success':
-        this.domElement.innerHTML = `<span class="icon"><i class="gg-check"></i></span>&nbsp;&nbsp; Success 
-          <a href="${hashLink}" class="etherscan" tooltip="View on Etherscan" flow="down" target="_blank">
-            <img src="assets/images/icons/etherscan-logo.svg" width="25">
-          </a>`;
+        this.domElement.innerHTML = `<span class="icon"><i class="gg-check"></i></span>&nbsp;&nbsp; Success`;
         break;
       case 'error':
-        this.domElement.innerHTML = `<span class="icon"><i class="gg-close"></i></span>&nbsp;&nbsp; Error 
-          <a href="${hashLink}" class="etherscan" tooltip="View on Etherscan" flow="down" target="_blank">
-            <img src="assets/images/icons/etherscan-logo.svg" width="25">
-          </a>`;
+        this.domElement.innerHTML = `<span class="icon"><i class="gg-danger"></i></span>&nbsp;&nbsp; Error`;
         break;
     }
 
+    const elClasses = ['etherscan'];
+
+    if (!this.hash)
+      elClasses.push('disabled');
+
+    this.etherscanBtn = new Button({
+      elClasses,
+      icon: 'etherscan-logo.svg',
+      clickAction: () => {
+        let hashLink = this.getTxURL();
+
+        if (hashLink)
+          window.open(hashLink, '_blank').focus();
+      }
+    });
+
+    this.domElement.appendChild(this.etherscanBtn.domElement);
+
+    if (this.type !== 'processing') {
+      this.closeBtn = new Button({
+        icon: 'gg-close',
+        clickAction: this.destroy.bind(this)
+      });
+
+      this.domElement.appendChild(this.closeBtn.domElement);
+    }
 
     if (this.time > 0)
       this.timer = setTimeout(this.destroy.bind(this), this.time);
@@ -51,13 +67,13 @@ export default class Notification {
   }
 
   setTxHash(hash) {
-    const etherscanDom = this.domElement.querySelector('.etherscan');
-    etherscanDom.setAttribute('href', this.getTxURL(hash));
-    etherscanDom.classList.remove('disabled');
+    this.hash = hash;
+    this.etherscanBtn.domElement.classList.remove('disabled');
   }
 
-  getTxURL(hash) {
-    return `${this.scene.game.web3.network.blockExplorerUrl}/tx/${hash}`;
+  getTxURL() {
+    if (this.hash)
+      return `${this.scene.game.web3.network.blockExplorerUrl}/tx/${this.hash}`;
   }
 
   destroy() {

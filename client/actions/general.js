@@ -172,11 +172,11 @@ export async function creditToken({ scene, value }) {
       return;
     }
 
-    scene.game.tools.setNotification(3000, 'error', txHash);
+    scene.game.tools.setNotification(10000, 'error', txHash);
     return;
   }
 
-  scene.game.tools.setNotification(3000, 'success', txHash);
+  scene.game.tools.setNotification(6500, 'success', txHash);
 }
 
 export function navigateMinimap({ pointer, scene }) {

@@ -7,7 +7,9 @@ export default class Button {
     this.loadingUI.classList.add('gg-loadbar-alt');
 
     this.domElement = document.createElement('button');
-    this.domElement.classList.add(...elClasses); // 'action-button'
+
+    if (elClasses)
+      this.domElement.classList.add(...elClasses); // 'action-button'
 
     this.triggerActionListener = this.triggerAction.bind(this); // For removeEventListener to work
 
@@ -78,7 +80,7 @@ export default class Button {
 
   setIcon(icon, alertAction) {
     if (this.domElement.classList.contains('info-text'))
-        this.domElement.classList.remove('info-text');
+      this.domElement.classList.remove('info-text');
 
     if (this.icon)
       this.domElement.classList.remove(this.icon.replace('gg-', ''));
