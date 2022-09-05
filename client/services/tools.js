@@ -13,6 +13,7 @@ import { formatShortAddress, getCookie } from '@util/helpers';
 import logger from '@util/logger';
 
 import { colorPixels } from '@actions/pixel';
+import Notification from '@components/notification';
 
 export default class ToolsManager {
 
@@ -319,6 +320,28 @@ export default class ToolsManager {
       this.connectionStatusBtn.setIcon(iconClass, alertIcon);
     if (action)
       this.connectionStatusBtn.setClickAction(action);
+  }
+
+  setNotification(time, type, hash) {
+    logger.log('ToolsManager: setNotification');
+
+    this.removeNotification();
+
+    this.domNotification = new Notification({ parent: this.parent, scene: this.game.scene.keys['MainScene'], time, type, hash })
+  }
+
+  setNotificationTxHash(hash) {
+    logger.log('ToolsManager: setNotificationTxHash');
+
+    if (this.domNotification)
+      this.domNotification.setTxHash(hash)
+  }
+
+  removeNotification() {
+    logger.log('ToolsManager: removeNotification');
+
+    if (this.domNotification)
+      this.domNotification.destroy();
   }
 
   setNetworkAlert(text) {

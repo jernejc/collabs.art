@@ -58,14 +58,16 @@ export async function colorPixels({ scene, selection }) {
     colors.push(stringToHex(pixel.HEXcolor));
     bids.push(toWei(pixel.bid.toString()).toString());
   });
-  
-  scene.game.tools.setNetworkAlert(config.appConfig.processingMsg);
 
   if (!scene.game.web3.activeAddress)
     await scene.game.web3.getActiveAddress();
 
   if (!scene.game.web3.activeAddress)
     return false;
+
+  let txHash = null;
+
+  scene.game.tools.setNotification(0, 'processing');
 
   try {
     await scene.game.web3.canvasContract.methods.setColors(
@@ -74,10 +76,19 @@ export async function colorPixels({ scene, selection }) {
       bids
     ).send({
       from: scene.game.web3.activeAddress
+    }).on('transactionHash', (hash) => {
+      txHash = hash;
+      scene.game.tools.setNotificationTxHash(txHash);
     });
   } catch (error) {
     logger.error('Action colorPixels: ', error);
-    scene.game.tools.setNetworkAlert();
+
+    if (error.message && error.message === 'MetaMask Tx Signature: User denied transaction signature.') {
+      scene.game.tools.removeNotification();
+      return;
+    }
+
+    scene.game.tools.setNotification(3000, 'error', txHash);
     return;
   }
 
@@ -85,7 +96,7 @@ export async function colorPixels({ scene, selection }) {
   updateWorldImagePixelColors({ pixels: selection, scene });
   // clear selection
   scene.game.selection.clearAllSelection();
-  scene.game.tools.setNetworkAlert()
+  scene.game.tools.setNotification(3000, 'success', txHash);
 }
 
 export function updateWorldImagePixelColors({ pixels, scene, updateTile }) {

@@ -31,7 +31,7 @@ const config = {
     },
     wsUrls: [dappConfig.wsUrl],
     rpcUrls: [dappConfig.httpUrl],
-    blockExplorerUrls: ['https://goerli.etherscan.io'],
+    blockExplorerUrl: 'https://goerli.etherscan.io',
   }, {
     id: 5777,
     enabled: false,
@@ -45,7 +45,7 @@ const config = {
     },
     wsUrls: ['ws://127.0.0.1:7545'],
     rpcUrls: ['http://127.0.0.1:7545'],
-    blockExplorerUrls: ['https://goerli.etherscan.io'],
+    blockExplorerUrl: 'https://goerli.etherscan.io',
   }, {
     id: 1,
     name: 'ETH Mainnet',
@@ -70,7 +70,8 @@ const config = {
     fps: 30,
     pixelColor: hexStringToColor('#168A33'),
     fillColor: hexStringToColor('#000000'),
-    processingMsg: '<i class="gg-loadbar-alt"></i>&nbsp;&nbsp; Processing Tx ..'
+    processingMsg: '<i class="gg-loadbar-alt"></i>&nbsp;&nbsp; Processing Tx ..',
+    defaultNotificationTime: 5000
   },
   slideshow: {
     emailActionText: 'Join',

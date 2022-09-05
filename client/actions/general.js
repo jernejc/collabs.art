@@ -6,17 +6,18 @@ import { getTileForPointer } from '@actions/pixel';
 
 import { formatColorNumber } from '@util/helpers';
 import logger from '@util/logger';
-import config from '@util/config';
 
-// Fired when user moves pointer through the grid
 export function handleMouseMove({ pointer, scene }) {
   //logger.log('User interactions: handleMove');
 
   switch (scene.game.mode) {
-    /*case 'move':
-      
+    case 'move':
+      handleGameMoving({ scene, pointer });
+
+      if (pointer.isDown)
+        panDragMap({ pointer, scene });
       break;
-    case 'shiftdown':
+    /*case 'shiftdown':
       const tile = getTileForPointer({ pointer, scene });
 
       if (scene.game.selection.isSelected(tile.cx, tile.cy))
@@ -28,30 +29,37 @@ export function handleMouseMove({ pointer, scene }) {
         scene.game.selection.resizeRectangleSelection({ pointer, scene });
       else
         positionSelectionBlock({ pointer, scene });
-      break;
+      break;*/
     case 'gameoflife':
     case 'select':
       positionSelectionBlock({ pointer, scene });
-      break;*/
-    case 'mininav':
-      if (pointer.isDown)
-        navigateMinimap({ pointer, scene: scene.minimap })
       break;
-    default:
+    case 'mininav':
+      handleGameMoving({ scene, pointer });
+
       if (pointer.isDown)
-        panDragMap({ pointer, scene });
-      else
-        scene.game.origDragPoint = null;
+        navigateMinimap({ pointer, scene: scene.minimap });
       break;
   }
 }
 
 export function handleMouseDown({ pointer, scene }) {
-  //logger.log('User interactions: handleMouseDown', scene.game.mode);
+  logger.log('User interactions: handleMouseDown', scene.game.mode);
 
   let tile;
 
   switch (scene.game.mode) {
+    case 'mininav':
+      navigateMinimap({ pointer, scene: scene.minimap })
+      handleGameMoving({ scene, pointer });
+      break;
+    case 'move':
+      handleGameMoving({ scene, pointer });
+      break;
+    case 'select':
+      tile = getTileForPointer({ pointer, scene });
+      scene.game.selection.addSelected({ tiles: [tile], scene });
+      break;
     case 'shiftdown':
       //scene.game.selection.createRectangleSelection({ pointer, scene });
       break;
@@ -69,28 +77,19 @@ export function handleMouseDown({ pointer, scene }) {
 }
 
 export async function handleMouseUp({ pointer, scene }) {
-  //logger.log('User interactions: handleMouseUp', pointer, scene);
+  logger.log('User interactions: handleMouseUp');
 
   let tile;
   const selection = scene.game.selection;
 
   switch (scene.game.mode) {
-    case 'mininav':
-      navigateMinimap({ pointer, scene: scene.minimap })
-      break;
-    case 'select':
-      if (!scene.game.origDragPoint) {
-        tile = getTileForPointer({ pointer, scene });
-        await scene.game.selection.addSelected({ tiles: [tile], scene });
-      }
-      break;
-    case 'shiftdown':
+    /*case 'shiftdown':
       //scene.game.selection.createRectangleSelection({ pointer, scene });
       if (!scene.game.origDragPoint) {
         tile = getTileForPointer({ pointer, scene });
         scene.game.selection.removeSelected({ tile });
       }
-      break;
+      break;*/
     /*case 'shiftdown':
       if (
         !selection.rectangleSelectionBeginPixel ||
@@ -130,8 +129,26 @@ export async function handleMouseUp({ pointer, scene }) {
       break;*/
   }
 
+  if (scene.game.origDragPoint) {
+    scene.game.origDragPoint = null;
+    scene.game.moving = false;
+  }
+
   scene.game.selection.refreshSelection();
-  scene.game.origDragPoint = null;
+}
+
+export function handleGameMoving({ scene, pointer }) {
+  if (pointer.isDown && !scene.game.moving) {
+    scene.game.selection.clearBorders();
+
+    if (scene.game.tools.infobox)
+      scene.game.tools.clearInfoBox();
+
+    scene.game.moving = true;
+
+    // set new drag origin to current position
+    scene.game.origDragPoint = pointer.position.clone();
+  }
 }
 
 export function handleMouseWheel({ scene, dx, dy, dz }) {
@@ -198,18 +215,31 @@ export async function creditToken({ scene, value }) {
   if (!scene.game.web3.activeAddress)
     return false;
 
-  scene.game.tools.setNetworkAlert(config.appConfig.processingMsg);
+  let txHash = null;
+
+  scene.game.tools.setNotification(0, 'processing');
 
   try {
     await scene.game.web3.tokenContract.methods.credit().send({
       from: scene.game.web3.activeAddress,
       value: Web3.utils.toWei(value)
-    });
+    }).on('transactionHash', (hash) => {
+      txHash = hash;
+      scene.game.tools.setNotificationTxHash(txHash);
+    })
   } catch (error) {
     logger.error('Action creditToken: ', error);
+
+    if (error.message && error.message === 'MetaMask Tx Signature: User denied transaction signature.') {
+      scene.game.tools.removeNotification();
+      return;
+    }
+
+    scene.game.tools.setNotification(3000, 'error', txHash);
+    return;
   }
 
-  scene.game.tools.setNetworkAlert();
+  scene.game.tools.setNotification(3000, 'success', txHash);
 }
 
 export function navigateMinimap({ pointer, scene }) {
@@ -242,15 +272,7 @@ export function panDragMap({ pointer, scene }) {
     const newY = scene.cameraY + (scene.game.origDragPoint.y - pointer.position.y);
 
     moveToPosition({ scene, x: newX, y: newY, save: true });
-  } else {
-    scene.game.selection.clearBorders();
-    
-    if (scene.game.tools.infobox)
-      scene.game.tools.clearInfoBox();
   }
-
-  // set new drag origin to current position
-  scene.game.origDragPoint = pointer.position.clone();
 }
 
 export function moveToPosition({ scene, x, y, save }) {

@@ -6,7 +6,8 @@
   --light-green-color: #339900;
   --dark-green-color: #19610D;
   --activebid-color: #e5d900;
-  --metamask-color: #e7893c;  /* eb942b */
+  --metamask-color: #e7893c;
+  /* eb942b */
   --polygon-color: #8247e5;
   --notification-red-color: #f02c2d;
   --blue-color: #255ebe;
@@ -757,7 +758,8 @@ input {
 }
 
 #connection-status .colab-info .social-connect.twitter:hover {
-  background: #999; /* #1d9bf0; */
+  background: #999;
+  /* #1d9bf0; */
   border: 1px solid #999;
 }
 
@@ -1119,6 +1121,10 @@ Info Box
   color: var(--active-black);
 }
 
+.action-button.apply i.gg-loadbar-alt {
+  background: var(--blue-color);
+}
+
 .action-settings {
   min-width: 27%;
   width: auto;
@@ -1405,6 +1411,73 @@ Info Box
   height: 100%;
   display: flex;
   align-items: center;
+}
+
+/**
+* Notification
+**/
+
+.notification {
+  position: absolute;
+  height: 50px;
+  background: var(--active-black);
+  color: white;
+  width: auto;
+  margin: 0 0 0 -116px;
+  left: 50%;
+  top: 10px;
+  display: flex;
+  align-items: center;
+  padding: 0 18px 0 0;
+}
+
+.notification a.etherscan {
+  align-items: center;
+  margin: 0 0 0 20px;
+  display: flex;
+  transition: 0.2s opacity;
+}
+
+.notification a.etherscan.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.notification .icon {
+  width: 50px;
+  color: white;
+  height: 50px;
+  --ggs: 1.1;
+  margin: 0 5px 0px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification.processing i.gg-loadbar-alt {
+  background: var(--light-green-color);
+}
+
+.notification.processing .icon {
+  margin: 0 -5px 0px 5px;
+}
+
+.notification.success {
+  margin: 0 0 0 -95px;
+}
+
+.notification.success .icon {
+  background: var(--light-green-color);
+  --ggs: 1.5;
+}
+
+.notification.error {
+  margin: 0 0 0 -85px;
+}
+
+.notification.error .icon {
+  background: var(--notification-red-color);
+  --ggs: 1.3;
 }
 
 /**

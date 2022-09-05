@@ -85,7 +85,7 @@ export default class Pixel {
     if (!this.tile)
       this.getTile();
 
-    this.tile.setFillStyle(this.color.color);
+    if (this.tile) this.tile.setFillStyle(this.color.color);
   }
 
   async setColor() {
@@ -175,8 +175,8 @@ export default class Pixel {
   removeFromSelection() {
     logger.log('Pixel: removeFromSelection');
 
-    this.clearActivePixel();
     this.resetColor();
+    this.clearActivePixel();
   }
 
   static fromTile({ tile, scene }) {
