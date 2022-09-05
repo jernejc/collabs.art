@@ -17,19 +17,6 @@ export function handleMouseMove({ pointer, scene }) {
       if (pointer.isDown)
         panDragMap({ pointer, scene });
       break;
-    /*case 'shiftdown':
-      const tile = getTileForPointer({ pointer, scene });
-
-      if (scene.game.selection.isSelected(tile.cx, tile.cy))
-        scene.input.setDefaultCursor('alias');
-      else
-        scene.input.setDefaultCursor('copy');
-
-      if (pointer.isDown && scene.game.selection.rectangleSelection)
-        scene.game.selection.resizeRectangleSelection({ pointer, scene });
-      else
-        positionSelectionBlock({ pointer, scene });
-      break;*/
     case 'gameoflife':
     case 'select':
       positionSelectionBlock({ pointer, scene });
@@ -78,56 +65,6 @@ export function handleMouseDown({ pointer, scene }) {
 
 export async function handleMouseUp({ pointer, scene }) {
   logger.log('User interactions: handleMouseUp');
-
-  let tile;
-  const selection = scene.game.selection;
-
-  switch (scene.game.mode) {
-    /*case 'shiftdown':
-      //scene.game.selection.createRectangleSelection({ pointer, scene });
-      if (!scene.game.origDragPoint) {
-        tile = getTileForPointer({ pointer, scene });
-        scene.game.selection.removeSelected({ tile });
-      }
-      break;*/
-    /*case 'shiftdown':
-      if (
-        !selection.rectangleSelectionBeginPixel ||
-        !selection.rectangleSelectionEndPixel ||
-        (selection.rectangleSelectionBeginPixel.x === selection.rectangleSelectionEndPixel.x &&
-          selection.rectangleSelectionBeginPixel.y === selection.rectangleSelectionEndPixel.y)) {
-
-        selection.clearRectangleSelection();
-
-        const tile = getTileForPointer({ pointer, scene });
-
-        if (scene.gameOfLife) {
-          tile.alive = !tile.alive;
-          return;
-        }
-
-        if (scene.game.selection.isSelected(tile.cx, tile.cy))
-          scene.game.selection.removeSelected({ tile, scene });
-        else
-          await scene.game.selection.addSelected({ tiles: [tile], scene });
-
-        return;
-      }
-
-      const rectangleSelection = selection.rectangleSelection;
-
-      if (!rectangleSelection)
-        return;
-
-      selection.selectRange({
-        startPixel: selection.rectangleSelectionBeginPixel,
-        endPixel: selection.rectangleSelectionEndPixel,
-        scene
-      });
-
-      selection.clearRectangleSelection();
-      break;*/
-  }
 
   if (scene.game.origDragPoint) {
     scene.game.origDragPoint = null;
