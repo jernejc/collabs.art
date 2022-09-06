@@ -82,6 +82,9 @@ export default class Pixel {
   refreshColor() {
     logger.log("Pixel: refreshColor");
 
+    if (!this.color) // not sure how this happens
+      return;
+
     if (!this.tile)
       this.getTile();
 

@@ -9,8 +9,17 @@ const ipfs = require('./ipfs');
 const CollabCanvasABI = require('./abis/CollabCanvas.json');
 // Config
 const config = require('./config');
+// Socker provider config
+const options = {
+  reconnect: {
+    auto: true,
+    delay: 5000, // ms
+    maxAttempts: 5,
+    onTimeout: true
+  }
+};
 
-const web3Instance = new Web3(config.wsUrl);
+const web3Instance = new Web3(new Web3.providers.WebsocketProvider(config.wsUrl, options));
 const canvasContract = new web3Instance.eth.Contract(
   CollabCanvasABI,
   config.canvasAddress
@@ -39,6 +48,9 @@ async function canvasContractListeners() {
       console.log('ColorPixels event triggered.', JSON.stringify(e));
       const worldImage = await loadWorldImage();
 
+      if (!worldImage)
+        throw new Error('Failed to load world image');
+        
       try {
         const positions = e.returnValues.positions;
         const colors = e.returnValues.colors;
