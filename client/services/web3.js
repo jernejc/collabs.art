@@ -422,6 +422,25 @@ export default class Web3Manager {
       throw new Error('No activeAddress found');
   }
 
+  async preWeb3ActionSequence() {
+
+    if (!this.hasMetamask) {
+      this.onboarding.startOnboarding();
+      return;
+    }
+    
+    if (!this.isConnected)
+      await scene.game.web3.switchToNetwork();
+
+    if (!this.activeAddress)
+      await scene.game.web3.getActiveAddress();
+
+    if (!this.activeAddress)
+      return false;
+
+    return true;
+  }
+
   removeAllListeners() {
     if (this.socketColorPixelsListener)
       this.socketColorPixelsListener.removeAllListeners('data');
