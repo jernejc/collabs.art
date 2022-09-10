@@ -217,7 +217,7 @@ export default class Menu {
       this.domElement.classList.add('closed')
 
     this.closed = true;
-    this.game.tools.updateActiveChangesCount();
+    this.game.tools.bottomNav.updateActiveChangesCount();
   }
 
   open() {
@@ -228,7 +228,7 @@ export default class Menu {
       this.domElement.classList.remove('closed')
 
     this.closed = false;
-    this.game.tools.updateActiveChangesCount();
+    this.game.tools.bottomNav.updateActiveChangesCount();
   }
 
   async loadPixels() {

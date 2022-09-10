@@ -1,5 +1,6 @@
 
 import logger from '@util/logger';
+import config from '@util/config';
 
 export default class Button {
   constructor({ elClasses, text, icon, disabled, tooltip, tooltipFlow, clickAction }) {
@@ -69,6 +70,26 @@ export default class Button {
       this.domElement.setAttribute('flow', tooltipFlow);
   }
 
+  setColor(color) {
+    if (!this.domElement.classList.contains(color))
+      this.domElement.classList.add(color)
+  }
+
+  clearColor(color) {
+    if (this.domElement.classList.contains(color))
+      this.domElement.classList.remove(color)
+  }
+
+  clearColors() {
+    config.appConfig.btnColors.forEach(color => {
+      this.clearColor(color);
+    })
+  }
+
+  clearTooltip() {
+    this.domElement.removeAttribute('tooltip');
+  }
+
   clearIcon() {
     if (this.icon)
       this.domElement.classList.remove(this.icon.replace('gg-', ''));
@@ -78,7 +99,7 @@ export default class Button {
     this.text = null;
   }
 
-  setIcon(icon, alertAction) {
+  setIcon(icon, text, alertAction) {
     if (this.domElement.classList.contains('info-text'))
       this.domElement.classList.remove('info-text');
 
@@ -86,6 +107,9 @@ export default class Button {
       this.domElement.classList.remove(this.icon.replace('gg-', ''));
 
     this.icon = icon || this.icon;
+
+    if (text)
+      this.text = text;
 
     if (this.icon.search('gg-') > -1) {
       const icon = document.createElement('i');

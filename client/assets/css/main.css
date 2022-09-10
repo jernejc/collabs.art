@@ -89,7 +89,7 @@ input {
 *   Top info
 **/
 
-.info {
+.auction-info.info, .colab-info.info {
   position: absolute;
   width: 350px;
   height: 140px;
@@ -327,10 +327,10 @@ input {
 }
 
 .changes-stats span {
-  background: var(--blue-color);
-  color: var(--header-white);
+  background:var(--header-white);
+  color: var(--active-black);
   font-size: 1.3em;
-  padding: 4px 6px;
+  padding: 4px 8px;
   margin-right: 8px;
 }
 
@@ -1099,12 +1099,24 @@ Info Box
   align-items: center;
   justify-content: center;
   height: 30px;
-  min-width: 75px;
   margin: auto 0;
+  padding: 4px 11px;
+  min-width: 80px;
 }
 
 .action-button i {
   margin: 0 auto;
+}
+
+.action-button i.gg-info, 
+.action-button i.gg-check-o {
+  margin: 0px 3px 0px -4px;
+  --ggs: 0.8;
+}
+
+.action-button i.gg-check {
+  margin: 0px 1px 0px -4px;
+  --ggs: 0.95;
 }
 
 .action-button:disabled {
@@ -1121,10 +1133,6 @@ Info Box
   color: var(--active-black);
 }
 
-.action-button.apply i.gg-loadbar-alt {
-  background: var(--blue-color);
-}
-
 .action-settings {
   min-width: 27%;
   width: auto;
@@ -1135,12 +1143,31 @@ Info Box
   color: var(--header-white)
 }
 
-.bidUI .action-button {
+.action-button.green i.gg-loadbar-alt {
+  background: var(--light-green-color);
+}
+
+.action-button.blue {
+  background: var(--blue-color);
+  color: var(--header-white)
+}
+
+.action-button.blue i.gg-loadbar-alt {
   background: var(--blue-color);
 }
 
-.activeBidUI .action-button {
-  background: var(--activebid-color);
+.action-button.orange {
+  background: var(--metamask-color);
+  color: var(--header-white)
+}
+
+.action-button.orange i.gg-loadbar-alt {
+  background: var(--metamask-color);
+}
+
+.action-button.white {
+  background: var(--header-white);
+  color: var(--active-black)
 }
 
 .label-border-input {

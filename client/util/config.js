@@ -71,7 +71,8 @@ const config = {
     pixelColor: hexStringToColor('#168A33'),
     fillColor: hexStringToColor('#000000'),
     processingMsg: '<i class="gg-loadbar-alt"></i>&nbsp;&nbsp; Processing Tx ..',
-    defaultNotificationTime: 5000
+    defaultNotificationTime: 5000,
+    btnColors: ['green', 'orange', 'blue', 'white']
   },
   slideshow: {
     emailActionText: 'Join',
@@ -84,7 +85,7 @@ const config = {
       icon: 'about.svg',
       title: 'About',
       shortTitle: 'about',
-      body: 'A social experiment where artists have to collaborate on a shared canvas by changing the color of individual pixels. The goal is to illustrate the process of self-organization within a community of random players with the help of blockchain technology.' // A social experiment where players collectively draw on a shared canvas by changing the color of individual pixels and thus continuously contribute to the emerging global image. 
+      body: 'A social experiment where artists collaborate on a shared canvas by changing the color of individual pixels. The goal is to illustrate the process of self-organization within a community of random players with the help of blockchain technology.' // A social experiment where players collectively draw on a shared canvas by changing the color of individual pixels and thus continuously contribute to the emerging global image. 
     }, {
       icon: 'ownership.svg',
       title: 'Ownership',
@@ -94,7 +95,7 @@ const config = {
       icon: 'social-dynamic.svg',
       title: 'Social Dynamic',
       shortTitle: 'social',
-      body: 'Every month a snapshot of the canvas is auctioned as a non-fungible token (NFT). The proceeds are converted to $COLAB and distributed between the participants based on how much tokens they have staked.'
+      body: 'Every month a snapshot of the canvas is auctioned as a non-fungible token (NFT). The proceeds are converted to $COLAB and distributed between the participants based on how much pixels they have colored.'
     }]
   },
 

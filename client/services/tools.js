@@ -12,8 +12,8 @@ import AuctionInfo from '@components/auctioninfo';
 import { formatShortAddress, getCookie } from '@util/helpers';
 import logger from '@util/logger';
 
-import { colorPixels } from '@actions/pixel';
 import Notification from '@components/notification';
+import BottomNav from '@components/bottomnav';
 
 export default class ToolsManager {
 
@@ -23,7 +23,6 @@ export default class ToolsManager {
     this.game = game;
     this.emitter = emitter;
     this.infobox = null;
-    this.changesBounceTimer = null;
 
     setTimeout(() => { // canvas null in Firefox -_-
       this.parent = this.game.canvas.parentNode;
@@ -59,6 +58,7 @@ export default class ToolsManager {
 
       this.setConnectionStatus();
       this.setNetworkAlert();
+      this.bottomNav.updateActiveChangesCount();
 
       if (this.menu && this.menu.loaded)
         await this.menu.loadPixels();
@@ -73,6 +73,7 @@ export default class ToolsManager {
 
       this.setConnectionStatus();
       this.setNetworkAlert();
+      this.bottomNav.updateActiveChangesCount();
 
       if (this.menu && this.menu.loaded)
         await this.menu.loadPixels();
@@ -97,6 +98,7 @@ export default class ToolsManager {
       logger.log('ToolsManager: on web3/balance', balance);
 
       this.setConnectionStatus();
+      this.bottomNav.updateActiveChangesCount();
     });
 
     this.emitter.on('selection/update', async update => {
@@ -130,7 +132,7 @@ export default class ToolsManager {
         }
       }
 
-      this.updateActiveChangesCount();
+      this.bottomNav.updateActiveChangesCount();
     })
 
     this.emitter.on('selection/clear', async () => {
@@ -143,7 +145,7 @@ export default class ToolsManager {
         this.clearInfoBox();
 
       this.game.selection.clearRectangleSelection();
-      this.updateActiveChangesCount();
+      this.bottomNav.updateActiveChangesCount();
     })
 
     this.emitter.on('graph/update', async pixel => {
@@ -169,7 +171,7 @@ export default class ToolsManager {
       await this.menu.init();
     }
 
-    this.updateActiveChangesCount();
+    this.bottomNav.updateActiveChangesCount();
   }
 
   async openInfoBox({ pixel }) {
@@ -201,73 +203,6 @@ export default class ToolsManager {
   hideTokenInfo() {
     if (!this.domTokenInfo.closed)
       this.domTokenInfo.close();
-  }
-
-  updateActiveChangesCount() {
-    logger.log(`ToolsManager: updateActiveChangesCount`);
-
-    if (this.changesBounceTimer) {
-      clearTimeout(this.changesBounceTimer);
-      this.changesBounceTimer = null;
-      this.bottomNavChangesCount.classList.remove('bounce7');
-    }
-
-    const activePixelsCount = this.game.selection.activeChangesCount;
-    const activeFullBid = this.game.selection.activeFullBid;
-
-    if (activePixelsCount > 0) {
-      this.bottomNavChangesCount.innerHTML = `<span>${activePixelsCount}</span>`;
-      this.bottomNavChangesStatus.innerHTML = `<span>${activeFullBid} $COLAB</span> ( ${activePixelsCount} modified )`;
-
-      this.showActiveChanges();
-
-      if (!this.bottomNavClearSelection.domElement.classList.contains('visible')) {
-        this.bottomNavClearSelection.domElement.classList.add('visible');
-        this.bottomNavClearSelection.domElement.classList.remove('hidden');
-      }
-    } else {
-      this.hideActiveChanges();
-
-      if (!this.bottomNavClearSelection.domElement.classList.contains('hidden')) {
-        this.bottomNavClearSelection.domElement.classList.add('hidden');
-        this.bottomNavClearSelection.domElement.classList.remove('visible');
-      }
-    }
-  }
-
-  showActiveChanges() {
-    const _self = this;
-
-    if (!this.domBottomNav.classList.contains('visible')) {
-      this.domBottomNav.classList.add('visible');
-      this.domBottomNav.classList.remove('hidden');
-    }
-
-    if (!this.bottomNavChangesCount.classList.contains('visible')) {
-      this.bottomNavChangesCount.classList.add('visible', 'bounce7');
-      this.bottomNavChangesCount.classList.remove('hidden');
-
-      this.changesBounceTimer = setTimeout(() => {
-        _self.bottomNavChangesCount.classList.remove('bounce7');
-      }, 1000);
-    } else if (!this.bottomNavChangesCount.classList.contains('bounce7')) {
-      this.bottomNavChangesCount.classList.add('bounce7');
-      this.changesBounceTimer = setTimeout(() => {
-        _self.bottomNavChangesCount.classList.remove('bounce7');
-      }, 1000);
-    }
-  }
-
-  hideActiveChanges() {
-    if (!this.domBottomNav.classList.contains('hidden')) {
-      this.domBottomNav.classList.add('hidden');
-      this.domBottomNav.classList.remove('visible');
-    }
-
-    if (!this.bottomNavChangesCount.classList.contains('hidden')) {
-      this.bottomNavChangesCount.classList.add('hidden');
-      this.bottomNavChangesCount.classList.remove('visible');
-    }
   }
 
   setConnectionStatus() {
@@ -317,7 +252,7 @@ export default class ToolsManager {
     }
 
     if (iconClass)
-      this.connectionStatusBtn.setIcon(iconClass, alertIcon);
+      this.connectionStatusBtn.setIcon(iconClass, null, alertIcon);
     if (action)
       this.connectionStatusBtn.setClickAction(action);
   }
@@ -388,44 +323,10 @@ export default class ToolsManager {
   addBottomNav() {
     logger.log('ToolsManager: addBottomNav');
 
-    this.domBottomNav = document.createElement('div');
-    this.domBottomNav.setAttribute('id', 'bottom-nav');
-    this.domBottomNav.classList.add('hidden');
-
-    this.bottomNavChangesCount = document.createElement('div');
-    this.bottomNavChangesCount.classList.add('changes-count', 'hidden');
-
-    this.domBottomNav.append(this.bottomNavChangesCount);
-
-    this.bottomNavClearSelection = new Button({
-      elClasses: ['clear-selection', 'hidden'],
-      icon: 'gg-trash',
-      tooltip: 'Clear changes',
-      clickAction: this.game.selection.clearAllSelection.bind(this.game.selection)
-    });
-
-    this.domBottomNav.append(this.bottomNavClearSelection.domElement);
-
-    this.bottomNavChangesStatus = document.createElement('div');
-    this.bottomNavChangesStatus.classList.add('changes-stats');
-
-    this.domBottomNav.append(this.bottomNavChangesStatus);
-
-    this.bottomNavApplyBtn = new Button({
-      elClasses: ['action-button', 'apply'],
-      text: 'Apply',
-      clickAction: async e => {
-        if (this.game.selection.activeFullBid > this.game.web3.walletBalance) {
-          this.game.tools.showTokenInfo();
-          return;
-        }
-
-        await colorPixels({ scene: this.game.scene.keys['MainScene'], selection: this.game.selection.pixels })
-      }
-    });
-    this.domBottomNav.append(this.bottomNavApplyBtn.domElement);
-
-    this.parent.append(this.domBottomNav);
+    this.bottomNav = new BottomNav({
+      game: this.game,
+      parent: this.parent
+    })
   }
 
   addHeader() {
@@ -557,7 +458,7 @@ export default class ToolsManager {
     this.connectionStatusBtn.domElement.style.display = 'none';
     this.header.style.display = 'none';
 
-    this.domBottomNav.classList.add('hidden')
+    this.bottomNav.classList.add('hidden')
 
     this.minimapWrapper.setVisible(false);
     this.minimapBackground.setVisible(false);
@@ -581,7 +482,7 @@ export default class ToolsManager {
     this.minimapBackground.setVisible(true);
     this.game.scene.start("MinimapScene");
 
-    this.updateActiveChangesCount();
+    this.bottomNav.updateActiveChangesCount();
   }
 
   clearOverlay() {

@@ -94,7 +94,7 @@ export default class InfoBox {
       update: (value) => {
         _self.pixel.changeToColorNumber(value);
         _self.pixel.setActivePixel();
-        _self.game.tools.updateActiveChangesCount();
+        _self.game.tools.bottomNav.updateActiveChangesCount();
         //_self.setActiveChanges();
       }
     });
