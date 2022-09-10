@@ -477,7 +477,7 @@ export default class ToolsManager {
     this.connectionStatusBtn.domElement.style.display = 'none';
     this.header.style.display = 'none';
 
-    this.bottomNav.classList.add('hidden')
+    this.bottomNav.domElement.classList.add('hidden');
 
     this.minimapWrapper.setVisible(false);
     this.minimapBackground.setVisible(false);
