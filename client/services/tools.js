@@ -1,19 +1,19 @@
 
 import MinimapScene from '@scenes/minimap';
 
-import InfoBox from '@components/infobox';
-import Menu from '@components/menu';
+import InfoBox from '@components/tools/infobox';
+import Menu from '@components/tools/menu';
 import Overlay from '@components/overlay';
-import Timer from '@components/timer';
+import Timer from '@components/tools/timer';
 import Button from '@components/form/button';
-import TokenInfo from '@components/tokeninfo';
-import AuctionInfo from '@components/auctioninfo';
+import TokenInfo from '@components/tools/tokeninfo';
+import AuctionInfo from '@components/tools/auctioninfo';
 
 import { formatShortAddress, getCookie } from '@util/helpers';
 import logger from '@util/logger';
 
 import Notification from '@components/notification';
-import BottomNav from '@components/bottomnav';
+import BottomNav from '@components/tools/bottomnav';
 
 export default class ToolsManager {
 

@@ -1,7 +1,7 @@
 import logger from "@util/logger";
 import { colorPixels } from '@actions/pixel';
 
-import Button from "./form/button";
+import Button from "../form/button";
 
 export default class BottomNav {
 

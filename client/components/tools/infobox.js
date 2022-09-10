@@ -3,7 +3,7 @@ import ColorPicker from '@components/color/picker';
 import LoadingBar from '@components/loading';
 
 import logger from '@util/logger';
-import Button from './form/button';
+import Button from '../form/button';
 
 
 /**

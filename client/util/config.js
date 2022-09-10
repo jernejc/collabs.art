@@ -72,7 +72,8 @@ const config = {
     fillColor: hexStringToColor('#000000'),
     processingMsg: '<i class="gg-loadbar-alt"></i>&nbsp;&nbsp; Processing Tx ..',
     defaultNotificationTime: 5000,
-    btnColors: ['green', 'orange', 'blue', 'white']
+    btnColors: ['green', 'orange', 'blue', 'white'],
+    btnIcons: ['ethereum-logo', 'link', 'info-text']
   },
   slideshow: {
     emailActionText: 'Join',

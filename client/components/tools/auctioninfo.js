@@ -1,6 +1,6 @@
 import logger from "@util/logger";
 import config from "@util/config";
-import Button from "./form/button";
+import Button from "../form/button";
 
 export default class AuctionInfo {
 

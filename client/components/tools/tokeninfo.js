@@ -3,8 +3,8 @@ import config from "@util/config";
 
 import { creditToken } from "@actions/general"
 
-import Button from "./form/button";
-import Input from "./form/input";
+import Button from "../form/button";
+import Input from "../form/input";
 
 export default class TokenInfo {
 

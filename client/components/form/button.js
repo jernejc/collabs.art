@@ -100,12 +100,12 @@ export default class Button {
   }
 
   setIcon(icon, text, alertAction) {
-    if (this.domElement.classList.contains('info-text'))
-      this.domElement.classList.remove('info-text');
+    logger.log('Button: setIcon');
 
-    if (this.icon)
-      this.domElement.classList.remove(this.icon.replace('gg-', ''));
-
+    config.appConfig.btnIcons.forEach(btnIcon => {
+      this.domElement.classList.remove(btnIcon);
+    });
+    
     this.icon = icon || this.icon;
 
     if (text)

@@ -612,7 +612,7 @@ input {
 #connection-status button {
   cursor: pointer;
   background: var(--active-black);
-  color: #FFF;
+  color: var(--header-white);
   border: none;
   padding: 8px;
   margin: 0 auto;
@@ -716,6 +716,7 @@ input {
 
 #connection-status button.link {
   background: var(--blue-color);
+  --ggs: 1.2;
 }
 
 #connection-status button.link i.gg-chevron-double-up {
@@ -1116,7 +1117,7 @@ Info Box
 
 .action-button i.gg-check {
   margin: 0px 1px 0px -4px;
-  --ggs: 0.95;
+  --ggs: 1;
 }
 
 .action-button:disabled {
