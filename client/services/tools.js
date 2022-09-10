@@ -196,13 +196,23 @@ export default class ToolsManager {
   }
 
   showTokenInfo() {
-    if (this.domTokenInfo.closed)
-      this.domTokenInfo.open()
+    logger.log('ToolsManager: showTokenInfo');
+
+    if (this.domTokenInfo && this.domTokenInfo.closed)
+      this.domTokenInfo.open();
+
+    if (this.connectionStatusInfo.classList.contains('hidden'))
+      this.connectionStatusInfo.classList.remove('hidden');
   }
 
   hideTokenInfo() {
-    if (!this.domTokenInfo.closed)
+    logger.log('ToolsManager: hideTokenInfo');
+
+    if (this.domTokenInfo && !this.domTokenInfo.closed)
       this.domTokenInfo.close();
+
+    if (this.connectionStatusInfo && !this.connectionStatusInfo.classList.contains('hidden'))
+      this.connectionStatusInfo.classList.add('hidden');
   }
 
   setConnectionStatus() {
@@ -232,7 +242,7 @@ export default class ToolsManager {
       case 'address':
         alertIcon = false;
         iconText = `${this.game.web3.walletBalance || 0} $COLAB`;
-        action = this.domTokenInfo.open.bind(this.domTokenInfo);
+        action = this.showTokenInfo.bind(this);
         break;
       case 'permit':
         iconClass = 'gg-extension';
@@ -305,7 +315,7 @@ export default class ToolsManager {
     }
 
     if (text) {
-      this.networkAlert.innerHTML = text
+      this.networkAlert.innerHTML = text;
       this.networkAlert.classList.add('show');
 
       if (this.networkAlert.classList.contains('hide'))
@@ -392,6 +402,15 @@ export default class ToolsManager {
     this.networkAlert.addEventListener('click', (e) => {
       this.connectionStatusBtn.domElement.dispatchEvent(new Event('click', { 'bubbles': true }));
     });
+
+    this.connectionStatusInfo = document.createElement('div');
+    this.connectionStatusInfo.classList.add('more-info', 'hidden');
+    this.connectionStatusInfo.setAttribute('tooltip', 'More info');
+    this.connectionStatusInfo.setAttribute('flow', 'left');
+
+    this.connectionStatusInfo.innerHTML = '<i class="gg-info"></i>';
+
+    this.domConnectionStatus.prepend(this.connectionStatusInfo);
 
     this.setNetworkAlert();
   }

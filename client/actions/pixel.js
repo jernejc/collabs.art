@@ -59,9 +59,6 @@ export async function colorPixels({ scene, selection }) {
     bids.push(toWei(pixel.bid.toString()).toString());
   });
 
-  if (!await scene.game.web3.preWeb3ActionSequence())
-    return;
-
   let txHash = null;
 
   scene.game.tools.setNotification(0, 'processing');

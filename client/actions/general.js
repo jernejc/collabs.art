@@ -146,9 +146,6 @@ export function handleSpaceUp({ scene }) {
 export async function creditToken({ scene, value }) {
   logger.log('Action: creditToken', value);
 
-  if (!await scene.game.web3.preWeb3ActionSequence())
-    return;
-
   let txHash = null;
 
   scene.game.tools.setNotification(0, 'processing');

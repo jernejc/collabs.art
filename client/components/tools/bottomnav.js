@@ -9,6 +9,7 @@ export default class BottomNav {
     logger.log('BottomNav: constructor');
 
     this.game = game;
+    this.scene = this.game.scene.keys['MainScene'];
     this.parent = parent;
     this.closed = closed || false;
 
@@ -20,7 +21,7 @@ export default class BottomNav {
 
     this.domElement = document.createElement('div');
     this.domElement.setAttribute('id', 'bottom-nav');
-    
+
     this.domElement.classList.add('hidden');
 
     this.changesCount = document.createElement('div');
@@ -46,12 +47,15 @@ export default class BottomNav {
       elClasses: ['action-button', 'apply'],
       text: 'Apply',
       clickAction: async e => {
+        if (!await this.game.web3.preWeb3ActionSequence())
+          return;
+          
         if (this.game.selection.activeFullBid > this.game.web3.walletBalance) {
           this.game.tools.showTokenInfo();
           return;
         }
 
-        await colorPixels({ scene: this.game.scene.keys['MainScene'], selection: this.game.selection.pixels })
+        await colorPixels({ scene: this.scene, selection: this.game.selection.pixels })
       }
     });
     this.domElement.append(this.applyBtn.domElement);
@@ -97,21 +101,28 @@ export default class BottomNav {
       this.applyBtn.clearColors();
       this.applyBtn.clearTooltip();
 
+      /**
+       * 
+       * iconClass = '';
+iconClass = '';
+iconClass = '';
+       */
+
       switch (this.game.web3.currentStateTag) {
         case 'metamask':
           this.applyBtn.setColor('orange');
           this.applyBtn.setToolTip('Install Metamask');
-          this.applyBtn.setIcon('gg-info', 'Apply');
+          this.applyBtn.setIcon('metamask-white.png', 'Apply');
           break;
         case 'network':
           this.applyBtn.setColor('white');
           this.applyBtn.setToolTip('Switch to Network');
-          this.applyBtn.setIcon('gg-info', 'Apply');
+          this.applyBtn.setIcon('ethereum-logo.png', 'Apply');
           break;
         case 'wallet':
           this.applyBtn.setColor('blue');
           this.applyBtn.setToolTip('Connect to Wallet');
-          this.applyBtn.setIcon('gg-info', 'Apply');
+          this.applyBtn.setIcon('gg-link', 'Apply');
           break;
         default:
           this.applyBtn.setColor('green');

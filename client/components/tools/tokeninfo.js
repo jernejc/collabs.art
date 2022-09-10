@@ -30,8 +30,9 @@ export default class TokenInfo {
     this.twitterButton = new Button({
       icon: 'twitter-logo.png',
       text: 'Connect',
-      tooltip: 'Available Soon!',
-      tooltipFlow: 'down',
+      // tooltip: 'Available Soon!',
+      // tooltipFlow: 'down',
+      caption: '100 $COLAB',
       elClasses: ['action-button', 'social-connect', 'twitter']
     });
 
@@ -81,8 +82,11 @@ export default class TokenInfo {
       icon: 'gg-arrows-exchange-alt',
       text: 'Exchange',
       elClasses: ['action-button', 'credit-token'],
-      clickAction: () => {
-        return creditToken({ scene: this.scene, value: this.supportInput.input.value})
+      clickAction: async () => {
+        if (!await this.scene.game.web3.preWeb3ActionSequence())
+          return;
+
+        return creditToken({ scene: this.scene, value: this.supportInput.input.value })
       }
     });
 
@@ -99,7 +103,7 @@ export default class TokenInfo {
 
     this.refreshTokenCalc();
 
-    if (this.closed) 
+    if (this.closed)
       this.close();
   }
 
@@ -114,6 +118,7 @@ export default class TokenInfo {
       this.domElement.classList.add('hidden');
 
     this.closed = true;
+    this.scene.game.tools.hideTokenInfo();
   }
 
   open() {

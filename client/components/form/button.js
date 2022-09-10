@@ -3,7 +3,7 @@ import logger from '@util/logger';
 import config from '@util/config';
 
 export default class Button {
-  constructor({ elClasses, text, icon, disabled, tooltip, tooltipFlow, clickAction }) {
+  constructor({ elClasses, text, icon, disabled, caption, tooltip, tooltipFlow, clickAction }) {
     this.loadingUI = document.createElement('i');
     this.loadingUI.classList.add('gg-loadbar-alt');
 
@@ -26,6 +26,8 @@ export default class Button {
       this.setText(text);
     if (tooltip)
       this.setToolTip(tooltip, tooltipFlow)
+    if (caption)
+      this.setCaption(caption)
   }
 
   loading() {
@@ -43,10 +45,17 @@ export default class Button {
     try {
       await this.clickAction();
     } catch (error) {
-      logger.error('Button ClickAction failed', error)
+      logger.error('Button ClickAction failed', error);
     }
 
     this.reset();
+  }
+
+  setCaption(caption) {
+    this.caption = caption || this.caption;
+
+    if (this.caption)
+      this.domElement.innerHTML += `<span class="caption">${this.caption}</span>`;
   }
 
   setText(text) {

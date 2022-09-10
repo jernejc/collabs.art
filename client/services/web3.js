@@ -430,10 +430,10 @@ export default class Web3Manager {
     }
     
     if (!this.isConnected)
-      await scene.game.web3.switchToNetwork();
+      await this.switchToNetwork();
 
     if (!this.activeAddress)
-      await scene.game.web3.getActiveAddress();
+      await this.getActiveAddress();
 
     if (!this.activeAddress)
       return false;

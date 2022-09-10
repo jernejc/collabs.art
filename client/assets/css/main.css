@@ -89,7 +89,8 @@ input {
 *   Top info
 **/
 
-.auction-info.info, .colab-info.info {
+.auction-info.info,
+.colab-info.info {
   position: absolute;
   width: 350px;
   height: 140px;
@@ -327,7 +328,7 @@ input {
 }
 
 .changes-stats span {
-  background:var(--header-white);
+  background: var(--header-white);
   color: var(--active-black);
   font-size: 1.3em;
   padding: 4px 8px;
@@ -609,6 +610,21 @@ input {
   display: flex;
 }
 
+#connection-status .more-info {
+  background: var(--active-black);
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  width: 50px;
+  border-right: 1px dotted #757575;
+  color: #757575;
+  cursor: pointer;
+}
+
+#connection-status .more-info.hidden {
+  display: none;
+}
+
 #connection-status button {
   cursor: pointer;
   background: var(--active-black);
@@ -759,9 +775,8 @@ input {
 }
 
 #connection-status .colab-info .social-connect.twitter:hover {
-  background: #999;
-  /* #1d9bf0; */
-  border: 1px solid #999;
+  background: #1d9bf0;
+  border: 1px solid #1d9bf0;
 }
 
 #connection-status .colab-info .social-connect.discord {
@@ -1109,15 +1124,27 @@ Info Box
   margin: 0 auto;
 }
 
-.action-button i.gg-info, 
-.action-button i.gg-check-o {
+.action-button i.gg-info,
+.action-button i.gg-check-o,
+.action-button i.gg-link {
   margin: 0px 3px 0px -4px;
   --ggs: 0.8;
 }
 
 .action-button i.gg-check {
   margin: 0px 1px 0px -4px;
-  --ggs: 1;
+  --ggs: 1.1;
+}
+
+.action-button i.gg-link {
+  margin: 0px 8px 0px 0px;
+  --ggs: 0.85;
+}
+
+.action-button img {
+  max-width: 18px;
+  max-height: 18px;
+  margin-right: 6px;
 }
 
 .action-button:disabled {
@@ -1169,6 +1196,17 @@ Info Box
 .action-button.white {
   background: var(--header-white);
   color: var(--active-black)
+}
+
+.action-button .caption {
+  position: absolute;
+  bottom: -11px;
+  font-size: 0.65em;
+  background: var(--active-black);
+  padding: 3px 6px;
+  color: var(--header-white);
+  border-radius: 4px;
+  margin-left: 8px;
 }
 
 .label-border-input {
@@ -1453,7 +1491,7 @@ Info Box
   width: auto;
   margin: 0 0 0 -120px;
   left: 50%;
-  top: 10px;
+  top: var(--edge-margin);
   display: flex;
   align-items: center;
 }
