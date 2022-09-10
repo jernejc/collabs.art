@@ -21,7 +21,7 @@ export default class SelectionManager {
   }
 
   get activeFullBid() {
-    return this.pixels.reduce((aggregator, pixel) => {
+    return this.pixels.filter(pixel => pixel.hasChanges).reduce((aggregator, pixel) => {
       aggregator += pixel.bid;
       return aggregator;
     }, 0)

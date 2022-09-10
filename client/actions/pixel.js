@@ -59,6 +59,9 @@ export async function colorPixels({ scene, selection }) {
     bids.push(toWei(pixel.bid.toString()).toString());
   });
 
+  if (!scene.game.web3.isConnected)
+    await scene.game.web3.switchToNetwork();
+
   if (!scene.game.web3.activeAddress)
     await scene.game.web3.getActiveAddress();
 

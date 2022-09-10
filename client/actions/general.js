@@ -144,7 +144,10 @@ export function handleSpaceUp({ scene }) {
 }
 
 export async function creditToken({ scene, value }) {
-  logger.log('Action: creditToken', value)
+  logger.log('Action: creditToken', value);
+
+  if (!scene.game.web3.isConnected)
+    await scene.game.web3.switchToNetwork();
 
   if (!scene.game.web3.activeAddress)
     await scene.game.web3.getActiveAddress();
