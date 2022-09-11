@@ -1,6 +1,6 @@
 {
-	"httpUrl": "https://eth-goerli.g.alchemy.com/v2/zq0-51OzM8fG3nIoHwnCpuIzunc_pb9g",
-	"wsUrl": "wss://eth-goerli.g.alchemy.com/v2/zq0-51OzM8fG3nIoHwnCpuIzunc_pb9g",
+	"httpUrl": "",
+	"wsUrl": "",
 	"CollabCanvasAddress": "0x57AB8C10Bf5c5Ba3AB322a7246aAA693835E9363",
 	"CollabTokenAddress": "0x168250f5baD021aDce521051B0f4C0Aa05b9e91A",
 	"ipfs": {

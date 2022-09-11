@@ -7,6 +7,8 @@ const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const PROD = process.env.NODE_ENV == 'production';
+const RPC_URL = process.env.RPC_URL;
+const WS_URL = process.env.WS_URL;
 
 const config = {
   target: 'web',
@@ -56,7 +58,16 @@ const config = {
     }]),
     new CopyPlugin([{
       from: path.resolve(__dirname, 'client/config.json'),
-      to: path.resolve(__dirname, 'dist/config.json')
+      to: path.resolve(__dirname, 'dist/config.json'),
+      transform: (content) => {
+        // copy-webpack-plugin passes a buffer
+        const config = JSON.parse(content.toString());
+
+        config.httpUrl = RPC_URL;
+        config.wsUrl = WS_URL;
+
+        return JSON.stringify(config, null, 2);
+      }
     }]),
     new webpack.DefinePlugin({
       PRODUCTION: PROD,
