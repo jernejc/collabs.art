@@ -2,7 +2,7 @@ build
 generated
 node_modules
 dist
-dapp-config.json
+config.json
 .vscode
 .secret
 .rpc

@@ -14,7 +14,8 @@
         "@initializers/*": ["client/initializers/*"],
         "@scenes/*": ["client/scenes/"],
         "@services/*":  ["client/services/*"],
-        "@util/*":  ["client/util/*"]
+        "@util/*":  ["client/util/*"],
+        "@root/*":  [""]
     }
   }
 }

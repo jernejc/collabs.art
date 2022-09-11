@@ -1,7 +1,7 @@
 {
-  "name": "autopoietic",
+  "name": "collabs.art",
   "version": "1.0.1",
-  "description": "autopoietic",
+  "description": "Art Collabs",
   "main": "dist/app.js",
   "author": "Jernej",
   "license": "ISC",
