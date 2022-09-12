@@ -7,8 +7,6 @@ import dappConfig from '@root/config.json';
 
 import { hexStringToColor } from '@util/helpers';
 
-console.log('dappConfig', dappConfig);
-
 const config = {
   contracts: {
     canvas: {
