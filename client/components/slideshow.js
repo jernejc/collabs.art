@@ -283,7 +283,7 @@ export default class Slideshow {
   docsAction() {
     logger.log('Slideshow: docsAction');
 
-    window.open(config.slideshow.docsLink, '_blank').focus();
+    window.open(config.appConfig.docsLink, '_blank').focus();
   }
 
   navigateSlideshow(toIndex) {

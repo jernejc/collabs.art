@@ -1,5 +1,4 @@
 module.exports = function (content) {
-    // copy-webpack-plugin passes a buffer
     const config = JSON.parse(content.toString());
     const RPC_URL = process.env.RPC_URL;
     const WS_URL = process.env.WS_URL;

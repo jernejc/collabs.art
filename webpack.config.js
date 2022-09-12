@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const webpack = require('webpack');
 
 // Webpack plugins
@@ -29,7 +30,7 @@ const config = {
         test: /config\.json$/,
         use: [
           {
-            loader: path.resolve(__dirname, 'webpack/config-loader.js'),
+            loader: path.resolve(__dirname, 'webpack/loaders/config.js'),
           },
         ],
       },
@@ -67,15 +68,7 @@ const config = {
     }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'client/public/index.html'),
-      inject: 'head',
-      chunksSortMode: (a, b) => {
-        if (a[0] < b[0])
-          return 1;
-        if (a[0] > b[0])
-          return -1;
-
-        return 0;
-      }
+      inject: 'head'
     })
   ]
 }
