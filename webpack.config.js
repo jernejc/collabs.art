@@ -28,6 +28,19 @@ const config = {
     libraryTarget: 'var'
   },
 
+  module: {
+    rules: [
+      {
+        test: /config\.json$/,
+        use: [
+          {
+            loader: path.resolve(__dirname, 'webpack/config-loader.js'),
+          },
+        ],
+      },
+    ],
+  },
+
   resolve: {
     extensions: ['.js'],
     alias: { // must keep in sync with jsconfig
@@ -59,7 +72,7 @@ const config = {
       from: path.resolve(__dirname, 'client/abis'),
       to: path.resolve(__dirname, 'dist/abis')
     }]),
-    new CopyPlugin([{
+    /*new CopyPlugin([{
       from: path.resolve(__dirname, 'config.json'),
       to: path.resolve(__dirname, 'dist/config.json'),
       transform: (content) => {
@@ -78,7 +91,7 @@ const config = {
 
         return JSON.stringify(config, null, 2);
       }
-    }]),
+    }]),*/
     new webpack.DefinePlugin({
       PRODUCTION: PROD,
       VERSION: "0.1.1",

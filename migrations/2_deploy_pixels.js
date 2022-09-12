@@ -63,7 +63,7 @@ module.exports = async (deployer, network, accounts) => {
     }
   }
 
-  fs.writeFileSync(`${__dirname}/../config.json`, JSON.stringify(config, null, '\t'), 'utf8');
+  fs.writeFileSync(`${__dirname}/../dapp_config.json`, JSON.stringify(config, null, '\t'), 'utf8');
 
   // Update subgraph yaml
   const subgraphConf = yaml.load(fs.readFileSync(subgraphYAML, 'utf8'));

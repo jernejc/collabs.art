@@ -15,7 +15,7 @@ import GraphManager from '@services/subgraph';
 
 // Game init
 export async function AppInitializer() {
-  logger.log('AppInitializer')
+  logger.log('AppInitializer');
 
   const canvas = document.querySelector('#' + config.appConfig.canvasElement);
   const canvasWidth = canvas.clientWidth //* window.devicePixelRatio;
