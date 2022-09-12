@@ -215,6 +215,26 @@ export default class ToolsManager {
       this.connectionStatusInfo.classList.add('hidden');
   }
 
+  showAuctionInfo() {
+    logger.log('ToolsManager: showAuctionInfo');
+
+    if (this.domAuctionInfo && this.domAuctionInfo.closed)
+      this.domAuctionInfo.open();
+
+    if (this.headerInfo.classList.contains('hidden'))
+      this.headerInfo.classList.remove('hidden');
+  }
+
+  hideAuctionInfo() {
+    logger.log('ToolsManager: hideAuctionInfo');
+
+    if (this.domAuctionInfo && !this.domAuctionInfo.closed)
+      this.domAuctionInfo.close();
+
+    if (this.headerInfo && !this.headerInfo.classList.contains('hidden'))
+      this.headerInfo.classList.add('hidden');
+  }
+
   setConnectionStatus() {
     logger.log('ToolsManager: setConnectionStatus', this.game.web3.currentStateTag);
 
@@ -353,13 +373,24 @@ export default class ToolsManager {
 
     this.headerTimer = new Timer({ parent: this.header, game: this.game });
 
-    this.domAuctionInfo = new AuctionInfo({ parent: this.header, closed: true });
+    this.domAuctionInfo = new AuctionInfo({
+      scene: this.game.scene.keys['MainScene'],
+      parent: this.header,
+      closed: true
+    });
+
+    this.headerInfo = document.createElement('div');
+    this.headerInfo.classList.add('more-info', 'hidden');
+    this.headerInfo.setAttribute('tooltip', 'More info');
+    this.headerInfo.setAttribute('flow', 'right');
+
+    this.headerInfo.innerHTML = '<i class="gg-info"></i>';
+
+    this.header.append(this.headerInfo);
 
     this.parent.append(this.header);
 
-    this.header.addEventListener('click', (e) => {
-      this.domAuctionInfo.open();
-    });
+    this.header.addEventListener('click', this.showAuctionInfo.bind(this));
   }
 
   addConnectionStatus() {
@@ -369,7 +400,7 @@ export default class ToolsManager {
     this.domConnectionStatus.setAttribute('id', 'connection-status');
 
     this.connectionStatusBtn = new Button({
-      elClasses: ['account', 'connection'],
+      elClasses: ['connection'],
       icon: 'gg-block'
     });
 

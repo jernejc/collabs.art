@@ -33,6 +33,7 @@ export default class BottomNav {
       elClasses: ['clear-selection', 'hidden'],
       icon: 'gg-trash',
       tooltip: 'Clear changes',
+      tooltipFlow: 'left',
       clickAction: this.game.selection.clearAllSelection.bind(this.game.selection)
     });
 

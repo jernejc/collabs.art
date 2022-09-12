@@ -82,7 +82,7 @@ input {
   color: #FFF;
   position: absolute;
   top: var(--edge-margin);
-  z-index: 1;
+  z-index: 2;
 }
 
 /**
@@ -119,6 +119,26 @@ input {
   display: none;
 }
 
+.more-info {
+  background: var(--active-black);
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  width: 50px;
+  border-right: 1px dotted #757575;
+  color: #757575;
+  cursor: pointer;
+}
+
+#header .more-info {
+  border-left: 1px dotted #757575;
+  border-right: none;
+}
+
+.more-info.hidden {
+  display: none;
+}
+
 /**
 *   Header
 **/
@@ -152,6 +172,7 @@ input {
 #header .auction-info {
   height: 140px;
   cursor: default;
+  width: 315px;
 }
 
 #header .auction-info .gg-close-r {
@@ -247,7 +268,7 @@ input {
   display: flex;
   flex-direction: row;
   background: var(--active-black);
-  padding: 0px 11px;
+  padding: 0px 12px 0 0;
   height: 50px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--header-white);
@@ -274,7 +295,7 @@ input {
 #bottom-nav .changes-count {
   position: absolute;
   top: -7px;
-  left: -57px;
+  left: -10px;
   z-index: 2;
   background-color: var(--notification-red-color);
   display: flex;
@@ -297,11 +318,7 @@ input {
 }
 
 #bottom-nav .clear-selection {
-  position: absolute;
   border: 0;
-  right: 0px;
-  top: -1px;
-  left: -50px;
   display: flex;
   background: var(--active-black);
   font-size: 1.5em;
@@ -309,9 +326,14 @@ input {
   cursor: pointer;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  height: 51px;
-  border-right: 1px solid;
+  width: 45px;
+  border-right: 1px dotted #757575;
+  margin-right: 10px;
+  padding-left: 5px;
+}
+
+#bottom-nav .clear-selection i {
+  --ggs: 1.1;
 }
 
 .changes-stats {
@@ -608,24 +630,11 @@ input {
 #connection-status {
   right: var(--edge-margin);
   display: flex;
-}
-
-#connection-status .more-info {
-  background: var(--active-black);
   align-items: center;
-  display: flex;
-  justify-content: center;
-  width: 50px;
-  border-right: 1px dotted #757575;
-  color: #757575;
-  cursor: pointer;
+  background: var(--active-black);
 }
 
-#connection-status .more-info.hidden {
-  display: none;
-}
-
-#connection-status button {
+#connection-status .connection {
   cursor: pointer;
   background: var(--active-black);
   color: var(--header-white);
@@ -633,6 +642,7 @@ input {
   padding: 8px;
   margin: 0 auto;
   box-shadow: none;
+  font-size: 16px;
   width: 50px;
   height: 50px;
   display: block;
@@ -643,80 +653,80 @@ input {
   justify-content: center;
 }
 
-#connection-status button.active {
+#connection-status .connection.active {
   background: rgba(255, 255, 255, 1);
   color: var(--active-black);
 }
 
-#connection-status button i {
+#connection-status .connection i {
   margin: auto;
 }
 
-#connection-status button i.gg-data {
+#connection-status .connection i.gg-data {
   margin-top: -2px;
 }
 
-#connection-status button.account i {
+#connection-status .connection i {
   --ggs: 1.5;
 }
 
-#connection-status button.account i.gg-link {
+#connection-status .connection i.gg-link {
   --ggs: 1.3;
 }
 
-#connection-status button.account i.gg-block {
+#connection-status .connection i.gg-block {
   --ggs: 1.8;
 }
 
-#connection-status button.metamask-white {
+#connection-status .connection.metamask-white {
   background: var(--metamask-color);
 }
 
-#connection-status button.metamask-white img,
-#connection-status button.metamask img {
+#connection-status .connection.metamask-white img,
+#connection-status .connection.metamask img {
   width: 80%;
   margin: auto;
 }
 
-#connection-status button.metamask-white i.gg-chevron-double-up {
+#connection-status .connection.metamask-white i.gg-chevron-double-up {
   color: var(--metamask-color);
 }
 
-#connection-status button.polygon {
+#connection-status .connection.polygon {
   background: var(--polygon-color);
 }
 
-#connection-status button.polygon img {
+#connection-status .connection.polygon img {
   width: 87%;
   margin: auto;
 }
 
-#connection-status button.ethereum-logo {
+#connection-status .connection.ethereum-logo {
   background: buttonface;
   color: var(--active-black);
 }
 
-#connection-status button.ethereum-logo img {
+#connection-status .connection.ethereum-logo img {
   width: 18px;
 }
 
-#connection-status button.ethereum-logo .gg-chevron-double-up {
+#connection-status .connection.ethereum-logo .gg-chevron-double-up {
   color: var(--active-black);
 }
 
-#connection-status button.polygon i.gg-chevron-double-up {
+#connection-status .connection.polygon i.gg-chevron-double-up {
   color: var(--polygon-color);
 }
 
-#connection-status button.user {
+#connection-status .connection.user {
   background: var(--light-green-color);
 }
 
-#connection-status button.user i.gg-chevron-double-up {
+#connection-status .connection.user i.gg-chevron-double-up {
   color: var(--light-green-color);
 }
 
-#connection-status button.info-text {
+#connection-status .connection.info-text {
   background: var(--light-green-color);
   color: var(--header-white);
   width: auto;
@@ -725,21 +735,21 @@ input {
   padding: 0 15px;
 }
 
-#connection-status button.info-text.info-text-gray {
+#connection-status .connection.info-text.info-text-gray {
   background: buttonface;
   color: var(--active-black);
 }
 
-#connection-status button.link {
+#connection-status .connection.link {
   background: var(--blue-color);
   --ggs: 1.2;
 }
 
-#connection-status button.link i.gg-chevron-double-up {
+#connection-status .connection.link i.gg-chevron-double-up {
   color: var(--blue-color);
 }
 
-#connection-status button .gg-chevron-double-up {
+#connection-status .connection .gg-chevron-double-up {
   position: absolute;
   --ggs: 1.6;
   opacity: 0.7;
@@ -766,6 +776,8 @@ input {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  height: 50px;
+  position: relative;
 }
 
 #connection-status .colab-info .social-connect.twitter {

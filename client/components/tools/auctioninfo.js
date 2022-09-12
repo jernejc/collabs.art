@@ -4,9 +4,10 @@ import Button from "../form/button";
 
 export default class AuctionInfo {
 
-  constructor({ parent, closed }) {
+  constructor({ scene, parent, closed }) {
     logger.log('AuctionInfo: constructor');
 
+    this.scene = scene;
     this.parent = parent;
     this.closed = closed || false;
 
@@ -54,6 +55,8 @@ export default class AuctionInfo {
 
     if (!this.domElement.classList.contains('hidden'))
       this.domElement.classList.add('hidden');
+
+    this.scene.game.tools.hideTokenInfo();
   }
 
   open() {
