@@ -6,16 +6,11 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const PROD = process.env.NODE_ENV == 'production';
-const RPC_URL = process.env.RPC_URL;
-const WS_URL = process.env.WS_URL;
-const CANVAS_ADDRESS = process.env.CANVAS_ADDRESS;
-const TOKEN_ADDRESS = process.env.TOKEN_ADDRESS;
+const PROD = (process.env.NODE_ENV == 'production');
 
 const config = {
   target: 'web',
   mode: PROD ? process.env.NODE_ENV : 'development',
-  devtool: 'source-map',
 
   entry: {
     app: './client/index.js'
@@ -53,13 +48,6 @@ const config = {
       '@util': path.resolve(__dirname, 'client/util/'),
       '@root': path.resolve(__dirname, __dirname)
     }
-    /*fallback: { // some browser fallbacks - for webpack v5 which had other issues, so currently still using v4
-      "crypto": require.resolve("crypto-browserify"),
-      "http": require.resolve("stream-http"),
-      "https": require.resolve("https-browserify"),
-      "os": require.resolve("os-browserify/browser"),
-      "stream": require.resolve("stream-browserify")
-    }*/
   },
 
   plugins: [
@@ -72,35 +60,11 @@ const config = {
       from: path.resolve(__dirname, 'client/abis'),
       to: path.resolve(__dirname, 'dist/abis')
     }]),
-    /*new CopyPlugin([{
-      from: path.resolve(__dirname, 'config.json'),
-      to: path.resolve(__dirname, 'dist/config.json'),
-      transform: (content) => {
-        // copy-webpack-plugin passes a buffer
-        const config = JSON.parse(content.toString());
-
-        console.log('RPC_URL', RPC_URL);
-        console.log('WS_URL', WS_URL);
-        config.httpUrl = RPC_URL;
-        config.wsUrl = WS_URL;
-
-        console.log('CANVAS_ADDRESS', CANVAS_ADDRESS);
-        console.log('TOKEN_ADDRESS', TOKEN_ADDRESS);
-        config.CollabCanvasAddress = CANVAS_ADDRESS;
-        config.CollabTokenAddress = TOKEN_ADDRESS;
-
-        return JSON.stringify(config, null, 2);
-      }
-    }]),*/
     new webpack.DefinePlugin({
       PRODUCTION: PROD,
       VERSION: "0.1.1",
       DEBUG: false // !PROD
     }),
-    /*new webpack.ProvidePlugin({ // in some cases fallback above did not work, so had to use https://webpack.js.org/guides/shimming/ (webpack v5)
-      Buffer: ['buffer', 'Buffer'],
-      process: 'process/browser'
-    }),*/
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'client/public/index.html'),
       inject: 'head',
