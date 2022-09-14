@@ -2,22 +2,15 @@ pragma solidity ^0.8.15;
 
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/token/ERC777/IERC777Recipient.sol";
 
 import "./CollabToken.sol";
 
 /**
  * @title CollabCanvas
- * CollabCanvas - living canvas
  */
 
-contract CollabCanvas is AccessControl, IERC777Recipient {
+contract CollabCanvas is AccessControl {
     using Address for address;
-
-    IERC1820Registry private _erc1820 =
-        IERC1820Registry(0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24);
-    bytes32 private constant TOKENS_RECIPIENT_INTERFACE_HASH =
-        keccak256("ERC777TokensRecipient");
 
     CollabToken private _CollabTokenContract;
 
@@ -47,14 +40,6 @@ contract CollabCanvas is AccessControl, IERC777Recipient {
         uint256[] bids,
         address owner
     );
-    event TokensReceived(
-        address operator,
-        address from,
-        address to,
-        uint256 amount,
-        bytes userData,
-        bytes operatorData
-    );
 
     /**
      * @dev Contract Constructor, sets max pixels
@@ -72,12 +57,6 @@ contract CollabCanvas is AccessControl, IERC777Recipient {
         _minUnit = minUnit;
         // assign admin
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
-        // register erc 777 reciever
-        _erc1820.setInterfaceImplementer(
-            address(this),
-            TOKENS_RECIPIENT_INTERFACE_HASH,
-            address(this)
-        );
     }
 
     /**
@@ -113,19 +92,15 @@ contract CollabCanvas is AccessControl, IERC777Recipient {
             "CollabCanvas: Bid must be higher than existing"
         );
 
-        _CollabTokenContract.operatorSend(
-            _msgSender(),
-            address(this),
-            bid,
-            "",
-            ""
+        require(
+            _CollabTokenContract.operatorSend(_msgSender(), address(this), bid),
+            "CollabCanvas: Failed to transfer $COLAB"
         );
 
-        if (_pixels[position].bid > 0) {
-            _CollabTokenContract.send(
+        if (_pixels[position].bid > 0) { // refund existing
+            _CollabTokenContract.transfer(
                 _pixels[position].owner,
-                _pixels[position].bid,
-                ""
+                _pixels[position].bid
             );
 
             delete _pixels[position];
@@ -178,12 +153,13 @@ contract CollabCanvas is AccessControl, IERC777Recipient {
         }
 
         // Require for full amount to be available and transfered
-        _CollabTokenContract.operatorSend(
-            _msgSender(),
-            address(this),
-            bidsSum,
-            "",
-            ""
+        require(
+            _CollabTokenContract.operatorSend(
+                _msgSender(),
+                address(this),
+                bidsSum
+            ),
+            "CollabCanvas: Failed to transfer $COLAB"
         );
 
         address[] memory existingOwners = new address[](positions.length);
@@ -213,10 +189,9 @@ contract CollabCanvas is AccessControl, IERC777Recipient {
                 address existingOwner = existingOwners[i];
 
                 if (_existingBids[existingOwner] > 0) {
-                    _CollabTokenContract.send(
+                    _CollabTokenContract.transfer(
                         existingOwner,
-                        _existingBids[existingOwner],
-                        ""
+                        _existingBids[existingOwner]
                     );
 
                     delete _existingBids[existingOwner];
@@ -225,32 +200,6 @@ contract CollabCanvas is AccessControl, IERC777Recipient {
         }
 
         emit ColorPixels(positions, colors, bids, _msgSender());
-    }
-
-    /**
-     * @dev tokens received
-     * @param operator operator
-     * @param from from
-     * @param to to
-     * @param amount amount
-     * @param userData userData
-     * @param operatorData operatorData
-     */
-
-    function tokensReceived(
-        address operator,
-        address from,
-        address to,
-        uint256 amount,
-        bytes calldata userData,
-        bytes calldata operatorData
-    ) external {
-        require(
-            msg.sender == address(_CollabTokenContract),
-            "CollabCanvas: ERC777Recipient Invalid token"
-        );
-
-        //emit TokensReceived(operator, from, to, amount, userData, operatorData);
     }
 
     /**
@@ -361,16 +310,16 @@ contract CollabCanvas is AccessControl, IERC777Recipient {
      */
 
     /**
-     * @dev add minter
-     * @param _account address to add as the new minter
+     * @dev add admin
+     * @param _account address to add as the new admin
      */
     function addAdmin(address _account) public onlyAdmin {
         grantRole(DEFAULT_ADMIN_ROLE, _account);
     }
 
     /**
-     * @dev remove minter
-     * @param _account address to remove as minter
+     * @dev remove admin
+     * @param _account address to remove as admin
      */
     function removeAdmin(address _account) public onlyAdmin {
         revokeRole(DEFAULT_ADMIN_ROLE, _account);
