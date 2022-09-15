@@ -61,7 +61,7 @@ contract("CollabToken tests", async accounts => {
       }
     });
 
-  it("should permit 100 allowance", async () => {
+  it("should permit 100 transfer", async () => {
 
     /** Create the new wallet */
     await web3.eth.accounts.wallet.create(1)

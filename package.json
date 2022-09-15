@@ -14,6 +14,7 @@
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^4.5.4",
     "eth-gas-reporter": "^0.2.20",
+    "eth-permit": "^0.2.3",
     "html-webpack-plugin": "^4.5.2",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
@@ -28,8 +29,5 @@
   "scripts": {
     "build": "webpack",
     "dev": "webpack-dev-server"
-  },
-  "dependencies": {
-    "eth-permit": "^0.2.3"
   }
 }

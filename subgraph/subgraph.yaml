@@ -8,7 +8,7 @@ dataSources:
     name: Collab
     network: goerli
     source:
-      address: '0xbb89e09D5c9df7C3683C78663FCeF255E2A37c5e'
+      address: '0xFd654D2802776D009451A9D7F2006762DEC495AC'
       abi: CollabCanvas
     mapping:
       kind: ethereum/events
