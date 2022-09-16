@@ -1,14 +1,12 @@
-specVersion: 0.0.6
-description: Art Collabs
-repository: https://github.com/graphprotocol/example-subgraph
+specVersion: 0.0.4
 schema:
   file: ./schema.graphql
 dataSources:
-  - kind: ethereum/contract
-    name: Collab
+  - kind: ethereum
+    name: CollabCanvas
     network: goerli
     source:
-      address: '0xFd654D2802776D009451A9D7F2006762DEC495AC'
+      address: "0x69c8c17be714F526a1BE2359437bDDF2F5041b41"
       abi: CollabCanvas
     mapping:
       kind: ethereum/events
@@ -18,10 +16,10 @@ dataSources:
         - Pixel
       abis:
         - name: CollabCanvas
-          file: ../build/contracts/CollabCanvas.json
+          file: ./abis/CollabCanvas.json
       eventHandlers:
         - event: ColorPixel(uint256,bytes6,uint256,address)
           handler: handleColorPixel
         - event: ColorPixels(uint256[],bytes6[],uint256[],address)
           handler: handleColorPixels
-      file: ./mappings/pixels.ts
+      file: ./src/collab-canvas.ts

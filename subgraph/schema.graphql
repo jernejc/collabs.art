@@ -3,5 +3,4 @@ type Pixel @entity {
   owner: Bytes!
   color: Bytes
   bid: BigInt
-  modifiedAt: BigInt
 }

@@ -1,16 +1,18 @@
 {
-  "name": "autopoietic",
-  "version": "0.2.0",
+  "name": "collabs-testnet",
+  "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --product hosted-service jernejc/collabsart",
-    "create-local": "graph create --node http://localhost:8020/ autopoietic.art",
-    "remove-local": "graph remove --node http://localhost:8020/ autopoietic.art",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 autopoietic.art"
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ collabs-testnet",
+    "create-local": "graph create --node http://localhost:8020/ collabs-testnet",
+    "remove-local": "graph remove --node http://localhost:8020/ collabs-testnet",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 collabs-testnet",
+    "test": "graph test"
   },
-  "devDependencies": {
-    "@graphprotocol/graph-cli": "^0.33.0",
-    "@graphprotocol/graph-ts": "^0.27.0"
-  }
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.33.1",
+    "@graphprotocol/graph-ts": "0.27.0"
+  },
+  "devDependencies": { "matchstick-as": "0.5.0" }
 }
