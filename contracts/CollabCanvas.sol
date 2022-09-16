@@ -97,7 +97,8 @@ contract CollabCanvas is AccessControl {
             "CollabCanvas: Failed to transfer $COLAB"
         );
 
-        if (_pixels[position].bid > 0) { // refund existing
+        if (_pixels[position].bid > 0) {
+            // refund existing
             _CollabTokenContract.transfer(
                 _pixels[position].owner,
                 _pixels[position].bid
@@ -184,18 +185,16 @@ contract CollabCanvas is AccessControl {
             });
         }
 
-        if (existingOwners.length > 0) {
-            for (uint256 i = 0; i < existingOwners.length; i++) {
-                address existingOwner = existingOwners[i];
+        for (uint256 i = 0; i < existingOwners.length; i++) {
+            address existingOwner = existingOwners[i];
 
-                if (_existingBids[existingOwner] > 0) {
-                    _CollabTokenContract.transfer(
-                        existingOwner,
-                        _existingBids[existingOwner]
-                    );
+            if (_existingBids[existingOwner] > 0) {
+                _CollabTokenContract.transfer(
+                    existingOwner,
+                    _existingBids[existingOwner]
+                );
 
-                    delete _existingBids[existingOwner];
-                }
+                delete _existingBids[existingOwner];
             }
         }
 

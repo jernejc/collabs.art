@@ -222,6 +222,7 @@ contract CollabToken is ERC20, ERC20Permit, AccessControl {
     }
 
     /********
+     * ERC20Permit
      * Permit override
      */
 

@@ -1,6 +1,5 @@
 import { toWei, stringToBN, stringToHex } from '@util/helpers';
 import logger from '@util/logger';
-import config from '@util/config';
 
 export function getColorForXY({ x, y, color, scene }) {
   //logger.log('getColorForXY', x, y, color, scene);

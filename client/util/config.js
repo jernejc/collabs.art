@@ -54,10 +54,10 @@ const config = {
   }],
   defaultMinUnit: 1,
   subgraph: {
-    url: 'https://api.thegraph.com/subgraphs/name/jernejc/collabsart'
+    url: 'https://api.studio.thegraph.com/query/9304/collabs-testnet/v0.0.1'
   },
   api: {
-    url: 'https://pixelworld-2e64c.uc.r.appspot.com'
+    getImage: 'https://httpgetimage-pgm7g5cugq-uc.a.run.app'
   },
   appConfig: {
     canvasElement: 'app',

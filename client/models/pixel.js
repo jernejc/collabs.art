@@ -182,6 +182,13 @@ export default class Pixel {
     this.clearActivePixel();
   }
 
+  resetColor() {
+    if (this.originalColor && this.originalColor.color !== this.color.color) {
+      this.changeToColorNumber(this.originalColor);
+      this.originalColor = null;
+    }
+  }
+
   static fromTile({ tile, scene }) {
     const color = tile.fillColor;
     const pixel = new Pixel({ tile, scene, color, cx: tile.cx, cy: tile.cy });
@@ -203,12 +210,5 @@ export default class Pixel {
     pixel.setGraphData(data)
 
     return pixel;
-  }
-
-  resetColor() {
-    if (this.originalColor && this.originalColor.color !== this.color.color) {
-      this.changeToColorNumber(this.originalColor);
-      this.originalColor = null;
-    }
   }
 }

@@ -26,7 +26,7 @@ export default class MainScene extends ApplicationScene {
   }
 
   preload() {
-    this.load.image('worldimage', `${config.api.url}/image`);
+    this.load.image('worldimage', config.api.getImage);
   }
 
   create(data) {
