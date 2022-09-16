@@ -10,7 +10,6 @@ const CollabCanvas = artifacts.require("CollabCanvas");
 const CollabToken = artifacts.require("CollabToken");
 
 const subgraphYAML = `${__dirname}/../subgraph/subgraph.yaml`;
-//const eventsYAML = `${__dirname}/../events/app.yaml`;
 
 module.exports = async (deployer, network, accounts) => {
 
@@ -20,11 +19,6 @@ module.exports = async (deployer, network, accounts) => {
 
   if (!httpUrl)
     throw new Error('No network URL found.');
-
-  if (network === 'development') {
-    // In a test environment an ERC777 token requires deploying an ERC1820 registry
-    await singletons.ERC1820Registry(accounts[0]);
-  }
 
   const wsUrl = deployer.networks[networkName].websocket || null;
   const maxPixels = 1000000;
@@ -80,24 +74,12 @@ module.exports = async (deployer, network, accounts) => {
   const newSubgraphYAML = yaml.dump(subgraphConf);
   fs.writeFileSync(subgraphYAML, newSubgraphYAML, 'utf8');
 
-  // Update events app yaml
-  //const eventsConf = yaml.load(fs.readFileSync(eventsYAML, 'utf8'));
-
-  // Update ENV vars
-  //eventsConf.env_variables.CANVAS_ADDRESS = CollabCanvas.address;
-  //eventsConf.env_variables.TOKEN_ADDRESS = CollabToken.address;
-  //eventsConf.env_variables.WSURL = wsUrl;
-
-  //const newEventsYAML = yaml.dump(eventsConf);
-  //fs.writeFileSync(eventsYAML, newEventsYAML, 'utf8');
-
   // Copy ABIs to client
   fs.writeFileSync(`${__dirname}/../client/abis/CollabCanvas.json`, JSON.stringify(CollabCanvas.abi), { flag: 'w' });
   fs.writeFileSync(`${__dirname}/../client/abis/CollabToken.json`, JSON.stringify(CollabToken.abi), { flag: 'w' });
 
-  // Copy ABIs to events
-  //fs.writeFileSync(`${__dirname}/../events/abis/CollabCanvas.json`, JSON.stringify(CollabCanvas.abi), { flag: 'w' });
-  //fs.writeFileSync(`${__dirname}/../events/abis/CollabToken.json`, JSON.stringify(CollabToken.abi), { flag: 'w' });
+  // Copy ABIs to subgraph
+  fs.writeFileSync(`${__dirname}/../subgraph/abis/CollabCanvas.json`, JSON.stringify(CollabCanvas.abi), { flag: 'w' });
 
   return;
 };
