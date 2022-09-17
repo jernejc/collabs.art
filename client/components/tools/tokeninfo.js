@@ -1,7 +1,7 @@
 import logger from "@util/logger";
 import config from "@util/config";
 
-import { creditToken } from "@actions/general"
+import { creditToken, permitSignature, permitToken } from "@actions/general"
 
 import Button from "../form/button";
 import Input from "../form/input";
@@ -30,10 +30,21 @@ export default class TokenInfo {
     this.twitterButton = new Button({
       icon: 'twitter-logo.png',
       text: 'Connect',
-      // tooltip: 'Available Soon!',
-      // tooltipFlow: 'down',
       caption: '100 $COLAB',
-      elClasses: ['action-button', 'social-connect', 'twitter']
+      elClasses: ['action-button', 'social-connect', 'twitter'],
+      clickAction: async () => {
+        await this.scene.game.firebase.twitterSigninPopup();
+
+        if (!this.scene.game.firebase.idToken)
+          return;
+          
+        const signatureData = await permitSignature({ scene: this.scene, token: this.scene.game.firebase.idToken });
+
+        if (signatureData) {
+          const permitResponse = await permitToken({ scene: this.scene, response: signatureData });
+          logger.log('permitResponse', permitResponse);
+        }
+      }
     });
 
     this.domElement.append(this.twitterButton.domElement);

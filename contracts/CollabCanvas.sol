@@ -73,6 +73,29 @@ contract CollabCanvas is AccessControl {
     }
 
     /**
+     * @dev Get pixel
+     * @param position pixel position in the world / id
+     */
+    function getPixel(uint256 position)
+        public
+        view
+        returns (
+            address owner,
+            bytes6 color,
+            uint256 bid
+        )
+    {
+        require(
+            _exists(position),
+            "CollabCanvas: Make sure position exists before returning it"
+        );
+
+        Pixel memory pixel = _pixels[position];
+
+        return (pixel.owner, pixel.color, pixel.bid);
+    }
+
+    /**
      * @dev Validate and set pixel color
      * @param position pixel position in the world / id
      * @param color pixel HEX color

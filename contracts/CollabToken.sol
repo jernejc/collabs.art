@@ -128,7 +128,8 @@ contract CollabToken is ERC20, ERC20Permit, AccessControl {
      * Based on ERC777 operators
      * https://docs.openzeppelin.com/contracts/2.x/api/token/erc777
 
-     * - uses _transfer instead of _moves
+     * - uses _transfer instead of _move
+     * - emits single event
      * - does not trigger callback
      * - returns boolean
      */

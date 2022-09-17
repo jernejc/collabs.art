@@ -71,11 +71,12 @@ module.exports = {
         privateKeys: [private_key],
         numberOfAddresses: 1,
         addressIndex: 0, 
-        providerOrUrl: goerliURL 
+        providerOrUrl: goerliURL,
+        pollingInterval: 15e3
       }),
       network_id: 5,
-      confirmations: 2,
-      timeoutBlocks: 200
+      networkCheckTimeout: 1e6,
+      deploymentPollingInterval: 15e3,
     }
 
     // Another network with more advanced options...

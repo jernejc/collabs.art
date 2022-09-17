@@ -10,7 +10,7 @@ import {
 import logger from '@util/logger';
 
 import { setInvertedStroke, resetStrokeStyle } from "@actions/general";
-import { getRelativeTile } from "@actions/pixel";
+import { getRelativeTile, loadPixel } from "@actions/pixel";
 
 export default class Pixel {
   constructor({ tile, scene, color, cx, cy }) {
@@ -193,7 +193,7 @@ export default class Pixel {
     const color = tile.fillColor;
     const pixel = new Pixel({ tile, scene, color, cx: tile.cx, cy: tile.cy });
 
-    if (!pixel.bid) pixel.bid = scene.game.web3.minUnit;
+    if (!pixel.bid) pixel.bid = parseInt(Web3.utils.fromWei(scene.game.web3.minUnit));
 
     return pixel;
   }

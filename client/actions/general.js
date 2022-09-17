@@ -5,7 +5,9 @@ import Web3 from 'web3';
 import { getTileForPointer } from '@actions/pixel';
 
 import { formatColorNumber } from '@util/helpers';
+
 import logger from '@util/logger';
+import config from '@util/config';
 
 export function handleMouseMove({ pointer, scene }) {
   //logger.log('User interactions: handleMove');
@@ -160,6 +162,78 @@ export async function creditToken({ scene, value }) {
     })
   } catch (error) {
     logger.error('Action creditToken: ', error);
+
+    if (error.message && error.message === 'MetaMask Tx Signature: User denied transaction signature.') {
+      scene.game.tools.removeNotification();
+      return;
+    }
+
+    scene.game.tools.setNotification(10000, 'error', txHash);
+    return;
+  }
+
+  scene.game.tools.setNotification(6500, 'success', txHash);
+}
+
+export async function permitSignature({ scene, token }) {
+  const web3 = scene.game.web3.RPCinstance;
+  const hash = web3.utils.sha3("Collabs metamask message.");
+
+  let response;
+
+  scene.game.tools.setNotification(0, 'processing');
+
+  try {
+    const signature = await web3.eth.personal.sign(hash, scene.game.web3.activeAddress);
+
+    response = await fetch(config.api.permit, {
+      method: 'POST',
+      headers: {
+        'signature': signature,
+        'Authorization': 'Bearer ' + token
+      }
+    }).then((data) => data.json());
+  } catch (error) {
+    logger.error('Action permitSignature: ', error);
+
+    if (error.message && error.message === 'MetaMask Tx Signature: User denied transaction signature.') {
+      scene.game.tools.removeNotification();
+      return;
+    }
+
+    scene.game.tools.setNotification(10000, 'error');
+    return;
+  }
+
+  scene.game.tools.setNotification(500, 'success');
+
+  return response;
+}
+
+export async function permitToken({ scene, response }) {
+  logger.log('Action: permitToken', response);
+
+  let txHash = null;
+
+  scene.game.tools.setNotification(0, 'processing');
+
+  try {
+    await scene.game.web3.tokenContract.methods.permit(
+      response.provider,
+      scene.game.web3.activeAddress,
+      response.value,
+      response.deadline,
+      response.v,
+      response.r,
+      response.s
+    ).send({
+      from: scene.game.web3.activeAddress
+    }).on('transactionHash', (hash) => {
+      txHash = hash;
+      scene.game.tools.setNotificationTxHash(txHash);
+    });
+  } catch (error) {
+    logger.error('Action permitToken: ', error);
 
     if (error.message && error.message === 'MetaMask Tx Signature: User denied transaction signature.') {
       scene.game.tools.removeNotification();

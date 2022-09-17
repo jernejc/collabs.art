@@ -52,12 +52,22 @@ const config = {
     symbol: 'Ξ',
     enabled: false
   }],
-  defaultMinUnit: 1,
+  firebaseConfig: {
+    apiKey: "AIzaSyDGLHnM6CRDaMYoj6lePMqGcaGHAtnD83U",
+    authDomain: "collabsart.firebaseapp.com",
+    projectId: "collabsart",
+    storageBucket: "collabsart.appspot.com",
+    messagingSenderId: "25720990970",
+    appId: "1:25720990970:web:9a09435d465ff402442d43",
+    measurementId: "G-M2298SCQ2L"
+  },
+  defaultMinUnit: Web3.utils.toWei('1'),
   subgraph: {
-    url: 'https://api.studio.thegraph.com/query/9304/collabs-testnet/v0.0.1'
+    url: 'https://api.studio.thegraph.com/query/9304/collabs-testnet/v1.0.0'
   },
   api: {
-    getImage: 'https://httpgetimage-pgm7g5cugq-uc.a.run.app'
+    getImage: 'https://httpgetimage-pgm7g5cugq-uc.a.run.app',
+    permit: 'https://permit-pgm7g5cugq-uc.a.run.app'
   },
   appConfig: {
     canvasElement: 'app',

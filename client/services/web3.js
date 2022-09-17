@@ -367,13 +367,13 @@ export default class Web3Manager {
 
     try {
       minUnit = await this.canvasContract.methods.getMinUnit().call();
-      this.minUnit = Web3.utils.fromWei(minUnit);
+      this.minUnit = Web3.utils.fromWei(minUnit).toNumber();
     } catch (error) {
       logger.warn('Failed to fetch RPC minUnit');
 
       try {
         minUnit = await this.eventCanvasContract.methods.getMinUnit().call();
-        this.minUnit = Web3.utils.fromWei(minUnit);
+        this.minUnit = Web3.utils.fromWei(minUnit).toNumber();
       } catch (error) {
         logger.warn('Failed to fetch WS minUnit');
         this.minUnit = config.defaultMinUnit;

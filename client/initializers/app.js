@@ -12,6 +12,7 @@ import Web3Manager from '@services/web3';
 import SelectionManager from '@services/selection';
 import ToolsManager from '@services/tools';
 import GraphManager from '@services/subgraph';
+import FirebaseManager from '@services/firebase';
 
 // Game init
 export async function AppInitializer() {
@@ -64,6 +65,8 @@ export async function AppInitializer() {
   // Web3Provider init is async
   await GameInstance.web3.initProviders();
 
+  // Init Firebase tools
+  GameInstance.firebase = new FirebaseManager(GameInstance, Emitter);
   // Init Selection Manager
   GameInstance.selection = new SelectionManager(GameInstance, Emitter);
   // Init Graph Manager

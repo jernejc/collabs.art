@@ -2,9 +2,9 @@
 const fs = require('fs');
 const yaml = require('js-yaml');
 
-require('@openzeppelin/test-helpers/configure')({ provider: web3.currentProvider, environment: 'truffle' });
+const web3 = require('web3');
 
-const { singletons } = require('@openzeppelin/test-helpers');
+require('@openzeppelin/test-helpers/configure')({ provider: web3.currentProvider, environment: 'truffle' });
 
 const CollabCanvas = artifacts.require("CollabCanvas");
 const CollabToken = artifacts.require("CollabToken");
@@ -22,7 +22,7 @@ module.exports = async (deployer, network, accounts) => {
 
   const wsUrl = deployer.networks[networkName].websocket || null;
   const maxPixels = 1000000;
-  const minUnit = 1;
+  const minUnit = web3.utils.toWei('1');
   const conversionRate = 500;
   const developmentRate = 10000000;
   const supportedColors = [

@@ -12,7 +12,8 @@ contract("CollabCanvas coloring tests", async accounts => {
   const position = web3.utils.utf8ToHex("PT232");
   const color = web3.utils.utf8ToHex("883992");
   const unsupportedColor = web3.utils.utf8ToHex("183992");
-  const bid = new BN(10);
+  const minUnit = web3.utils.toWei('1');
+  const bid = new BN(minUnit);
 
   const positions = ["PT233", "PT234", "PT235", "PT236", "PT237"].map(item => web3.utils.utf8ToHex(item));
   const colors = ["883992", "883992", "883992", "883992", "883992"].map(item => web3.utils.stringToHex(item));
@@ -38,6 +39,11 @@ contract("CollabCanvas coloring tests", async accounts => {
       // Verfiy color is set
       const NewPixelColor = await canvasInstance.getColor(position);
       expect(web3.utils.numberToHex(NewPixelColor)).to.equal(color);
+      // Verfiy pixe data
+      const NewPixel = await canvasInstance.getPixel(position);
+      expect(web3.utils.numberToHex(NewPixel.color)).to.equal(color);
+      expect(NewPixel.owner).to.equal(accounts[0]);
+      expect(NewPixel.bid.toString()).to.equal(bid.toString());
       // Verify account balance
       const finalBalanceAccount = await tokenInstance.balanceOf(accounts[0]);
       expect(finalBalanceAccount.toString()).to.equal(initialBalanceAccount.sub(bid).toString());
@@ -103,21 +109,25 @@ contract("CollabCanvas coloring tests", async accounts => {
   })
 
   it("should refund existing bids when new one is applied", async () => {
-    const newBids = bids.map(item => item.add(new BN(1)));
+    const newBids = bids.map(item => item.add(new BN(minUnit)));
     const newBidsSum = newBids.reduce((a, b) => b.add(a), new BN(0));
 
     const initialBalanceAccount0 = await tokenInstance.balanceOf(accounts[0]);
     const initialBalanceAccount1 = await tokenInstance.balanceOf(accounts[1]);
+    const initialBalanceContract = await tokenInstance.balanceOf(canvasInstance.address);
 
     try {
       await canvasInstance.setColors(positions, colors, newBids.map(item => item.toString()), { from: accounts[1] });
 
+      // Verify account0 balance 
       const finalBalanceAccount0 = await tokenInstance.balanceOf(accounts[0]);
       expect(finalBalanceAccount0.toString()).to.equal(initialBalanceAccount0.add(bidsSum).toString());
+      // Verify account1 balance 
       const finalBalanceAccount1 = await tokenInstance.balanceOf(accounts[1]);
       expect(finalBalanceAccount1.toString()).to.equal(initialBalanceAccount1.sub(newBidsSum).toString());
+      // Verify contract balance
       const finalBalanceContract = await tokenInstance.balanceOf(canvasInstance.address);
-      expect(finalBalanceContract.toString()).to.equal('65'); // we know the value based on previous tests, needs re-factor
+      expect(finalBalanceContract.toString()).to.equal(initialBalanceContract.sub(bidsSum).add(newBidsSum).toString());
     } catch (error) {
       console.error(error);
       assert.fail("One or more errors occured.");

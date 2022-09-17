@@ -47,6 +47,19 @@ export function getTileForXY({ x, y, scene }) {
   return tile;
 }
 
+export async function loadPixel({ scene, position }) {
+  logger.log('Action loadPixel', position);
+
+  try {
+    const pixel = await scene.game.web3.canvasContract.methods.getPixel(stringToBN(position)).call();
+
+    console.log('loaded pixel', pixel);
+  } catch (error) {
+    logger.error('Action loadPixel: ', error);
+    return;
+  }
+}
+
 export async function colorPixels({ scene, selection }) {
   logger.log('Action colorPixels', selection)
 
