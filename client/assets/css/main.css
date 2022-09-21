@@ -767,40 +767,6 @@ input {
   font-weight: normal;
 }
 
-#connection-status .colab-info .social-connect {
-  width: 47%;
-  padding: 10px;
-  border: 1px solid;
-  border-radius: 4px;
-  margin: 20px 5px 0px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 50px;
-  position: relative;
-}
-
-#connection-status .colab-info .social-connect.twitter {
-  color: var(--header-white);
-  border: 1px solid #1d9bf0;
-  background: rgba(29, 155, 240, 0.5);
-}
-
-#connection-status .colab-info .social-connect.twitter:hover {
-  background: #1d9bf0;
-  border: 1px solid #1d9bf0;
-}
-
-#connection-status .colab-info .social-connect.discord {
-  color: var(--header-white);
-  border: 1px solid #5c6bc0;
-  background: rgba(92, 107, 192, 0.5);
-}
-
-#connection-status .colab-info .social-connect.discord:hover {
-  background: #5c6bc0;
-}
-
 #connection-status .colab-info .credit-token {
   color: var(--header-white);
   border: 1px solid var(--light-green-color);
@@ -870,7 +836,7 @@ input {
   Alert
 ***/
 
-#alert {
+.alert {
   padding: 0px 18px;
   background: var(--active-black);
   font-size: 16px;
@@ -883,17 +849,17 @@ input {
   user-select: none;
 }
 
-#alert.show {
+.alert.show {
   transform: translate(0%, 0px);
   opacity: 1;
 }
 
-#alert.hide {
+.alert.hide {
   transform: translate(130%, 0px);
   opacity: 0;
 }
 
-#alert .gg-info {
+.alert .gg-info {
   --ggs: 0.8;
   margin-right: 5px;
 }
@@ -1126,7 +1092,7 @@ Info Box
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 30px;
+  min-height: 30px;
   margin: auto 0;
   padding: 4px 11px;
   min-width: 80px;
@@ -1944,6 +1910,49 @@ Info Box
 .action-bar .docs-action i {
   margin-right: 10px;
 }
+
+/*** 
+*  Social connect
+***/
+
+.social-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 17px 0px;
+}
+
+.social-connect {
+  width: 49.2%;
+  padding: 10px;
+  border: 1px solid;
+  border-radius: 4px;
+  height: 50px;
+  position: relative;
+  --ggs: 1.3;
+}
+
+.social-connect.twitter {
+  color: var(--header-white);
+  border: 1px solid #1d9bf0;
+  background: rgba(29, 155, 240, 0.5);
+}
+
+.social-connect.twitter:hover {
+  background: #1d9bf0;
+  border: 1px solid #1d9bf0;
+}
+
+.social-connect.discord {
+  color: var(--header-white);
+  border: 1px solid #5c6bc0;
+  background: rgba(92, 107, 192, 0.5);
+}
+
+.social-connect.discord:hover {
+  background: #5c6bc0;
+}
+
 
 /* Animations */
 

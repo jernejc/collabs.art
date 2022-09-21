@@ -190,13 +190,18 @@ export async function permitSignature({ scene, token }) {
       method: 'POST',
       headers: {
         'signature': signature,
-        'Authorization': 'Bearer ' + token
-      }
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        type: 'twitter',
+        category: 'login'
+      })
     }).then((data) => data.json());
   } catch (error) {
     logger.error('Action permitSignature: ', error);
 
-    if (error.message && error.message === 'MetaMask Tx Signature: User denied transaction signature.') {
+    if (error.message && error.message === 'MetaMask Message Signature: User denied message signature.') {
       scene.game.tools.removeNotification();
       return;
     }

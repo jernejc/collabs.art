@@ -27,27 +27,33 @@ export default class TokenInfo {
     this.domElement.classList.add('info', 'colab-info');
     this.domElement.innerHTML = `Get $COLAB by connecting your Twitter account and come say hi on our Discord channel. <a href="${config.appConfig.docs.getColabLink}" target="_blank">(more)</a>`;
 
+    this.socialButtonsWrapper = document.createElement('div');
+    this.socialButtonsWrapper.classList.add('social-buttons');
+
+    this.domElement.append(this.socialButtonsWrapper);
+
     this.twitterButton = new Button({
       icon: 'twitter-logo.png',
       text: 'Connect',
       caption: '100 $COLAB',
       elClasses: ['action-button', 'social-connect', 'twitter'],
       clickAction: async () => {
+        if (!await this.scene.game.web3.preWeb3ActionSequence())
+          return;
+
         await this.scene.game.firebase.twitterSigninPopup();
 
         if (!this.scene.game.firebase.idToken)
           return;
-          
+
         const signatureData = await permitSignature({ scene: this.scene, token: this.scene.game.firebase.idToken });
 
-        if (signatureData) {
-          const permitResponse = await permitToken({ scene: this.scene, response: signatureData });
-          logger.log('permitResponse', permitResponse);
-        }
+        if (signatureData) 
+          await permitToken({ scene: this.scene, response: signatureData });
       }
     });
 
-    this.domElement.append(this.twitterButton.domElement);
+    this.socialButtonsWrapper.append(this.twitterButton.domElement);
 
     this.discordButton = new Button({
       icon: 'discord-icon.png',
@@ -58,7 +64,7 @@ export default class TokenInfo {
       }
     });
 
-    this.domElement.append(this.discordButton.domElement)
+    this.socialButtonsWrapper.append(this.discordButton.domElement);
 
     this.supportForm = {
       value: 0.2

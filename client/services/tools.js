@@ -426,7 +426,7 @@ export default class ToolsManager {
     }
 
     this.networkAlert = document.createElement('div');
-    this.networkAlert.setAttribute('id', 'alert');
+    this.networkAlert.classList.add('alert');
 
     this.domConnectionStatus.prepend(this.networkAlert);
 
