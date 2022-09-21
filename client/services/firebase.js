@@ -19,13 +19,15 @@ export default class FirebaseManager {
   }
 
   async twitterSigninPopup() {
+    logger.log('FirebaseManager: twitterSigninPopup');
+
     try {
       const result = await signInWithPopup(this.auth, this.twitterProvider);
 
       this.credential = TwitterAuthProvider.credentialFromResult(result);
       this.setTokens(result);
     } catch (error) {
-      logger.error('Twitter popup error', error);
+      logger.error('FirebaseManager: Twitter popup error', error);
 
       // const credential = TwitterAuthProvider.credentialFromError(error);
       // console.log('error credential', credential);
@@ -33,12 +35,17 @@ export default class FirebaseManager {
   }
 
   setTokens(response) {
+    logger.log('FirebaseManager: setTokens', response);
+    
     this.idToken = response._tokenResponse.idToken;
     this.refreshToken = response._tokenResponse.refreshToken;
     this.user = response.user;
   }
 
   async updateTokens() {
-    return this.auth.currentUser.getIdToken(true);
+    logger.log('FirebaseManager: updateTokens');
+
+    const response = await this.auth.currentUser.getIdToken(true);
+    this.setTokens(response);
   }
 }

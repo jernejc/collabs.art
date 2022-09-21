@@ -56,7 +56,7 @@ export default class AuctionInfo {
     if (!this.domElement.classList.contains('hidden'))
       this.domElement.classList.add('hidden');
 
-    this.scene.game.tools.hideTokenInfo();
+    this.scene.game.tools.hideAuctionInfo();
   }
 
   open() {
