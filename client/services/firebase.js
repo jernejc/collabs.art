@@ -37,4 +37,8 @@ export default class FirebaseManager {
     this.refreshToken = response._tokenResponse.refreshToken;
     this.user = response.user;
   }
+
+  async updateTokens() {
+    return this.auth.currentUser.getIdToken(true);
+  }
 }
