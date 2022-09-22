@@ -205,6 +205,30 @@ export default class ToolsManager {
       this.connectionStatusInfo.classList.remove('hidden');
   }
 
+  updateTokenInfo() {
+    logger.log('ToolsManager: updateTokenInfo');
+
+    if (this.domTokenInfo) {
+      const twitterGrantUsed = this.game.firebase.twitterGrantUsed;
+      const twitterBtn = this.domTokenInfo.twitterButton;
+
+      if (twitterGrantUsed) {
+        twitterBtn.caption = `@${this.game.firebase.userInfo.screenName}`;
+        twitterBtn.text = 'Connected';
+        twitterBtn.disabled = true;
+        twitterBtn.connected = true;
+      } else {
+        twitterBtn.caption = `100 $COLAB`;
+        twitterBtn.text = 'Connect';
+        twitterBtn.disabled = false;
+        twitterBtn.connected = false;
+      }
+
+      if (!twitterBtn.isLoading) 
+        twitterBtn.reset();
+    }
+  }
+
   hideTokenInfo() {
     logger.log('ToolsManager: hideTokenInfo');
 

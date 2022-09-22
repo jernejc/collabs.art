@@ -10,14 +10,14 @@ export default class Button {
     this.domElement = document.createElement('button');
 
     if (elClasses)
-      this.domElement.classList.add(...elClasses); // 'action-button'
+      this.domElement.classList.add(...elClasses);
 
     this.triggerActionListener = this.triggerAction.bind(this); // For removeEventListener to work
 
     if (disabled)
-      this.defaultDisabled = disabled;
-    if (this.defaultDisabled)
-      this.domElement.disabled = true;
+      this.disabled = disabled;
+    if (this.disabled)
+      this.domElement.setAttribute('disabled', 'disabled');
     if (icon)
       this.setIcon(icon);
     if (clickAction)
@@ -31,8 +31,9 @@ export default class Button {
   }
 
   loading() {
+    this.isLoading = true;
     this.domElement.innerHTML = '';
-    this.domElement.disabled = true;
+    this.domElement.setAttribute('disabled', 'disabled');
     this.domElement.append(this.loadingUI);
   }
 
@@ -70,6 +71,9 @@ export default class Button {
     }
 
     this.domElement.innerHTML += this.text;
+
+    if (this.caption)
+      this.setCaption();
   }
 
   setToolTip(tooltip, tooltipFlow) {
@@ -82,6 +86,15 @@ export default class Button {
   setColor(color) {
     if (!this.domElement.classList.contains(color))
       this.domElement.classList.add(color)
+  }
+
+  setDisabled(disabled) {
+    this.disabled = disabled;
+
+    if (this.disabled)
+      this.domElement.setAttribute('disabled', 'disabled');
+    else
+      this.domElement.removeAttribute('disabled');
   }
 
   clearColor(color) {
@@ -114,7 +127,7 @@ export default class Button {
     config.appConfig.btnIcons.forEach(btnIcon => {
       this.domElement.classList.remove(btnIcon);
     });
-    
+
     this.icon = icon || this.icon;
 
     if (text)
@@ -151,6 +164,9 @@ export default class Button {
       this.alertIcon.classList.add('gg-chevron-double-up');
       this.domElement.append(this.alertIcon);
     }
+
+    if (this.caption)
+      this.setCaption();
   }
 
   setClickAction(action) {
@@ -166,19 +182,27 @@ export default class Button {
     this.domElement.addEventListener('click', this.triggerActionListener);
   }
 
-  toggleDisabled() {
-    this.domElement.disabled = !this.domElement.disabled;
-  }
-
   reset() {
+    if (this.isLoading) {
+      this.isLoading = false;
+      this.domElement.removeChild(this.loadingUI);
+    }
+
     if (this.text)
-      this.domElement.textContent = this.text;
+      this.setText();
     if (this.icon)
       this.setIcon();
-    if (this.defaultDisabled)
-      this.domElement.disabled = true;
-    else
-      this.domElement.disabled = false;
+    if (this.caption)
+      this.setCaption();
+    if (this.connected) {
+      if (!this.domElement.classList.contains('connected'))
+        this.domElement.classList.add('connected');
+    } else {
+      if (this.domElement.classList.contains('connected'))
+        this.domElement.classList.remove('connected');
+    }
+
+    this.setDisabled(this.disabled);
   }
 
   destroy() {
