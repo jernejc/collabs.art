@@ -96,7 +96,9 @@ export default class Notification {
   destroy() {
     logger.log('Notification: destroy');
 
-    this.parent.removeChild(this.domElement);
+    if (this.parent.contains(this.domElement))
+        this.parent.removeChild(this.domElement);
+
     this.scene.game.tools.domNotification = null; // hacky, not cool
   }
 }

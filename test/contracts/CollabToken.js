@@ -97,7 +97,7 @@ contract("CollabToken tests", async accounts => {
       }
 
       const result = await signERC2612Permit(provider, domain, provider.addresses[0], accounts[4], web3.utils.toWei('1', 'ether'), max_int, nonce);
-      await tokenInstance.permit(provider.addresses[0], accounts[4], web3.utils.toWei('1', 'ether'), result.deadline, result.v, result.r, result.s, {
+      await tokenInstance.grant(provider.addresses[0], accounts[4], web3.utils.toWei('1', 'ether'), result.deadline, 'twitter:login', result.v, result.r, result.s, {
         from: accounts[4]
       });
 

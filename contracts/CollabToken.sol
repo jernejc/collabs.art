@@ -27,7 +27,9 @@ contract CollabToken is ERC20, ERC20Permit, AccessControl {
 
     // solhint-disable-next-line var-name-mixedcase
     bytes32 private constant _PERMIT_TYPEHASH =
-        keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
+        keccak256(
+            "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
+        );
 
     /**
      * @dev Emitted when `operator` is made operator for `tokenHolder`
@@ -43,6 +45,16 @@ contract CollabToken is ERC20, ERC20Permit, AccessControl {
     event RevokedOperator(
         address indexed operator,
         address indexed tokenHolder
+    );
+
+    /**
+     * @dev Emitted when permit is triggered
+     */
+    event Permit(
+        address owner,
+        address spender,
+        uint256 value,
+        string category
     );
 
     /**
@@ -156,7 +168,7 @@ contract CollabToken is ERC20, ERC20Permit, AccessControl {
     function authorizeOperator(address operator) public virtual {
         require(
             _msgSender() != operator,
-            "ERC777: authorizing self as operator"
+            "CollabToken: authorizing self as operator"
         );
 
         if (_defaultOperators[operator]) {
@@ -200,7 +212,7 @@ contract CollabToken is ERC20, ERC20Permit, AccessControl {
     ) public virtual returns (bool) {
         require(
             isOperatorFor(_msgSender(), sender),
-            "ERC777: caller is not an operator for holder"
+            "CollabToken: caller is not an operator for holder"
         );
         _transfer(sender, recipient, amount);
         return true;
@@ -216,7 +228,7 @@ contract CollabToken is ERC20, ERC20Permit, AccessControl {
     {
         require(
             isOperatorFor(_msgSender(), account),
-            "ERC777: caller is not an operator for holder"
+            "CollabToken: caller is not an operator for holder"
         );
         _burn(account, amount);
         return true;
@@ -230,16 +242,17 @@ contract CollabToken is ERC20, ERC20Permit, AccessControl {
     /**
      * @dev See {IERC20Permit-permit}.
      */
-    function permit(
+    function grant(
         address owner,
         address spender,
         uint256 value,
         uint256 deadline,
+        string memory category,
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) public virtual override {
-        require(block.timestamp <= deadline, "ERC20Permit: expired deadline");
+    ) public virtual {
+        require(block.timestamp <= deadline, "CollabToken: expired deadline");
 
         bytes32 structHash = keccak256(
             abi.encode(
@@ -255,9 +268,11 @@ contract CollabToken is ERC20, ERC20Permit, AccessControl {
         bytes32 hash = _hashTypedDataV4(structHash);
 
         address signer = ECDSA.recover(hash, v, r, s);
-        require(signer == owner, "ERC20Permit: invalid signature");
+        require(signer == owner, "CollabToken: invalid signature");
 
         _transfer(owner, spender, value);
+
+        emit Permit(owner, spender, value, category);
     }
 
     /********

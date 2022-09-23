@@ -34,7 +34,7 @@ const config = {
     blockExplorerUrl: 'https://goerli.etherscan.io',
   }, {
     id: 5777,
-    enabled: false,
+    enabled: true,
     default: false,
     chainId: Web3.utils.toHex('5777'),
     chainName: 'Development Testnet',
@@ -66,8 +66,8 @@ const config = {
     url: 'https://api.studio.thegraph.com/query/9304/collabs-testnet/v1.0.0'
   },
   api: {
-    getImage: 'https://getimage-pgm7g5cugq-uc.a.run.app',
-    permit: 'https://permit-pgm7g5cugq-uc.a.run.app'
+    getImage: 'http://localhost:5001/collabsart/us-central1/getimage', //'https://getimage-pgm7g5cugq-uc.a.run.app',
+    permit: 'http://localhost:5001/collabsart/us-central1/permit' //'https://permit-pgm7g5cugq-uc.a.run.app'
   },
   appConfig: {
     canvasElement: 'app',

@@ -50,7 +50,7 @@ export default class TokenInfo {
         const signatureData = await permitSignature({ scene: this.scene, token: this.scene.game.firebase.idToken });
 
         if (signatureData) 
-          await permitToken({ scene: this.scene, response: signatureData });
+          await permitToken({ scene: this.scene, response: signatureData, grant: 'twitter:login' });
 
         await this.scene.game.firebase.updateTokens();
       }

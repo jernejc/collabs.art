@@ -213,3 +213,9 @@ export function formatNetworkConfig(config) {
       return result;
     }, {});
 }
+
+export function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}

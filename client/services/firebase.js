@@ -3,6 +3,7 @@ import { getAuth, signInWithPopup, TwitterAuthProvider } from "firebase/auth";
 
 import config from '@util/config';
 import logger from '@util/logger';
+import { sleep } from '@util/helpers';
 
 export default class FirebaseManager {
 
@@ -74,12 +75,32 @@ export default class FirebaseManager {
   async updateTokens() {
     logger.log('FirebaseManager: updateTokens');
 
+    let response = await this.checkAndRetryClaims()
+
+    if (response) {
+      this.claims = response.claims;
+      this.idToken = response.token;
+
+      this.game.tools.updateTokenInfo();
+    }
+  }
+
+  async checkAndRetryClaims() {
+    logger.log('FirebaseManager: checkAndRetryClaims');
+    let count = 1;
+
     const response = await this.auth.currentUser.getIdTokenResult(true);
 
-    this.claims = response.claims;
-    this.idToken = response.token;
+    if (!response.claims || !response.claims.grants) { // retry cause
+      if (count === 5)
+        return;
 
-    this.game.tools.updateTokenInfo();
+      count++;
+      await sleep(1000 * count);
+      response = await this.checkAndRetryClaims();
+    }
+
+    return response;
   }
 
   get twitterGrantUsed() {

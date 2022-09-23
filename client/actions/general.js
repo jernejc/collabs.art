@@ -4,7 +4,7 @@ import Web3 from 'web3';
 
 import { getTileForPointer } from '@actions/pixel';
 
-import { formatColorNumber } from '@util/helpers';
+import { formatColorNumber, sleep } from '@util/helpers';
 
 import logger from '@util/logger';
 import config from '@util/config';
@@ -215,7 +215,7 @@ export async function permitSignature({ scene, token }) {
   return response;
 }
 
-export async function permitToken({ scene, response }) {
+export async function permitToken({ scene, response, grant }) {
   logger.log('Action: permitToken');
 
   let txHash = null;
@@ -223,11 +223,12 @@ export async function permitToken({ scene, response }) {
   scene.game.tools.setNotification(0, 'processing');
 
   try {
-    await scene.game.web3.tokenContract.methods.permit(
+    await scene.game.web3.tokenContract.methods.grant(
       response.provider,
       scene.game.web3.activeAddress,
       response.value,
       response.deadline,
+      grant,
       response.v,
       response.r,
       response.s

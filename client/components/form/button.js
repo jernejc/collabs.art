@@ -183,9 +183,14 @@ export default class Button {
   }
 
   reset() {
+    if (!this.domElement)
+      return;
+
     if (this.isLoading) {
       this.isLoading = false;
-      this.domElement.removeChild(this.loadingUI);
+      
+      if (this.domElement.contains(this.loadingUI))
+        this.domElement.removeChild(this.loadingUI);
     }
 
     if (this.text)
