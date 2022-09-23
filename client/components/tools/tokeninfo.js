@@ -23,9 +23,6 @@ export default class TokenInfo {
 
     const _self = this;
 
-    const twitterGrantUsed = this.scene.game.firebase.twitterGrantUsed;
-    const twitterScreenName = this.scene.game.firebase.twitterScreenName;
-
     this.domElement = document.createElement('div');
     this.domElement.classList.add('info', 'colab-info');
     this.domElement.innerHTML = `Get $COLAB by connecting your Twitter account and come say hi on our Discord channel. <a href="${config.appConfig.docs.getColabLink}" target="_blank">(more)</a>`;
@@ -35,17 +32,12 @@ export default class TokenInfo {
 
     this.domElement.append(this.socialButtonsWrapper);
 
-    const twitterClasses = ['action-button', 'social-connect', 'twitter'];
-
-    if (twitterGrantUsed)
-      twitterClasses.push('connected');
-
     this.twitterButton = new Button({
       icon: 'twitter-logo.png',
-      text: (twitterGrantUsed) ? 'Connected' : 'Connect',
-      caption: (twitterGrantUsed) ? twitterScreenName : '100 $COLAB',
-      disabled: (twitterGrantUsed),
-      elClasses: twitterClasses,
+      text: 'Connect',
+      caption: '100 $COLAB',
+      disabled: false,
+      elClasses: ['action-button', 'social-connect', 'twitter'],
       clickAction: async () => {
         if (!await this.scene.game.web3.preWeb3ActionSequence())
           return;

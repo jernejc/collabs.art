@@ -761,7 +761,7 @@ input {
 }
 
 #connection-status .colab-info {
-  height: 251px;
+  height: 245px;
   right: 0;
 }
 
@@ -1522,16 +1522,35 @@ Info Box
   justify-content: center;
 }
 
+.notification .secondary-icon {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+}
+
+.notification .secondary-icon .gg-pen {
+  --ggs: 0.95;
+  margin-top: -2px;
+}
+
 .notification.processing {
-  padding-right: 19px;
+  padding-right: 15px;
 }
 
-.notification.processing i.gg-loadbar-alt {
+.notification.signature {
+  margin: 0 0 0 -130px;
+}
+
+/*.notification.processing i.gg-loadbar-alt {
+  
+}*/
+
+.notification.processing .icon,
+.notification.signature .icon {
   background: var(--light-green-color);
-}
-
-.notification.processing .icon {
-  margin: 0 -5px 0px 5px;
 }
 
 .notification.success {
@@ -1961,6 +1980,18 @@ Info Box
 
 .social-connect.discord:hover {
   background: #5c6bc0;
+}
+
+.expand {
+  position: absolute;
+  z-index: 3;
+  bottom: 7px;
+  left: 177px;
+  background: var(--active-black);
+  color: var(--header-white);
+  padding: 2px;
+  cursor: pointer;
+  --ggs: 0.7;
 }
 
 

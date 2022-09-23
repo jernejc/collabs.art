@@ -1,9 +1,12 @@
 
 import ApplicationScene from '@scenes/application';
 import { setGameMode } from '@actions/general';
+import logger from '@util/logger';
 
 export default class MinimapScene extends ApplicationScene {
   constructor(config, wrapper) {
+    logger.log('MinimapScene: constructor');
+
     super({ key: 'MinimapScene', active: true });
 
     this.appConfig = config.appConfig;
@@ -53,12 +56,18 @@ export default class MinimapScene extends ApplicationScene {
     let prevMode; // TO-DO: needs a more general solution
 
     this.wrapper.on('pointerover', () => {
+      logger.log('MinimapScene: pointerover');
+
       prevMode = this.game.mode;
       setGameMode({ scene: this, mode: 'mininav' });
+      //this.game.tools.showExpandBtn();
     });
 
     this.wrapper.on('pointerout', () => {
+      logger.log('MinimapScene: pointerout');
+
       setGameMode({ scene: this, mode: this.mainscene.appConfig.defaultMode });
+      //this.game.tools.hideExpandBtn();
     });
   }
 

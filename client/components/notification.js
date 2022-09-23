@@ -3,9 +3,10 @@ import Button from "./form/button";
 
 export default class Notification {
 
-  constructor({ parent, time, type, hash, scene }) {
+  constructor({ parent, time, text, type, hash, scene }) {
     logger.log('Notification: constructor');
 
+    this.text = text;
     this.parent = parent;
     this.time = time || 0 // ms
     this.type = type;
@@ -21,20 +22,29 @@ export default class Notification {
     this.domElement = document.createElement('div');
     this.domElement.classList.add('notification', this.type);
 
+    let text;
+    let icon;
+
     switch (this.type) {
       case 'processing':
-        this.domElement.innerHTML = `<span class="icon"><i class="gg-loadbar-alt"></i></span>&nbsp;&nbsp; Processing Tx ..`;
+        icon = `gg-loadbar-alt`;
+        text = `Processing Tx ..`;
         break;
       case 'success':
-        this.domElement.innerHTML = `<span class="icon"><i class="gg-check"></i></span>&nbsp;&nbsp; Success`;
+        icon = `gg-check`;
+        text = `Success`;
         break;
       case 'signature':
-        this.domElement.innerHTML = `<span class="icon"><i class="gg-pen"></i></span>&nbsp;&nbsp; Signature request`;
+        icon = `gg-loadbar-alt`;
+        text = `Signature request ..`;
         break;
       case 'error':
-        this.domElement.innerHTML = `<span class="icon"><i class="gg-danger"></i></span>&nbsp;&nbsp; Error`;
+        icon = `gg-danger`;
+        text = `Error`;
         break;
     }
+
+    this.domElement.innerHTML = `<span class="icon"><i class="${icon}"></i></span>&nbsp;&nbsp; ${text}`;
 
     const elClasses = ['etherscan'];
 
@@ -54,6 +64,8 @@ export default class Notification {
       });
 
       this.domElement.appendChild(this.etherscanBtn.domElement);
+    } else {
+      this.domElement.innerHTML += `<div class="secondary-icon" tooltip="Confirm wallet ownership" flow="down"><i class="gg-pen"></i></div>`;
     }
 
     if (this.type === 'success' || this.type === 'error') {

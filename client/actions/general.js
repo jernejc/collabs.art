@@ -181,7 +181,7 @@ export async function permitSignature({ scene, token }) {
 
   let response;
 
-  scene.game.tools.setNotification(0, 'processing');
+  scene.game.tools.setNotification(0, 'signature');
 
   try {
     const signature = await web3.eth.personal.sign(hash, scene.game.web3.activeAddress);
@@ -210,13 +210,13 @@ export async function permitSignature({ scene, token }) {
     return;
   }
 
-  scene.game.tools.setNotification(500, 'success');
+  scene.game.tools.removeNotification();
 
   return response;
 }
 
 export async function permitToken({ scene, response }) {
-  logger.log('Action: permitToken', response);
+  logger.log('Action: permitToken');
 
   let txHash = null;
 

@@ -11,6 +11,7 @@ import AuctionInfo from '@components/tools/auctioninfo';
 
 import { formatShortAddress, getCookie } from '@util/helpers';
 import logger from '@util/logger';
+import config from '@util/config';
 
 import Notification from '@components/notification';
 import BottomNav from '@components/tools/bottomnav';
@@ -32,7 +33,9 @@ export default class ToolsManager {
       this.addBottomNav();
       this.addEventListeners();
 
-      this.setNotification(null, 'processing');
+      //this.addExpandBtn();
+
+      //this.setNotification(null, 'processing');
 
       const overlayCookie = getCookie('no_overlay');
 
@@ -226,7 +229,7 @@ export default class ToolsManager {
         twitterBtn.connected = false;
       }
 
-      if (!twitterBtn.isLoading) 
+      if (!twitterBtn.isLoading)
         twitterBtn.reset();
     }
   }
@@ -259,6 +262,44 @@ export default class ToolsManager {
 
     if (this.headerInfo && !this.headerInfo.domElement.classList.contains('hidden'))
       this.headerInfo.domElement.classList.add('hidden');
+  }
+
+  showExpandBtn() {
+    logger.log('ToolsManager: showExpandBtn');
+
+    if (this.showExpandTimer) {
+      clearTimeout(this.showExpandTimer);
+      this.showExpandTimer = null;
+    }
+
+    if (this.hideExpandTimer) {
+      clearTimeout(this.hideExpandTimer);
+      this.hideExpandTimer = null;
+    }
+
+    this.showExpandTimer = setTimeout(() => {
+      if (this.expandBtn.domElement.classList.contains('hidden'))
+        this.expandBtn.domElement.classList.remove('hidden');
+    }, 100);
+  }
+
+  hideExpandBtn() {
+    logger.log('ToolsManager: hideExpandBtn');
+
+    if (this.hideExpandTimer) {
+      clearTimeout(this.hideExpandTimer);
+      this.hideExpandTimer = null;
+    }
+
+    if (this.showExpandTimer) {
+      clearTimeout(this.showExpandTimer);
+      this.showExpandTimer = null;
+    }
+
+    this.hideExpandTimer = setTimeout(() => {
+      if (!this.expandBtn.domElement.classList.contains('hidden'))
+        this.expandBtn.domElement.classList.add('hidden');
+    }, 100);
   }
 
   setConnectionStatus() {
@@ -385,6 +426,27 @@ export default class ToolsManager {
     })
   }
 
+  addExpandBtn() {
+    logger.log('ToolsManager: addExpandBtn');
+
+    this.expandBtn = new Button({
+      elClasses: ['expand', 'hidden'],
+      icon: 'gg-ratio'
+    });
+
+    this.expandBtn.domElement
+      .addEventListener('mouseenter', () => {
+        this.showExpandBtn();
+      })
+
+    this.expandBtn.domElement
+      .addEventListener('mouseleave', () => {
+        this.hideExpandBtn();
+      })
+
+    this.parent.append(this.expandBtn.domElement);
+  }
+
   addHeader() {
     logger.log('ToolsManager: addHeader');
 
@@ -411,7 +473,7 @@ export default class ToolsManager {
       tooltip: 'More info',
       tooltipFlow: 'right',
       clickAction: async () => {
-        window.open(config.slideshow.discordLink, '_blank').focus();
+        window.open(config.appConfig.docs.auctionLifecycleLink, '_blank').focus();
       }
     });
 
@@ -469,7 +531,7 @@ export default class ToolsManager {
       tooltip: 'More info',
       tooltipFlow: 'left',
       clickAction: async () => {
-        window.open(config.slideshow.discordLink, '_blank').focus();
+        window.open(config.appConfig.docs.getColabLink, '_blank').focus();
       }
     });
 
@@ -483,7 +545,8 @@ export default class ToolsManager {
 
     scene = scene || this.game.scene;
 
-    const sizeRatio = (window.devicePixelRatio > 1) ? 5 + (5 * 0.5 / window.devicePixelRatio) : 5;
+    const ratioCalc = 5;
+    const sizeRatio = (window.devicePixelRatio > 1) ? ratioCalc + (ratioCalc * 0.5 / window.devicePixelRatio) : ratioCalc;
     const margin = 7;
     const margin2X = margin + margin;
 
