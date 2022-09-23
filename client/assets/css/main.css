@@ -125,6 +125,7 @@ input {
   display: flex;
   justify-content: center;
   width: 50px;
+  border: none;
   border-right: 1px dotted #757575;
   color: #757575;
   cursor: pointer;
@@ -153,7 +154,7 @@ input {
   user-select: none;
 }
 
-#header button {
+#header .time {
   background: buttonface;
   border: none;
   color: var(--active-black);
@@ -183,6 +184,7 @@ input {
 #header .auction-info button {
   width: 100%;
   margin-top: 20px;
+  height: 50px;
 }
 
 #header .auction-info button i {

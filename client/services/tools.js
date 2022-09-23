@@ -32,6 +32,8 @@ export default class ToolsManager {
       this.addBottomNav();
       this.addEventListeners();
 
+      this.setNotification(null, 'processing');
+
       const overlayCookie = getCookie('no_overlay');
 
       if (!overlayCookie)
@@ -201,8 +203,8 @@ export default class ToolsManager {
     if (this.domTokenInfo && this.domTokenInfo.closed)
       this.domTokenInfo.open();
 
-    if (this.connectionStatusInfo.classList.contains('hidden'))
-      this.connectionStatusInfo.classList.remove('hidden');
+    if (this.connectionStatusInfo.domElement.classList.contains('hidden'))
+      this.connectionStatusInfo.domElement.classList.remove('hidden');
   }
 
   updateTokenInfo() {
@@ -235,8 +237,8 @@ export default class ToolsManager {
     if (this.domTokenInfo && !this.domTokenInfo.closed)
       this.domTokenInfo.close();
 
-    if (this.connectionStatusInfo && !this.connectionStatusInfo.classList.contains('hidden'))
-      this.connectionStatusInfo.classList.add('hidden');
+    if (this.connectionStatusInfo && !this.connectionStatusInfo.domElement.classList.contains('hidden'))
+      this.connectionStatusInfo.domElement.classList.add('hidden');
   }
 
   showAuctionInfo() {
@@ -245,8 +247,8 @@ export default class ToolsManager {
     if (this.domAuctionInfo && this.domAuctionInfo.closed)
       this.domAuctionInfo.open();
 
-    if (this.headerInfo.classList.contains('hidden'))
-      this.headerInfo.classList.remove('hidden');
+    if (this.headerInfo.domElement.classList.contains('hidden'))
+      this.headerInfo.domElement.classList.remove('hidden');
   }
 
   hideAuctionInfo() {
@@ -255,8 +257,8 @@ export default class ToolsManager {
     if (this.domAuctionInfo && !this.domAuctionInfo.closed)
       this.domAuctionInfo.close();
 
-    if (this.headerInfo && !this.headerInfo.classList.contains('hidden'))
-      this.headerInfo.classList.add('hidden');
+    if (this.headerInfo && !this.headerInfo.domElement.classList.contains('hidden'))
+      this.headerInfo.domElement.classList.add('hidden');
   }
 
   setConnectionStatus() {
@@ -403,14 +405,17 @@ export default class ToolsManager {
       closed: true
     });
 
-    this.headerInfo = document.createElement('div');
-    this.headerInfo.classList.add('more-info', 'hidden');
-    this.headerInfo.setAttribute('tooltip', 'More info');
-    this.headerInfo.setAttribute('flow', 'right');
+    this.headerInfo = new Button({
+      icon: 'gg-info',
+      elClasses: ['more-info', 'hidden'],
+      tooltip: 'More info',
+      tooltipFlow: 'right',
+      clickAction: async () => {
+        window.open(config.slideshow.discordLink, '_blank').focus();
+      }
+    });
 
-    this.headerInfo.innerHTML = '<i class="gg-info"></i>';
-
-    this.header.append(this.headerInfo);
+    this.header.append(this.headerInfo.domElement);
 
     this.parent.append(this.header);
 
@@ -458,14 +463,17 @@ export default class ToolsManager {
       this.connectionStatusBtn.domElement.dispatchEvent(new Event('click', { 'bubbles': true }));
     });
 
-    this.connectionStatusInfo = document.createElement('div');
-    this.connectionStatusInfo.classList.add('more-info', 'hidden');
-    this.connectionStatusInfo.setAttribute('tooltip', 'More info');
-    this.connectionStatusInfo.setAttribute('flow', 'left');
+    this.connectionStatusInfo = new Button({
+      icon: 'gg-info',
+      elClasses: ['more-info', 'hidden'],
+      tooltip: 'More info',
+      tooltipFlow: 'left',
+      clickAction: async () => {
+        window.open(config.slideshow.discordLink, '_blank').focus();
+      }
+    });
 
-    this.connectionStatusInfo.innerHTML = '<i class="gg-info"></i>';
-
-    this.domConnectionStatus.prepend(this.connectionStatusInfo);
+    this.domConnectionStatus.prepend(this.connectionStatusInfo.domElement);
 
     this.setNetworkAlert();
   }

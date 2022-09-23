@@ -26,8 +26,6 @@ export default class TokenInfo {
     const twitterGrantUsed = this.scene.game.firebase.twitterGrantUsed;
     const twitterScreenName = this.scene.game.firebase.twitterScreenName;
 
-    console.log('twitterGrantUsed', twitterGrantUsed);
-
     this.domElement = document.createElement('div');
     this.domElement.classList.add('info', 'colab-info');
     this.domElement.innerHTML = `Get $COLAB by connecting your Twitter account and come say hi on our Discord channel. <a href="${config.appConfig.docs.getColabLink}" target="_blank">(more)</a>`;

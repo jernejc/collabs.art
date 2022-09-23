@@ -28,6 +28,9 @@ export default class Notification {
       case 'success':
         this.domElement.innerHTML = `<span class="icon"><i class="gg-check"></i></span>&nbsp;&nbsp; Success`;
         break;
+      case 'signature':
+        this.domElement.innerHTML = `<span class="icon"><i class="gg-pen"></i></span>&nbsp;&nbsp; Signature request`;
+        break;
       case 'error':
         this.domElement.innerHTML = `<span class="icon"><i class="gg-danger"></i></span>&nbsp;&nbsp; Error`;
         break;
@@ -38,20 +41,22 @@ export default class Notification {
     if (!this.hash)
       elClasses.push('disabled');
 
-    this.etherscanBtn = new Button({
-      elClasses,
-      icon: 'etherscan-logo.svg',
-      clickAction: () => {
-        let hashLink = this.getTxURL();
+    if (this.type !== 'signature') {
+      this.etherscanBtn = new Button({
+        elClasses,
+        icon: 'etherscan-logo.svg',
+        clickAction: () => {
+          let hashLink = this.getTxURL();
 
-        if (hashLink)
-          window.open(hashLink, '_blank').focus();
-      }
-    });
+          if (hashLink)
+            window.open(hashLink, '_blank').focus();
+        }
+      });
 
-    this.domElement.appendChild(this.etherscanBtn.domElement);
+      this.domElement.appendChild(this.etherscanBtn.domElement);
+    }
 
-    if (this.type !== 'processing') {
+    if (this.type === 'success' || this.type === 'error') {
       this.closeBtn = new Button({
         icon: 'gg-close',
         clickAction: this.destroy.bind(this)
