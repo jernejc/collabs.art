@@ -1,6 +1,6 @@
 pragma solidity ^0.8.15;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Pausable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
  * - ERC777 inspired 'operator' concept (allows opt-out)
  */
 
-contract CollabToken is ERC20, ERC20Permit, AccessControl {
+contract CollabToken is ERC20Pausable, ERC20Permit, AccessControl {
     uint256 private _conversionRate;
 
     // This isn't ever read from - it's only used to respond to the defaultOperators query.
@@ -104,6 +104,7 @@ contract CollabToken is ERC20, ERC20Permit, AccessControl {
             tokensAmount > 1 * 10**uint256(decimals()),
             "CollabToken: You must credit at least one $COLAB"
         );
+        require(!paused(), "CollabToken: credit token while paused");
 
         _mint(_msgSender(), tokensAmount);
     }
@@ -131,6 +132,7 @@ contract CollabToken is ERC20, ERC20Permit, AccessControl {
             address(this).balance >= amount,
             "CollabToken: Enough funds must be available"
         );
+        require(!paused(), "CollabToken: withdraw token while paused");
 
         payable(_msgSender()).transfer(amount);
     }
@@ -276,23 +278,57 @@ contract CollabToken is ERC20, ERC20Permit, AccessControl {
     }
 
     /********
+     * Pause
+     */
+
+    /**
+     * @dev Pauses all token transfers.
+     *
+     * See {ERC20Pausable} and {Pausable-_pause}.
+     */
+    function pause() public onlyAdmin {
+        _pause();
+    }
+
+    /**
+     * @dev Unpauses all token transfers.
+     *
+     * See {ERC20Pausable} and {Pausable-_unpause}.
+     */
+    function unpause() public onlyAdmin {
+        _unpause();
+    }
+
+    /**
+     * @dev _beforeTokenTransfer override
+     * Both contracts define it, so we must override
+     */
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal virtual override(ERC20, ERC20Pausable) {
+        super._beforeTokenTransfer(from, to, amount);
+    }
+
+    /********
      * ACL
      */
 
     /**
-     * @dev add minter
-     * @param _account address to add as the new minter
+     * @dev add admin
+     * @param account address to add as the new admin
      */
-    function addAdmin(address _account) public onlyAdmin {
-        grantRole(DEFAULT_ADMIN_ROLE, _account);
+    function addAdmin(address account) public onlyAdmin {
+        grantRole(DEFAULT_ADMIN_ROLE, account);
     }
 
     /**
-     * @dev remove minter
-     * @param _account address to remove as minter
+     * @dev remove admin
+     * @param account address to remove as admin
      */
-    function removeAdmin(address _account) public onlyAdmin {
-        revokeRole(DEFAULT_ADMIN_ROLE, _account);
+    function removeAdmin(address account) public onlyAdmin {
+        revokeRole(DEFAULT_ADMIN_ROLE, account);
     }
 
     /**

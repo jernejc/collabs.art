@@ -87,9 +87,9 @@ export default class FirebaseManager {
 
   async checkAndRetryClaims() {
     logger.log('FirebaseManager: checkAndRetryClaims');
+    
     let count = 1;
-
-    const response = await this.auth.currentUser.getIdTokenResult(true);
+    let response = await this.auth.currentUser.getIdTokenResult(true);
 
     if (!response.claims || !response.claims.grants) { // retry cause
       if (count === 5)

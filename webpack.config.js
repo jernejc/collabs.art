@@ -6,10 +6,11 @@ const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const PROD = (process.env.NODE_ENV == 'production');
+const MODE = PROD ? process.env.NODE_ENV : 'development';
 
 const config = {
   target: 'web',
-  mode: PROD ? process.env.NODE_ENV : 'development',
+  mode: MODE,
 
   entry: {
     app: './client/index.js'
