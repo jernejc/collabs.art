@@ -251,6 +251,7 @@ export async function permitToken({ scene, response, grant }) {
   }
 
   scene.game.tools.setNotification(6500, 'success', txHash);
+  return true;
 }
 
 export function navigateMinimap({ pointer, scene }) {

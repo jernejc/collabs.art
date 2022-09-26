@@ -18,6 +18,7 @@ export default class FirebaseManager {
     this.app = initializeApp(config.firebaseConfig);
     this.auth = getAuth(this.app);
     this.loggedIn = false;
+    this.retryCount = 1;
 
     this.initListeners();
   }
@@ -88,18 +89,20 @@ export default class FirebaseManager {
   async checkAndRetryClaims() {
     logger.log('FirebaseManager: checkAndRetryClaims');
     
-    let count = 1;
     let response = await this.auth.currentUser.getIdTokenResult(true);
 
     if (!response.claims || !response.claims.grants) { // retry cause
-      if (count === 5)
+      if (this.retryCount === 5) {
+        this.retryCount = 1;
         return;
+      }
 
-      count++;
+      this.retryCount++;
       await sleep(1000 * count);
       response = await this.checkAndRetryClaims();
     }
-
+    
+    this.retryCount = 1;
     return response;
   }
 
