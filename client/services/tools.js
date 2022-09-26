@@ -35,13 +35,11 @@ export default class ToolsManager {
 
       //this.addExpandBtn();
 
-      //this.setNotification(null, 'processing');
-
       const overlayCookie = getCookie('no_overlay');
 
       if (!overlayCookie)
         this.openOverlay()
-    }, 10);
+    }, 100);
   }
 
   get metamaskURL() {
@@ -310,8 +308,7 @@ export default class ToolsManager {
     let action = null;
     let alertIcon = true;
 
-    if (this.connectionStatusBtn.domElement.classList.contains('info-text-gray'))
-      this.connectionStatusBtn.domElement.classList.remove('info-text-gray');
+    this.connectionStatusBtn.clearColor('info-text-gray');
 
     switch (this.game.web3.currentStateTag) {
       case 'metamask':
@@ -342,14 +339,13 @@ export default class ToolsManager {
     if (iconText) {
       this.connectionStatusBtn.setText(iconText);
 
-      if (this.game.web3.walletBalance == 0) {
-        if (!this.connectionStatusBtn.domElement.classList.contains('info-text-gray'))
-          this.connectionStatusBtn.domElement.classList.add('info-text-gray');
-      }
+      if (this.game.web3.walletBalance == 0) 
+        this.connectionStatusBtn.setColor('info-text-gray');
     }
-
+    
     if (iconClass)
       this.connectionStatusBtn.setIcon(iconClass, null, alertIcon);
+
     if (action)
       this.connectionStatusBtn.setClickAction(action);
   }

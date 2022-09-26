@@ -60,6 +60,8 @@ export default class Button {
   }
 
   setText(text) {
+    logger.log('Button: setText');
+
     this.text = text || this.text;
 
     if (this.icon) {
@@ -84,6 +86,8 @@ export default class Button {
   }
 
   setColor(color) {
+    logger.log('Button: setColor');
+
     if (!this.domElement.classList.contains(color))
       this.domElement.classList.add(color)
   }
@@ -113,10 +117,12 @@ export default class Button {
   }
 
   clearIcon() {
+    logger.log('Button: clearIcon');
+
     if (this.icon)
       this.domElement.classList.remove(this.icon.replace('gg-', ''));
 
-    this.domElement.innerHTML = '';
+    this.clearHTML();
     this.icon = null;
     this.text = null;
   }
@@ -183,6 +189,8 @@ export default class Button {
   }
 
   reset() {
+    logger.log('Button: reset');
+
     if (!this.domElement)
       return;
 
@@ -192,6 +200,8 @@ export default class Button {
       if (this.domElement.contains(this.loadingUI))
         this.domElement.removeChild(this.loadingUI);
     }
+
+    this.clearHTML();
 
     if (this.text)
       this.setText();
@@ -208,6 +218,10 @@ export default class Button {
     }
 
     this.setDisabled(this.disabled);
+  }
+
+  clearHTML() {
+    while (this.domElement.firstChild) this.domElement.removeChild(this.domElement.firstChild);
   }
 
   destroy() {

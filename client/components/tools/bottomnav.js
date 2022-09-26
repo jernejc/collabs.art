@@ -97,17 +97,9 @@ export default class BottomNav {
     }
 
     if (!this.closed) {
-      // reset UI
       this.applyBtn.clearIcon();
       this.applyBtn.clearColors();
       this.applyBtn.clearTooltip();
-
-      /**
-       * 
-       * iconClass = '';
-iconClass = '';
-iconClass = '';
-       */
 
       switch (this.game.web3.currentStateTag) {
         case 'metamask':
