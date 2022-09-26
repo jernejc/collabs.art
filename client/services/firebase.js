@@ -98,7 +98,7 @@ export default class FirebaseManager {
       }
 
       this.retryCount++;
-      await sleep(1000 * count);
+      await sleep(1000 * this.retryCount);
       response = await this.checkAndRetryClaims();
     }
     
