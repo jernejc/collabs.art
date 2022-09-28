@@ -50,7 +50,8 @@ export function handleMouseDown({ pointer, scene }) {
       scene.game.selection.addSelected({ tiles: [tile], scene });
       break;
     case 'shiftdown':
-      //scene.game.selection.createRectangleSelection({ pointer, scene });
+      tile = getTileForPointer({ pointer, scene });
+      scene.game.selection.removeSelected({ tile });
       break;
     case 'gameoflife':
       tile = getTileForPointer({ pointer, scene });
@@ -278,10 +279,12 @@ export function navigateMinimap({ pointer, scene }) {
 export function panDragMap({ pointer, scene }) {
   logger.log('User interactions: panDragMap');
 
+  const sensitivity = 2;
+
   if (scene.game.origDragPoint) {
     // move the camera by the amount the mouse has moved since last update
-    const newX = scene.cameraX + (scene.game.origDragPoint.x - pointer.position.x);
-    const newY = scene.cameraY + (scene.game.origDragPoint.y - pointer.position.y);
+    const newX = scene.cameraX + (scene.game.origDragPoint.x - pointer.position.x * sensitivity);
+    const newY = scene.cameraY + (scene.game.origDragPoint.y - pointer.position.y * sensitivity);
 
     moveToPosition({ scene, x: newX, y: newY, save: true });
   }
@@ -378,7 +381,7 @@ export function setGameMode({ scene, mode }) {
       generalResetStrokeStyle({ scene, selection: true });
       break;
     case 'shiftdown':
-      scene.input.setDefaultCursor('cell');
+      scene.input.setDefaultCursor('alias');
       scene.game.mode = 'shiftdown';
 
       generalResetStrokeStyle({ scene, selection: true });

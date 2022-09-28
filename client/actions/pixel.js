@@ -53,7 +53,7 @@ export async function loadPixel({ scene, position }) {
   try {
     const pixel = await scene.game.web3.canvasContract.methods.getPixel(stringToBN(position)).call();
 
-    console.log('loaded pixel', pixel);
+    //console.log('loaded pixel', pixel);
   } catch (error) {
     logger.error('Action loadPixel: ', error);
     return;

@@ -134,14 +134,14 @@ export default class SelectionManager {
     logger.log("SelectionManager: removeSelected");
 
     const pixel = this.isSelected(tile.cx, tile.cy);
+    //console.log('isSelected', pixel)
 
     if (pixel) {
       this.pixels = this.pixels.filter((p) => {
         return !(p.cx === tile.cx && p.cy === tile.cy);
       });
 
-      pixel.clearActivePixel();
-      pixel.resetColor();
+      pixel.removeFromSelection();
 
       if (pixel.infobox) {
         this.game.tools.clearInfoBox();
