@@ -56,7 +56,7 @@ export default class BottomNav {
           return;
         }
 
-        await colorPixels({ scene: this.scene, selection: this.game.selection.pixels })
+        await colorPixels({ scene: this.scene, selection: this.game.selection.activeSelection })
       }
     });
     this.domElement.append(this.applyBtn.domElement);

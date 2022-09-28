@@ -16,6 +16,10 @@ export default class SelectionManager {
     this.pixels = [];
   }
 
+  get activeSelection() {
+    return this.pixels.filter(pixel => pixel.hasChanges);
+  }
+
   get activeChangesCount() {
     return this.pixels.filter(pixel => pixel.hasChanges).length;
   }

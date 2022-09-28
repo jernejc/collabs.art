@@ -205,7 +205,7 @@ export default class Menu {
           return;
         }
 
-        await colorPixels({ scene: this.scene, selection: this.game.selection.pixels })
+        await colorPixels({ scene: this.scene, selection: this.game.selection.activeSelection })
       }
     });
 

@@ -150,7 +150,7 @@ export default class Web3Manager {
 
     // Contract events
     if (this.websocketInstance) {
-      this.socketColorPixelsListener = this.eventCanvasContract.events.ColorPixels({ fromBlock: 'latest' })
+      this.colorPixelsListener = this.eventCanvasContract.events.ColorPixels({ fromBlock: 'latest' })
         .on('data', (e) => {
           logger.log('Web3Manager: ColorPixels')
           const _positions = e.returnValues.positions;
@@ -444,7 +444,7 @@ export default class Web3Manager {
   }
 
   removeAllListeners() {
-    if (this.socketColorPixelsListener)
-      this.socketColorPixelsListener.removeAllListeners('data');
+    if (this.colorPixelsListener)
+      this.colorPixelsListener.removeAllListeners('data');
   }
 }
