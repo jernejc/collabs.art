@@ -149,6 +149,16 @@ export default class Slideshow {
 
     this.domElement.append(this.insipredBy);
 
+    this.ribbon = document.createElement('div');
+    this.ribbon.classList.add('ribbon');
+
+    this.ribbonContent = document.createElement('div');
+    this.ribbonContent.classList.add('ribbon-content');
+    this.ribbonContent.innerHTML = '<a href="https://goerli.net/" target="_blank">Görli Testnet</a>';
+
+    this.ribbon.append(this.ribbonContent);
+    this.domElement.append(this.ribbon);
+
     this.parent.append(this.domElement);
   }
 
