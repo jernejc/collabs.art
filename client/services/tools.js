@@ -464,7 +464,7 @@ export default class ToolsManager {
     });
 
     this.headerInfo = new Button({
-      icon: 'gg-info',
+      icon: 'gg-file-document',
       elClasses: ['more-info', 'hidden'],
       tooltip: 'More info',
       tooltipFlow: 'right',
@@ -522,7 +522,7 @@ export default class ToolsManager {
     });
 
     this.connectionStatusInfo = new Button({
-      icon: 'gg-info',
+      icon: 'gg-file-document',
       elClasses: ['more-info', 'hidden'],
       tooltip: 'More info',
       tooltipFlow: 'left',
