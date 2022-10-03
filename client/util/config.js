@@ -84,12 +84,12 @@ const config = {
     defaultNotificationTime: 5000,
     btnColors: ['green', 'orange', 'blue', 'white'],
     btnIcons: ['ethereum-logo', 'link', 'info-text'],
-    docsLink: 'https://unexpected-jupiter-4e2.notion.site/About-collabs-art-0c8e5af1deee4b6982b1c70fd354c9fc',
+    docsLink: 'https://artcollabs.notion.site/Art-collabs-0c8e5af1deee4b6982b1c70fd354c9fc',
     docs: {
-      link: 'https://unexpected-jupiter-4e2.notion.site/About-collabs-art-0c8e5af1deee4b6982b1c70fd354c9fc',
-      getColabLink: "https://unexpected-jupiter-4e2.notion.site/Get-COLAB-e782417f324d420b9fd27f7e1fbf5efa",
-      auctionLifecycleLink: "https://unexpected-jupiter-4e2.notion.site/Auction-Lifecycle-efd602f095e14de690af4f77600e1e04",
-      coloringPixelsLink: "https://unexpected-jupiter-4e2.notion.site/Coloring-pixels-0fc42efade074114b823c67ff5874fd2"
+      link: 'https://artcollabs.notion.site/Art-collabs-0c8e5af1deee4b6982b1c70fd354c9fc',
+      getColabLink: "https://artcollabs.notion.site/Get-COLAB-e782417f324d420b9fd27f7e1fbf5efa",
+      auctionLifecycleLink: "https://artcollabs.notion.site/Auction-Lifecycle-efd602f095e14de690af4f77600e1e04",
+      coloringPixelsLink: "https://artcollabs.notion.site/Coloring-pixels-0fc42efade074114b823c67ff5874fd2"
     },
   },
   slideshow: {
