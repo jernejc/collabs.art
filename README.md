@@ -3,7 +3,7 @@
 # Idea and concept
 
 Better described here:
-<a href="https://unexpected-jupiter-4e2.notion.site/About-collabs-art-0c8e5af1deee4b6982b1c70fd354c9fc" target="_blank">Docs</a>
+<a href="https://artcollabs.notion.site/Art-collabs-0c8e5af1deee4b6982b1c70fd354c9fc" target="_blank">Docs</a>
 
 
 ## Client app
