@@ -111,7 +111,7 @@ export default class Web3Manager {
   }
 
   connectWebsocket() {
-    logger.log('connectWebsocket this.network', this.network);
+    logger.log('connectWebsocket');
 
     if (this.network.wsUrls && this.network.wsUrls.length > 0) {
       const options = {

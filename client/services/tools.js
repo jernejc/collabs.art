@@ -9,7 +9,7 @@ import Button from '@components/form/button';
 import TokenInfo from '@components/tools/tokeninfo';
 import AuctionInfo from '@components/tools/auctioninfo';
 
-import { formatShortAddress, getCookie } from '@util/helpers';
+import { formatShortAddress, getCookie, detectMob } from '@util/helpers';
 import logger from '@util/logger';
 import config from '@util/config';
 
@@ -24,22 +24,6 @@ export default class ToolsManager {
     this.game = game;
     this.emitter = emitter;
     this.infobox = null;
-
-    setTimeout(() => { // canvas null in Firefox -_-
-      this.parent = this.game.canvas.parentNode;
-      this.addHeader();
-      this.addConnectionStatus();
-      this.addNetworkAlert();
-      this.addBottomNav();
-      this.addEventListeners();
-
-      //this.addExpandBtn();
-
-      const overlayCookie = getCookie('no_overlay');
-
-      if (!overlayCookie)
-        this.openOverlay()
-    }, 100);
   }
 
   get metamaskURL() {
@@ -53,6 +37,28 @@ export default class ToolsManager {
       url = 'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn';
 
     return url;
+  }
+
+  initTools({ scene }) {
+    this.parent = this.game.canvas.parentNode;
+    this.addHeader();
+    this.addConnectionStatus();
+    this.addNetworkAlert();
+    this.addBottomNav();
+    this.addEventListeners();
+    this.addMinimap(scene);
+
+    //this.addExpandBtn();
+
+    const overlayCookie = getCookie('no_overlay');
+
+    if (!overlayCookie)
+      this.openOverlay();
+
+    if (detectMob()) {
+      this.hideTools();
+      this.setDesktopOnly();
+    }
   }
 
   addEventListeners() {
@@ -339,10 +345,10 @@ export default class ToolsManager {
     if (iconText) {
       this.connectionStatusBtn.setText(iconText);
 
-      if (this.game.web3.walletBalance == 0) 
+      if (this.game.web3.walletBalance == 0)
         this.connectionStatusBtn.setColor('info-text-gray');
     }
-    
+
     if (iconClass)
       this.connectionStatusBtn.setIcon(iconClass, null, alertIcon);
 
@@ -410,6 +416,14 @@ export default class ToolsManager {
 
       if (this.networkAlert.classList.contains('show'))
         this.networkAlert.classList.remove('show');
+    }
+  }
+
+  setDesktopOnly() {
+    logger.log('ToolsManager: setDesktopOnly');
+
+    if (this.overlay) {
+      this.overlay.disableSlideBtn();
     }
   }
 

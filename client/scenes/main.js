@@ -52,8 +52,6 @@ export default class MainScene extends ApplicationScene {
 
     this.createVisibleTiles();
 
-    this.game.tools.addMinimap(this);
-
     /** 
      * Mouse Events
      */
@@ -123,6 +121,7 @@ export default class MainScene extends ApplicationScene {
     }
 
     //window.addEventListener('resize', this.resize.bind(this));
+    this.game.tools.initTools({ scene: this });
   }
 
   resize() {

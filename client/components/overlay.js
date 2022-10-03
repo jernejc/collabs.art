@@ -6,6 +6,7 @@ import {
 } from '@actions/general';
 
 import Slideshow from './slideshow';
+import { detectMob } from '@util/helpers';
 
 export default class Overlay {
   constructor({ game, parent, close }) {
@@ -34,7 +35,7 @@ export default class Overlay {
   destroy() {
     logger.log("Overlay: destroy");
 
-    if (this.game.mode === 'gameoflife') 
+    if (this.game.mode === 'gameoflife')
       this.stopGameOfLife();
 
     if (this.slideshow)
@@ -54,6 +55,19 @@ export default class Overlay {
     } else {
       this.startGameOfLife();
       this.slideshow.gameOfLifeButton.setIcon('gg-play-pause');
+    }
+  }
+
+  disableSlideBtn() {
+    if (this.slideshow) {
+      this.slideshow.slideActionButton.setDisabled(true);
+      this.slideshow.slideActionButton.domElement.innerHTML = `
+        <span class="desktop-only">  
+          <i class="gg-screen"></i>
+          <img src="assets/images/icons/chrome.png"/>
+          <img src="assets/images/icons/firefox.png"/>
+        </span> 
+      `
     }
   }
 
@@ -127,7 +141,9 @@ export default class Overlay {
     setGameMode({ scene: this.scene, mode: this.scene.appConfig.defaultMode });
 
     this.scene.updateTiles();
-    this.game.tools.showTools();
+
+    if (!detectMob())
+      this.game.tools.showTools();
 
     if (this.domElement.classList.contains('gameoflife'))
       this.domElement.classList.remove('gameoflife');
