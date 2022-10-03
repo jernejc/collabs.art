@@ -1584,6 +1584,11 @@ Info Box
   --ggs: 1.3;
 }
 
+.notification.warning .icon {
+  background: var(--metamask-color);
+  --ggs: 1.5;
+}
+
 /**
 * Slideshow
 **/

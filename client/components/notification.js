@@ -38,6 +38,10 @@ export default class Notification {
         icon = `gg-loadbar-alt`;
         text = `Signature request ..`;
         break;
+      case 'warning':
+        icon = `gg-block`;
+        text = `Invalid request`;
+        break;
       case 'error':
         icon = `gg-danger`;
         text = `Error`;
@@ -51,7 +55,8 @@ export default class Notification {
     if (!this.hash)
       elClasses.push('disabled');
 
-    if (this.type !== 'signature') {
+    // Some types need additional icons
+    if (this.type !== 'signature' && this.type !== 'warning') {
       this.etherscanBtn = new Button({
         elClasses,
         icon: 'etherscan-logo.svg',
@@ -64,11 +69,15 @@ export default class Notification {
       });
 
       this.domElement.appendChild(this.etherscanBtn.domElement);
-    } else {
-      this.domElement.innerHTML += `<div class="secondary-icon" tooltip="Confirm wallet ownership" flow="down"><i class="gg-pen"></i></div>`;
-    }
+    } else if (this.type === 'signature') {
+      this.domElement.innerHTML += `
+        <div class="secondary-icon" tooltip="Confirm wallet ownership" flow="down">
+          <i class="gg-pen"></i>
+        </div>`;
+    } 
 
-    if (this.type === 'success' || this.type === 'error') {
+    // Close btn
+    if (this.type === 'success' || this.type === 'error' || this.type === 'warning') {
       this.closeBtn = new Button({
         icon: 'gg-close',
         clickAction: this.destroy.bind(this)

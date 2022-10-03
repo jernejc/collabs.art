@@ -207,7 +207,7 @@ export async function permitSignature({ scene, token }) {
       return;
     }
 
-    scene.game.tools.setNotification(10000, 'error');
+    scene.game.tools.setNotification(10000, 'warning');
     return;
   }
 
