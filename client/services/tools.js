@@ -469,7 +469,7 @@ export default class ToolsManager {
       tooltip: 'More info',
       tooltipFlow: 'right',
       clickAction: async () => {
-        window.open(config.appConfig.docs.auctionLifecycleLink, '_blank').focus();
+        window.open(config.appConfig.docsLink, '_blank').focus();
       }
     });
 
