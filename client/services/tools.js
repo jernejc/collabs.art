@@ -218,8 +218,10 @@ export default class ToolsManager {
   showTokenInfo() {
     logger.log('ToolsManager: showTokenInfo');
 
-    if (this.domTokenInfo && this.domTokenInfo.closed)
+    if (this.domTokenInfo && this.domTokenInfo.closed) {
+      this.updateTokenInfo();
       this.domTokenInfo.open();
+    }
 
     if (this.connectionStatusInfo.domElement.classList.contains('hidden'))
       this.connectionStatusInfo.domElement.classList.remove('hidden');
