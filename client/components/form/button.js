@@ -134,6 +134,9 @@ export default class Button {
       this.domElement.classList.remove(btnIcon);
     });
 
+    if (this.icon)
+      this.domElement.classList.remove(this.icon.replace('gg-', ''));
+
     this.icon = icon || this.icon;
 
     if (text)

@@ -154,7 +154,7 @@ input {
   user-select: none;
 }
 
-#header .time {
+#header .header-icon {
   background: buttonface;
   border: none;
   color: var(--active-black);
@@ -163,11 +163,23 @@ input {
   height: 50px;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
+}
+
+#header .header-icon.home {
+  background: var(--light-green-color);
+  border-right: 1px solid buttonface;
+  color: buttonface;
+}
+
+#header .header-icon.home i {
+  --ggs: 1.1;
 }
 
 #header .timer {
-  margin: 5px 17px;
+  margin: 0px 17px;
   font-size: 1.12em;
+  line-height: 50px;
 }
 
 #header .auction-info {
@@ -1868,6 +1880,11 @@ Info Box
 
 .action-bar .key-note i {
   margin-left: 6px;
+}
+
+.action-bar .key-note i.gg-block {
+  margin: 0 4px 0 0;
+  --ggs: 0.8;
 }
 
 .action-bar .key-note i.gg-mail {

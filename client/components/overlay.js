@@ -67,7 +67,8 @@ export default class Overlay {
           <img src="assets/images/icons/chrome.png"/>
           <img src="assets/images/icons/firefox.png"/>
         </span> 
-      `
+      `;
+      this.slideshow.keyNoteWrapper.innerHTML = '<i class="gg-block"></i> Desktop only'
     }
   }
 

@@ -1,7 +1,7 @@
 import { Events, Game, CANVAS, WEBGL, Scale } from 'phaser';
 
 import config from '@util/config';
-import { maliDetect } from '@util/helpers';
+import { maliDetect, getGridSize } from '@util/helpers';
 import logger from '@util/logger';
 
 // Scenes
@@ -25,8 +25,6 @@ export async function AppInitializer() {
   const Emitter = new Events.EventEmitter();
   const GameInstance = new Game({
     type: (maliDetect()) ? CANVAS : WEBGL,
-    width: canvasWidth,
-    height: canvasHeight,
     parent: config.appConfig.canvasElement,
     fps: {
       target: config.appConfig.fps,
@@ -41,23 +39,12 @@ export async function AppInitializer() {
   });
 
   window.devicePixelRatio = Math.ceil(window.devicePixelRatio);
-  let gridSize = config.appConfig.gridSize, strokeSize = config.appConfig.strokeSize;
-
-  if (window.devicePixelRatio > 1) {
-    // GridSize calc
-    // Size needs to be different based on screen resolution
-    gridSize = parseInt(gridSize + (gridSize * 0.2) / window.devicePixelRatio);
-    strokeSize = strokeSize - (gridSize * 0.2 / window.devicePixelRatio);
-  }
 
   GameInstance.emitter = Emitter;
   GameInstance.appConfig = {
     ...config.appConfig,
-    canvasWidth: canvasWidth,
-    canvasHeight: canvasHeight,
-    pixelRatio: window.devicePixelRatio,
-    gridSize,
-    strokeSize
+    canvas,
+    pixelRatio: window.devicePixelRatio
   }
 
   // Init Web3 Manager

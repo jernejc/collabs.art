@@ -98,8 +98,8 @@ export function handleMouseWheel({ scene, dx, dy, dz }) {
 
   if (newSize > 15 && newSize < 35) { // min, max zoom needs to be moved to config
     scene.size = newSize;
-    scene.gridWidth = scene.appConfig.canvasWidth / scene.size;
-    scene.gridHeight = scene.appConfig.canvasHeight / scene.size;
+    scene.gridWidth = scene.appConfig.canvas.clientWidth / scene.size;
+    scene.gridHeight = scene.appConfig.canvas.clientHeight / scene.size;
 
     scene.clearVisibleTiles();
     scene.createVisibleTiles();
@@ -264,7 +264,7 @@ export function navigateMinimap({ pointer, scene }) {
 
   // Relative X,Y to the minimap
   const x = pointer.position.x - margin;
-  const y = pointer.position.y - (scene.appConfig.canvasHeight - (scene.sceneConfig.height + margin));
+  const y = pointer.position.y - (scene.appConfig.canvas.clientHeight - (scene.sceneConfig.height + margin));
 
   // Actual X,Y based on the size ratio
   const cx = (x * scene.sceneConfig.sizeRatio) - (fieldWidth / 2);
@@ -365,7 +365,7 @@ export function positionSelectionBlock({ pointer, scene }) {
 
 // Set scene mode
 export function setGameMode({ scene, mode }) {
-  //logger.log('User interactions: setGameMode', mode);
+  logger.log('User interactions: setGameMode', mode);
 
   switch (mode) {
     case 'move':

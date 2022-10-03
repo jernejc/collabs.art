@@ -15,9 +15,10 @@ export default class MinimapScene extends ApplicationScene {
   }
 
   create() {
+    logger.log('MinimapScene: create');
     this.mainscene = this.game.scene.keys["MainScene"];
 
-    this.appConfig.canvasWidth / this.sceneConfig.size;
+    this.mainscene.appConfig.canvas.clientWidth / this.mainscene.size;
     this.worldmap = this.add.image(this.sceneConfig.width / 2, this.sceneConfig.height / 2, 'worldmap');
     this.worldmap.setDisplaySize(this.sceneConfig.width, this.sceneConfig.height);
 
@@ -36,8 +37,8 @@ export default class MinimapScene extends ApplicationScene {
     )
 
     // Visible field box / mask
-    this.fieldWidth = (this.appConfig.canvasWidth / this.sceneConfig.size) / this.sceneConfig.sizeRatio // viewport width
-    this.fieldHeight = (this.appConfig.canvasHeight / this.sceneConfig.size) / this.sceneConfig.sizeRatio // viewport height
+    this.fieldWidth = (this.mainscene.appConfig.canvas.clientWidth / this.sceneConfig.size) / this.sceneConfig.sizeRatio // viewport width
+    this.fieldHeight = (this.mainscene.appConfig.canvas.clientHeight / this.sceneConfig.size) / this.sceneConfig.sizeRatio // viewport height
 
     this.visibleField = this.add.rectangle(
       this.mainscene.cameraX / this.sceneConfig.sizeRatio, // initial X position

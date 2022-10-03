@@ -94,6 +94,8 @@ export default class Slideshow {
     this.cookieToggleInput = document.createElement('input');
     this.cookieToggleInput.type = 'checkbox';
 
+    this.cookieToggleInput.addEventListener('click', this.bindToggleCookie);
+
     if (overlayCookie)
       this.cookieToggleInput.setAttribute('checked', true);
 
@@ -236,7 +238,7 @@ export default class Slideshow {
   }
 
   formAction(e) {
-    logger.log('Slideshow: formAction', e);
+    logger.log('Slideshow: formAction');
 
     e.preventDefault();
     e.stopImmediatePropagation();
@@ -244,7 +246,7 @@ export default class Slideshow {
   }
 
   navAction(e) {
-    logger.log('Slideshow: navAction', e);
+    logger.log('Slideshow: navAction');
 
     let navItem;
 
@@ -264,7 +266,7 @@ export default class Slideshow {
   }
 
   nextPrevAction(e) {
-    logger.log('Slideshow: nextPrevAction', e, this.slideIndex)
+    logger.log('Slideshow: nextPrevAction');
 
     let navItem, currentIndex = this.slideIndex;
 

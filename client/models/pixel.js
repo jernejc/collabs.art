@@ -52,7 +52,7 @@ export default class Pixel {
   }
 
   changeToColorHex(hex) {
-    logger.log("Pixel: changeToColorHex", hex)
+    logger.log("Pixel: changeToColorHex")
 
     if (!this.originalColor) this.originalColor = this.color;
 

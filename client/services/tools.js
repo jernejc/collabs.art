@@ -41,24 +41,35 @@ export default class ToolsManager {
 
   initTools({ scene }) {
     this.parent = this.game.canvas.parentNode;
-    this.addHeader();
-    this.addConnectionStatus();
-    this.addNetworkAlert();
-    this.addBottomNav();
+
+    if (!this.header)
+      this.addHeader();
+    if (!this.domConnectionStatus)
+      this.addConnectionStatus();
+    if (!this.networkAlert)
+      this.addNetworkAlert();
+    if (!this.bottomNav)
+      this.addBottomNav();
+
     this.addEventListeners();
     this.addMinimap(scene);
+
+    this.toolsVisible = true;
 
     //this.addExpandBtn();
 
     const overlayCookie = getCookie('no_overlay');
 
-    if (!overlayCookie)
+    if (!overlayCookie || detectMob())
       this.openOverlay();
+    else if (this.overlay)
+      this.clearOverlay();
 
     if (detectMob()) {
       this.hideTools();
       this.setDesktopOnly();
-    }
+    } else 
+      this.showTools();
   }
 
   addEventListeners() {
@@ -464,9 +475,24 @@ export default class ToolsManager {
     this.header.setAttribute('id', 'header');
 
     this.headerIcon = new Button({
-      elClasses: [],
-      icon: 'gg-time' // <i class="gg-time"></i>
+      elClasses: ['header-icon'],
+      icon: 'gg-time',
+      clickAction: (e) =>  {
+        this.headerIcon.setIcon('gg-time');
+        this.openOverlay();
+      }
     });
+
+    this.headerIcon.domElement
+      .addEventListener('mouseenter', () => {
+        this.headerIcon.setIcon('gg-home');
+      })
+
+    this.headerIcon.domElement
+      .addEventListener('mouseleave', () => {
+        this.headerIcon.setIcon('gg-time');
+      })
+
     this.header.append(this.headerIcon.domElement);
 
     this.headerTimer = new Timer({ parent: this.header, game: this.game });
@@ -491,7 +517,7 @@ export default class ToolsManager {
 
     this.parent.append(this.header);
 
-    this.header.addEventListener('click', this.showAuctionInfo.bind(this));
+    this.headerTimer.domElement.addEventListener('click', this.showAuctionInfo.bind(this));
   }
 
   addConnectionStatus() {
@@ -566,7 +592,7 @@ export default class ToolsManager {
 
     // Minimap position
     const x = margin2X;
-    const y = scene.appConfig.canvasHeight - (height + margin2X);
+    const y = scene.appConfig.canvas.clientHeight - (height + margin2X);
 
     this.minimapWrapper = scene.add.zone(
       x,
@@ -623,6 +649,8 @@ export default class ToolsManager {
       this.clearInfoBox();
     if (this.menu)
       this.clearMenu();
+
+    this.toolsVisible = false;
   }
 
   showTools() {
@@ -638,6 +666,7 @@ export default class ToolsManager {
     this.game.scene.start("MinimapScene");
 
     this.bottomNav.updateActiveChangesCount();
+    this.toolsVisible = true;
   }
 
   clearOverlay() {

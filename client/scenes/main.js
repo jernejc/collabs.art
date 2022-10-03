@@ -17,40 +17,63 @@ import {
 } from '@actions/general';
 
 import config from '@util/config';
-import { hexStringToColor } from '@util/helpers';
+import { hexStringToColor, getGridSize, detectMob } from '@util/helpers';
 import logger from '@util/logger';
 
 export default class MainScene extends ApplicationScene {
   constructor() {
+    logger.log("MainScene: constructor");
     super({ key: 'MainScene', active: true });
   }
 
   preload() {
-    this.load.image('worldimage', config.api.getImage);
+    logger.log("MainScene: preload");
+
+    if (!this.textures.exists('worldimage'))
+      this.load.image('worldimage', config.api.getImage);
   }
 
   create(data) {
+    logger.log("MainScene: create");
     super.create(data);
 
-    const _self = this;
     const sourceImage = this.textures.get('worldimage').getSourceImage();
 
-    this.size = this.appConfig.gridSize;
-    this.strokeSize = this.appConfig.strokeSize;
+    const { gridSize, strokeSize } = getGridSize({
+      gridSize: config.appConfig.gridSize,
+      strokeSize: config.appConfig.strokeSize
+    });
+
+    this.size = gridSize;
+    this.strokeSize = strokeSize;
+
     this.strokeColor = hexStringToColor(this.appConfig.strokeColor);
-    this.gridWidth = this.appConfig.canvasWidth / this.size;
-    this.gridHeight = this.appConfig.canvasHeight / this.size;
+    this.gridWidth = this.appConfig.canvas.clientWidth / this.size;
+    this.gridHeight = this.appConfig.canvas.clientHeight / this.size;
     this.pMax = 1000;
 
     this.imageWidth = sourceImage.width;
     this.imageHeight = sourceImage.height;
 
-    this.worldmap = this.textures.createCanvas('worldmap', this.imageWidth, this.imageHeight);
+    this.worldmap = this.textures.get('worldmap');
+
+    if (!this.worldmap || this.worldmap.key !== "worldmap")
+      this.worldmap = this.textures.createCanvas('worldmap', this.imageWidth, this.imageHeight);
+
     this.worldmap.draw(0, 0, sourceImage);
 
     this.input.mouse.disableContextMenu(); // prevent right click context menu
 
     this.createVisibleTiles();
+
+    moveToPosition({ ...getLastPosition(), scene: this });
+
+    if (this.game.web3.onboarding) {
+      if (this.game.web3.onboarding.state !== 'REGISTERED') {
+        setGameMode({ scene: this, mode: 'select' });
+      } else
+        setGameMode({ scene: this, mode: 'select' });
+    }
 
     /** 
      * Mouse Events
@@ -93,11 +116,25 @@ export default class MainScene extends ApplicationScene {
     });
 
     this.input.keyboard.on('keyup-G', (event) => {
-      if (!this.game.tools.overlay)
+      if (!this.game.tools.overlay || detectMob())
         this.game.tools.openOverlay();
       else
         this.game.tools.clearOverlay();
     });
+
+    this.game.tools.initTools({ scene: this });
+
+    if (!this.eventsEnabled)
+      this.initGlobalEvents();
+    else
+      setGameMode({ scene: this, mode: 'select'})
+
+    // Main scene is ready.
+    this.game.emitter.emit('scene/ready');
+  }
+
+  initGlobalEvents() {
+    const _self = this;
 
     /**
      * Game mode events
@@ -108,36 +145,22 @@ export default class MainScene extends ApplicationScene {
         setGameMode({ scene: _self, mode: mode });
     });
 
-    // Main scene is ready.
-    this.game.emitter.emit('scene/ready');
+    const debounceResize = _.debounce(this.resize.bind(this), 200);
 
-    moveToPosition({ ...getLastPosition(), scene: this });
+    window.addEventListener('resize', debounceResize);
 
-    if (this.game.web3.onboarding) {
-      if (this.game.web3.onboarding.state !== 'REGISTERED') {
-        setGameMode({ scene: this, mode: 'select' });
-      } else
-        setGameMode({ scene: this, mode: 'select' });
-    }
-
-    //window.addEventListener('resize', this.resize.bind(this));
-    this.game.tools.initTools({ scene: this });
+    this.eventsEnabled = true;
   }
 
   resize() {
-    let w = window.innerWidth * window.devicePixelRatio;
-    let h = window.innerHeight * window.devicePixelRatio;
+    logger.log("MainScene: resize");
 
-    //this.scale.resize(w, h);
-
-    /*for (let scene of this.scene.manager.scenes) {
-      if (scene.scene.settings.active) {
-        scene.cameras.main.setViewport(0, 0, w, h);
-        if (scene.resizeField) {
-          scene.resizeField(w, h);
-        }
-      }
-    }*/
+    this.game.selection.clearAllSelection();
+    this.textures.remove('worldmap');
+    this.registry.destroy();
+    this.events.off();
+    this.scene.remove('MinimapScene');
+    this.scene.restart();
   }
 
   createVisibleTiles() {

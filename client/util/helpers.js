@@ -98,6 +98,17 @@ export function formatExpireDate(endTime) { // end time in seconds
   return string;
 }
 
+export function getGridSize({ gridSize, strokeSize }) {
+  if (window.devicePixelRatio > 1) {
+    // GridSize calc
+    // Size needs to be different based on screen resolution
+    gridSize = parseInt(gridSize + (gridSize * 0.2) / window.devicePixelRatio);
+    strokeSize = strokeSize - (gridSize * 0.2 / window.devicePixelRatio);
+  }
+
+  return { gridSize, strokeSize }
+}
+
 // Normalize beetwen min, max
 export function normalize(v, i1, i2, o1, o2) {
   return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
@@ -222,16 +233,16 @@ export function sleep(ms) {
 
 export function detectMob() {
   const toMatch = [
-      /Android/i,
-      /webOS/i,
-      /iPhone/i,
-      /iPad/i,
-      /iPod/i,
-      /BlackBerry/i,
-      /Windows Phone/i
+    /Android/i,
+    /webOS/i,
+    /iPhone/i,
+    /iPad/i,
+    /iPod/i,
+    /BlackBerry/i,
+    /Windows Phone/i
   ];
-  
+
   return toMatch.some((toMatchItem) => {
-      return navigator.userAgent.match(toMatchItem);
+    return navigator.userAgent.match(toMatchItem);
   });
 }
