@@ -2004,6 +2004,7 @@ Info Box
 
 .desktop-only i {
   --ggs: 0.9;
+  margin-top: -2px;
 }
 
 .desktop-only img {
