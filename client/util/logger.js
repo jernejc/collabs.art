@@ -11,11 +11,15 @@ class Logger {
 
   error() {
     // report / handle error
-    console.error(...arguments);
+    if (debug) {
+      console.error(...arguments);
+    }
   }
 
   warn() {
-    console.warn(...arguments)
+    if (debug) {
+      console.warn(...arguments);
+    }
   }
 }
 
