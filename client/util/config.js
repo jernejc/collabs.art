@@ -102,7 +102,7 @@ const config = {
       icon: 'about.svg',
       title: 'About',
       shortTitle: 'about',
-      body: 'A social experiment where artists collaborate on a shared canvas by changing the color of individual pixels. The goal is to illustrate the process of self-organization within a community of random players with the help of blockchain technology.' // A social experiment where players collectively draw on a shared canvas by changing the color of individual pixels and thus continuously contribute to the emerging global image. 
+      body: 'A social game where players collaborate on a shared canvas by changing the color of individual pixels. The goal is to illustrate the process of self-organization within a community of random players with the help of blockchain technology.' // A social experiment where players collectively draw on a shared canvas by changing the color of individual pixels and thus continuously contribute to the emerging global image. 
     }, {
       icon: 'ownership.svg',
       title: 'Ownership',
