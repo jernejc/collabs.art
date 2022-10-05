@@ -37,6 +37,7 @@ export default class MainScene extends ApplicationScene {
     logger.log("MainScene: create");
     super.create(data);
 
+    const _self = this;
     const sourceImage = this.textures.get('worldimage').getSourceImage();
 
     const { gridSize, strokeSize } = getGridSize({
