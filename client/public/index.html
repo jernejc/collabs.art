@@ -2,38 +2,37 @@
 <html>
 
 <head>
-  <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no">
-
-  <link rel="icon" href="assets/images/favicon-dark.ico" type="image/x-icon" />
-  <link rel="shortcut icon" href="assets/images/favicon-dark.ico" type="image/x-icon" />
-
-  <link rel="stylesheet" href="https://css.gg/css">
-  <link rel="stylesheet" href="assets/css/main.css">
-  <link rel="stylesheet" href="assets/css/tooltip.css">
-  <link rel="stylesheet" href="assets/css/ribbon.css">
-  <link rel="stylesheet" href="assets/css/media-queries.css">
-
-  <title>Art collabs - where collaboration is rewarded</title>
-  <meta name="description"
-    content="A social experiment where players collectively draw on a shared canvas by changing the color of individual pixels and thus continuously contribute to the emerging global image.">
-
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ENH6T41MGQ"></script>
   <script>
-    (function (h, o, t, j, a, r) {
-      h.hj = h.hj || function () { (h.hj.q = h.hj.q || []).push(arguments) };
-      h._hjSettings = { hjid: 2766680, hjsv: 6 };
-      a = o.getElementsByTagName('head')[0];
-      r = o.createElement('script'); r.async = 1;
-      r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
-      a.appendChild(r);
-    })(window, document, 'https://static.hotjar.com/c/hotjar-', '.js?sv=');
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-ENH6T41MGQ');
   </script>
 </head>
+
+<meta name="viewport" content="width=device-width, height=device-height, user-scalable=no">
+
+<link rel="icon" href="assets/images/favicon-dark.ico" type="image/x-icon" />
+<link rel="shortcut icon" href="assets/images/favicon-dark.ico" type="image/x-icon" />
+
+<link rel="stylesheet" href="https://css.gg/css">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="stylesheet" href="assets/css/tooltip.css">
+<link rel="stylesheet" href="assets/css/ribbon.css">
+<link rel="stylesheet" href="assets/css/media-queries.css">
+
+<title>Art collabs - where consensus is rewarded</title>
+<meta name="description"
+  content="A social game where players collectively draw on a shared canvas by changing the color of individual pixels and thus continuously contribute to the emerging global image.">
 
 <body>
   <div id="app"></div>
 
   <script>
-  new collabs.Main();
+    new collabs.Main();
   </script>
 </body>
 
