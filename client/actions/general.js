@@ -50,7 +50,7 @@ export function handleMouseDown({ pointer, scene }) {
   let tile;
 
   if (!downDelay && scene.game.moode !== 'mininav') { // delay for 200ms for move event
-    downDelay = _.delay(handleMouseDown, 200, { pointer, scene })
+    downDelay = _.delay(handleMouseDown, 100, { pointer, scene })
     return;
   }
 
