@@ -19,7 +19,7 @@ export function handleMouseMove({ pointer, scene }) {
     downDelay = null;
   }
 
-  if (pointer.isDown && scene.game.mode !== 'move' && scene.game.moode !== 'mininav') { // switch to move if mouse down
+  if (pointer.isDown && scene.game.mode !== 'move' && scene.game.mode !== 'mininav') { // switch to move if mouse down
     scene.game.moveAutomatic = scene.game.mode;
     setGameMode({ scene, mode: 'move' });
   }
