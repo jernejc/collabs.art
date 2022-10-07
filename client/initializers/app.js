@@ -19,8 +19,8 @@ export async function AppInitializer() {
   logger.log('AppInitializer');
 
   const canvas = document.querySelector('#' + config.appConfig.canvasElement);
-  const canvasWidth = canvas.clientWidth //* window.devicePixelRatio;
-  const canvasHeight = canvas.clientHeight //* window.devicePixelRatio;
+  //const canvasWidth = canvas.clientWidth //* window.devicePixelRatio;
+  //const canvasHeight = canvas.clientHeight //* window.devicePixelRatio;
 
   const Emitter = new Events.EventEmitter();
   const GameInstance = new Game({

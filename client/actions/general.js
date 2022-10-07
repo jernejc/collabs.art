@@ -9,8 +9,20 @@ import { formatColorNumber, sleep } from '@util/helpers';
 import logger from '@util/logger';
 import config from '@util/config';
 
+let downDelay = null;
+
 export function handleMouseMove({ pointer, scene }) {
   //logger.log('User interactions: handleMove');
+
+  if (downDelay && pointer.isDown) {
+    clearTimeout(downDelay);
+    downDelay = null;
+  }
+
+  if (pointer.isDown && scene.game.mode !== 'move' && scene.game.moode !== 'mininav') { // switch to move if mouse down
+    scene.game.moveAutomatic = scene.game.mode;
+    setGameMode({ scene, mode: 'move' });
+  }
 
   switch (scene.game.mode) {
     case 'move':
@@ -33,9 +45,14 @@ export function handleMouseMove({ pointer, scene }) {
 }
 
 export function handleMouseDown({ pointer, scene }) {
-  logger.log('User interactions: handleMouseDown', scene.game.mode);
+  //logger.log('User interactions: handleMouseDown');
 
   let tile;
+
+  if (!downDelay && scene.game.moode !== 'mininav') { // delay for 200ms for move event
+    downDelay = _.delay(handleMouseDown, 200, { pointer, scene })
+    return;
+  }
 
   switch (scene.game.mode) {
     case 'mininav':
@@ -64,20 +81,32 @@ export function handleMouseDown({ pointer, scene }) {
       scene.tiles[tile.cy + 1][tile.cx].alive = true;
       break;
   }
+
+  if (downDelay) {
+    clearTimeout(downDelay);
+    downDelay = null;
+  }
 }
 
 export async function handleMouseUp({ pointer, scene }) {
-  logger.log('User interactions: handleMouseUp');
+  //logger.log('User interactions: handleMouseUp');
 
   if (scene.game.origDragPoint) {
     scene.game.origDragPoint = null;
     scene.game.moving = false;
   }
 
+  if (scene.game.moveAutomatic) {
+    setGameMode({ scene, mode: scene.game.moveAutomatic }) // reset to previos mode
+    scene.game.moveAutomatic = null;
+  }
+
   scene.game.selection.refreshSelection();
 }
 
 export function handleGameMoving({ scene, pointer }) {
+  //logger.log('User interactions: handleGameMoving');
+
   if (pointer.isDown && !scene.game.moving) {
     scene.game.selection.clearBorders();
 
@@ -256,7 +285,7 @@ export async function permitToken({ scene, response, grant }) {
 }
 
 export function navigateMinimap({ pointer, scene }) {
-  //logger.log('User interactions: navigateMinimap', pointer, scene);
+  //logger.log('User interactions: navigateMinimap');
 
   const margin = scene.sceneConfig.margin * 2; // we have to use double margin due to black border
   const fieldWidth = scene.fieldWidth * scene.sceneConfig.sizeRatio;
@@ -270,28 +299,32 @@ export function navigateMinimap({ pointer, scene }) {
   const cx = (x * scene.sceneConfig.sizeRatio) - (fieldWidth / 2);
   const cy = (y * scene.sceneConfig.sizeRatio) - (fieldHeight / 2);
 
-  /*if (scene.game.selection.pixels.length > 0)
-    scene.game.selection.reset();*/
-
   moveToPosition({ scene: scene.mainscene, x: cx, y: cy, save: true });
 }
 
 export function panDragMap({ pointer, scene }) {
-  logger.log('User interactions: panDragMap');
+  //logger.log('User interactions: panDragMap');
 
-  const sensitivity = 2;
+  const gridSize = scene.size / 10;
 
   if (scene.game.origDragPoint) {
     // move the camera by the amount the mouse has moved since last update
-    const newX = scene.cameraX + (scene.game.origDragPoint.x - pointer.position.x * sensitivity);
-    const newY = scene.cameraY + (scene.game.origDragPoint.y - pointer.position.y * sensitivity);
+    let moveMomentumX = ((scene.game.origDragPoint.x - pointer.position.x) / gridSize);
+    let moveMomentumY = ((scene.game.origDragPoint.y - pointer.position.y) / gridSize);
+
+    let newX, newY;
+
+    newX = scene.cameraX + moveMomentumX;
+    newY = scene.cameraY + moveMomentumY;
 
     moveToPosition({ scene, x: newX, y: newY, save: true });
   }
+
+  scene.game.origDragPoint = pointer.position.clone();
 }
 
 export function moveToPosition({ scene, x, y, save }) {
-  //logger.log('moveToPosition', x, y);
+  //logger.log('User interactions: moveToPosition', x, y);
 
   scene.cameraX = x;
   scene.cameraY = y;
@@ -327,7 +360,7 @@ export function saveLastPosition(x, y) {
 
 // Debounce save position -- https://stackoverflow.com/questions/23858046/debounce-function-with-args-underscore/23858092
 // should be var for hoisting
-var debounceSaveLastPosition = _.debounce(saveLastPosition, 300);
+var debounceSaveLastPosition = _.debounce(saveLastPosition, 500);
 
 export function getLastPosition() {
   //logger.log('getLastPosition');
@@ -373,6 +406,7 @@ export function setGameMode({ scene, mode }) {
       scene.game.mode = 'move';
 
       generalResetStrokeStyle({ scene, alpha: 0 });
+      scene.game.selection.clearHighlight();
       break;
     case 'select':
       scene.input.setDefaultCursor('default');
