@@ -60,6 +60,10 @@ export default class MinimapScene extends ApplicationScene {
       logger.log('MinimapScene: pointerover');
 
       prevMode = this.game.mode;
+
+      if (this.game.moveAutomatic)
+        this.game.moveAutomatic = 'mininav';
+        
       setGameMode({ scene: this, mode: 'mininav' });
       //this.game.tools.showExpandBtn();
     });
