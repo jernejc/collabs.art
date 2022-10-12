@@ -21,7 +21,7 @@ export default class Pixel {
     this.cx = cx;
     this.cy = cy;
 
-    if (color) {
+    if (color || color === 0) {
       this.color = Phaser.Display.Color.HexStringToColor(
         "#" + formatColorNumber(color)
       );
@@ -54,7 +54,7 @@ export default class Pixel {
   changeToColorHex(hex) {
     logger.log("Pixel: changeToColorHex")
 
-    if (!this.originalColor) this.originalColor = this.color;
+    if (!this.originalColor && this.color) this.originalColor = this.color;
 
     this.color = Phaser.Display.Color.HexStringToColor("#" + hexToString(hex));
 
@@ -66,7 +66,7 @@ export default class Pixel {
   changeToColorNumber(color) {
     logger.log("Pixel: changeToColorNumber");
 
-    if (!this.originalColor) this.originalColor = this.color.clone();
+    if (!this.originalColor && this.color) this.originalColor = this.color.clone();
 
     this.color.setFromRGB(color);
 
