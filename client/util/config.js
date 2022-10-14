@@ -66,7 +66,7 @@ const config = {
     url: 'https://api.studio.thegraph.com/query/9304/collabs-testnet/v1.0.1'
   },
   api: {
-    getImage: 'https://getimage-pgm7g5cugq-uc.a.run.app', 
+    getImage: 'https://getimage-pgm7g5cugq-uc.a.run.app', // 'assets/images/place.png', //
     permit: 'https://permit-pgm7g5cugq-uc.a.run.app'
   },
   appConfig: {

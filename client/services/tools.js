@@ -68,7 +68,7 @@ export default class ToolsManager {
     if (detectMob()) {
       this.hideTools();
       this.setDesktopOnly();
-    } else 
+    } else
       this.showTools();
   }
 
@@ -261,14 +261,20 @@ export default class ToolsManager {
       this.connectionStatusInfo.domElement.classList.add('hidden');
   }
 
+  toggleAuctionInfo() {
+    logger.log('ToolsManager: toggleAuctionInfo', this.domAuctionInfo.closed);
+
+    if (this.domAuctionInfo.closed)
+      this.showAuctionInfo();
+    else
+      this.hideAuctionInfo();
+  }
+
   showAuctionInfo() {
     logger.log('ToolsManager: showAuctionInfo');
 
     if (this.domAuctionInfo && this.domAuctionInfo.closed)
       this.domAuctionInfo.open();
-
-    if (this.headerInfo.domElement.classList.contains('hidden'))
-      this.headerInfo.domElement.classList.remove('hidden');
   }
 
   hideAuctionInfo() {
@@ -276,9 +282,6 @@ export default class ToolsManager {
 
     if (this.domAuctionInfo && !this.domAuctionInfo.closed)
       this.domAuctionInfo.close();
-
-    if (this.headerInfo && !this.headerInfo.domElement.classList.contains('hidden'))
-      this.headerInfo.domElement.classList.add('hidden');
   }
 
   showExpandBtn() {
@@ -478,25 +481,11 @@ export default class ToolsManager {
 
     this.headerIcon = new Button({
       elClasses: ['header-icon'],
-      icon: 'gg-time',
-      clickAction: (e) =>  {
-        this.headerIcon.setIcon('gg-time');
-        this.openOverlay();
-      }
+      icon: 'gg-menu-left-alt',
+      clickAction: this.toggleAuctionInfo.bind(this)
     });
 
-    this.headerIcon.domElement
-      .addEventListener('mouseenter', () => {
-        this.headerIcon.setIcon('gg-home');
-      })
-
-    this.headerIcon.domElement
-      .addEventListener('mouseleave', () => {
-        this.headerIcon.setIcon('gg-time');
-      })
-
     this.header.append(this.headerIcon.domElement);
-
     this.headerTimer = new Timer({ parent: this.header, game: this.game });
 
     this.domAuctionInfo = new AuctionInfo({
@@ -519,7 +508,7 @@ export default class ToolsManager {
 
     this.parent.append(this.header);
 
-    this.headerTimer.domElement.addEventListener('click', this.showAuctionInfo.bind(this));
+    this.headerTimer.domElement.addEventListener('click', this.toggleAuctionInfo.bind(this));
   }
 
   addConnectionStatus() {

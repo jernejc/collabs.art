@@ -19,9 +19,29 @@ export default class AuctionInfo {
 
     this.domElement = document.createElement('div');
     this.domElement.classList.add('info', 'auction-info');
-    this.domElement.innerHTML = `Every season a snapshot of the canvas is auctioned as a
-                                 non-fungible token (NFT). The proceeds are converted 
-                                 to $COLAB and distributed between the participants. <a href="${config.appConfig.docs.auctionLifecycleLink}" target="_blank">(more)</a>`;
+
+    this.homeButton = new Button({
+      icon: 'gg-home',
+      text: 'Home',
+      elClasses: ['action-button'],
+      clickAction: () => {
+        this.scene.game.tools.openOverlay();
+        this.scene.game.tools.hideAuctionInfo();
+      }
+    });
+
+    this.domElement.append(this.homeButton.domElement);
+
+    this.documentationButton = new Button({
+      icon: 'gg-file-document',
+      text: 'Documentation',
+      elClasses: ['action-button'],
+      clickAction: () => {
+        window.open(config.appConfig.docsLink, '_blank').focus();
+      }
+    });
+
+    this.domElement.append(this.documentationButton.domElement);
 
     this.auctionPageButton = new Button({
       icon: 'gg-today',
@@ -32,12 +52,12 @@ export default class AuctionInfo {
 
     this.domElement.append(this.auctionPageButton.domElement);
 
-    this.closeBtn = document.createElement('i');
+    /*this.closeBtn = document.createElement('i');
     this.closeBtn.classList.add('gg-close-r');
     this.domElement.append(this.closeBtn);
 
     this.closeListener = this.close.bind(this);
-    this.closeBtn.addEventListener('click', this.closeListener);
+    this.closeBtn.addEventListener('click', this.closeListener);*/
 
     this.parent.append(this.domElement);
 
@@ -56,7 +76,7 @@ export default class AuctionInfo {
     if (!this.domElement.classList.contains('hidden'))
       this.domElement.classList.add('hidden');
 
-    this.scene.game.tools.hideAuctionInfo();
+    this.closed = true;
   }
 
   open() {
@@ -64,6 +84,8 @@ export default class AuctionInfo {
 
     if (this.domElement.classList.contains('hidden'))
       this.domElement.classList.remove('hidden');
+
+    this.closed = false;
   }
 
   destroy() {

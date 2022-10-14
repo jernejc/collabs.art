@@ -19,7 +19,7 @@ export function handleMouseMove({ pointer, scene }) {
     downDelay = null;
   }
 
-  if (pointer.isDown && scene.game.mode !== 'move' && scene.game.mode !== 'mininav') { // switch to move if mouse down
+  if (pointer.isDown && scene.game.mode === 'select') { // switch to move if mouse down
     scene.game.moveAutomatic = scene.game.mode;
     setGameMode({ scene, mode: 'move' });
   }
@@ -89,7 +89,7 @@ export function handleMouseDown({ pointer, scene }) {
 }
 
 export async function handleMouseUp({ pointer, scene }) {
-  //logger.log('User interactions: handleMouseUp');
+  logger.log('User interactions: handleMouseUp');
 
   if (scene.game.origDragPoint) {
     scene.game.origDragPoint = null;

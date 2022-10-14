@@ -145,7 +145,8 @@ input {
 **/
 
 #header {
-  background: var(--active-black);
+  background: buttonface;
+  color: var(--active-black);
   left: var(--edge-margin);
   display: flex;
   align-items: center;
@@ -155,15 +156,16 @@ input {
 }
 
 #header .header-icon {
-  background: buttonface;
+  background: var(--active-black);
   border: none;
-  color: var(--active-black);
+  color: buttonface;
   display: flex;
   width: 50px;
   height: 50px;
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  --ggs: 1.1;
 }
 
 #header .header-icon.home {
@@ -183,9 +185,10 @@ input {
 }
 
 #header .auction-info {
-  height: 140px;
+  height: auto;
   cursor: default;
-  width: 315px;
+  width: 285px;
+  padding: 5px 0 0 0;
 }
 
 #header .auction-info .gg-close-r {
@@ -195,8 +198,10 @@ input {
 
 #header .auction-info button {
   width: 100%;
-  margin-top: 20px;
   height: 50px;
+  justify-content: left;
+  padding: 10px 15px;
+  border-bottom: 1px solid #333;
 }
 
 #header .auction-info button i {

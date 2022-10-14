@@ -64,7 +64,6 @@ export default class SelectionManager {
 
   async addSelected({ tiles, scene }) {
     logger.log("SelectionManager: addSelected");
-
     const added = [];
 
     for (let i = 0; i < tiles.length; i++) {
