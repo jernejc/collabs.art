@@ -41,22 +41,11 @@
   }
 }
 
-@media (min-width:481px) {
-  /* portrait e-readers (Nook/Kindle), smaller tablets @ 600 or @ 640 wide. */
-}
 
-@media (min-width:641px) {
-  /* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
-}
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) and (-webkit-min-device-pixel-ratio: 1) {
+  /* iPad Portrait */
 
-@media (min-width:961px) {
-  /* tablet, landscape iPad, lo-res laptops ands desktops */
-}
-
-@media (min-width:1025px) {
-  /* big landscape tablets, laptops, and desktops */
-}
-
-@media (min-width:1281px) {
-  /* hi-res laptops and desktops */
+  #slideshow {
+    margin-left: 16%;
+  }
 }
