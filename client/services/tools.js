@@ -338,7 +338,7 @@ export default class ToolsManager {
         action = this.game.web3.onboarding.startOnboarding;
         break;
       case 'network':
-        iconClass = 'ethereum-logo.png';
+        iconClass = 'polygon.svg';
         action = this.game.web3.switchToNetwork.bind(this.game.web3);
         break;
       case 'wallet':
