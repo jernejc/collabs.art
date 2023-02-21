@@ -156,7 +156,7 @@ export default class Slideshow {
 
     this.ribbonContent = document.createElement('div');
     this.ribbonContent.classList.add('ribbon-content');
-    this.ribbonContent.innerHTML = '<a href="https://goerli.net/" target="_blank">Polygon</a>';
+    this.ribbonContent.innerHTML = '<a href="https://polygon.technology/" target="_blank">Polygon</a>';
 
     this.ribbon.append(this.ribbonContent);
     this.domElement.append(this.ribbon);
