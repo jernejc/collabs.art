@@ -240,7 +240,7 @@ export default class ToolsManager {
         twitterBtn.disabled = true;
         twitterBtn.connected = true;
       } else {
-        twitterBtn.caption = `100 $COLAB`;
+        twitterBtn.caption = `100 followers = 1 $COLAB`;
         twitterBtn.text = 'Connect';
         twitterBtn.disabled = false;
         twitterBtn.connected = false;
@@ -262,9 +262,9 @@ export default class ToolsManager {
   }
 
   toggleAuctionInfo() {
-    logger.log('ToolsManager: toggleAuctionInfo', this.domAuctionInfo.closed);
+    logger.log('ToolsManager: toggleAuctionInfo');
 
-    if (this.domAuctionInfo.closed)
+    if (this.domAuctionInfo && this.domAuctionInfo.closed)
       this.showAuctionInfo();
     else
       this.hideAuctionInfo();
@@ -480,13 +480,16 @@ export default class ToolsManager {
     this.header.setAttribute('id', 'header');
 
     this.headerIcon = new Button({
-      elClasses: ['header-icon'],
-      icon: 'gg-menu-left-alt',
-      clickAction: this.toggleAuctionInfo.bind(this)
+      elClasses: ['header-icon', 'black'],
+      icon: 'gg-home',
+      clickAction: this.openOverlay.bind(this),
+      tooltip: 'Home',
+      tooltipFlow: 'right'
+      //clickAction: this.toggleAuctionInfo.bind(this)
     });
 
     this.header.append(this.headerIcon.domElement);
-    this.headerTimer = new Timer({ parent: this.header, game: this.game });
+    /*this.headerTimer = new Timer({ parent: this.header, game: this.game });
 
     this.domAuctionInfo = new AuctionInfo({
       scene: this.game.scene.keys['MainScene'],
@@ -504,11 +507,11 @@ export default class ToolsManager {
       }
     });
 
-    this.header.append(this.headerInfo.domElement);
+    this.header.append(this.headerInfo.domElement);*/
 
     this.parent.append(this.header);
 
-    this.headerTimer.domElement.addEventListener('click', this.toggleAuctionInfo.bind(this));
+    //this.headerTimer.domElement.addEventListener('click', this.toggleAuctionInfo.bind(this));
   }
 
   addConnectionStatus() {

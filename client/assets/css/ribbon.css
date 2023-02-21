@@ -13,10 +13,10 @@
   height: inherit;
   z-index: 100;
   width: 150%;
-  background: rgba(25, 97, 13, 0.7);
+  background-color: var(--polygon-color-transparent);
   line-height: 25px;
   color: #FFF;
-  border: 1px solid var(--light-green-color);
+  border: 1px solid var(--polygon-color);
   box-shadow: 0 3px 6px -3px rgb(0 0 0 / 50%);
   display: flex;
   align-items: center;
@@ -35,7 +35,7 @@
  
 .ribbon-content:before {
   bottom: -3px;
-  border-top: 3px solid #163216;
+  border-top: 3px solid var(--polygon-color-transparent);
   border-left: 3px solid transparent;
   border-right: 3px solid transparent;
 

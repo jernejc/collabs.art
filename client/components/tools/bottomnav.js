@@ -118,7 +118,7 @@ export default class BottomNav {
           this.applyBtn.setIcon('gg-link', 'Apply');
           break;
         default:
-          this.applyBtn.setColor('green');
+          this.applyBtn.setColor('polygon');
           this.applyBtn.setIcon('gg-check', 'Apply');
       }
     }

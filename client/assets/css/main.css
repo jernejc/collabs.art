@@ -8,7 +8,10 @@
   --activebid-color: #e5d900;
   --metamask-color: #e7893c;
   /* eb942b */
-  --polygon-color: #8247e5;
+  --polygon-color: rgb(123, 63, 228);
+  /* #8247e5 */
+  --polygon-color-transparent: rgba(123, 63, 228, 0.7);
+  /* #8247e5 */
   --notification-red-color: #f02c2d;
   --blue-color: #255ebe;
   --active-black: rgb(24, 26, 27);
@@ -112,7 +115,7 @@ input {
 }
 
 .info a {
-  color: var(--light-green-color);
+  color: var(--polygon-color);
 }
 
 .info.hidden {
@@ -153,6 +156,12 @@ input {
   height: 50px;
   cursor: pointer;
   user-select: none;
+  opacity: 0.2;
+  transition: 0.2s linear opacity;
+}
+
+#header:hover {
+  opacity: 1;
 }
 
 #header .header-icon {
@@ -168,14 +177,9 @@ input {
   --ggs: 1.1;
 }
 
-#header .header-icon.home {
-  background: var(--light-green-color);
-  border-right: 1px solid buttonface;
-  color: buttonface;
-}
-
 #header .header-icon.home i {
   --ggs: 1.1;
+  top: 2px;
 }
 
 #header .timer {
@@ -738,15 +742,15 @@ input {
 }
 
 #connection-status .connection.user {
-  background: var(--light-green-color);
+  background: var(--polygon-color);
 }
 
 #connection-status .connection.user i.gg-chevron-double-up {
-  color: var(--light-green-color);
+  color: var(--polygon-color);
 }
 
 #connection-status .connection.info-text {
-  background: var(--light-green-color);
+  background: var(--polygon-color);
   color: var(--header-white);
   width: auto;
   align-items: center;
@@ -788,12 +792,12 @@ input {
 
 #connection-status .colab-info .credit-token {
   color: var(--header-white);
-  border: 1px solid var(--light-green-color);
+  border: 1px solid var(--polygon-color);
   /* #c3a428;*/
   height: 43px;
   width: 100%;
   margin: 14px 0px 0px;
-  background-color: rgba(51, 153, 0, 0.5);
+  background-color: var(--polygon-color-transparent);
   align-content: center;
   justify-content: center;
 }
@@ -808,7 +812,7 @@ input {
 }
 
 #connection-status .colab-info .credit-token:hover {
-  background: var(--light-green-color);
+  background: var(--polygon-color);
 }
 
 #connection-status .colab-info .action-button img {
@@ -1146,7 +1150,7 @@ Info Box
   margin-right: 6px;
 }
 
-.slide-action:disabled, 
+.slide-action:disabled,
 .action-button:disabled {
   opacity: 0.8;
   background: rgba(100, 100, 100, 0.6) !important;
@@ -1173,6 +1177,15 @@ Info Box
 
 .action-button.green i.gg-loadbar-alt {
   background: var(--light-green-color);
+}
+
+.action-button.polygon {
+  background: var(--polygon-color);
+  color: var(--header-white)
+}
+
+.action-button.polygon i.gg-loadbar-alt {
+  background: var(--polygon-color);
 }
 
 .action-button.blue {
@@ -1568,7 +1581,7 @@ Info Box
 
 .notification.processing .icon,
 .notification.signature .icon {
-  background: var(--light-green-color);
+  background: var(--polygon-color);
 }
 
 .notification.success {
@@ -1576,7 +1589,7 @@ Info Box
 }
 
 .notification.success .icon {
-  background: var(--light-green-color);
+  background: var(--polygon-color);
   --ggs: 1.5;
 }
 
@@ -1725,7 +1738,7 @@ Info Box
 }
 
 .slides-nav .nav-item .progress-bar__fill {
-  background: var(--light-green-color);
+  background: var(--polygon-color);
   position: relative;
   bottom: 5px;
   transition: all 100ms;
@@ -1747,11 +1760,11 @@ Info Box
 
 /*.slides-nav .nav-item.nav-seen span,*/
 .slides-nav .nav-item.nav-active span {
-  background: var(--light-green-color);
+  background: var(--polygon-color);
 }
 
 .slides-nav .nav-item.nav-seen .progress-bar__wrap {
-  background: var(--light-green-color);
+  background: var(--polygon-color);
 }
 
 /*.slides-nav .nav-item.nav-active span,*/
@@ -1794,13 +1807,13 @@ Info Box
 }
 
 .action-bar .slide-action {
-  background: rgba(25, 97, 13, 0.7);
+  background: var(--polygon-color-transparent);
   line-height: 25px;
   font-size: 18px;
   padding: 10px 13px;
   margin-left: 5px;
   color: #FFF;
-  border: 1px solid var(--light-green-color);
+  border: 1px solid var(--polygon-color);
   cursor: pointer;
   transition: background-color 0.2s;
   --ggs: 1.8;
@@ -1812,7 +1825,7 @@ Info Box
 
 .action-bar .slide-action.success,
 .action-bar .slide-action:hover {
-  background: var(--light-green-color);
+  background: var(--polygon-color);
 }
 
 .action-bar .slide-action.success {
@@ -1976,7 +1989,7 @@ Info Box
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 17px 0px;
+  margin: 17px 0px 20px;
 }
 
 .social-connect {
@@ -2037,7 +2050,8 @@ Info Box
 .desktop-only img {
   max-width: 22px;
   margin-left: 8px;
-  -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+  -webkit-filter: grayscale(100%);
+  /* Safari 6.0 - 9.0 */
   filter: grayscale(100%);
 }
 

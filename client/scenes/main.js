@@ -199,7 +199,7 @@ export default class MainScene extends ApplicationScene {
     //logger.log("MainScene: updateTile");
 
     if (this.game.mode === 'gameoflife') {
-      const randomPixelColor = hexStringToColor(this.appConfig.defaultTileColors[Phaser.Math.Between(0, this.appConfig.defaultTileColors.length - 1)])
+      const randomPixelColor = hexStringToColor(this.appConfig.gameOfLifeTileColors[Phaser.Math.Between(0, this.appConfig.gameOfLifeTileColors.length - 1)])
       let fillColor = this.appConfig.fillColor;
 
       if (this.tiles[y][x].intial || this.tiles[y][x].alive)

@@ -35,7 +35,7 @@ export default class TokenInfo {
     this.twitterButton = new Button({
       icon: 'twitter-logo.png',
       text: 'Connect',
-      caption: '100 $COLAB',
+      caption: '100 followers = 1 $COLAB',
       disabled: false,
       elClasses: ['action-button', 'social-connect', 'twitter'],
       clickAction: async () => {
@@ -76,7 +76,7 @@ export default class TokenInfo {
     }
 
     this.supportHeader = document.createElement('h3');
-    this.supportHeader.textContent = 'or Support the project: ';
+    this.supportHeader.textContent = 'or common DEXs: ';
 
     this.domElement.append(this.supportHeader);
 
