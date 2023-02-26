@@ -6,7 +6,7 @@ dataSources:
     name: CollabCanvas
     network: mumbai
     source:
-      address: '0x1a13c88f9b50C3254D9007B3A9D2198A37379a5a'
+      address: '0xA7958a46A9A726f53a4e87CC99Eb0b9EE46cd5AA'
       abi: CollabCanvas
     mapping:
       kind: ethereum/events
