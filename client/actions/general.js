@@ -255,7 +255,7 @@ export async function permitToken({ scene, response, grant }) {
 
   scene.game.tools.setNotification(0, 'processing');
 
-  const fees = await scene.game.web3.getEstimatedGasFees('fast');
+  const fees = await scene.game.web3.getEstimatedGasFees();
 
   try {
     await scene.game.web3.tokenContract.methods.grant(

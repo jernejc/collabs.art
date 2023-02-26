@@ -456,12 +456,15 @@ export default class Web3Manager {
       if (data[speed]) {
         gasFees.maxPriorityFeePerGas = Web3.utils.toWei(this.formatGasPrice(data[speed].maxPriorityFee), 'gwei');
         gasFees.maxFeePerGas = Web3.utils.toWei(this.formatGasPrice(data[speed].maxFee), 'gwei');
+      } else if (data.safeLow) {
+        gasFees.maxPriorityFeePerGas = Web3.utils.toWei(this.formatGasPrice(data.safeLow.maxPriorityFee), 'gwei');
+        gasFees.maxFeePerGas = Web3.utils.toWei(this.formatGasPrice(data.safeLow.maxFee), 'gwei');
       } else if (data.standard) {
         gasFees.maxPriorityFeePerGas = Web3.utils.toWei(this.formatGasPrice(data.standard.maxPriorityFee), 'gwei');
         gasFees.maxFeePerGas = Web3.utils.toWei(this.formatGasPrice(data.standard.maxFee), 'gwei');
       }
     }
-    
+
     return gasFees;
   }
 
