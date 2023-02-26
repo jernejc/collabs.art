@@ -4,9 +4,9 @@ schema:
 dataSources:
   - kind: ethereum
     name: CollabCanvas
-    network: polygon
+    network: matic
     source:
-      address: '0x329e89036f6a40F890fcE5C9bF056d51251046b7'
+      address: '0x495d8B9358219b81B6648B26B382aAcCBc5506F1'
       abi: CollabCanvas
     mapping:
       kind: ethereum/events

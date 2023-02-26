@@ -35,7 +35,7 @@ export default class TokenInfo {
     this.twitterButton = new Button({
       icon: 'twitter-logo.png',
       text: 'Connect',
-      caption: '100 followers = 1 $COLAB',
+      caption: '10 followers = 1 $COLAB',
       disabled: false,
       elClasses: ['action-button', 'social-connect', 'twitter'],
       clickAction: async () => {

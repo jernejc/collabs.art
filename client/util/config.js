@@ -20,8 +20,8 @@ const config = {
   },
   networks: [{
     id: 137,
-    enabled: false,
-    default: false,
+    enabled: true,
+    default: true,
     chainId: Web3.utils.toHex('137'),
     chainName: 'Polygon Mainnet',
     nativeCurrency: {
@@ -34,8 +34,8 @@ const config = {
     blockExplorerUrl: 'https://polygonscan.com/',
   }, {
     id: 80001,
-    enabled: true,
-    default: true,
+    enabled: false,
+    default: false,
     chainId: Web3.utils.toHex('80001'),
     chainName: 'Polygon Testnet',
     nativeCurrency: {
@@ -91,7 +91,7 @@ const config = {
   },
   defaultMinUnit: Web3.utils.toWei('1'),
   subgraph: {
-    url: 'https://api.studio.thegraph.com/query/9304/collabs-mumbai/v0.0.1' //'https://api.studio.thegraph.com/query/9304/collabs-testnet/v1.0.1'
+    url: 'https://api.thegraph.com/subgraphs/id/QmQhaaEyK6YVj9UN57yPGSt9Gcreazz8My3Jz92rqPmE5K' //'https://api.studio.thegraph.com/query/9304/collabs-mumbai/v0.0.1' //'https://api.studio.thegraph.com/query/9304/collabs-testnet/v1.0.1'
   },
   api: {
     getImage: 'https://getimage-pgm7g5cugq-uc.a.run.app', // 'assets/images/place.png', //

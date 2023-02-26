@@ -62,6 +62,7 @@ module.exports = {
         providerOrUrl: RPC_URL 
       }),
       network_id: 137,
+      gasPrice: 200000000000,
       confirmations: 2,
       timeoutBlocks: 200,
       skipDryRun: true

@@ -240,7 +240,7 @@ export default class ToolsManager {
         twitterBtn.disabled = true;
         twitterBtn.connected = true;
       } else {
-        twitterBtn.caption = `100 followers = 1 $COLAB`;
+        twitterBtn.caption = `10 followers = 1 $COLAB`;
         twitterBtn.text = 'Connect';
         twitterBtn.disabled = false;
         twitterBtn.connected = false;
