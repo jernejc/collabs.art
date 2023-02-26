@@ -6,6 +6,7 @@ const { signERC2612Permit } = require('eth-permit');
 
 const CollabToken = artifacts.require("CollabToken");
 
+const conversionRate = 2
 const rpcURL = 'http://localhost:7545'; // needs Ganache
 
 contract("CollabToken tests", async accounts => {
@@ -15,14 +16,14 @@ contract("CollabToken tests", async accounts => {
     tokenInstance = await CollabToken.deployed();
   });
 
-  it("should credit 1 ETH", async () => {
+  it("should credit 10 ETH", async () => {
     try {
-      // credit account[1] with some $PXT
+      // credit account[1] with some $COLAB
       await tokenInstance.credit({ from: accounts[1], value: web3.utils.toWei('1', 'ether') });
 
       // Verify account balance
       const finalBalanceAccount1 = await tokenInstance.balanceOf(accounts[1]);
-      expect(finalBalanceAccount1.toString()).to.equal(web3.utils.toWei('500', 'ether')); // $PXT tokens use the same decimals as ETH
+      expect(finalBalanceAccount1.toString()).to.equal(web3.utils.toWei(conversionRate.toString(), 'ether')); // $COLAB tokens use the same decimals as ETH
       // Verify contract balance
       const finalBalanceContract = await web3.eth.getBalance(tokenInstance.address);
       expect(finalBalanceContract.toString()).to.equal(web3.utils.toWei('1', 'ether'));
@@ -32,13 +33,12 @@ contract("CollabToken tests", async accounts => {
     }
   });
 
-  it("should withdraw 0.5 ETH", async () => {
+  it("should withdraw 1 ETH", async () => {
     try {
       const initialBalanceContract = new BN(await web3.eth.getBalance(tokenInstance.address));
       const initialBalanceAccount0 = new BN(await web3.eth.getBalance(accounts[0]));
 
-      // credit account[1] with some $PXT
-      const response = await tokenInstance.withdraw(web3.utils.toWei('0.5', 'ether'));
+      const response = await tokenInstance.withdraw(web3.utils.toWei('1', 'ether'));
 
       // get gas used
       const gasUsed = new BN(response.receipt.gasUsed);
@@ -50,11 +50,11 @@ contract("CollabToken tests", async accounts => {
 
       // Verify account balance
       const finalBalanceAccount0 = new BN(await web3.eth.getBalance(accounts[0]));
-      expect(finalBalanceAccount0.toString()).to.equal(adjustedInitialBalanceAccount0.add(new BN(web3.utils.toWei('0.5', 'ether'))).toString());
+      expect(finalBalanceAccount0.toString()).to.equal(adjustedInitialBalanceAccount0.add(new BN(web3.utils.toWei('1', 'ether'))).toString());
 
       // Verify contract balance
       const finalBalanceContract = await web3.eth.getBalance(tokenInstance.address);
-      expect(finalBalanceContract.toString()).to.equal(initialBalanceContract.sub(new BN(web3.utils.toWei('0.5', 'ether'))).toString());
+      expect(finalBalanceContract.toString()).to.equal(initialBalanceContract.sub(new BN(web3.utils.toWei('1', 'ether'))).toString());
     } catch (error) {
       console.error(error);
       assert.fail("One or more errors occured.");

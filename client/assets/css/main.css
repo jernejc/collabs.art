@@ -782,12 +782,13 @@ input {
 }
 
 #connection-status .colab-info {
-  height: 245px;
+  height: 240px;
   right: 0;
 }
 
 #connection-status .colab-info h3 {
   font-weight: normal;
+  margin-bottom: 10px;
 }
 
 #connection-status .colab-info .credit-token {

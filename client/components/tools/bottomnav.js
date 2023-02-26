@@ -110,7 +110,7 @@ export default class BottomNav {
         case 'network':
           this.applyBtn.setColor('white');
           this.applyBtn.setToolTip('Switch to Network');
-          this.applyBtn.setIcon('ethereum-logo.png', 'Apply');
+          this.applyBtn.setIcon('polygon-matic-logo.svg', 'Apply');
           break;
         case 'wallet':
           this.applyBtn.setColor('blue');

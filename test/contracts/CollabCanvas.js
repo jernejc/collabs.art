@@ -26,7 +26,7 @@ contract("CollabCanvas coloring tests", async accounts => {
 
     // account[0] already has $COLAB from constructing the contract
     // credit account[1] with some $COLAB
-    await tokenInstance.credit({ from: accounts[1], value: web3.utils.toWei('0.5', 'ether') });
+    await tokenInstance.credit({ from: accounts[1], value: web3.utils.toWei('10', 'ether') });
   });
 
   it("set pixel color", async () => {

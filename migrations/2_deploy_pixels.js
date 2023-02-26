@@ -23,8 +23,8 @@ module.exports = async (deployer, network, accounts) => {
   const wsUrl = deployer.networks[networkName].websocket || null;
   const maxPixels = 1000000;
   const minUnit = web3.utils.toWei('1');
-  const conversionRate = 500;
-  const developmentRate = 10000000;
+  const conversionRate = 2;
+  const developmentRate = 165000000;
   const supportedColors = [
     '93002c', 'c33502', 'c48100', 'c3a428', '027d4e', '029d5d',
     '60b640', '005a54', '007a81', '1a3f7e', '2a6fb5', '3fb4bd',

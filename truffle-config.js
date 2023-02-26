@@ -22,8 +22,9 @@ const HDWalletProvider = require('@truffle/hdwallet-provider');
 
 const fs = require('fs');
 const private_key = fs.readFileSync('.secret').toString().trim();
-const goerliURL = fs.readFileSync('.rpc').toString().trim();
-const goerliWSS = fs.readFileSync('.wss').toString().trim();
+
+const RPC_URL = process.env.RPC_URL;
+const WS_URL = process.env.WS_URL;
 
 module.exports = {
   /**
@@ -51,27 +52,44 @@ module.exports = {
       network_id: '*',       // Any network (default: none)
     },
 
-    /*matic: {
+    'polygon': {
+      websocket: WS_URL,
+      url: RPC_URL,
       provider: () => new HDWalletProvider({
         privateKeys: [private_key],
         numberOfAddresses: 1,
         addressIndex: 0, 
-        providerOrUrl: mumbaiURL 
+        providerOrUrl: RPC_URL 
+      }),
+      network_id: 137,
+      confirmations: 2,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    },
+    
+    'mumbai': {
+      websocket: WS_URL,
+      url: RPC_URL,
+      provider: () => new HDWalletProvider({
+        privateKeys: [private_key],
+        numberOfAddresses: 1,
+        addressIndex: 0,
+        providerOrUrl: RPC_URL
       }),
       network_id: 80001,
       confirmations: 2,
       timeoutBlocks: 200,
       skipDryRun: true
-    },*/
+    },
     
     'goerli': {
-      websocket: goerliWSS,
-      url: goerliURL,
+      websocket: WS_URL,
+      url: RPC_URL,
       provider: () => new HDWalletProvider({
         privateKeys: [private_key],
         numberOfAddresses: 1,
         addressIndex: 0, 
-        providerOrUrl: goerliURL,
+        providerOrUrl: RPC_URL,
         pollingInterval: 15e3
       }),
       network_id: 5,

@@ -218,7 +218,7 @@ export function maliDetect() {
 }
 
 export function formatNetworkConfig(config) {
-  return ['id', 'chainId', 'chainName', 'nativeCurrency', 'rpcUrls', 'blockExplorerUrls']
+  return ['chainId', 'chainName', 'nativeCurrency', 'rpcUrls', 'blockExplorerUrls']
     .reduce((result, key) => {
       result[key] = config[key];
       return result;

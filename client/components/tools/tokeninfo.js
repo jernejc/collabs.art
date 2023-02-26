@@ -72,23 +72,23 @@ export default class TokenInfo {
     this.socialButtonsWrapper.append(this.discordButton.domElement);
 
     this.supportForm = {
-      value: 0.2
+      value: 50
     }
 
     this.supportHeader = document.createElement('h3');
-    this.supportHeader.textContent = 'or common DEXs: ';
+    this.supportHeader.textContent = 'or purchase from the presale: ';
 
     this.domElement.append(this.supportHeader);
 
     this.supportInput = new Input(this.supportForm, 'value', {
       elClasses: ['input'],
       type: 'number',
-      step: 0.2,
-      min: 0.2,
+      step: 1,
+      min: 1,
       max: 9999,
       label: this.scene.game.web3.network.nativeCurrency.symbol,
       dynamicWidth: true,
-      decimals: 1,
+      decimals: 0,
       onChange: async () => {
         _self.refreshTokenCalc()
       }
@@ -130,7 +130,7 @@ export default class TokenInfo {
   }
 
   refreshTokenCalc() {
-    this.tokenCalc.innerHTML = `<i class="gg-arrows-exchange-alt"></i> ${parseInt(this.supportInput.input.value * 500)} $COLAB`;
+    this.tokenCalc.innerHTML = `<i class="gg-arrows-exchange-alt"></i> ${parseInt(this.supportInput.input.value * 2)} $COLAB`;
   }
 
   close() {

@@ -4,9 +4,9 @@ schema:
 dataSources:
   - kind: ethereum
     name: CollabCanvas
-    network: goerli
+    network: mumbai
     source:
-      address: '0xbFac6D4D451e7a3584126cA0F77ce31bD4d8D404'
+      address: '0xAD2526809F47FB612DC8c314aC049CcCD06EA60f'
       abi: CollabCanvas
     mapping:
       kind: ethereum/events
