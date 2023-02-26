@@ -182,10 +182,13 @@ export async function creditToken({ scene, value }) {
 
   scene.game.tools.setNotification(0, 'processing');
 
+  const fees = await scene.game.web3.getEstimatedGasFees();
+
   try {
     await scene.game.web3.tokenContract.methods.credit().send({
       from: scene.game.web3.activeAddress,
-      value: Web3.utils.toWei(value)
+      value: Web3.utils.toWei(value),
+      ...fees
     }).on('transactionHash', (hash) => {
       txHash = hash;
       scene.game.tools.setNotificationTxHash(txHash);
@@ -252,6 +255,8 @@ export async function permitToken({ scene, response, grant }) {
 
   scene.game.tools.setNotification(0, 'processing');
 
+  const fees = await scene.game.web3.getEstimatedGasFees('fast');
+
   try {
     await scene.game.web3.tokenContract.methods.grant(
       response.provider,
@@ -263,7 +268,8 @@ export async function permitToken({ scene, response, grant }) {
       response.r,
       response.s
     ).send({
-      from: scene.game.web3.activeAddress
+      from: scene.game.web3.activeAddress,
+      ...fees
     }).on('transactionHash', (hash) => {
       txHash = hash;
       scene.game.tools.setNotificationTxHash(txHash);

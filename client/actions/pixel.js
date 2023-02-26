@@ -75,13 +75,16 @@ export async function colorPixels({ scene, selection }) {
 
   scene.game.tools.setNotification(0, 'processing');
 
+  const fees = await scene.game.web3.getEstimatedGasFees();
+
   try {
     await scene.game.web3.canvasContract.methods.setColors(
       positions,
       colors,
       bids
     ).send({
-      from: scene.game.web3.activeAddress
+      from: scene.game.web3.activeAddress,
+      ...fees
     }).on('transactionHash', (hash) => {
       txHash = hash;
       scene.game.tools.setNotificationTxHash(txHash);

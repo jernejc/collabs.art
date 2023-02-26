@@ -95,6 +95,8 @@ export default class Pixel {
     logger.log("setColor", this.cx, this.cy, this.HEXcolor);
 
     try {
+      const fees = await scene.game.web3.getEstimatedGasFees();
+
       await this.scene.game.web3.canvasContract.methods
         .setColor(
           stringToBN(this.position), // pixel position
@@ -102,7 +104,7 @@ export default class Pixel {
         )
         .send({
           from: this.scene.game.web3.activeAddress,
-          gas: 200000,
+          ...fees
         });
     } catch (error) {
       logger.error("Pixel: setColor", error);

@@ -430,7 +430,7 @@ export default class Web3Manager {
       this.onboarding.startOnboarding();
       return;
     }
-    
+
     if (!this.isConnected)
       await this.switchToNetwork();
 
@@ -441,6 +441,32 @@ export default class Web3Manager {
       return false;
 
     return true;
+  }
+
+  async getEstimatedGasFees(speed) {
+    let gasFees = {
+      maxPriorityFeePerGas: Web3.utils.toWei('40', 'gwei'),
+      maxFeePerGas: Web3.utils.toWei('40', 'gwei'),
+    }
+
+    const response = await fetch('https://gasstation-mainnet.matic.network/v2');
+    const data = await response.json();
+
+    if (data) {
+      if (data[speed]) {
+        gasFees.maxPriorityFeePerGas = Web3.utils.toWei(this.formatGasPrice(data[speed].maxPriorityFee), 'gwei');
+        gasFees.maxFeePerGas = Web3.utils.toWei(this.formatGasPrice(data[speed].maxFee), 'gwei');
+      } else if (data.standard) {
+        gasFees.maxPriorityFeePerGas = Web3.utils.toWei(this.formatGasPrice(data.standard.maxPriorityFee), 'gwei');
+        gasFees.maxFeePerGas = Web3.utils.toWei(this.formatGasPrice(data.standard.maxFee), 'gwei');
+      }
+    }
+    
+    return gasFees;
+  }
+
+  formatGasPrice(price) {
+    return price.toFixed(8).toString()
   }
 
   removeAllListeners() {
