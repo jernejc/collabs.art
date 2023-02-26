@@ -7,7 +7,7 @@ const { signERC2612Permit } = require('eth-permit');
 const CollabToken = artifacts.require("CollabToken");
 
 const conversionRate = 2
-const rpcURL = 'http://localhost:7545'; // needs Ganache
+const rpcURL = 'http://127.0.0.1:7545'; // needs Ganache
 
 contract("CollabToken tests", async accounts => {
   let tokenInstance;
@@ -72,17 +72,18 @@ contract("CollabToken tests", async accounts => {
     await web3.eth.personal.unlockAccount(wallet.address, '', 10000) // arbitrary duration
 
     // Need to user HDWallerProvider else "eth_signTypedData_v4" is not supported
-    const provider = new HDWalletProvider({ privateKeys: [wallet.privateKey], provider: rpcURL });
+    const provider = new HDWalletProvider({ privateKeys: [wallet.privateKey], providerOrUrl: rpcURL });
+    const providerAddress = provider.getAddresses()[0];
 
     try {
       // Transfer some $COLAB to new provider account
-      await tokenInstance.transfer(provider.addresses[0], web3.utils.toWei('10', 'ether'));
+      await tokenInstance.transfer(providerAddress, web3.utils.toWei('3', 'ether'));
 
-      const initialBalanceWalletProvider = await tokenInstance.balanceOf(provider.addresses[0]);
+      const initialBalanceWalletProvider = await tokenInstance.balanceOf(providerAddress);
       const initialBalanceAccount4 = await tokenInstance.balanceOf(accounts[4]);
 
       // find the correct nonce to use with a query to the test network
-      const nonce = await tokenInstance.nonces(provider.addresses[0]);
+      const nonce = await tokenInstance.nonces(providerAddress);
       const max_int = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
       // create a wallet that will use a mainnet chainId for its provider but does not connect to anything
@@ -96,12 +97,12 @@ contract("CollabToken tests", async accounts => {
         "verifyingContract": tokenInstance.address
       }
 
-      const result = await signERC2612Permit(provider, domain, provider.addresses[0], accounts[4], web3.utils.toWei('1', 'ether'), max_int, nonce);
-      await tokenInstance.grant(provider.addresses[0], accounts[4], web3.utils.toWei('1', 'ether'), result.deadline, 'twitter:login', result.v, result.r, result.s, {
+      const result = await signERC2612Permit(provider, domain, providerAddress, accounts[4], web3.utils.toWei('1', 'ether'), max_int, nonce);
+      await tokenInstance.grant(providerAddress, accounts[4], web3.utils.toWei('1', 'ether'), result.deadline, 'twitter:login', result.v, result.r, result.s, {
         from: accounts[4]
       });
 
-      const finalBalanceWalletProvider = await tokenInstance.balanceOf(provider.addresses[0]);
+      const finalBalanceWalletProvider = await tokenInstance.balanceOf(providerAddress);
       expect(finalBalanceWalletProvider.toString()).to.equal(initialBalanceWalletProvider.sub(new BN(web3.utils.toWei('1', 'ether'))).toString());
       const finalBalanceAccount4 = await tokenInstance.balanceOf(accounts[4]);
       expect(finalBalanceAccount4.toString()).to.equal(initialBalanceAccount4.add(new BN(web3.utils.toWei('1', 'ether'))).toString());
@@ -109,7 +110,7 @@ contract("CollabToken tests", async accounts => {
       // Make sure signature cannot be re-used
       const detectedError = "CollabToken: invalid signature";
       try {
-        await tokenInstance.grant(provider.addresses[0], accounts[4], web3.utils.toWei('1', 'ether'), result.deadline, 'twitter:login', result.v, result.r, result.s, {
+        await tokenInstance.grant(providerAddress, accounts[4], web3.utils.toWei('1', 'ether'), result.deadline, 'twitter:login', result.v, result.r, result.s, {
           from: accounts[4]
         });
       } catch (error) {
