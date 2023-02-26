@@ -62,23 +62,23 @@ contract CollabToken is ERC20Pausable, ERC20Permit, AccessControl {
      * @param name_ token name
      * @param symbol_ token symbol
      * @param defaultOperators_ array of default operators
-     * @param conversionRate_ token native conversion rate
-     * @param developmentRate_ token development rate
+     * @param conversionRate_ token presale conversion rate
+     * @param intialSupply_ token initial supply
      */
     constructor(
         string memory name_,
         string memory symbol_,
         address[] memory defaultOperators_,
         uint256 conversionRate_,
-        uint256 developmentRate_
+        uint256 intialSupply_
     ) ERC20(name_, symbol_) ERC20Permit(name_) {
         require(
             conversionRate_ > 0,
             "CollabToken: Conversion rate must be greater than 0"
         );
         require(
-            developmentRate_ > 0,
-            "CollabToken: Development rate must be greater than 0"
+            intialSupply_ > 0,
+            "CollabToken: Initial supply must be greater than 0"
         );
 
         _defaultOperatorsArray = defaultOperators_;
@@ -88,8 +88,8 @@ contract CollabToken is ERC20Pausable, ERC20Permit, AccessControl {
 
         // set conversion rate
         _conversionRate = conversionRate_;
-        // mint development tokens to sender
-        _mint(_msgSender(), developmentRate_ * 10**uint256(decimals()));
+        // mint initial supply to sender
+        _mint(_msgSender(), intialSupply_ * 10**uint256(decimals()));
         // assign admin
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
