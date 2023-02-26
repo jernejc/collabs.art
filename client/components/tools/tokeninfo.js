@@ -83,8 +83,8 @@ export default class TokenInfo {
     this.supportInput = new Input(this.supportForm, 'value', {
       elClasses: ['input'],
       type: 'number',
-      step: 1,
-      min: 1,
+      step: 50,
+      min: 50,
       max: 9999,
       label: this.scene.game.web3.network.nativeCurrency.symbol,
       dynamicWidth: true,
