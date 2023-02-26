@@ -72,7 +72,7 @@ contract("CollabToken tests", async accounts => {
     await web3.eth.personal.unlockAccount(wallet.address, '', 10000) // arbitrary duration
 
     // Need to user HDWallerProvider else "eth_signTypedData_v4" is not supported
-    const provider = new HDWalletProvider({ privateKeys: [wallet.privateKey], provider: rpcURL });
+    const provider = new HDWalletProvider({ privateKeys: [wallet.privateKey], providerOrUrl: rpcURL });
 
     try {
       // Transfer some $COLAB to new provider account
