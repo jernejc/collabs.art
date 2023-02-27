@@ -135,12 +135,12 @@ const config = {
       icon: 'ownership.svg',
       title: 'Ownership',
       shortTitle: 'ownership',
-      body: 'Pixel colors are stored in a smart contract on the Ethereum network. Players can overwrite an existing\'s pixels color by staking their $COLAB tokens. The required amount is determent by previous bids placed on the same position.'
+      body: 'Pixel colors are stored in a smart contract on the Ethereum network. Players can overwrite an existing\'s pixels color using their $COLAB tokens. The required amount is determent by previous bids placed on the same position.'
     }, {
       icon: 'social-dynamic.svg',
       title: 'Social Dynamic',
       shortTitle: 'social',
-      body: 'Every month a snapshot of the canvas is auctioned as a non-fungible token (NFT). The proceeds are converted to $COLAB and distributed between the participants based on how much pixels they have colored.'
+      body: 'Every month a snapshot of the canvas is auctioned as a non-fungible token (NFT). The proceeds (ETH) are exchanged for $COLAB and distributed between the participants based on how much pixels they have colored.'
     }]
   },
 
