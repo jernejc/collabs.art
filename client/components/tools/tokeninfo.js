@@ -72,7 +72,7 @@ export default class TokenInfo {
     this.socialButtonsWrapper.append(this.discordButton.domElement);
 
     this.supportForm = {
-      value: 50
+      value: 25
     }
 
     this.supportHeader = document.createElement('h3');
@@ -83,8 +83,8 @@ export default class TokenInfo {
     this.supportInput = new Input(this.supportForm, 'value', {
       elClasses: ['input'],
       type: 'number',
-      step: 50,
-      min: 50,
+      step: 25,
+      min: 25,
       max: 9999,
       label: this.scene.game.web3.network.nativeCurrency.symbol,
       dynamicWidth: true,
