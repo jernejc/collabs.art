@@ -75,7 +75,7 @@ export async function colorPixels({ scene, selection }) {
 
   scene.game.tools.setNotification(0, 'processing');
 
-  const fees = await scene.game.web3.getEstimatedGasFees();
+  const fees = await scene.game.web3.getEstimatedGasFees('fast');
 
   try {
     await scene.game.web3.canvasContract.methods.setColors(
