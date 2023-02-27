@@ -156,11 +156,6 @@ input {
   height: 50px;
   cursor: pointer;
   user-select: none;
-  opacity: 0.2;
-  transition: 0.2s linear opacity;
-}
-
-#header:hover {
   opacity: 1;
 }
 
