@@ -76,7 +76,7 @@ export default class TokenInfo {
     }
 
     this.supportHeader = document.createElement('h3');
-    this.supportHeader.textContent = 'or purchase from the presale: ';
+    this.supportHeader.textContent = 'or support the project: ';
 
     this.domElement.append(this.supportHeader);
 
