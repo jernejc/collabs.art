@@ -445,8 +445,8 @@ export default class Web3Manager {
 
   async getEstimatedGasFees(speed) {
     let gasFees = {
-      maxPriorityFeePerGas: Web3.utils.toWei('40', 'gwei'),
-      maxFeePerGas: Web3.utils.toWei('40', 'gwei'),
+      maxPriorityFeePerGas: Web3.utils.toWei('50', 'gwei'),
+      maxFeePerGas: Web3.utils.toWei('50', 'gwei'),
     }
 
     const response = await fetch('https://gasstation-mainnet.matic.network/v2');
@@ -454,11 +454,15 @@ export default class Web3Manager {
 
     if (data) {
       if (data[speed]) {
-        gasFees.maxPriorityFeePerGas = Web3.utils.toWei(this.formatGasPrice(data[speed].maxPriorityFee), 'gwei');
-        gasFees.maxFeePerGas = Web3.utils.toWei(this.formatGasPrice(data[speed].maxFee), 'gwei');
+        if (data[speed].maxPriorityFee)
+          gasFees.maxPriorityFeePerGas = Web3.utils.toWei(this.formatGasPrice(data[speed].maxPriorityFee), 'gwei');
+        if (data[speed].maxFee)
+          gasFees.maxFeePerGas = Web3.utils.toWei(this.formatGasPrice(data[speed].maxFee), 'gwei');
       } else if (data.standard) {
-        gasFees.maxPriorityFeePerGas = Web3.utils.toWei(this.formatGasPrice(data.standard.maxPriorityFee), 'gwei');
-        gasFees.maxFeePerGas = Web3.utils.toWei(this.formatGasPrice(data.standard.maxFee), 'gwei');
+        if (data.standard.maxPriorityFee)
+          gasFees.maxPriorityFeePerGas = Web3.utils.toWei(this.formatGasPrice(data.standard.maxPriorityFee), 'gwei');
+        if (data.standard.maxFee)
+          gasFees.maxFeePerGas = Web3.utils.toWei(this.formatGasPrice(data.standard.maxFee), 'gwei');
       }
     }
 
