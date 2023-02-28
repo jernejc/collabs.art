@@ -18,6 +18,7 @@ const config = {
       abi: CollabToken
     }
   },
+  sentry: 'https://f9d304aeac7c49128f6e3a45d75b655c@o4504758107570176.ingest.sentry.io/4504758109011968',
   networks: [{
     id: 137,
     enabled: true,

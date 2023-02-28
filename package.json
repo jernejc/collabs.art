@@ -31,6 +31,8 @@
     "dev": "webpack-dev-server"
   },
   "dependencies": {
+    "@sentry/browser": "^7.39.0",
+    "@sentry/tracing": "^7.39.0",
     "firebase": "^9.10.0"
   }
 }

@@ -63,6 +63,8 @@ export async function loadPixel({ scene, position }) {
 export async function colorPixels({ scene, selection }) {
   logger.log('Action colorPixels', selection)
 
+  scene.game.tools.setNotification(0, 'processing');
+
   let positions = [], colors = [], bids = [];
 
   selection.forEach(pixel => {
@@ -71,35 +73,37 @@ export async function colorPixels({ scene, selection }) {
     bids.push(toWei(pixel.bid.toString()).toString());
   });
 
-  let txHash = null;
-
-  scene.game.tools.setNotification(0, 'processing');
-
   const fees = await scene.game.web3.getEstimatedGasFees('fast');
 
-  try {
-    await scene.game.web3.canvasContract.methods.setColors(
-      positions,
-      colors,
-      bids
-    ).send({
+  let txHash;
+
+  await scene.game.web3.canvasContract.methods.setColors(
+    positions,
+    colors,
+    bids
+  )
+    .send({
       from: scene.game.web3.activeAddress,
       ...fees
-    }).on('transactionHash', (hash) => {
+    })
+    .on('transactionHash', (hash) => {
+      logger.log('Action colorPixels: transactionHash', hash)
       txHash = hash;
       scene.game.tools.setNotificationTxHash(txHash);
-    });
-  } catch (error) {
-    logger.error('Action colorPixels: ', error);
+    })
+    .on('confirmation', (confNumber, receipt) => {
+      logger.log('Action colorPixels: confirmation')
+    })
+    .on('error', function (error) {
+      logger.error('Action colorPixels:', error);
 
-    if (error.message && error.message === 'MetaMask Tx Signature: User denied transaction signature.') {
-      scene.game.tools.removeNotification();
-      return;
-    }
-
-    scene.game.tools.setNotification(10000, 'error', txHash);
-    return;
-  }
+      if (error) {
+        if (error.code && error.code === 4001) {
+          scene.game.tools.removeNotification();
+          return;
+        }
+      }
+    })
 
   updateWorldImagePixelColors({ pixels: selection, scene });
 

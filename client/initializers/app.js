@@ -1,7 +1,10 @@
+import * as Sentry from "@sentry/browser";
+import { BrowserTracing } from "@sentry/tracing";
+
 import { Events, Game, CANVAS, WEBGL, Scale } from 'phaser';
 
 import config from '@util/config';
-import { maliDetect, getGridSize } from '@util/helpers';
+import { maliDetect } from '@util/helpers';
 import logger from '@util/logger';
 
 // Scenes
@@ -18,9 +21,14 @@ import FirebaseManager from '@services/firebase';
 export async function AppInitializer() {
   logger.log('AppInitializer');
 
+  Sentry.init({
+    dsn: config.sentry,
+    release: process.env.npm_package_version,
+    integrations: [new BrowserTracing()],
+    tracesSampleRate: 1.0,
+  });
+
   const canvas = document.querySelector('#' + config.appConfig.canvasElement);
-  //const canvasWidth = canvas.clientWidth //* window.devicePixelRatio;
-  //const canvasHeight = canvas.clientHeight //* window.devicePixelRatio;
 
   const Emitter = new Events.EventEmitter();
   const GameInstance = new Game({
