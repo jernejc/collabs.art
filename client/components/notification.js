@@ -110,6 +110,9 @@ export default class Notification {
     if (this.type !== 'processing')
       return;
 
+    if (this.messageInterval)
+      return;
+
     this.clearMessageInterval();
 
     this.messageInterval = setInterval(() => {
