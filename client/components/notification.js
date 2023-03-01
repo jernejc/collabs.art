@@ -105,8 +105,12 @@ export default class Notification {
   }
 
   startInterval() {
-    if (this.messageInterval)
-      clearInterval(this.messageInterval);
+    logger.log('Notification: setupDom');
+
+    if (this.type !== 'processing')
+      return;
+
+    this.clearMessageInterval();
 
     this.messageInterval = setInterval(() => {
       const elapsedTime = parseInt(this.elapsedTime / 10); // react every 10s
@@ -114,10 +118,10 @@ export default class Notification {
 
       switch (elapsedTime) {
         case 1:
-          this.domElement.querySelector('span.text').innerHTML = `Getting confirmations ..`;
+          this.domElement.querySelector('span.text').innerHTML = `Confirmations ..`;
           break;
         case 2:
-          this.domElement.querySelector('span.text').innerHTML = `Can take a few minutes ..`;
+          this.domElement.querySelector('span.text').innerHTML = `In few minutes ..`;
           break;
       }
 
@@ -126,6 +130,8 @@ export default class Notification {
   }
 
   setTxHash(hash) {
+    logger.log('Notification: setTxHash');
+
     this.hash = hash;
     this.etherscanBtn.domElement.classList.remove('disabled');
 
@@ -137,11 +143,19 @@ export default class Notification {
       return `${this.scene.game.web3.network.blockExplorerUrl}/tx/${this.hash}`;
   }
 
+  clearMessageInterval() {
+    logger.log('Notification: clearMessageInterval');
+
+    if (this.messageInterval) {
+      clearInterval(this.messageInterval);
+      this.messageInterval = null;
+    }
+  }
+
   destroy() {
     logger.log('Notification: destroy');
 
-    if (this.messageInterval)
-      clearInterval(this.messageInterval);
+    this.clearMessageInterval();
 
     if (this.parent.contains(this.domElement))
       this.parent.removeChild(this.domElement);
