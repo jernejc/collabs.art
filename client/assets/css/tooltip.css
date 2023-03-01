@@ -48,7 +48,9 @@
 [tooltip]:hover::before,
 [tooltip]:hover::after,
 [tooltip]:focus:before,
-[tooltip]:focus::after {
+[tooltip]:focus::after,
+[tooltip].open::before,
+[tooltip].open::after {
   display: flex;
   visibility: visible;
 }
@@ -194,7 +196,13 @@
 [tooltip][flow^="up"]:focus::before,
 [tooltip][flow^="up"]:focus::after,
 [tooltip][flow^="down"]:focus::before,
-[tooltip][flow^="down"]:focus::after {
+[tooltip][flow^="down"]:focus::after,
+[tooltip]:not([flow]).open::before,
+[tooltip]:not([flow]).open::after,
+[tooltip][flow^="up"].open::before,
+[tooltip][flow^="up"].open::after,
+[tooltip][flow^="down"].open::before,
+[tooltip][flow^="down"].open::after {
   animation: tooltips-vert 100ms ease-out forwards;
 }
 
@@ -205,6 +213,10 @@
 [tooltip][flow^="left"]:focus::before,
 [tooltip][flow^="left"]:focus::after,
 [tooltip][flow^="right"]:focus::before,
-[tooltip][flow^="right"]:focus::after {
+[tooltip][flow^="right"]:focus::after,
+[tooltip][flow^="left"].open::before,
+[tooltip][flow^="left"].open::after,
+[tooltip][flow^="right"].open::before,
+[tooltip][flow^="right"].open::after {
   animation: tooltips-horz 100ms ease-out forwards;
 }

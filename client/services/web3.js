@@ -447,6 +447,8 @@ export default class Web3Manager {
     let gasFees = {
       maxPriorityFeePerGas: Web3.utils.toWei('50', 'gwei'),
       maxFeePerGas: Web3.utils.toWei('50', 'gwei'),
+      type: '0x2',
+      gasLimit: null
     }
 
     const response = await fetch('https://gasstation-mainnet.matic.network/v2');

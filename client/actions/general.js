@@ -184,30 +184,78 @@ export async function creditToken({ scene, value }) {
 
   const fees = await scene.game.web3.getEstimatedGasFees('fast');
 
-  await scene.game.web3.tokenContract.methods.credit().send({
-    from: scene.game.web3.activeAddress,
-    value: Web3.utils.toWei(value),
-    ...fees
-  }).on('transactionHash', (hash) => {
-    logger.log('Action creditToken: transactionHash', hash)
-    txHash = hash;
-    scene.game.tools.setNotificationTxHash(txHash);
-  })
-    .on('confirmation', (confNumber, receipt) => {
-      logger.log('Action creditToken: confirmation')
+  try {
+    await scene.game.web3.tokenContract.methods.credit().send({
+      from: scene.game.web3.activeAddress,
+      value: Web3.utils.toWei(value),
+      ...fees
     })
-    .on('error', function (error) {
-      logger.error('Action colorPixels:', error);
+      .once('transactionHash', (hash) => {
+        logger.log('Action creditToken: transactionHash', hash)
+        txHash = hash;
+        scene.game.tools.setNotificationTxHash(txHash);
+      })
+  } catch (error) {
+    logger.error('Action colorPixels:', error);
 
-      if (error) {
-        if (error.code && error.code === 4001) {
-          scene.game.tools.removeNotification();
-          return;
-        }
+    if (error) {
+      if (error.code && error.code === 4001) {
+        scene.game.tools.removeNotification();
+        return;
       }
-    })
+    }
+
+    scene.game.tools.setNotification(12000, 'error', txHash, 'Wallet RPC error, please try again.');
+    return;
+  }
 
   scene.game.tools.setNotification(6500, 'success', txHash);
+}
+
+export async function permitToken({ scene, response, grant }) {
+  logger.log('Action: permitToken');
+
+  let txHash = null;
+
+  scene.game.tools.setNotification(0, 'processing');
+
+  const fees = await scene.game.web3.getEstimatedGasFees('fast');
+
+  try {
+    await scene.game.web3.tokenContract.methods.grant(
+      response.provider,
+      scene.game.web3.activeAddress,
+      response.value,
+      response.deadline,
+      grant,
+      response.v,
+      response.r,
+      response.s
+    ).send({
+      from: scene.game.web3.activeAddress,
+      ...fees
+    })
+      .once('transactionHash', (hash) => {
+        logger.log('Action permitToken: transactionHash', hash)
+        txHash = hash;
+        scene.game.tools.setNotificationTxHash(txHash);
+      })
+  } catch (error) {
+    logger.error('Action permitToken:', error);
+
+    if (error) {
+      if (error.code && error.code === 4001) {
+        scene.game.tools.removeNotification();
+        return;
+      }
+    }
+
+    scene.game.tools.setNotification(12000, 'error', txHash, 'Wallet RPC error, please try again.');
+    return;
+  }
+
+  scene.game.tools.setNotification(6500, 'success', txHash);
+  return true;
 }
 
 export async function permitSignature({ scene, token }) {
@@ -248,51 +296,6 @@ export async function permitSignature({ scene, token }) {
   scene.game.tools.removeNotification();
 
   return response;
-}
-
-export async function permitToken({ scene, response, grant }) {
-  logger.log('Action: permitToken');
-
-  let txHash = null;
-
-  scene.game.tools.setNotification(0, 'processing');
-
-  const fees = await scene.game.web3.getEstimatedGasFees('fast');
-
-  await scene.game.web3.tokenContract.methods.grant(
-    response.provider,
-    scene.game.web3.activeAddress,
-    response.value,
-    response.deadline,
-    grant,
-    response.v,
-    response.r,
-    response.s
-  ).send({
-    from: scene.game.web3.activeAddress,
-    ...fees
-  })
-    .on('transactionHash', (hash) => {
-      logger.log('Action permitToken: transactionHash', hash)
-      txHash = hash;
-      scene.game.tools.setNotificationTxHash(txHash);
-    })
-    .on('confirmation', (confNumber, receipt) => {
-      logger.log('Action permitToken: confirmation')
-    })
-    .on('error', function (error) {
-      logger.error('Action permitToken:', error);
-
-      if (error) {
-        if (error.code && error.code === 4001) {
-          scene.game.tools.removeNotification();
-          return;
-        }
-      }
-    })
-
-  scene.game.tools.setNotification(6500, 'success', txHash);
-  return true;
 }
 
 export function navigateMinimap({ pointer, scene }) {

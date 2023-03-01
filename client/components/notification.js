@@ -3,7 +3,7 @@ import Button from "./form/button";
 
 export default class Notification {
 
-  constructor({ parent, time, text, type, hash, scene }) {
+  constructor({ parent, time, text, type, hash, scene, message }) {
     logger.log('Notification: constructor');
 
     this.text = text;
@@ -12,6 +12,9 @@ export default class Notification {
     this.type = type;
     this.scene = scene;
     this.hash = hash || null;
+    this.message = message || null;
+
+    this.elapsedTime = 0;
 
     this.setupDom();
   }
@@ -48,7 +51,7 @@ export default class Notification {
         break;
     }
 
-    this.domElement.innerHTML = `<span class="icon"><i class="${icon}"></i></span>&nbsp;&nbsp; ${text}`;
+    this.domElement.innerHTML = `<span class="icon"><i class="${icon}"></i></span>&nbsp;&nbsp; <span class="text">${text}</span>`;
 
     const elClasses = ['etherscan'];
 
@@ -74,7 +77,7 @@ export default class Notification {
         <div class="secondary-icon" tooltip="Confirm wallet ownership" flow="down">
           <i class="gg-pen"></i>
         </div>`;
-    } 
+    }
 
     // Close btn
     if (this.type === 'success' || this.type === 'error' || this.type === 'warning') {
@@ -90,11 +93,43 @@ export default class Notification {
       this.timer = setTimeout(this.destroy.bind(this), this.time);
 
     this.parent.appendChild(this.domElement);
+
+    // Message icon
+    if (this.message) {
+      const icon = this.domElement.querySelector('span.icon');
+
+      icon.setAttribute('tooltip', this.message);
+      icon.setAttribute('flow', 'down');
+      icon.classList.add('open');
+    }
+  }
+
+  startInterval() {
+    if (this.messageInterval)
+      clearInterval(this.messageInterval);
+
+    this.messageInterval = setInterval(() => {
+      const elapsedTime = parseInt(this.elapsedTime / 10); // react every 10s
+      logger.log('Notification: messageInterval', elapsedTime);
+
+      switch (elapsedTime) {
+        case 1:
+          this.domElement.querySelector('span.text').innerHTML = `Getting confirmations ..`;
+          break;
+        case 2:
+          this.domElement.querySelector('span.text').innerHTML = `Can take a few minutes ..`;
+          break;
+      }
+
+      this.elapsedTime++;
+    }, 1000);
   }
 
   setTxHash(hash) {
     this.hash = hash;
     this.etherscanBtn.domElement.classList.remove('disabled');
+
+    this.startInterval();
   }
 
   getTxURL() {
@@ -105,8 +140,11 @@ export default class Notification {
   destroy() {
     logger.log('Notification: destroy');
 
+    if (this.messageInterval)
+      clearInterval(this.messageInterval);
+
     if (this.parent.contains(this.domElement))
-        this.parent.removeChild(this.domElement);
+      this.parent.removeChild(this.domElement);
 
     this.scene.game.tools.domNotification = null; // hacky, not cool
   }

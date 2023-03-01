@@ -70,6 +70,8 @@ export default class ToolsManager {
       this.setDesktopOnly();
     } else
       this.showTools();
+
+    //this.setNotification(25000, 'error', null, 'Please use a desktop browser for the best experience.');
   }
 
   addEventListeners() {
@@ -372,12 +374,12 @@ export default class ToolsManager {
       this.connectionStatusBtn.setClickAction(action);
   }
 
-  setNotification(time, type, hash) {
+  setNotification(time, type, hash, message) {
     logger.log('ToolsManager: setNotification');
 
     this.removeNotification();
 
-    this.domNotification = new Notification({ parent: this.parent, scene: this.game.scene.keys['MainScene'], time, type, hash })
+    this.domNotification = new Notification({ parent: this.parent, scene: this.game.scene.keys['MainScene'], time, type, hash, message })
   }
 
   setNotificationTxHash(hash) {

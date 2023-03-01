@@ -76,34 +76,34 @@ export async function colorPixels({ scene, selection }) {
   const fees = await scene.game.web3.getEstimatedGasFees('fast');
 
   let txHash;
+  let transaction;
+  
+  try {
+    transaction = await scene.game.web3.canvasContract.methods.setColors(
+      positions,
+      colors,
+      bids
+    )
+      .send({
+        from: scene.game.web3.activeAddress,
+        ...fees
+      })
+      .once('transactionHash', (hash) => {
+        logger.log('Action colorPixels: transactionHash', hash)
+        txHash = hash;
+        scene.game.tools.setNotificationTxHash(txHash);
+      })
+  } catch (error) {
+    logger.error('Action colorPixels:', error);
 
-  await scene.game.web3.canvasContract.methods.setColors(
-    positions,
-    colors,
-    bids
-  )
-    .send({
-      from: scene.game.web3.activeAddress,
-      ...fees
-    })
-    .on('transactionHash', (hash) => {
-      logger.log('Action colorPixels: transactionHash', hash)
-      txHash = hash;
-      scene.game.tools.setNotificationTxHash(txHash);
-    })
-    .on('confirmation', (confNumber, receipt) => {
-      logger.log('Action colorPixels: confirmation')
-    })
-    .on('error', function (error) {
-      logger.error('Action colorPixels:', error);
+    if (error.code && error.code === 4001) {
+      scene.game.tools.removeNotification();
+      return;
+    }
 
-      if (error) {
-        if (error.code && error.code === 4001) {
-          scene.game.tools.removeNotification();
-          return;
-        }
-      }
-    })
+    scene.game.tools.setNotification(12000, 'error', txHash, 'Wallet RPC error, please try again.');
+    return;
+  }
 
   updateWorldImagePixelColors({ pixels: selection, scene });
 

@@ -6,7 +6,7 @@ dataSources:
     name: CollabCanvas
     network: matic
     source:
-      address: '0x495d8B9358219b81B6648B26B382aAcCBc5506F1'
+      address: '0x9066d8C3B40653C3501060bD602E35775C752653'
       abi: CollabCanvas
     mapping:
       kind: ethereum/events
