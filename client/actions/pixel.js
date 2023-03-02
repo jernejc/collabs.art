@@ -73,13 +73,22 @@ export async function colorPixels({ scene, selection }) {
     bids.push(toWei(pixel.bid.toString()).toString());
   });
 
-  const fees = await scene.game.web3.getEstimatedGasFees('fast');
-
   let txHash;
-  let transaction;
-  
+  let estimatedGas;
+
   try {
-    transaction = await scene.game.web3.canvasContract.methods.setColors(
+    estimatedGas = await scene.game.web3.canvasContract.methods.setColors(
+      positions,
+      colors,
+      bids
+    )
+      .estimateGas({
+        from: scene.game.web3.activeAddress,
+      });
+
+    const fees = await scene.game.web3.getEstimatedGasFees('fast');
+
+    await scene.game.web3.canvasContract.methods.setColors(
       positions,
       colors,
       bids

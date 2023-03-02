@@ -122,7 +122,7 @@ export default class Pixel {
       this.color.b
     );
 
-    this.scene.worldmap.update();
+    //this.scene.worldmap.update();
   }
 
   async loadGraphData(refresh) {

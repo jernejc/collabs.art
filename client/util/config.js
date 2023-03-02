@@ -116,9 +116,9 @@ const config = {
     docsLink: 'https://collabsart.notion.site/Collabs-0c8e5af1deee4b6982b1c70fd354c9fc',
     docs: {
       link: 'https://collabsart.notion.site/Collabs-0c8e5af1deee4b6982b1c70fd354c9fc',
-      getColabLink: "https://collabsart.notion.so/Collabs-0c8e5af1deee4b6982b1c70fd354c9fc#502e4f2338344a3b8bdd6f903470dd3b",
-      auctionLifecycleLink: "https://collabsart.notion.so/Auction-Lifecycle-efd602f095e14de690af4f77600e1e04",
-      coloringPixelsLink: "https://collabsart.notion.so/Coloring-pixels-0fc42efade074114b823c67ff5874fd2"
+      getColabLink: "https://collabsart.notion.site/Get-COLAB-e782417f324d420b9fd27f7e1fbf5efa",
+      auctionLifecycleLink: "https://collabsart.notion.site/Auction-Lifecycle-efd602f095e14de690af4f77600e1e04",
+      coloringPixelsLink: "https:/collabsart.notion.site/Coloring-pixels-0fc42efade074114b823c67ff5874fd2"
     },
   },
   slideshow: {

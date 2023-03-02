@@ -64,7 +64,7 @@ export default class Web3Manager {
   async initProviders() {
     logger.log('Web3Manager: initProviders');
 
-    if (window.ethereum) {
+    if (typeof window.ethereum !== 'undefined') {
       this.hasMetamask = true;
       this.RPCinstance = new Web3(window.ethereum);
 
@@ -117,13 +117,23 @@ export default class Web3Manager {
       const options = {
         reconnect: {
           auto: true,
-          delay: 5000, // ms
-          maxAttempts: 5,
+          delay: 4000, // ms
+          maxAttempts: 6,
           onTimeout: true
         }
       };
 
-      this.websocketInstance = new Web3(new Web3.providers.WebsocketProvider(this.network.wsUrls[0], options));
+      if (this.websocketProvider) {
+        this.websocketProvider.disconnect();
+        this.websocketProvider = null;
+      }
+
+      this.websocketProvider = new Web3.providers.WebsocketProvider(this.network.wsUrls[0], options);
+
+      if (this.websocketInstance)
+        this.websocketInstance.setProvider(this.websocketProvider);
+      else
+        this.websocketInstance = new Web3(this.websocketProvider);
     }
   }
 
@@ -282,13 +292,13 @@ export default class Web3Manager {
         method: 'eth_chainId',
       });
 
-      this.handleNewChain(chainId)
+      this.handleNewChain(chainId);
 
       const networkId = await this.RPCinstance.currentProvider.request({
         method: 'net_version',
       });
 
-      this.handleNewNetwork(networkId)
+      await this.handleNewNetwork(networkId);
     } catch (err) {
       logger.error(err)
     }
@@ -335,8 +345,6 @@ export default class Web3Manager {
 
   async switchToNetwork() {
     logger.log('Web3Manager: switchToNetwork');
-
-    //chainId = chainId || Web3.utils.toHex('5777') // Default to Development testnet
 
     const networkConfig = config.networks.find(net => net.default === true);
 
