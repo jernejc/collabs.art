@@ -51,9 +51,7 @@ export async function loadPixel({ scene, position }) {
   logger.log('Action loadPixel', position);
 
   try {
-    const pixel = await scene.game.web3.canvasContract.methods.getPixel(stringToBN(position)).call();
-
-    //console.log('loaded pixel', pixel);
+    await scene.game.web3.canvasContract.methods.getPixel(stringToBN(position)).call();
   } catch (error) {
     logger.error('Action loadPixel: ', error);
     return;
@@ -74,38 +72,27 @@ export async function colorPixels({ scene, selection }) {
   });
 
   let txHash;
-  let estimatedGas;
 
   try {
-    estimatedGas = await scene.game.web3.canvasContract.methods.setColors(
-      positions,
-      colors,
-      bids
-    )
-      .estimateGas({
-        from: scene.game.web3.activeAddress,
-      });
-
     const fees = await scene.game.web3.getEstimatedGasFees('fast');
-
-    await scene.game.web3.canvasContract.methods.setColors(
+    const tx = await scene.game.web3.canvasContract.setColors(
       positions,
       colors,
-      bids
-    )
-      .send({
+      bids,
+      {
         from: scene.game.web3.activeAddress,
         ...fees
-      })
-      .once('transactionHash', (hash) => {
-        logger.log('Action colorPixels: transactionHash', hash)
-        txHash = hash;
-        scene.game.tools.setNotificationTxHash(txHash);
-      })
+      }
+    )
+
+    txHash = tx.hash;
+    scene.game.tools.setNotificationTxHash(txHash);
+
+    await tx.wait();
   } catch (error) {
     logger.error('Action colorPixels:', error);
 
-    if (error.code && error.code === 4001) {
+    if (error.code && (error.code === 'ACTION_REJECTED' || error.code === 'UNPREDICTABLE_GAS_LIMIT')) {
       scene.game.tools.removeNotification();
       return;
     }

@@ -1,5 +1,5 @@
-import * as Sentry from "@sentry/browser";
-import { BrowserTracing } from "@sentry/tracing";
+//import * as Sentry from "@sentry/browser";
+//import { BrowserTracing } from "@sentry/tracing";
 
 import { Events, Game, CANVAS, WEBGL, Scale } from 'phaser';
 
@@ -21,12 +21,12 @@ import FirebaseManager from '@services/firebase';
 export async function AppInitializer() {
   logger.log('AppInitializer');
 
-  Sentry.init({
+  /*Sentry.init({
     dsn: config.sentry,
     release: process.env.npm_package_version,
     integrations: [new BrowserTracing()],
     tracesSampleRate: 1.0,
-  });
+  });*/
 
   const canvas = document.querySelector('#' + config.appConfig.canvasElement);
 

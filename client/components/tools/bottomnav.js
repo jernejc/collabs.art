@@ -48,9 +48,11 @@ export default class BottomNav {
       elClasses: ['action-button', 'apply'],
       text: 'Apply',
       clickAction: async e => {
-        if (!await this.game.web3.preWeb3ActionSequence())
+        const isReady = await this.game.web3.preWeb3ActionSequence();
+
+        if (!isReady)
           return;
-          
+
         if (this.game.selection.activeFullBid > this.game.web3.walletBalance) {
           this.game.tools.showTokenInfo();
           return;
@@ -120,6 +122,11 @@ export default class BottomNav {
         default:
           this.applyBtn.setColor('polygon');
           this.applyBtn.setIcon('gg-check', 'Apply');
+
+          if (this.game.tools.domNotification && this.game.tools.domNotification.type === 'processing')
+            this.applyBtn.loading();
+          else
+            this.applyBtn.setDisabled(false);
       }
     }
   }

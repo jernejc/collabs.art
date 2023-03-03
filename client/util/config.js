@@ -1,4 +1,4 @@
-import Web3 from 'web3';
+import { ethers } from "ethers";
 
 import CollabCanvas from '../abis/CollabCanvas.json';
 import CollabToken from '../abis/CollabToken.json';
@@ -23,7 +23,7 @@ const config = {
     id: 137,
     enabled: true,
     default: true,
-    chainId: Web3.utils.toHex('137'),
+    chainId: ethers.utils.hexlify(137),
     chainName: 'Polygon Mainnet',
     nativeCurrency: {
       symbol: 'MATIC',
@@ -37,7 +37,7 @@ const config = {
     id: 80001,
     enabled: false,
     default: false,
-    chainId: Web3.utils.toHex('80001'),
+    chainId: ethers.utils.hexlify(80001),
     chainName: 'Polygon Testnet',
     nativeCurrency: {
       symbol: 'tMATIC',
@@ -51,7 +51,7 @@ const config = {
     id: 5,
     enabled: false,
     default: false,
-    chainId: Web3.utils.toHex('5'),
+    chainId: ethers.utils.hexlify(5),
     chainName: 'Goerli Testnet',
     nativeCurrency: {
       symbol: 'GöETH',
@@ -65,7 +65,7 @@ const config = {
     id: 5777,
     enabled: false,
     default: false,
-    chainId: Web3.utils.toHex('5777'),
+    chainId: ethers.utils.hexlify(5777),
     chainName: 'Development Testnet',
     nativeCurrency: {
       symbol: 'DevETH',
@@ -90,7 +90,10 @@ const config = {
     appId: "1:25720990970:web:9a09435d465ff402442d43",
     measurementId: "G-M2298SCQ2L"
   },
-  defaultMinUnit: Web3.utils.toWei('1'),
+  networkSettings: {
+    defaultMinUnit: ethers.utils.parseUnits("1", "ether").toString(),
+    alchemy: dappConfig.api
+  },
   subgraph: {
     url: 'https://api.thegraph.com/subgraphs/id/QmQhaaEyK6YVj9UN57yPGSt9Gcreazz8My3Jz92rqPmE5K' //'https://api.studio.thegraph.com/query/9304/collabs-mumbai/v0.0.1' //'https://api.studio.thegraph.com/query/9304/collabs-testnet/v1.0.1'
   },

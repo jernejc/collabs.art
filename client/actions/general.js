@@ -1,10 +1,10 @@
 
 import _ from 'lodash';
-import Web3 from 'web3';
+import { ethers } from "ethers";
 
 import { getTileForPointer } from '@actions/pixel';
 
-import { formatColorNumber, sleep } from '@util/helpers';
+import { formatColorNumber } from '@util/helpers';
 
 import logger from '@util/logger';
 import config from '@util/config';
@@ -185,21 +185,21 @@ export async function creditToken({ scene, value }) {
   const fees = await scene.game.web3.getEstimatedGasFees('fast');
 
   try {
-    await scene.game.web3.tokenContract.methods.credit().send({
+    const tx = await scene.game.web3.tokenContract.credit({
       from: scene.game.web3.activeAddress,
-      value: Web3.utils.toWei(value),
+      value: ethers.utils.parseEther(value),
       ...fees
-    })
-      .once('transactionHash', (hash) => {
-        logger.log('Action creditToken: transactionHash', hash)
-        txHash = hash;
-        scene.game.tools.setNotificationTxHash(txHash);
-      })
+    });
+
+    txHash = tx.hash;
+    scene.game.tools.setNotificationTxHash(txHash);
+
+    await tx.wait();
   } catch (error) {
     logger.error('Action colorPixels:', error);
 
     if (error) {
-      if (error.code && error.code === 4001) {
+      if (error.code && error.code === 'ACTION_REJECTED') {
         scene.game.tools.removeNotification();
         return;
       }
@@ -222,7 +222,7 @@ export async function permitToken({ scene, response, grant }) {
   const fees = await scene.game.web3.getEstimatedGasFees('fast');
 
   try {
-    await scene.game.web3.tokenContract.methods.grant(
+    const tx = await scene.game.web3.tokenContract.grant(
       response.provider,
       scene.game.web3.activeAddress,
       response.value,
@@ -230,21 +230,20 @@ export async function permitToken({ scene, response, grant }) {
       grant,
       response.v,
       response.r,
-      response.s
-    ).send({
+      response.s, {
       from: scene.game.web3.activeAddress,
       ...fees
     })
-      .once('transactionHash', (hash) => {
-        logger.log('Action permitToken: transactionHash', hash)
-        txHash = hash;
-        scene.game.tools.setNotificationTxHash(txHash);
-      })
+
+    txHash = tx.hash;
+    scene.game.tools.setNotificationTxHash(txHash);
+
+    await tx.wait();
   } catch (error) {
     logger.error('Action permitToken:', error);
 
     if (error) {
-      if (error.code && error.code === 4001) {
+      if (error.code && error.code === 'ACTION_REJECTED') {
         scene.game.tools.removeNotification();
         return;
       }
@@ -259,15 +258,13 @@ export async function permitToken({ scene, response, grant }) {
 }
 
 export async function permitSignature({ scene, token }) {
-  const web3 = scene.game.web3.RPCinstance;
-  const hash = web3.utils.sha3("Collabs metamask message.");
-
   let response;
 
   scene.game.tools.setNotification(0, 'signature');
 
   try {
-    const signature = await web3.eth.personal.sign(hash, scene.game.web3.activeAddress);
+    const msgBody = ethers.utils.hashMessage("Collabs metamask message.");    
+    const signature = await scene.game.web3.signer.signMessage(msgBody);
 
     response = await fetch(config.api.permit, {
       method: 'POST',

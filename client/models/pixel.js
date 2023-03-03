@@ -1,4 +1,4 @@
-import Web3 from 'web3';
+import { ethers } from "ethers";
 import {
   numberToLetterColumn,
   formatColorNumber,
@@ -149,7 +149,7 @@ export default class Pixel {
 
     if (data) {
       if (data.bid)
-        this.bid = parseInt(Web3.utils.fromWei(data.bid)) + 1;
+        this.bid = parseInt(ethers.utils.formatEther(data.bid)) + 1;
       if (data.color)
         this.changeToColorHex(data.color);
 
@@ -195,7 +195,7 @@ export default class Pixel {
     const color = tile.fillColor;
     const pixel = new Pixel({ tile, scene, color, cx: tile.cx, cy: tile.cy });
 
-    if (!pixel.bid) pixel.bid = parseInt(Web3.utils.fromWei(scene.game.web3.minUnit));
+    if (!pixel.bid) pixel.bid = parseInt(ethers.utils.formatEther(scene.game.web3.minUnit));
 
     return pixel;
   }

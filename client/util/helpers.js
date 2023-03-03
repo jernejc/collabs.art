@@ -1,5 +1,5 @@
 
-import web3 from 'web3';
+import { ethers } from "ethers";
 
 // https://stackoverflow.com/questions/9905533/convert-excel-column-alphabet-e-g-aa-to-number-e-g-25
 export function letterToNumberColumn(columnLetter) {
@@ -116,19 +116,23 @@ export function normalize(v, i1, i2, o1, o2) {
 
 // Convert string to BigNumber, should be fine for short strings
 export function stringToBN(string) {
-  return web3.utils.toBN(web3.utils.stringToHex(string)).toNumber(); // There has to be another way of doing this
+  return ethers.BigNumber.from(stringToHex(string)).toNumber(); // There has to be another way of doing this
 }
 
 export function hexToString(hex) {
-  return web3.utils.hexToString(hex);
+  return ethers.utils.toUtf8String(hex);
 }
 
 export function stringToHex(string) {
-  return web3.utils.stringToHex(string);
+  return ethers.utils.hexlify(ethers.utils.toUtf8Bytes(string))
+}
+
+export function numberToHex(string) {
+  return ethers.utils.hexlify(string);
 }
 
 export function toWei(price, currency) {
-  return web3.utils.toWei(price, currency || "ether");
+  return ethers.utils.parseUnits(price, currency || "ether");
 }
 
 export function formatColorNumber(hex) {

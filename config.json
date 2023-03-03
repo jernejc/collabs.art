@@ -1,6 +1,5 @@
 {
-	"httpUrl": "",
-	"wsUrl": "",
+	"api": "",
 	"CollabCanvasAddress": "",
 	"CollabTokenAddress": "",
 	"ipfs": {

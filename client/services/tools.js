@@ -4,10 +4,8 @@ import MinimapScene from '@scenes/minimap';
 import InfoBox from '@components/tools/infobox';
 import Menu from '@components/tools/menu';
 import Overlay from '@components/overlay';
-import Timer from '@components/tools/timer';
 import Button from '@components/form/button';
 import TokenInfo from '@components/tools/tokeninfo';
-import AuctionInfo from '@components/tools/auctioninfo';
 
 import { formatShortAddress, getCookie, detectMob } from '@util/helpers';
 import logger from '@util/logger';
@@ -70,6 +68,10 @@ export default class ToolsManager {
       this.setDesktopOnly();
     } else
       this.showTools();
+
+    // Init some tools
+    //this.setConnectionStatus();
+    //this.setNetworkAlert();
 
     //this.setNotification(25000, 'error', null, 'Please use a desktop browser for the best experience.');
   }
@@ -397,7 +399,7 @@ export default class ToolsManager {
   }
 
   setNetworkAlert(text) {
-    logger.log('ToolsManager: setNetworkAlert');
+    logger.log('ToolsManager: setNetworkAlert', this.game.web3.currentStateTag, this.game.web3.activeAddress);
 
     text = text || null;
 

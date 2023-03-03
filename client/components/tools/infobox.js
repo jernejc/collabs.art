@@ -1,5 +1,3 @@
-import Web3 from 'web3';
-
 import ColorPicker from '@components/color/picker';
 import LoadingBar from '@components/loading';
 
