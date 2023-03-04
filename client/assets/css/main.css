@@ -2062,12 +2062,17 @@ Info Box
   background: rgba(0, 0, 0, 0.95);
   color: white;
   display: flex;
+  overflow: hidden;
+
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
 }
 
 .loading-overlay__content {
-  width: 200px;
+  width: 150px;
   height: auto;
-  margin: auto;
   display: flex;
   gap: 10px;
   align-items: center;

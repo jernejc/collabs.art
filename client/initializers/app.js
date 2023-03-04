@@ -28,6 +28,15 @@ export async function AppInitializer() {
     tracesSampleRate: 1.0,
   });*/
 
+  const restartTimeout = setTimeout(() => {
+    const loading = document.querySelector('#loading-overlay');
+
+    if (loading)
+      window.location.reload();
+
+    clearTimeout(restartTimeout);
+  }, 5000);
+
   const canvas = document.querySelector('#' + config.appConfig.canvasElement);
 
   const Emitter = new Events.EventEmitter();

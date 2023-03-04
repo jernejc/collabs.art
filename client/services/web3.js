@@ -143,8 +143,8 @@ export default class Web3Manager {
 
     // Provider events
     this.originalProvider.on('accountsChanged', this.handleAccountsChangedListener);
-    this.originalProvider.on('chainChanged', this.handleNewNetworkListener);
-    //this.originalProvider.on('networkChanged', this.handleNewNetworkListener);
+    //this.originalProvider.on('chainChanged', this.handleNewNetworkListener);
+    this.originalProvider.on('networkChanged', this.handleNewNetworkListener);
   }
 
   reload() {
@@ -196,17 +196,6 @@ export default class Web3Manager {
       });
     }
   }
-
-  /*handleNewChain(chainId) {
-    logger.log('Web3Manager: handleNewChain', chainId);
-    const supported = config.networks.find(net => net.chainId == chainId && net.enabled === true);
-
-    if (!supported) {
-      logger.warn('Web3Manager: Chain ID not supported');
-      this.chainId = null;
-    } else
-      this.chainId = chainId;
-  }*/
 
   async handleNewNetwork() {
     logger.log('Web3Manager: handleNewNetwork');
