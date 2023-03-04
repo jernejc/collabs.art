@@ -74,14 +74,25 @@ export async function colorPixels({ scene, selection }) {
   let txHash;
 
   try {
-    const fees = await scene.game.web3.getEstimatedGasFees('fast');
+    //const fees = await scene.game.web3.getEstimatedGasFees('fast');
+    const feeData = await scene.game.web3.signer.getFeeData();
+    const gasLimit = await scene.game.web3.canvasContract.estimateGas.setColors(
+      positions,
+      colors,
+      bids,
+      {
+        from: scene.game.web3.activeAddress
+      }
+    )
+
     const tx = await scene.game.web3.canvasContract.setColors(
       positions,
       colors,
       bids,
       {
         from: scene.game.web3.activeAddress,
-        ...fees
+        gasPrice: feeData.gasPrice,
+        gasLimit
       }
     )
 

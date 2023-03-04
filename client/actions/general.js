@@ -182,13 +182,17 @@ export async function creditToken({ scene, value }) {
 
   scene.game.tools.setNotification(0, 'processing');
 
-  const fees = await scene.game.web3.getEstimatedGasFees('fast');
-
   try {
+    const feeData = await scene.game.web3.signer.getFeeData();
+    const gasLimit = await scene.game.web3.tokenContract.estimateGas.credit({
+      from: scene.game.web3.activeAddress,
+      value: ethers.utils.parseEther(value)
+    });
     const tx = await scene.game.web3.tokenContract.credit({
       from: scene.game.web3.activeAddress,
       value: ethers.utils.parseEther(value),
-      ...fees
+      gasPrice: feeData.gasPrice,
+      gasLimit
     });
 
     txHash = tx.hash;
@@ -219,9 +223,22 @@ export async function permitToken({ scene, response, grant }) {
 
   scene.game.tools.setNotification(0, 'processing');
 
-  const fees = await scene.game.web3.getEstimatedGasFees('fast');
-
   try {
+    const feeData = await scene.game.web3.signer.getFeeData();
+    const gasLimit = await scene.game.web3.tokenContract.estimateGas.grant(
+      response.provider,
+      scene.game.web3.activeAddress,
+      response.value,
+      response.deadline,
+      grant,
+      response.v,
+      response.r,
+      response.s,
+      {
+        from: scene.game.web3.activeAddress,
+      }
+    )
+
     const tx = await scene.game.web3.tokenContract.grant(
       response.provider,
       scene.game.web3.activeAddress,
@@ -230,10 +247,13 @@ export async function permitToken({ scene, response, grant }) {
       grant,
       response.v,
       response.r,
-      response.s, {
-      from: scene.game.web3.activeAddress,
-      ...fees
-    })
+      response.s,
+      {
+        from: scene.game.web3.activeAddress,
+        gasPrice: feeData.gasPrice,
+        gasLimit
+      }
+    )
 
     txHash = tx.hash;
     scene.game.tools.setNotificationTxHash(txHash);
@@ -263,7 +283,7 @@ export async function permitSignature({ scene, token }) {
   scene.game.tools.setNotification(0, 'signature');
 
   try {
-    const msgBody = ethers.utils.hashMessage("Collabs metamask message.");    
+    const msgBody = ethers.utils.hashMessage("Collabs metamask message.");
     const signature = await scene.game.web3.signer.signMessage(msgBody);
 
     response = await fetch(config.api.permit, {

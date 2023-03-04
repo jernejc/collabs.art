@@ -137,14 +137,14 @@ export default class Web3Manager {
 
     const _self = this; // Had to wrap them in anonymous functions to handle 'this'
 
-    this.handleNewChainListener = chainId => _self.handleNewChain(chainId);
+    //this.handleNewChainListener = chainId => _self.handleNewChain(chainId);
     this.handleNewNetworkListener = networkId => _self.handleNewNetwork(networkId);
     this.handleAccountsChangedListener = accounts => _self.handleAccountsChanged(accounts);
 
     // Provider events
     this.originalProvider.on('accountsChanged', this.handleAccountsChangedListener);
-    this.originalProvider.on('chainChanged', this.handleNewChainListener);
-    this.originalProvider.on('networkChanged', this.handleNewNetworkListener);
+    this.originalProvider.on('chainChanged', this.handleNewNetworkListener);
+    //this.originalProvider.on('networkChanged', this.handleNewNetworkListener);
   }
 
   reload() {
@@ -197,7 +197,7 @@ export default class Web3Manager {
     }
   }
 
-  handleNewChain(chainId) {
+  /*handleNewChain(chainId) {
     logger.log('Web3Manager: handleNewChain', chainId);
     const supported = config.networks.find(net => net.chainId == chainId && net.enabled === true);
 
@@ -206,17 +206,18 @@ export default class Web3Manager {
       this.chainId = null;
     } else
       this.chainId = chainId;
-  }
+  }*/
 
   async handleNewNetwork() {
     logger.log('Web3Manager: handleNewNetwork');
 
-    const networkRPC = await this.RPCProvider.getNetwork();
-    const supported = config.networks.find(net => net.id == networkRPC.chainId && net.enabled === true);
+    const chainId = await this.RPCProvider.send("eth_chainId");
+    const supported = config.networks.find(net => net.chainId == chainId && net.enabled === true);
 
     if (!supported) {
       logger.warn('Web3Manager: Network ID not supported');
       this.network = null;
+      this.chainId = null;
       this.isNetworkConnected = false;
 
       this.network = config.networks.find(net => net.default === true);
@@ -230,7 +231,7 @@ export default class Web3Manager {
 
       this.initContracts();
 
-      await this.getAccounts(true);
+      await this.getAccounts();
     }
 
     await this.getMinUnit();
@@ -238,7 +239,7 @@ export default class Web3Manager {
     this.emitter.emit('web3/network', this.network);
   }
 
-  async handleAccountsChanged(accounts, skipEvent) {
+  async handleAccountsChanged(accounts) {
     logger.log('Web3Manager: handleAccountsChanged', accounts);
 
     if (accounts.length > 0) {
@@ -254,8 +255,7 @@ export default class Web3Manager {
       this.activeAddress = null;
     }
 
-    if (!skipEvent)
-      this.emitter.emit('web3/address', this.activeAddress);
+    this.emitter.emit('web3/address', this.activeAddress);
   }
 
   handleProviderMessage(msg) {
@@ -289,22 +289,22 @@ export default class Web3Manager {
     }
   }
 
-  async requestAccounts(skipEvent) {
+  async requestAccounts() {
     logger.log('Web3Manager: requestAccounts');
 
     const accounts = await this.RPCProvider.send("eth_requestAccounts", []);
 
-    await this.handleAccountsChanged(accounts, skipEvent);
+    await this.handleAccountsChanged(accounts);
 
     return;
   }
 
-  async getAccounts(skipEvent) {
+  async getAccounts() {
     logger.log('Web3Manager: getAccounts');
 
     const accounts = await this.RPCProvider.listAccounts();
 
-    await this.handleAccountsChanged(accounts, skipEvent);
+    await this.handleAccountsChanged(accounts);
 
     return this.accounts;
   }
@@ -373,7 +373,7 @@ export default class Web3Manager {
   }
 
   async getWalletBalance() {
-    logger.log('Web3Manager: getWalletBalance', this.isNetworkConnected, this.activeAddress, this.tokenContract);
+    logger.log('Web3Manager: getWalletBalance');
 
     if (!this.isNetworkConnected || !this.activeAddress)
       return;
@@ -385,12 +385,13 @@ export default class Web3Manager {
       this.walletBalance = parseInt(ethers.utils.formatEther(balance));
     } catch (error) {
       logger.error('Failed to fetch RPC balance', error);
+      await delay(1000);
 
       try {
-        balance = await this.eventTokenContract.balanceOf(this.activeAddress);
+        balance = await this.tokenContract.balanceOf(this.activeAddress);
         this.walletBalance = parseInt(ethers.utils.formatEther(balance));
       } catch (error) {
-        logger.error('Failed to fetch WS balance', error);
+        logger.error('Failed to fetch RPC balance 2nd', error);
         this.walletBalance = 0;
       }
     }

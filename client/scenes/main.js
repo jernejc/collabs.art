@@ -58,6 +58,11 @@ export default class MainScene extends ApplicationScene {
 
     this.worldmap = this.textures.get('worldmap');
 
+    const loading = document.querySelector('#loading-overlay');
+    
+    if (loading)
+      loading.remove();
+
     if (!this.worldmap || this.worldmap.key !== "worldmap")
       this.worldmap = this.textures.createCanvas('worldmap', this.imageWidth, this.imageHeight);
 
@@ -128,7 +133,7 @@ export default class MainScene extends ApplicationScene {
     if (!this.eventsEnabled)
       this.initGlobalEvents();
     else
-      setGameMode({ scene: this, mode: 'select'})
+      setGameMode({ scene: this, mode: 'select' })
 
     // Main scene is ready.
     this.game.emitter.emit('scene/ready');
