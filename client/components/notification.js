@@ -121,10 +121,13 @@ export default class Notification {
 
       switch (elapsedTime) {
         case 1:
-          this.domElement.querySelector('span.text').innerHTML = `Confirmations ..`;
+          this.domElement.querySelector('span.text').innerHTML = `Confirming ..`;
           break;
         case 2:
-          this.domElement.querySelector('span.text').innerHTML = `In few minutes ..`;
+          this.domElement.querySelector('span.text').innerHTML = `In a minute ..`;
+          break;
+        case 3:
+          this.domElement.querySelector('span.text').innerHTML = `Any day now ..`;
           break;
       }
 
