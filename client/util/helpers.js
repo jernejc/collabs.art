@@ -152,10 +152,6 @@ export function hexStringToColor(hex) {
   return Phaser.Display.Color.HexStringToColor(hex);
 }
 
-export function fromWei(number) {
-  return web3.utils.fromWei(number);
-}
-
 export async function delay(seconds) {
   return new Promise((resolve) => setTimeout(resolve, seconds * 1000))
 }

@@ -39,7 +39,9 @@ export default class TokenInfo {
       disabled: false,
       elClasses: ['action-button', 'social-connect', 'twitter'],
       clickAction: async () => {
-        if (!await this.scene.game.web3.preWeb3ActionSequence())
+        const isReady = await this.scene.game.web3.preWeb3ActionSequence();
+        
+        if (!isReady)
           return;
 
         await this.scene.game.firebase.twitterSigninPopup();
@@ -72,7 +74,7 @@ export default class TokenInfo {
     this.socialButtonsWrapper.append(this.discordButton.domElement);
 
     this.supportForm = {
-      value: 25
+      value: 1
     }
 
     this.supportHeader = document.createElement('h3');
@@ -83,8 +85,8 @@ export default class TokenInfo {
     this.supportInput = new Input(this.supportForm, 'value', {
       elClasses: ['input'],
       type: 'number',
-      step: 25,
-      min: 25,
+      step: 1,
+      min: 1,
       max: 9999,
       label: this.scene.game.web3.network.nativeCurrency.symbol,
       dynamicWidth: true,
@@ -108,7 +110,7 @@ export default class TokenInfo {
         if (!await this.scene.game.web3.preWeb3ActionSequence())
           return;
 
-        return creditToken({ scene: this.scene, value: this.supportInput.input.value })
+        await creditToken({ scene: this.scene, value: this.supportInput.input.value });
       }
     });
 

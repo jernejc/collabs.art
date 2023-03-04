@@ -133,7 +133,6 @@ export default class SelectionManager {
     logger.log("SelectionManager: removeSelected");
 
     const pixel = this.isSelected(tile.cx, tile.cy);
-    //console.log('isSelected', pixel)
 
     if (pixel) {
       this.pixels = this.pixels.filter((p) => {
