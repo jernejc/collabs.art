@@ -200,8 +200,9 @@ export default class Web3Manager {
   async handleNewNetwork() {
     logger.log('Web3Manager: handleNewNetwork');
 
+    await this.RPCProvider.ready;
     await this.RPCProvider.getNetwork();
-    
+
     const chainId = await this.RPCProvider.send("eth_chainId");
     const supported = config.networks.find(net => net.chainId == chainId && net.enabled === true);
 
