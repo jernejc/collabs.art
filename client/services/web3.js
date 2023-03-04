@@ -143,8 +143,8 @@ export default class Web3Manager {
 
     // Provider events
     this.originalProvider.on('accountsChanged', this.handleAccountsChangedListener);
-    //this.originalProvider.on('chainChanged', this.handleNewNetworkListener);
-    this.originalProvider.on('networkChanged', this.handleNewNetworkListener);
+    this.originalProvider.on('chainChanged', this.handleNewNetworkListener);
+    //this.originalProvider.on('networkChanged', this.handleNewNetworkListener);
   }
 
   reload() {
@@ -200,6 +200,8 @@ export default class Web3Manager {
   async handleNewNetwork() {
     logger.log('Web3Manager: handleNewNetwork');
 
+    await this.RPCProvider.getNetwork();
+    
     const chainId = await this.RPCProvider.send("eth_chainId");
     const supported = config.networks.find(net => net.chainId == chainId && net.enabled === true);
 
