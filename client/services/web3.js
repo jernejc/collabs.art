@@ -64,7 +64,7 @@ export default class Web3Manager {
         this.enableProviderEvents();
 
         // Get network and chainsetNetworkAndChainId data
-        await this.setNetworkAndChainId(true);
+        await this.handleNewNetwork();
 
         // Connect websocket
         await this.connectWebsocket();
@@ -78,12 +78,7 @@ export default class Web3Manager {
     logger.log('Web3Manager: initContracts');
 
     if (this.RPCProvider) {
-      if (this.tokenContract && this.canvasContract) {
-        this.tokenContract.removeAllListeners();
-        this.tokenContract = null;
-        this.canvasContract.removeAllListeners();
-        this.canvasContract = null;
-      }
+      this.resetContracts();
 
       this.tokenContract = new ethers.Contract(
         config.contracts.token.address,
@@ -96,6 +91,17 @@ export default class Web3Manager {
         config.contracts.canvas.abi,
         this.signer
       );
+    }
+  }
+
+  resetContracts() {
+    logger.log('Web3Manager: resetContracts');
+
+    if (this.tokenContract && this.canvasContract) {
+      this.tokenContract.removeAllListeners();
+      this.tokenContract = null;
+      this.canvasContract.removeAllListeners();
+      this.canvasContract = null;
     }
   }
 
@@ -202,43 +208,32 @@ export default class Web3Manager {
       this.chainId = chainId;
   }
 
-  async handleDefaultNetwork() {
-    logger.log('Web3Manager: handleDefaultNetwork');
-    this.network = config.networks.find(net => net.default === true);
+  async handleNewNetwork() {
+    logger.log('Web3Manager: handleNewNetwork');
 
-    this.initContracts();
-    await this.getMinUnit();
-  }
-
-  async handleNewNetwork(network, init) {
-    logger.log('Web3Manager: handleNewNetwork', network);
-
-    const networkId = (network && network.chainId) ? network.chainId : network;
-    const supported = config.networks.find(net => net.id == networkId && net.enabled === true);
+    const networkRPC = await this.RPCProvider.getNetwork();
+    const supported = config.networks.find(net => net.id == networkRPC.chainId && net.enabled === true);
 
     if (!supported) {
       logger.warn('Web3Manager: Network ID not supported');
       this.network = null;
       this.isNetworkConnected = false;
 
-      await this.handleDefaultNetwork();
+      this.network = config.networks.find(net => net.default === true);
     } else {
       this.isNetworkConnected = true;
       this.network = supported;
       this.chainId = supported.chainId;
 
-      if (init)
-        this.RPCProvider = new ethers.providers.Web3Provider(window.ethereum, 'any');
-
       await this.RPCProvider.send("eth_requestAccounts", []);
-
       this.signer = this.RPCProvider.getSigner();
 
       this.initContracts();
 
-      await this.getMinUnit();
       await this.getAccounts(true);
     }
+
+    await this.getMinUnit();
 
     this.emitter.emit('web3/network', this.network);
   }
@@ -284,11 +279,10 @@ export default class Web3Manager {
     return owner;
   }
 
-  async setNetworkAndChainId(init) {
+  async setNetworkAndChainId(network, init) {
     logger.log('Web3Manager: setNetworkAndChainId');
 
     try {
-      const network = await this.RPCProvider.getNetwork();
       await this.handleNewNetwork(network, init);
     } catch (err) {
       logger.error(err)
@@ -379,7 +373,7 @@ export default class Web3Manager {
   }
 
   async getWalletBalance() {
-    logger.log('Web3Manager: getWalletBalance');
+    logger.log('Web3Manager: getWalletBalance', this.isNetworkConnected, this.activeAddress, this.tokenContract);
 
     if (!this.isNetworkConnected || !this.activeAddress)
       return;

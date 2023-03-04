@@ -40,7 +40,7 @@ export default class TokenInfo {
       elClasses: ['action-button', 'social-connect', 'twitter'],
       clickAction: async () => {
         const isReady = await this.scene.game.web3.preWeb3ActionSequence();
-        
+
         if (!isReady)
           return;
 
@@ -74,7 +74,7 @@ export default class TokenInfo {
     this.socialButtonsWrapper.append(this.discordButton.domElement);
 
     this.supportForm = {
-      value: 1
+      value: 25
     }
 
     this.supportHeader = document.createElement('h3');
@@ -85,8 +85,8 @@ export default class TokenInfo {
     this.supportInput = new Input(this.supportForm, 'value', {
       elClasses: ['input'],
       type: 'number',
-      step: 1,
-      min: 1,
+      step: 25,
+      min: 25,
       max: 9999,
       label: this.scene.game.web3.network.nativeCurrency.symbol,
       dynamicWidth: true,
