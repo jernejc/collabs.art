@@ -151,9 +151,9 @@ export default class MainScene extends ApplicationScene {
         setGameMode({ scene: _self, mode: mode });
     });
 
-    const debounceResize = _.debounce(this.resize.bind(this), 200);
+    //const debounceResize = _.debounce(this.resize.bind(this), 200);
 
-    window.addEventListener('resize', debounceResize);
+    //window.addEventListener('resize', debounceResize);
 
     this.eventsEnabled = true;
   }

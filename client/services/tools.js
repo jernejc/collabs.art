@@ -54,8 +54,6 @@ export default class ToolsManager {
 
     this.toolsVisible = true;
 
-    //this.addExpandBtn();
-
     const overlayCookie = getCookie('no_overlay');
 
     if (!overlayCookie || detectMob())
@@ -68,12 +66,6 @@ export default class ToolsManager {
       this.setDesktopOnly();
     } else
       this.showTools();
-
-    // Init some tools
-    //this.setConnectionStatus();
-    //this.setNetworkAlert();
-
-    //this.setNotification(25000, 'error', null, 'Please use a desktop browser for the best experience.');
   }
 
   addEventListeners() {
