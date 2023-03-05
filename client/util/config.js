@@ -104,6 +104,7 @@ const config = {
   appConfig: {
     canvasElement: 'app',
     defaultMode: 'select',
+    maxChanges: 80,
     gridSize: 12,
     strokeSize: 0.3,
     strokeColor: '#c1c1c1',

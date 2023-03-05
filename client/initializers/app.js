@@ -1,6 +1,3 @@
-//import * as Sentry from "@sentry/browser";
-//import { BrowserTracing } from "@sentry/tracing";
-
 import { Events, Game, CANVAS, WEBGL, Scale } from 'phaser';
 
 import config from '@util/config';
@@ -21,13 +18,6 @@ import FirebaseManager from '@services/firebase';
 export async function AppInitializer() {
   logger.log('AppInitializer');
 
-  /*Sentry.init({
-    dsn: config.sentry,
-    release: process.env.npm_package_version,
-    integrations: [new BrowserTracing()],
-    tracesSampleRate: 1.0,
-  });*/
-
   const restartTimeout = setTimeout(() => {
     const loading = document.querySelector('#loading-overlay');
 
@@ -35,7 +25,7 @@ export async function AppInitializer() {
       window.location.reload();
 
     clearTimeout(restartTimeout);
-  }, 5000);
+  }, 8000);
 
   const canvas = document.querySelector('#' + config.appConfig.canvasElement);
 

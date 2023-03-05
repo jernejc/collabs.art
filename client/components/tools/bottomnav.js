@@ -1,4 +1,6 @@
 import logger from "@util/logger";
+import config from "@util/config";
+
 import { colorPixels } from '@actions/pixel';
 
 import Button from "../form/button";
@@ -61,10 +63,9 @@ export default class BottomNav {
         await colorPixels({ scene: this.scene, selection: this.game.selection.activeSelection })
       }
     });
+
     this.domElement.append(this.applyBtn.domElement);
-
     this.parent.append(this.domElement);
-
   }
 
   updateActiveChangesCount() {
@@ -80,8 +81,18 @@ export default class BottomNav {
     const activeFullBid = this.game.selection.activeFullBid;
 
     if (activePixelsCount > 0) {
+      const tooltipText = `Max ${config.appConfig.maxChanges} changes at a time`;
+      let toolTipClasses = "pixelsModified";
+
+      if (this.game.selection.pixels.length > config.appConfig.maxChanges)
+        toolTipClasses += " open";
+
       this.changesCount.innerHTML = `<span>${activePixelsCount}</span>`;
-      this.changesStatus.innerHTML = `<span>${activeFullBid} $COLAB</span> ( ${activePixelsCount} modified )`;
+      this.changesStatus.innerHTML = `
+        <span class="sumTotal">${activeFullBid} $COLAB</span>&nbsp;
+        <span class="${toolTipClasses}" tooltip="${tooltipText}" tooltip-flow="up">
+          (&nbsp;<b>${activePixelsCount}</b>&nbsp;modified&nbsp;)
+        </span>`;
 
       this.showActiveChanges();
 
@@ -132,7 +143,7 @@ export default class BottomNav {
   }
 
   showActiveChanges() {
-    logger.log('BottomNav: showActiveChanges')
+    logger.log('BottomNav: showActiveChanges');
     const _self = this;
 
     this.open()

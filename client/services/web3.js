@@ -1,5 +1,6 @@
 
 import { ethers } from "ethers";
+import retry from 'async-retry';
 import MetaMaskOnboarding from '@metamask/onboarding';
 
 import { updateWorldImagePixelColors } from '@actions/pixel';
@@ -35,7 +36,7 @@ export default class Web3Manager {
 
     if (!this.hasMetamask)
       stateTag = 'metamask';
-    else if (!this.isConnected)
+    else if (!this.isNetworkConnected)
       stateTag = 'network';
     else if (!this.activeAddress)
       stateTag = 'wallet';
@@ -97,9 +98,12 @@ export default class Web3Manager {
   resetContracts() {
     logger.log('Web3Manager: resetContracts');
 
-    if (this.tokenContract && this.canvasContract) {
+    if (this.tokenContract) {
       this.tokenContract.removeAllListeners();
       this.tokenContract = null;
+    }
+
+    if (this.canvasContract) {
       this.canvasContract.removeAllListeners();
       this.canvasContract = null;
     }
@@ -137,7 +141,6 @@ export default class Web3Manager {
 
     const _self = this; // Had to wrap them in anonymous functions to handle 'this'
 
-    //this.handleNewChainListener = chainId => _self.handleNewChain(chainId);
     this.handleNewNetworkListener = networkId => _self.handleNewNetwork(networkId);
     this.handleAccountsChangedListener = accounts => _self.handleAccountsChanged(accounts);
 
@@ -159,32 +162,24 @@ export default class Web3Manager {
   enableContractEvents() {
     logger.log('Web3Manager: enableContractEvents');
 
-    const _self = this;
-
-    // Contract events
     if (this.eventCanvasContract) {
       this.eventCanvasContract.on('ColorPixels', (_positions, _colors, _bids) => {
         logger.log('Web3Manager: ColorPixels');
 
-        const pixels = _positions.map((position, i) => {
-          return {
-            ...formatPosition(hexToString(numberToHex(position))),
-            color: hexStringToColor('#' + hexToString(_colors[i]))
-          }
-        });
-
-        updateWorldImagePixelColors({ pixels, scene: this.game.scene.keys["MainScene"], updateTile: true })
+        updateWorldImagePixelColors({
+          pixels: _positions.map((position, i) => {
+            return {
+              ...formatPosition(hexToString(numberToHex(position))),
+              color: hexStringToColor('#' + hexToString(_colors[i]))
+            }
+          }), scene: this.game.scene.keys["MainScene"], updateTile: true
+        })
       });
     }
 
     if (this.eventTokenContract) {
       this.eventTokenContract.on('Transfer', async (from, to, value) => {
         logger.log('Web3Manager: TransferToken');
-
-        if (!from || !to || !value) {
-          logger.warn('Web3Manager: No return values found in event');
-          return;
-        }
 
         if (to.toLowerCase() === this.activeAddress) {
           this.walletBalance += parseInt(ethers.utils.formatUnits(value));
@@ -201,10 +196,9 @@ export default class Web3Manager {
     logger.log('Web3Manager: handleNewNetwork');
 
     await this.RPCProvider.ready;
-    await this.RPCProvider.getNetwork();
 
-    const chainId = await this.RPCProvider.send("eth_chainId");
-    const supported = config.networks.find(net => net.chainId == chainId && net.enabled === true);
+    const network = await this.RPCProvider.getNetwork();
+    const supported = config.networks.find(net => net.id == network.chainId && net.enabled === true);
 
     if (!supported) {
       logger.warn('Web3Manager: Network ID not supported');
@@ -218,12 +212,12 @@ export default class Web3Manager {
       this.network = supported;
       this.chainId = supported.chainId;
 
-      await this.RPCProvider.send("eth_requestAccounts", []);
+      const accounts = await this.RPCProvider.send("eth_requestAccounts", []);
       this.signer = this.RPCProvider.getSigner();
 
       this.initContracts();
 
-      await this.getAccounts();
+      await this.getAccounts(accounts);
     }
 
     await this.getMinUnit();
@@ -291,10 +285,10 @@ export default class Web3Manager {
     return;
   }
 
-  async getAccounts() {
+  async getAccounts(accounts) {
     logger.log('Web3Manager: getAccounts');
 
-    const accounts = await this.RPCProvider.listAccounts();
+    accounts = accounts || await this.RPCProvider.listAccounts();
 
     await this.handleAccountsChanged(accounts);
 
@@ -367,26 +361,24 @@ export default class Web3Manager {
   async getWalletBalance() {
     logger.log('Web3Manager: getWalletBalance');
 
-    if (!this.isNetworkConnected || !this.activeAddress)
-      return;
+    if (!this.isNetworkConnected)
+      throw new Error('No network connected.');
+    if (!this.activeAddress)
+      throw new Error('No active address.');
 
-    let balance;
+    await retry(
+      async () => {
+        let balance = await this.tokenContract.balanceOf(this.activeAddress);
 
-    try {
-      balance = await this.tokenContract.balanceOf(this.activeAddress);
-      this.walletBalance = parseInt(ethers.utils.formatEther(balance));
-    } catch (error) {
-      logger.error('Failed to fetch RPC balance', error);
-      await delay(1000);
-
-      try {
-        balance = await this.tokenContract.balanceOf(this.activeAddress);
-        this.walletBalance = parseInt(ethers.utils.formatEther(balance));
-      } catch (error) {
-        logger.error('Failed to fetch RPC balance 2nd', error);
-        this.walletBalance = 0;
+        if (balance)
+          this.walletBalance = parseInt(ethers.utils.formatEther(balance));
+        else
+          this.walletBalance = 0;
+      },
+      {
+        retries: 5,
       }
-    }
+    );
 
     return this.walletBalance;
   }
@@ -397,7 +389,6 @@ export default class Web3Manager {
     if (this.activeAddress)
       return this.activeAddress;
 
-    // Request account connection
     await this.requestAccounts();
 
     if (this.activeAddress)
@@ -430,7 +421,7 @@ export default class Web3Manager {
       maxPriorityFeePerGas: ethers.utils.parseUnits('50', 'gwei'),
       maxFeePerGas: ethers.utils.parseUnits('50', 'gwei'),
       type: '0x2',
-      gasLimit: null
+      estimatedBaseFee: null
     }
 
     const response = await fetch('https://gasstation-mainnet.matic.network/v2');
@@ -448,6 +439,8 @@ export default class Web3Manager {
         if (data.standard.maxFee)
           gasFees.maxFeePerGas = ethers.utils.parseUnits(this.formatGasPrice(data.standard.maxFee), 'gwei');
       }
+      if (data.estimatedBaseFee)
+        gasFees.estimatedBaseFee = ethers.utils.parseUnits(this.formatGasPrice(data.estimatedBaseFee), 'gwei');
     }
 
     return gasFees;

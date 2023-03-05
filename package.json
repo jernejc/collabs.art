@@ -1,6 +1,6 @@
 {
   "name": "collabs.art",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Collabs",
   "main": "dist/app.js",
   "author": "Jernej",
@@ -9,8 +9,6 @@
     "@metamask/onboarding": "^1.0.1",
     "@openzeppelin/contracts": "^4.7.2",
     "@openzeppelin/test-helpers": "^0.5.15",
-    "@sentry/browser": "^7.39.0",
-    "@sentry/tracing": "^7.39.0",
     "@truffle/hdwallet-provider": "^2.1.7",
     "chai": "^4.3.7",
     "clean-webpack-plugin": "^4.0.0",
@@ -33,5 +31,8 @@
   "scripts": {
     "build": "webpack",
     "dev": "webpack-dev-server"
+  },
+  "dependencies": {
+    "async-retry": "^1.3.3"
   }
 }

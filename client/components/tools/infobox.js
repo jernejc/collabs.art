@@ -1,8 +1,10 @@
 import ColorPicker from '@components/color/picker';
 import LoadingBar from '@components/loading';
 
+import Button from '@components/form/button';
+
 import logger from '@util/logger';
-import Button from '../form/button';
+import config from "@util/config";
 
 
 /**
@@ -90,6 +92,14 @@ export default class InfoBox {
       type: 'color',
       scene: this.scene,
       elClasses: ['color-picker'],
+      validate: () => {
+        if (this.game.selection.pixels.length > config.appConfig.maxChanges) {
+          _self.game.tools.setNotification(5000, 'info', null, 'Apply existing changes');
+          return false;
+        }
+
+        return true;
+      },
       update: (value) => {
         _self.pixel.changeToColorNumber(value);
         _self.pixel.setActivePixel();

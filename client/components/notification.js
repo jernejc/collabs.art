@@ -31,23 +31,27 @@ export default class Notification {
     switch (this.type) {
       case 'processing':
         icon = `gg-loadbar-alt`;
-        text = `Processing Tx ..`;
+        text = this.message || `Processing Tx ..`;
         break;
       case 'success':
         icon = `gg-check`;
-        text = `Success`;
+        text = this.message || `Success`;
         break;
       case 'signature':
         icon = `gg-loadbar-alt`;
-        text = `Signature request ..`;
+        text = this.message || `Signature request ..`;
         break;
       case 'warning':
         icon = `gg-block`;
-        text = `Invalid request`;
+        text = this.message || `Invalid request`;
         break;
       case 'error':
         icon = `gg-danger`;
-        text = `Error`;
+        text = this.message || `Error`;
+        break;
+      case 'info':
+        icon = `gg-info`;
+        text = this.message;
         break;
     }
 
@@ -59,7 +63,7 @@ export default class Notification {
       elClasses.push('disabled');
 
     // Some types need additional icons
-    if (this.type !== 'signature' && this.type !== 'warning') {
+    if (this.type !== 'signature' && this.type !== 'warning' && this.type !== 'info') {
       this.etherscanBtn = new Button({
         elClasses,
         icon: 'etherscan-logo.svg',
@@ -80,7 +84,7 @@ export default class Notification {
     }
 
     // Close btn
-    if (this.type === 'success' || this.type === 'error' || this.type === 'warning') {
+    if (this.type === 'success' || this.type === 'error' || this.type === 'warning' || this.type === 'info') {
       this.closeBtn = new Button({
         icon: 'gg-close',
         clickAction: this.destroy.bind(this)
@@ -95,7 +99,7 @@ export default class Notification {
     this.parent.appendChild(this.domElement);
 
     // Message icon
-    if (this.message) {
+    if (this.message && (this.type !== 'info')) {
       const icon = this.domElement.querySelector('span.icon');
 
       icon.setAttribute('tooltip', this.message);
@@ -157,10 +161,20 @@ export default class Notification {
       this.messageInterval = null;
     }
   }
+  
+  clearTimer() {
+    logger.log('Notification: clearTimer');
+
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+  }
 
   destroy() {
     logger.log('Notification: destroy');
 
+    this.clearTimer();
     this.clearMessageInterval();
 
     if (this.parent.contains(this.domElement))

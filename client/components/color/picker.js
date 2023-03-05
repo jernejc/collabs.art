@@ -18,6 +18,10 @@ export default class ColorPicker extends Controller {
     logger.log('ColorPicker: constructor');
 
     super(object, property, params);
+
+    if (params.validate)
+      this.validate = params.validate;
+
     this.setupDom();
   }
 
@@ -58,6 +62,9 @@ export default class ColorPicker extends Controller {
     let bgColor = window.getComputedStyle(event.target, null).getPropertyValue('background-color');
 
     if (!event.target.classList.contains('color-box') || !bgColor)
+      return;
+
+    if (this.validate && !this.validate())
       return;
 
     let colorBoxIndex = this.getColorBoxIndex(event.target)

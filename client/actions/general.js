@@ -11,15 +11,15 @@ import config from '@util/config';
 
 let downDelay = null;
 
-export function handleMouseMove({ pointer, scene }) {
-  //logger.log('User interactions: handleMove');
+export function handleMouseMove({ pointer, scene, noAutomatic }) {
+  //logger.log('User interactions: handleMove', pointer, scene);
 
   if (downDelay && pointer.isDown) {
     clearTimeout(downDelay);
     downDelay = null;
   }
 
-  if (pointer.isDown && scene.game.mode === 'select') { // switch to move if mouse down
+  if (pointer.isDown && scene.game.mode === 'select' && !noAutomatic) { // switch to move if mouse down
     scene.game.moveAutomatic = scene.game.mode;
     setGameMode({ scene, mode: 'move' });
   }
@@ -50,7 +50,7 @@ export function handleMouseDown({ pointer, scene }) {
   let tile;
 
   if (!downDelay && scene.game.moode !== 'mininav') { // delay for 200ms for move event
-    downDelay = _.delay(handleMouseDown, 100, { pointer, scene })
+    downDelay = _.delay(handleMouseDown, 60, { pointer, scene, noAutomatic: true })
     return;
   }
 
@@ -183,7 +183,7 @@ export async function creditToken({ scene, value }) {
   scene.game.tools.setNotification(0, 'processing');
 
   try {
-    const feeData = await scene.game.web3.signer.getFeeData();
+    const gasPrice = await scene.game.web3.RPCProvider.getGasPrice();
     const gasLimit = await scene.game.web3.tokenContract.estimateGas.credit({
       from: scene.game.web3.activeAddress,
       value: ethers.utils.parseEther(value)
@@ -191,7 +191,7 @@ export async function creditToken({ scene, value }) {
     const tx = await scene.game.web3.tokenContract.credit({
       from: scene.game.web3.activeAddress,
       value: ethers.utils.parseEther(value),
-      gasPrice: feeData.gasPrice,
+      gasPrice,
       gasLimit
     });
 
@@ -200,7 +200,7 @@ export async function creditToken({ scene, value }) {
 
     await tx.wait();
   } catch (error) {
-    logger.error('Action colorPixels:', error);
+    logger.error('Action creditToken:', error);
 
     if (error) {
       if (error.code && error.code === 'ACTION_REJECTED') {
@@ -224,7 +224,7 @@ export async function permitToken({ scene, response, grant }) {
   scene.game.tools.setNotification(0, 'processing');
 
   try {
-    const feeData = await scene.game.web3.signer.getFeeData();
+    const gasPrice = await scene.game.web3.RPCProvider.getGasPrice();
     const gasLimit = await scene.game.web3.tokenContract.estimateGas.grant(
       response.provider,
       scene.game.web3.activeAddress,
@@ -250,7 +250,7 @@ export async function permitToken({ scene, response, grant }) {
       response.s,
       {
         from: scene.game.web3.activeAddress,
-        gasPrice: feeData.gasPrice,
+        gasPrice,
         gasLimit
       }
     )
@@ -336,7 +336,7 @@ export function navigateMinimap({ pointer, scene }) {
 export function panDragMap({ pointer, scene }) {
   //logger.log('User interactions: panDragMap');
 
-  const gridSize = scene.size / 10;
+  const gridSize = scene.size / 8;
 
   if (scene.game.origDragPoint) {
     // move the camera by the amount the mouse has moved since last update

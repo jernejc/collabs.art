@@ -59,7 +59,7 @@ export async function loadPixel({ scene, position }) {
 }
 
 export async function colorPixels({ scene, selection }) {
-  logger.log('Action colorPixels', selection)
+  logger.log('Action colorPixels')
 
   scene.game.tools.setNotification(0, 'processing');
 
@@ -74,8 +74,7 @@ export async function colorPixels({ scene, selection }) {
   let txHash;
 
   try {
-    //const fees = await scene.game.web3.getEstimatedGasFees('fast');
-    const feeData = await scene.game.web3.signer.getFeeData();
+    const gasPrice = await scene.game.web3.RPCProvider.getGasPrice();
     const gasLimit = await scene.game.web3.canvasContract.estimateGas.setColors(
       positions,
       colors,
@@ -84,14 +83,13 @@ export async function colorPixels({ scene, selection }) {
         from: scene.game.web3.activeAddress
       }
     )
-
     const tx = await scene.game.web3.canvasContract.setColors(
       positions,
       colors,
       bids,
       {
         from: scene.game.web3.activeAddress,
-        gasPrice: feeData.gasPrice,
+        gasPrice,
         gasLimit
       }
     )

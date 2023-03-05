@@ -367,12 +367,16 @@ input {
   --ggs: 0.6;
 }
 
-.changes-stats span {
+.changes-stats span.sumTotal {
   background: var(--header-white);
   color: var(--active-black);
   font-size: 1.3em;
   padding: 4px 8px;
   margin-right: 8px;
+}
+
+.changes-stats span.pixelsModified {
+  line-height: 49px;
 }
 
 .menu-btn {
@@ -1587,6 +1591,11 @@ Info Box
 .notification.success .icon {
   background: var(--polygon-color);
   --ggs: 1.5;
+}
+
+.notification.info .icon {
+  background: var(--polygon-color);
+  --ggs: 1.1;
 }
 
 .notification.error {
