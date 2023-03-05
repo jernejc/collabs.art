@@ -126,8 +126,8 @@ export default class Notification {
         case 2:
           this.domElement.querySelector('span.text').innerHTML = `In a minute ..`;
           break;
-        case 3:
-          this.domElement.querySelector('span.text').innerHTML = `Any day now ..`;
+        case 4:
+          this.domElement.querySelector('span.text').innerHTML = `A few minutes ..`;
           break;
       }
 
