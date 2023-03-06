@@ -149,15 +149,9 @@ export default class Web3Manager {
   enableProviderEvents() {
     logger.log('Web3Manager: enableProviderEvents');
 
-    const _self = this; // Had to wrap them in anonymous functions to handle 'this'
-
-    this.handleNewNetworkListener = networkId => _self.handleNewNetwork(networkId).bind(_self);
-    this.handleAccountsChangedListener = accounts => _self.handleAccountsChanged(accounts).bind(_self);
-
     // Provider events
-    this.originalProvider.on('accountsChanged', this.handleAccountsChangedListener);
-    this.originalProvider.on('chainChanged', this.handleNewNetworkListener);
-    //this.originalProvider.on('networkChanged', this.handleNewNetworkListener);
+    this.originalProvider.on('accountsChanged', this.handleAccountsChanged.bind(this));
+    this.originalProvider.on('chainChanged', this.handleNewNetwork.bind(this));
   }
 
   reload() {
