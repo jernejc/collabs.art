@@ -388,7 +388,7 @@ export default class Web3Manager {
           this.walletBalance = 0;
       },
       {
-        retries: 4,
+        retries: 5,
       }
     );
 
