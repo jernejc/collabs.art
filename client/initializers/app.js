@@ -25,7 +25,7 @@ export async function AppInitializer() {
       window.location.reload();
 
     clearTimeout(restartTimeout);
-  }, 6000);
+  }, 4000);
 
   const canvas = document.querySelector('#' + config.appConfig.canvasElement);
 

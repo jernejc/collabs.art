@@ -75,17 +75,27 @@ export default class Web3Manager {
     }
   }
 
-  initContracts() {
+  async initContracts() {
     logger.log('Web3Manager: initContracts');
 
     if (this.RPCProvider) {
       this.resetContracts();
+
+      const deployedCodeTokenContract = await this.RPCProvider.getCode(config.contracts.token.address);
+
+      if (deployedCodeTokenContract === '0x')
+        throw new Error('Token contract code not found! Wrong network ?');
 
       this.tokenContract = new ethers.Contract(
         config.contracts.token.address,
         config.contracts.token.abi,
         this.signer
       );
+
+      const deployedCodeCanvasContract = await this.RPCProvider.getCode(config.contracts.canvas.address);
+
+      if (deployedCodeCanvasContract === '0x')
+        throw new Error('Canvas contract code not found! Wrong network ?');
 
       this.canvasContract = new ethers.Contract(
         config.contracts.canvas.address,
@@ -141,8 +151,8 @@ export default class Web3Manager {
 
     const _self = this; // Had to wrap them in anonymous functions to handle 'this'
 
-    this.handleNewNetworkListener = networkId => _self.handleNewNetwork(networkId);
-    this.handleAccountsChangedListener = accounts => _self.handleAccountsChanged(accounts);
+    this.handleNewNetworkListener = networkId => _self.handleNewNetwork(networkId).bind(_self);
+    this.handleAccountsChangedListener = accounts => _self.handleAccountsChanged(accounts).bind(_self);
 
     // Provider events
     this.originalProvider.on('accountsChanged', this.handleAccountsChangedListener);
@@ -213,10 +223,11 @@ export default class Web3Manager {
       this.chainId = supported.chainId;
 
       const accounts = await this.RPCProvider.send("eth_requestAccounts", []);
+
       this.signer = this.RPCProvider.getSigner();
+      this.signerAddress = await this.signer.getAddress();
 
-      this.initContracts();
-
+      await this.initContracts();
       await this.getAccounts(accounts);
     }
 
@@ -361,25 +372,19 @@ export default class Web3Manager {
   async getWalletBalance() {
     logger.log('Web3Manager: getWalletBalance');
 
+    if (!this.tokenContract)
+      throw new Error('No token contract found.');
     if (!this.isNetworkConnected)
       throw new Error('No network connected.');
     if (!this.activeAddress)
       throw new Error('No active address.');
 
-    await retry(
-      async () => {
-        let balance = await this.tokenContract.balanceOf(this.activeAddress);
+    let balance = await this.tokenContract.balanceOf(this.activeAddress);
 
-        if (balance)
-          this.walletBalance = parseInt(ethers.utils.formatEther(balance));
-        else
-          this.walletBalance = 0;
-      },
-      {
-        retries: 2,
-        minTimeout: 2000,
-      }
-    );
+    if (balance)
+      this.walletBalance = parseInt(ethers.utils.formatEther(balance));
+    else
+      this.walletBalance = 0;
 
     return this.walletBalance;
   }
