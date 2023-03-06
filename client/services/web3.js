@@ -65,7 +65,7 @@ export default class Web3Manager {
         this.enableProviderEvents();
 
         // Get network and chainsetNetworkAndChainId data
-        await this.handleNewNetwork();
+        await this.handleNewNetwork(true);
 
         // Connect websocket
         await this.connectWebsocket();
@@ -196,7 +196,7 @@ export default class Web3Manager {
     }
   }
 
-  async handleNewNetwork() {
+  async handleNewNetwork(init) {
     logger.log('Web3Manager: handleNewNetwork');
 
     await this.RPCProvider.ready;
@@ -211,6 +211,7 @@ export default class Web3Manager {
       this.isNetworkConnected = false;
 
       this.network = config.networks.find(net => net.default === true);
+      this.resetContracts();
     } else {
       this.isNetworkConnected = true;
       this.network = supported;
@@ -219,7 +220,6 @@ export default class Web3Manager {
       const accounts = await this.RPCProvider.send("eth_requestAccounts", []);
 
       this.signer = this.RPCProvider.getSigner();
-      this.signerAddress = await this.signer.getAddress();
 
       await this.initContracts();
       await this.getAccounts(accounts);
@@ -232,6 +232,11 @@ export default class Web3Manager {
 
   async handleAccountsChanged(accounts) {
     logger.log('Web3Manager: handleAccountsChanged', accounts);
+
+    if (!this.isNetworkConnected)
+      return;
+    if (!this.tokenContract)
+      return;
 
     if (accounts.length > 0) {
       this.accounts = accounts;
@@ -373,12 +378,19 @@ export default class Web3Manager {
     if (!this.activeAddress)
       throw new Error('No active address.');
 
-    let balance = await this.tokenContract.balanceOf(this.activeAddress);
+    await retry(
+      async () => {
+        const balance = await this.tokenContract.balanceOf(this.activeAddress);
 
-    if (balance)
-      this.walletBalance = parseInt(ethers.utils.formatEther(balance));
-    else
-      this.walletBalance = 0;
+        if (balance)
+          this.walletBalance = parseInt(ethers.utils.formatEther(balance));
+        else
+          this.walletBalance = 0;
+      },
+      {
+        retries: 4,
+      }
+    );
 
     return this.walletBalance;
   }

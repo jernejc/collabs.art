@@ -88,7 +88,7 @@ export default class TokenInfo {
       step: 25,
       min: 25,
       max: 9999,
-      label: this.scene.game.web3.network.nativeCurrency.symbol,
+      label: (this.scene.game.web3.network) ? this.scene.game.web3.network.nativeCurrency.symbol : 'MATIC',
       dynamicWidth: true,
       decimals: 0,
       onChange: async () => {
