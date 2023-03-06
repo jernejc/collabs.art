@@ -188,11 +188,12 @@ export async function creditToken({ scene, value }) {
       from: scene.game.web3.activeAddress,
       value: ethers.utils.parseEther(value)
     });
+    const finalGasLimit = ethers.BigNumber.from(parseInt(gasLimit.toNumber() * 1.1));
     const tx = await scene.game.web3.tokenContract.credit({
       from: scene.game.web3.activeAddress,
       value: ethers.utils.parseEther(value),
       gasPrice,
-      gasLimit
+      gasLimit: finalGasLimit
     });
 
     txHash = tx.hash;
@@ -238,7 +239,7 @@ export async function permitToken({ scene, response, grant }) {
         from: scene.game.web3.activeAddress,
       }
     )
-
+    const finalGasLimit = ethers.BigNumber.from(parseInt(gasLimit.toNumber() * 1.1));
     const tx = await scene.game.web3.tokenContract.grant(
       response.provider,
       scene.game.web3.activeAddress,
@@ -251,7 +252,7 @@ export async function permitToken({ scene, response, grant }) {
       {
         from: scene.game.web3.activeAddress,
         gasPrice,
-        gasLimit
+        gasLimit: finalGasLimit
       }
     )
 

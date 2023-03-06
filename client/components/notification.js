@@ -31,23 +31,23 @@ export default class Notification {
     switch (this.type) {
       case 'processing':
         icon = `gg-loadbar-alt`;
-        text = this.message || `Processing Tx ..`;
+        text = `Processing Tx ..`;
         break;
       case 'success':
         icon = `gg-check`;
-        text = this.message || `Success`;
+        text = `Success`;
         break;
       case 'signature':
         icon = `gg-loadbar-alt`;
-        text = this.message || `Signature request ..`;
+        text = `Signature request ..`;
         break;
       case 'warning':
         icon = `gg-block`;
-        text = this.message || `Invalid request`;
+        text = `Invalid request`;
         break;
       case 'error':
         icon = `gg-danger`;
-        text = this.message || `Error`;
+        text = `Error`;
         break;
       case 'info':
         icon = `gg-info`;

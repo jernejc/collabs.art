@@ -1,5 +1,6 @@
 import { toWei, stringToBN, stringToHex } from '@util/helpers';
 import logger from '@util/logger';
+import { ethers } from 'ethers';
 
 export function getColorForXY({ x, y, color, scene }) {
   //logger.log('getColorForXY', x, y, color, scene);
@@ -83,6 +84,7 @@ export async function colorPixels({ scene, selection }) {
         from: scene.game.web3.activeAddress
       }
     )
+    const finalGasLimit = ethers.BigNumber.from(parseInt(gasLimit.toNumber() * 1.1));
     const tx = await scene.game.web3.canvasContract.setColors(
       positions,
       colors,
@@ -90,7 +92,7 @@ export async function colorPixels({ scene, selection }) {
       {
         from: scene.game.web3.activeAddress,
         gasPrice,
-        gasLimit
+        gasLimit: finalGasLimit
       }
     )
 
