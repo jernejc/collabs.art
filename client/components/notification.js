@@ -133,6 +133,9 @@ export default class Notification {
         case 4:
           this.domElement.querySelector('span.text').innerHTML = `A few minutes ..`;
           break;
+        case 5:
+          this.domElement.querySelector('span.text').innerHTML = `Be patient ..`;
+          break;
       }
 
       this.elapsedTime++;

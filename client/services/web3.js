@@ -217,12 +217,12 @@ export default class Web3Manager {
       this.network = supported;
       this.chainId = supported.chainId;
 
-      const accounts = await this.RPCProvider.send("eth_requestAccounts", []);
+      //const accounts = await this.RPCProvider.send("eth_requestAccounts", []);
 
       this.signer = this.RPCProvider.getSigner();
 
       await this.initContracts();
-      await this.getAccounts(accounts);
+      await this.getAccounts();
     }
 
     await this.getMinUnit();
@@ -422,6 +422,9 @@ export default class Web3Manager {
     if (!this.isNetworkConnected)
       return false;
 
+    if (!this.activeAddress)
+      await this.getActiveAddress();
+      
     if (!this.activeAddress)
       return false;
 
