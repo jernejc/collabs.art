@@ -60,7 +60,7 @@ export default class BottomNav {
   async applyBtnAction() {
     logger.log(`BottomNav: applyBtnAction`);
 
-    pushGTMEvent('bottomNavApplyBtnClick', 'btnClick', this.scene);
+    pushGTMEvent('bottomNavApplyBtn', 'applyBtnClick', this.scene);
     const isReady = await this.game.web3.preWeb3ActionSequence();
 
     if (!isReady)

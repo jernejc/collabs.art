@@ -113,14 +113,14 @@ export async function colorPixels({ scene, selection }) {
       return;
     }
 
-    pushGTMEvent('bottomNavApplyBtnClick', 'colorPixelError', scene);
+    pushGTMEvent('bottomNavApplyBtn', 'colorPixelError', scene);
     scene.game.tools.setNotification(12000, 'error', txHash, 'Wallet RPC error, please try again.');
     return;
   }
 
   updateWorldImagePixelColors({ pixels: selection, scene });
 
-  pushGTMEvent('bottomNavApplyBtnClick', 'colorPixelSuccess', scene);
+  pushGTMEvent('bottomNavApplyBtn', 'colorPixelSuccess', scene);
   scene.game.selection.clearAllSelection();
   scene.game.tools.setNotification(6500, 'success', txHash);
 }

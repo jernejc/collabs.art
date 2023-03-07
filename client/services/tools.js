@@ -362,7 +362,7 @@ export default class ToolsManager {
   async connectionStatusAction() {
     logger.log('ToolsManager: connectionStatusAction');
 
-    pushGTMEvent('connectionStatusBtnClick', 'btnClick', this.game.scene.keys['MainScene']);
+    pushGTMEvent('connectionStatusBtn', 'connectionStatusBtnClick', this.game.scene.keys['MainScene']);
     switch (this.game.web3.currentStateTag) {
       case 'metamask':
         await this.game.web3.onboarding.startOnboarding();

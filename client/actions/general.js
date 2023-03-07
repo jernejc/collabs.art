@@ -181,7 +181,7 @@ export async function creditToken({ scene, value }) {
   let txHash = null;
 
   scene.game.tools.setNotification(0, 'processing');
-  pushGTMEvent('creditBtnClick', 'creditStart', scene);
+  pushGTMEvent('creditBtn', 'creditStart', scene);
 
   try {
     const gasPrice = await scene.game.web3.RPCProvider.getGasPrice();
@@ -216,12 +216,12 @@ export async function creditToken({ scene, value }) {
       }
     }
 
-    pushGTMEvent('creditBtnClick', 'creditError', scene);
+    pushGTMEvent('creditBtn', 'creditError', scene);
     scene.game.tools.setNotification(12000, 'error', txHash, 'Wallet RPC error, please try again.');
     return;
   }
 
-  pushGTMEvent('creditBtnClick', 'creditSuccess', scene);
+  pushGTMEvent('creditBtn', 'creditSuccess', scene);
   scene.game.tools.setNotification(6500, 'success', txHash);
 }
 
@@ -231,7 +231,7 @@ export async function permitToken({ scene, response, grant }) {
   let txHash = null;
 
   scene.game.tools.setNotification(0, 'processing');
-  pushGTMEvent('twitterBtnClick', 'permitStart', scene);
+  pushGTMEvent('connectTwitterBtn', 'permitStart', scene);
 
   try {
     const gasPrice = await scene.game.web3.RPCProvider.getGasPrice();
@@ -284,12 +284,12 @@ export async function permitToken({ scene, response, grant }) {
       }
     }
 
-    pushGTMEvent('twitterBtnClick', 'permitError', scene);
+    pushGTMEvent('connectTwitterBtn', 'permitError', scene);
     scene.game.tools.setNotification(12000, 'error', txHash, 'Wallet RPC error, please try again.');
     return;
   }
 
-  pushGTMEvent('twitterBtnClick', 'permitSuccess', scene);
+  pushGTMEvent('connectTwitterBtn', 'permitSuccess', scene);
   scene.game.tools.setNotification(6500, 'success', txHash);
   return true;
 }
@@ -298,7 +298,7 @@ export async function permitSignature({ scene, token }) {
   let response;
 
   scene.game.tools.setNotification(0, 'signature');
-  pushGTMEvent('twitterBtnClick', 'signatureStart', scene);
+  pushGTMEvent('connectTwitterBtn', 'signatureStart', scene);
 
   try {
     const msgBody = ethers.utils.hashMessage("Collabs metamask message.");
@@ -324,12 +324,12 @@ export async function permitSignature({ scene, token }) {
       return;
     }
 
-    pushGTMEvent('twitterBtnClick', 'signatureError', scene);
+    pushGTMEvent('connectTwitterBtn', 'signatureError', scene);
     scene.game.tools.setNotification(10000, 'warning');
     return;
   }
 
-  pushGTMEvent('twitterBtnClick', 'signatureSuccess', scene);
+  pushGTMEvent('connectTwitterBtn', 'signatureSuccess', scene);
   scene.game.tools.removeNotification();
   return response;
 }

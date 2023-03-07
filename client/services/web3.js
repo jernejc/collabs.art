@@ -319,11 +319,11 @@ export default class Web3Manager {
         return;
       }
 
-      pushGTMEvent('connectionStatusBtnClick', 'addNetworkError', this.game.scene.keys['MainScene']);
+      pushGTMEvent('connectionStatusBtn', 'addNetworkError', this.game.scene.keys['MainScene']);
       return;
     }
 
-    pushGTMEvent('connectionStatusBtnClick', 'addNetworkSuccess', this.game.scene.keys['MainScene']);
+    pushGTMEvent('connectionStatusBtn', 'addNetworkSuccess', this.game.scene.keys['MainScene']);
   }
 
   async switchToNetwork() {
@@ -347,12 +347,12 @@ export default class Web3Manager {
         logger.warn('User closed window.');
         return;
       } else {
-        pushGTMEvent('connectionStatusBtnClick', 'switchNetworkError', this.game.scene.keys['MainScene']);
+        pushGTMEvent('connectionStatusBtn', 'switchNetworkError', this.game.scene.keys['MainScene']);
         throw new Error('Failed to switch network: ', error);
       }
     }
 
-    pushGTMEvent('connectionStatusBtnClick', 'switchNetworkSuccess', this.game.scene.keys['MainScene']);
+    pushGTMEvent('connectionStatusBtn', 'switchNetworkSuccess', this.game.scene.keys['MainScene']);
   }
 
   async getMinUnit() {
