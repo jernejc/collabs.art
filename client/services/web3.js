@@ -53,6 +53,9 @@ export default class Web3Manager {
   async initProviders() {
     logger.log('Web3Manager: initProviders');
 
+    // Connect websocket
+    await this.connectWebsocket();
+
     if (typeof window.ethereum !== 'undefined') {
       try {
         this.hasMetamask = true;
@@ -66,9 +69,6 @@ export default class Web3Manager {
 
         // Get network and chainsetNetworkAndChainId data
         await this.handleNewNetwork(true);
-
-        // Connect websocket
-        await this.connectWebsocket();
       } catch (error) {
         logger.error('Failed to connect to Metamask:', error);
       }
@@ -217,8 +217,6 @@ export default class Web3Manager {
       this.network = supported;
       this.chainId = supported.chainId;
 
-      //const accounts = await this.RPCProvider.send("eth_requestAccounts", []);
-
       this.signer = this.RPCProvider.getSigner();
 
       await this.initContracts();
@@ -288,9 +286,7 @@ export default class Web3Manager {
   async requestAccounts() {
     logger.log('Web3Manager: requestAccounts');
 
-    const accounts = await this.RPCProvider.send("eth_requestAccounts", []);
-
-    await this.handleAccountsChanged(accounts);
+    await this.RPCProvider.send("eth_requestAccounts", []);
 
     return;
   }
@@ -394,12 +390,28 @@ export default class Web3Manager {
 
     await retry(
       async () => {
-        const balance = await this.tokenContract.balanceOf(this.activeAddress);
+        try {
+          const balance = await this.tokenContract.balanceOf(this.activeAddress);
 
-        if (balance)
-          this.walletBalance = parseInt(ethers.utils.formatEther(balance));
-        else
-          this.walletBalance = 0;
+          if (balance)
+            this.walletBalance = parseInt(ethers.utils.formatEther(balance));
+          else if (balance === 0)
+            this.walletBalance = 0;
+          else
+            throw new Error('No balance found');
+        } catch (error) {
+          logger.error('Failed to fetch RPC balance', error);
+
+          if (this.eventTokenContract) {
+            const balance = await this.eventTokenContract.balanceOf(this.activeAddress);
+
+            if (balance)
+              this.walletBalance = parseInt(ethers.utils.formatEther(balance));
+            else
+              this.walletBalance = 0;
+          } else
+            this.walletBalance = 0;
+        }
       },
       {
         retries: 5,
@@ -438,7 +450,7 @@ export default class Web3Manager {
 
     if (!this.activeAddress)
       await this.getActiveAddress();
-      
+
     if (!this.activeAddress)
       return false;
 
