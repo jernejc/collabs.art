@@ -5,6 +5,7 @@ import { creditToken, permitSignature, permitToken } from "@actions/general"
 
 import Button from "../form/button";
 import Input from "../form/input";
+import { pushGTMEvent } from "@util/helpers";
 
 export default class TokenInfo {
 
@@ -39,11 +40,13 @@ export default class TokenInfo {
       disabled: false,
       elClasses: ['action-button', 'social-connect', 'twitter'],
       clickAction: async () => {
+        pushGTMEvent('twitterBtnClick', 'btnClick', this.scene);
         const isReady = await this.scene.game.web3.preWeb3ActionSequence();
 
         if (!isReady)
           return;
 
+        pushGTMEvent('twitterBtnClick', 'twitterSignin', this.scene);
         await this.scene.game.firebase.twitterSigninPopup();
 
         if (!this.scene.game.firebase.idToken)
@@ -67,6 +70,7 @@ export default class TokenInfo {
       text: 'Channel',
       elClasses: ['action-button', 'social-connect', 'discord'],
       clickAction: async () => {
+        pushGTMEvent('discordBtnClick', 'btnClick', this.scene);
         window.open(config.slideshow.discordLink, '_blank').focus();
       }
     });
@@ -107,6 +111,8 @@ export default class TokenInfo {
       text: 'Exchange',
       elClasses: ['action-button', 'credit-token'],
       clickAction: async () => {
+        pushGTMEvent('creditBtnClick', 'btnClick', this.scene);
+
         if (!await this.scene.game.web3.preWeb3ActionSequence())
           return;
 

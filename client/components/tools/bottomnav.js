@@ -4,6 +4,7 @@ import config from "@util/config";
 import { colorPixels } from '@actions/pixel';
 
 import Button from "../form/button";
+import { pushGTMEvent } from "@util/helpers";
 
 export default class BottomNav {
 
@@ -49,23 +50,28 @@ export default class BottomNav {
     this.applyBtn = new Button({
       elClasses: ['action-button', 'apply'],
       text: 'Apply',
-      clickAction: async e => {
-        const isReady = await this.game.web3.preWeb3ActionSequence();
-
-        if (!isReady)
-          return;
-
-        if (this.game.selection.activeFullBid > this.game.web3.walletBalance) {
-          this.game.tools.showTokenInfo();
-          return;
-        }
-
-        await colorPixels({ scene: this.scene, selection: this.game.selection.activeSelection })
-      }
+      clickAction: this.applyBtnAction.bind(this)
     });
 
     this.domElement.append(this.applyBtn.domElement);
     this.parent.append(this.domElement);
+  }
+
+  async applyBtnAction() {
+    logger.log(`BottomNav: applyBtnAction`);
+
+    pushGTMEvent('bottomNavApplyBtnClick', 'btnClick', this.scene);
+    const isReady = await this.game.web3.preWeb3ActionSequence();
+
+    if (!isReady)
+      return;
+
+    if (this.game.selection.activeFullBid > this.game.web3.walletBalance) {
+      this.game.tools.showTokenInfo();
+      return;
+    }
+
+    await colorPixels({ scene: this.scene, selection: this.game.selection.activeSelection })
   }
 
   updateActiveChangesCount() {

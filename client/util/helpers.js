@@ -184,6 +184,16 @@ export function deleteCookie(name, path) {
   setCookie(name, '', -1, path)
 }
 
+export function pushGTMEvent(category, action, scene) {
+  dataLayer.push({
+    'event': action,
+    'eventCategory': category,
+    'currentStateTag': scene.game.web3.currentStateTag,
+    'walletBalance': scene.game.web3.walletBalance,
+    'activeChangesCount': scene.game.selection.activeChangesCount
+  });
+}
+
 // Blinkering issue in some android browser
 // WEBGL rendering seems to be connected
 // https://www.html5gamedevs.com/topic/25507-phaserwebgl-flickering-on-chrome-for-android-v53/

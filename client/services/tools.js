@@ -7,7 +7,7 @@ import Overlay from '@components/overlay';
 import Button from '@components/form/button';
 import TokenInfo from '@components/tools/tokeninfo';
 
-import { formatShortAddress, getCookie, detectMob } from '@util/helpers';
+import { formatShortAddress, getCookie, detectMob, pushGTMEvent } from '@util/helpers';
 import logger from '@util/logger';
 import config from '@util/config';
 
@@ -323,7 +323,6 @@ export default class ToolsManager {
 
     let iconText = '';
     let iconClass = null;
-    let action = null;
     let alertIcon = true;
 
     this.connectionStatusBtn.clearColor('info-text-gray');
@@ -331,24 +330,19 @@ export default class ToolsManager {
     switch (this.game.web3.currentStateTag) {
       case 'metamask':
         iconClass = 'metamask-white.png';
-        action = this.game.web3.onboarding.startOnboarding;
         break;
       case 'network':
         iconClass = 'polygon.svg';
-        action = this.game.web3.switchToNetwork.bind(this.game.web3);
         break;
       case 'wallet':
         iconClass = 'gg-link';
-        action = this.game.web3.getActiveAddress.bind(this.game.web3);
         break;
       case 'address':
         alertIcon = false;
         iconText = `${this.game.web3.walletBalance || 0} $COLAB`;
-        action = this.showTokenInfo.bind(this);
         break;
       case 'permit':
         iconClass = 'gg-extension';
-        action = this.game.web3.permitContractAllowance.bind(this.game.web3);
         break;
     }
 
@@ -363,9 +357,31 @@ export default class ToolsManager {
 
     if (iconClass)
       this.connectionStatusBtn.setIcon(iconClass, null, alertIcon);
+  }
 
-    if (action)
-      this.connectionStatusBtn.setClickAction(action);
+  async connectionStatusAction() {
+    logger.log('ToolsManager: connectionStatusAction');
+
+    pushGTMEvent('connectionStatusBtnClick', 'btnClick', this.game.scene.keys['MainScene']);
+    switch (this.game.web3.currentStateTag) {
+      case 'metamask':
+        await this.game.web3.onboarding.startOnboarding();
+        break;
+      case 'network':
+        await this.game.web3.switchToNetwork();
+        break;
+      case 'wallet':
+        await this.game.web3.getActiveAddress();
+        break;
+      case 'address':
+        this.showTokenInfo();
+        break;
+      case 'permit':
+        await this.game.web3.permitContractAllowance();
+        break;
+    }
+
+    return;
   }
 
   setNotification(time, type, hash, message) {
@@ -518,7 +534,8 @@ export default class ToolsManager {
 
     this.connectionStatusBtn = new Button({
       elClasses: ['connection'],
-      icon: 'gg-block'
+      icon: 'gg-block',
+      clickAction: this.connectionStatusAction.bind(this)
     });
 
     this.domConnectionStatus.append(this.connectionStatusBtn.domElement);

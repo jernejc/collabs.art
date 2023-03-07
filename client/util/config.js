@@ -130,7 +130,8 @@ const config = {
     keyActionText: 'Enter',
     emailRegex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     subtitle: '<span>Contribute to a living</span> canvas.<br /><span>Become a</span> Creator.', // is HTML
-    discordLink: 'https://discord.gg/DKZkG4CnrC',
+    discordLink: 'https://discord.gg/QfxwMUH5Kg',
+    twitterLink: 'https://twitter.com/collabs_art',
     articles: [{ // This goes async from server
       icon: 'about.svg',
       title: 'About',

@@ -6,7 +6,7 @@ import MetaMaskOnboarding from '@metamask/onboarding';
 import { updateWorldImagePixelColors } from '@actions/pixel';
 
 import config from '@util/config';
-import { stringToBN, formatPosition, hexStringToColor, formatNetworkConfig, hexToString, numberToHex, delay } from '@util/helpers';
+import { stringToBN, formatPosition, hexStringToColor, formatNetworkConfig, hexToString, numberToHex, pushGTMEvent } from '@util/helpers';
 import logger from '@util/logger';
 
 export default class Web3Manager {
@@ -317,7 +317,17 @@ export default class Web3Manager {
       });
     } catch (error) {
       logger.error('Failed to add network to provider: ', error);
+
+      if (error.code === 4001) {
+        logger.warn('User closed window.');
+        return;
+      }
+
+      pushGTMEvent('connectionStatusBtnClick', 'addNetworkError', this.game.scene.keys['MainScene']);
+      return;
     }
+
+    pushGTMEvent('connectionStatusBtnClick', 'addNetworkSuccess', this.game.scene.keys['MainScene']);
   }
 
   async switchToNetwork() {
@@ -338,11 +348,15 @@ export default class Web3Manager {
         logger.warn('Network not found in Metamask, adding new config.')
         await this.addNetwork(networkConfig);
       } else if (error.code === 4001) {
-        logger.warn('User closed window.')
+        logger.warn('User closed window.');
         return;
-      } else
+      } else {
+        pushGTMEvent('connectionStatusBtnClick', 'switchNetworkError', this.game.scene.keys['MainScene']);
         throw new Error('Failed to switch network: ', error);
+      }
     }
+
+    pushGTMEvent('connectionStatusBtnClick', 'switchNetworkSuccess', this.game.scene.keys['MainScene']);
   }
 
   async getMinUnit() {

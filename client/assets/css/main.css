@@ -1965,6 +1965,28 @@ Info Box
   border-radius: 5px;
 }
 
+.action-bar .twitter-action {
+  background: transparent;
+  border: 0;
+  margin-left: 5px;
+  padding: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border: 1px solid #1d9bf0;
+  background: rgba(29, 155, 240, 0.5);
+}
+
+.action-bar .twitter-action:hover {
+  background: rgba(29, 155, 240, 1);
+}
+
+.action-bar .twitter-action img {
+  width: 30px;
+  padding: 8px;
+  border-radius: 5px;
+}
+
 .action-bar .docs-action {
   background: transparent;
   border: 0;

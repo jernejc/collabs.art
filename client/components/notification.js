@@ -136,7 +136,7 @@ export default class Notification {
         case 6:
           this.domElement.querySelector('span.text').innerHTML = `Be patient ..`;
           break;
-        case 8:
+        case 9:
           this.domElement.querySelector('span.text').innerHTML = `Increase gas ..`;
           break;
       }

@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 
 import { getTileForPointer } from '@actions/pixel';
 
-import { formatColorNumber } from '@util/helpers';
+import { formatColorNumber, pushGTMEvent } from '@util/helpers';
 
 import logger from '@util/logger';
 import config from '@util/config';
@@ -181,6 +181,7 @@ export async function creditToken({ scene, value }) {
   let txHash = null;
 
   scene.game.tools.setNotification(0, 'processing');
+  pushGTMEvent('creditBtnClick', 'creditStart', scene);
 
   try {
     const gasPrice = await scene.game.web3.RPCProvider.getGasPrice();
@@ -188,7 +189,7 @@ export async function creditToken({ scene, value }) {
       from: scene.game.web3.activeAddress,
       value: ethers.utils.parseEther(value)
     });
-    const finalGasLimit = ethers.BigNumber.from(parseInt(gasLimit.toNumber() * 1.1));
+    const finalGasLimit = ethers.BigNumber.from(parseInt(gasLimit.toNumber() * 1.2));
     const tx = await scene.game.web3.tokenContract.credit({
       from: scene.game.web3.activeAddress,
       value: ethers.utils.parseEther(value),
@@ -210,10 +211,12 @@ export async function creditToken({ scene, value }) {
       }
     }
 
+    pushGTMEvent('creditBtnClick', 'creditError', scene);
     scene.game.tools.setNotification(12000, 'error', txHash, 'Wallet RPC error, please try again.');
     return;
   }
 
+  pushGTMEvent('creditBtnClick', 'creditSuccess', scene);
   scene.game.tools.setNotification(6500, 'success', txHash);
 }
 
@@ -223,6 +226,7 @@ export async function permitToken({ scene, response, grant }) {
   let txHash = null;
 
   scene.game.tools.setNotification(0, 'processing');
+  pushGTMEvent('twitterBtnClick', 'permitStart', scene);
 
   try {
     const gasPrice = await scene.game.web3.RPCProvider.getGasPrice();
@@ -239,7 +243,7 @@ export async function permitToken({ scene, response, grant }) {
         from: scene.game.web3.activeAddress,
       }
     )
-    const finalGasLimit = ethers.BigNumber.from(parseInt(gasLimit.toNumber() * 1.1));
+    const finalGasLimit = ethers.BigNumber.from(parseInt(gasLimit.toNumber() * 1.2));
     const tx = await scene.game.web3.tokenContract.grant(
       response.provider,
       scene.game.web3.activeAddress,
@@ -270,10 +274,12 @@ export async function permitToken({ scene, response, grant }) {
       }
     }
 
+    pushGTMEvent('twitterBtnClick', 'permitError', scene);
     scene.game.tools.setNotification(12000, 'error', txHash, 'Wallet RPC error, please try again.');
     return;
   }
 
+  pushGTMEvent('twitterBtnClick', 'permitSuccess', scene);
   scene.game.tools.setNotification(6500, 'success', txHash);
   return true;
 }
@@ -282,6 +288,7 @@ export async function permitSignature({ scene, token }) {
   let response;
 
   scene.game.tools.setNotification(0, 'signature');
+  pushGTMEvent('twitterBtnClick', 'signatureStart', scene);
 
   try {
     const msgBody = ethers.utils.hashMessage("Collabs metamask message.");
@@ -307,12 +314,13 @@ export async function permitSignature({ scene, token }) {
       return;
     }
 
+    pushGTMEvent('twitterBtnClick', 'signatureError', scene);
     scene.game.tools.setNotification(10000, 'warning');
     return;
   }
 
+  pushGTMEvent('twitterBtnClick', 'signatureSuccess', scene);
   scene.game.tools.removeNotification();
-
   return response;
 }
 
