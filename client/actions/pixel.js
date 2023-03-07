@@ -108,6 +108,11 @@ export async function colorPixels({ scene, selection }) {
       return;
     }
 
+    if (error.data && error.data.message && error.data.message.includes('insufficient funds')) {
+      scene.game.tools.setNotification(10000, 'info', null, 'Insufficient funds.');
+      return;
+    }
+
     pushGTMEvent('bottomNavApplyBtnClick', 'colorPixelError', scene);
     scene.game.tools.setNotification(12000, 'error', txHash, 'Wallet RPC error, please try again.');
     return;

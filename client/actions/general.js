@@ -209,6 +209,11 @@ export async function creditToken({ scene, value }) {
         scene.game.tools.removeNotification();
         return;
       }
+
+      if (error.data && error.data.message && error.data.message.includes('insufficient funds')) {
+        scene.game.tools.setNotification(10000, 'info', null, 'Insufficient funds.');
+        return;
+      }
     }
 
     pushGTMEvent('creditBtnClick', 'creditError', scene);
@@ -270,6 +275,11 @@ export async function permitToken({ scene, response, grant }) {
     if (error) {
       if (error.code && error.code === 'ACTION_REJECTED') {
         scene.game.tools.removeNotification();
+        return;
+      }
+
+      if (error.data && error.data.message && error.data.message.includes('insufficient funds')) {
+        scene.game.tools.setNotification(10000, 'info', null, 'Insufficient funds.');
         return;
       }
     }

@@ -68,6 +68,7 @@ export default class BottomNav {
 
     if (this.game.selection.activeFullBid > this.game.web3.walletBalance) {
       this.game.tools.showTokenInfo();
+      this.game.tools.setNotification(10000, 'info', null, 'Insufficient funds.');
       return;
     }
 
