@@ -70,7 +70,8 @@ export default class Slideshow {
     this.docsIcon = new Button({
       elClasses: ['docs-action'],
       icon: 'gg-file-document',
-      text: 'Docs',
+      tooltip: 'Read the docs',
+      tooltipFlow: 'down',
       clickAction: async () => {
         this.docsAction();
       }
@@ -80,6 +81,8 @@ export default class Slideshow {
     this.discordButton = new Button({
       elClasses: ['discord-action'],
       icon: 'discord-icon.png',
+      tooltip: 'Join discord',
+      tooltipFlow: 'down',
       clickAction: async () => {
         this.discordAction();
       }
@@ -89,6 +92,8 @@ export default class Slideshow {
     this.twitterButton = new Button({
       elClasses: ['twitter-action'],
       icon: 'twitter-logo.png',
+      tooltip: 'Follow on Twitter',
+      tooltipFlow: 'down',
       clickAction: async () => {
         this.twitterAction();
       }

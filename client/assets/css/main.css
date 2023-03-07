@@ -2005,7 +2005,8 @@ Info Box
 }
 
 .action-bar .docs-action i {
-  margin-right: 10px;
+  margin: 0px 6px;
+  --ggs: 1.2;
 }
 
 /*** 
