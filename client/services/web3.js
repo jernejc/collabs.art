@@ -429,8 +429,10 @@ export default class Web3Manager {
 
     await this.requestAccounts();
 
-    if (this.activeAddress)
+    if (this.activeAddress) {
+      pushGTMEvent('connectionStatusBtn', 'activeAddressSuccess', this.game.scene.keys['MainScene']);
       return this.activeAddress;
+    }
     else
       throw new Error('No activeAddress found');
   }
