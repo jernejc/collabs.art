@@ -26,7 +26,7 @@ export default class TokenInfo {
 
     this.domElement = document.createElement('div');
     this.domElement.classList.add('info', 'colab-info');
-    this.domElement.innerHTML = `Get $COLAB by connecting your Twitter account and come say hi on our Discord channel. <a href="${config.appConfig.docs.getColabYTLink}" target="_blank">(How to YT)</a>`;
+    this.domElement.innerHTML = `Get $COLAB for FREE by connecting your Twitter account. Video tutorial: <a href="${config.appConfig.docs.getColabYTLink}" target="_blank">(Link)</a>`;
 
     this.socialButtonsWrapper = document.createElement('div');
     this.socialButtonsWrapper.classList.add('social-buttons');
