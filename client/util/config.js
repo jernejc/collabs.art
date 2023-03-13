@@ -121,6 +121,7 @@ const config = {
     docs: {
       link: 'https://collabsart.notion.site/Collabs-0c8e5af1deee4b6982b1c70fd354c9fc',
       getColabLink: "https://collabsart.notion.site/Get-COLAB-e782417f324d420b9fd27f7e1fbf5efa",
+      getColabYTLink: "https://www.youtube.com/watch?v=-3Gr8VWNSvI&ab_channel=Collabs",
       auctionLifecycleLink: "https://collabsart.notion.site/Auction-Lifecycle-efd602f095e14de690af4f77600e1e04",
       coloringPixelsLink: "https:/collabsart.notion.site/Coloring-pixels-0fc42efade074114b823c67ff5874fd2"
     },
