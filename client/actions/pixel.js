@@ -1,4 +1,4 @@
-import { toWei, stringToBN, stringToHex } from '@util/helpers';
+import { toWei, stringToBN, stringToHex, pushGTMEvent } from '@util/helpers';
 import logger from '@util/logger';
 import { ethers } from 'ethers';
 
@@ -84,7 +84,7 @@ export async function colorPixels({ scene, selection }) {
         from: scene.game.web3.activeAddress
       }
     )
-    const finalGasLimit = ethers.BigNumber.from(parseInt(gasLimit.toNumber() * 1.1));
+    const finalGasLimit = ethers.BigNumber.from(parseInt(gasLimit.toNumber() * 1.25));
     const tx = await scene.game.web3.canvasContract.setColors(
       positions,
       colors,
@@ -108,12 +108,19 @@ export async function colorPixels({ scene, selection }) {
       return;
     }
 
+    if (error.data && error.data.message && error.data.message.includes('insufficient funds')) {
+      scene.game.tools.setNotification(10000, 'info', null, 'Insufficient funds.');
+      return;
+    }
+
+    pushGTMEvent('bottomNavApplyBtn', 'colorPixelError', scene);
     scene.game.tools.setNotification(12000, 'error', txHash, 'Wallet RPC error, please try again.');
     return;
   }
 
   updateWorldImagePixelColors({ pixels: selection, scene });
 
+  pushGTMEvent('bottomNavApplyBtn', 'colorPixelSuccess', scene);
   scene.game.selection.clearAllSelection();
   scene.game.tools.setNotification(6500, 'success', txHash);
 }

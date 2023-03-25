@@ -121,6 +121,7 @@ const config = {
     docs: {
       link: 'https://collabsart.notion.site/Collabs-0c8e5af1deee4b6982b1c70fd354c9fc',
       getColabLink: "https://collabsart.notion.site/Get-COLAB-e782417f324d420b9fd27f7e1fbf5efa",
+      getColabYTLink: "https://www.youtube.com/watch?v=-3Gr8VWNSvI&ab_channel=Collabs",
       auctionLifecycleLink: "https://collabsart.notion.site/Auction-Lifecycle-efd602f095e14de690af4f77600e1e04",
       coloringPixelsLink: "https:/collabsart.notion.site/Coloring-pixels-0fc42efade074114b823c67ff5874fd2"
     },
@@ -130,7 +131,8 @@ const config = {
     keyActionText: 'Enter',
     emailRegex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     subtitle: '<span>Contribute to a living</span> canvas.<br /><span>Become a</span> Creator.', // is HTML
-    discordLink: 'https://discord.gg/DKZkG4CnrC',
+    discordLink: 'https://discord.gg/QfxwMUH5Kg',
+    twitterLink: 'https://twitter.com/collabs_art',
     articles: [{ // This goes async from server
       icon: 'about.svg',
       title: 'About',

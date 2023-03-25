@@ -1,5 +1,5 @@
 import config from '@util/config';
-import { deleteCookie, setCookie, getCookie } from '@util/helpers';
+import { deleteCookie, setCookie, getCookie, pushGTMEvent } from '@util/helpers';
 import logger from '@util/logger';
 import Button from './form/button';
 
@@ -62,14 +62,16 @@ export default class Slideshow {
     this.slideActionButton = new Button({
       elClasses: ['slide-action'],
       text: 'Launch app',
-      clickAction: this.game.tools.clearOverlay.bind(this.game.tools)
+      clickAction: this.slideAction.bind(this)
     });
+
     this.actionBarForm.append(this.slideActionButton.domElement);
 
     this.docsIcon = new Button({
       elClasses: ['docs-action'],
       icon: 'gg-file-document',
-      text: 'Docs',
+      tooltip: 'Read the docs',
+      tooltipFlow: 'down',
       clickAction: async () => {
         this.docsAction();
       }
@@ -79,11 +81,24 @@ export default class Slideshow {
     this.discordButton = new Button({
       elClasses: ['discord-action'],
       icon: 'discord-icon.png',
+      tooltip: 'Join discord',
+      tooltipFlow: 'down',
       clickAction: async () => {
         this.discordAction();
       }
     });
     this.actionBarForm.append(this.discordButton.domElement)
+
+    this.twitterButton = new Button({
+      elClasses: ['twitter-action'],
+      icon: 'twitter-logo.png',
+      tooltip: 'Follow on Twitter',
+      tooltipFlow: 'down',
+      clickAction: async () => {
+        this.twitterAction();
+      }
+    });
+    this.actionBarForm.append(this.twitterButton.domElement)
 
     const overlayCookie = getCookie('no_overlay');
 
@@ -162,6 +177,13 @@ export default class Slideshow {
     this.domElement.append(this.ribbon);
 
     this.parent.append(this.domElement);
+  }
+
+  slideAction() {
+    logger.log('Slideshow: slideAction');
+
+    pushGTMEvent('overlayBtns', 'launchApp', this.game.scene.keys['MainScene']);
+    this.game.tools.clearOverlay();
   }
 
   navTemplate({ shortTitle, icon, active }) {
@@ -250,6 +272,7 @@ export default class Slideshow {
 
     let navItem;
 
+    pushGTMEvent('overlayBtns', 'navClick', this.game.scene.keys['MainScene']);
     if (e.target.classList.contains('nav-item'))
       navItem = e.target;
     else
@@ -289,12 +312,21 @@ export default class Slideshow {
   discordAction() {
     logger.log('Slideshow: discordAction');
 
+    pushGTMEvent('overlayBtns', 'discordClick', this.game.scene.keys['MainScene']);
     window.open(config.slideshow.discordLink, '_blank').focus();
+  }
+
+  twitterAction() {
+    logger.log('Slideshow: twitterAction');
+
+    pushGTMEvent('overlayBtns', 'twitterClick', this.game.scene.keys['MainScene']);
+    window.open(config.slideshow.twitterLink, '_blank').focus();
   }
 
   docsAction() {
     logger.log('Slideshow: docsAction');
 
+    pushGTMEvent('overlayBtns', 'docsClick', this.game.scene.keys['MainScene']);
     window.open(config.appConfig.docsLink, '_blank').focus();
   }
 

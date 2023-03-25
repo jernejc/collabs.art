@@ -5,6 +5,7 @@ import { creditToken, permitSignature, permitToken } from "@actions/general"
 
 import Button from "../form/button";
 import Input from "../form/input";
+import { pushGTMEvent } from "@util/helpers";
 
 export default class TokenInfo {
 
@@ -25,7 +26,7 @@ export default class TokenInfo {
 
     this.domElement = document.createElement('div');
     this.domElement.classList.add('info', 'colab-info');
-    this.domElement.innerHTML = `Get $COLAB by connecting your Twitter account and come say hi on our Discord channel. <a href="${config.appConfig.docs.getColabLink}" target="_blank">(more)</a>`;
+    this.domElement.innerHTML = `Get $COLAB for FREE by connecting your Twitter account. Check out the Youtube tutorial <a href="${config.appConfig.docs.getColabYTLink}" target="_blank">(Link)</a>`;
 
     this.socialButtonsWrapper = document.createElement('div');
     this.socialButtonsWrapper.classList.add('social-buttons');
@@ -39,11 +40,13 @@ export default class TokenInfo {
       disabled: false,
       elClasses: ['action-button', 'social-connect', 'twitter'],
       clickAction: async () => {
+        pushGTMEvent('connectTwitterBtn', 'twitterBtnClick', this.scene);
         const isReady = await this.scene.game.web3.preWeb3ActionSequence();
 
         if (!isReady)
           return;
 
+        pushGTMEvent('connectTwitterBtn', 'twitterSignin', this.scene);
         await this.scene.game.firebase.twitterSigninPopup();
 
         if (!this.scene.game.firebase.idToken)
@@ -67,6 +70,7 @@ export default class TokenInfo {
       text: 'Channel',
       elClasses: ['action-button', 'social-connect', 'discord'],
       clickAction: async () => {
+        pushGTMEvent('discordBtn', 'discordBtnClick', this.scene);
         window.open(config.slideshow.discordLink, '_blank').focus();
       }
     });
@@ -107,6 +111,8 @@ export default class TokenInfo {
       text: 'Exchange',
       elClasses: ['action-button', 'credit-token'],
       clickAction: async () => {
+        pushGTMEvent('creditBtn', 'creditBtnClick', this.scene);
+
         if (!await this.scene.game.web3.preWeb3ActionSequence())
           return;
 
