@@ -3,7 +3,7 @@
 # Idea and concept
 
 Better described here:
-<a href="https://artcollabs.notion.site/Art-collabs-0c8e5af1deee4b6982b1c70fd354c9fc" target="_blank">Docs</a>
+<a href="https://collabsart.notion.site/collabsart/Collabs-0c8e5af1deee4b6982b1c70fd354c9fc" target="_blank" title="Notion Docs">Docs</a>
 
 
 ## Client app
