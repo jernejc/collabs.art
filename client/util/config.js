@@ -95,7 +95,7 @@ const config = {
     alchemy: dappConfig.api
   },
   subgraph: {
-    url: 'https://api.thegraph.com/subgraphs/id/QmQhaaEyK6YVj9UN57yPGSt9Gcreazz8My3Jz92rqPmE5K' //'https://api.studio.thegraph.com/query/9304/collabs-mumbai/v0.0.1' //'https://api.studio.thegraph.com/query/9304/collabs-testnet/v1.0.1'
+    url: 'https://api.thegraph.com/subgraphs/id/QmfGHkKvNb2T58oY33EW1dGMWocGKQgDQ2h88oKZDc34WF' //'https://api.studio.thegraph.com/query/9304/collabs-mumbai/v0.0.1' //'https://api.studio.thegraph.com/query/9304/collabs-testnet/v1.0.1'
   },
   api: {
     getImage: 'https://getimage-pgm7g5cugq-uc.a.run.app', // 'assets/images/place.png', //
