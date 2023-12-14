@@ -84,7 +84,7 @@ export async function colorPixels({ scene, selection }) {
         from: scene.game.web3.activeAddress
       }
     )
-    const finalGasLimit = ethers.BigNumber.from(parseInt(gasLimit.toNumber() * 1.25));
+    const finalGasLimit = ethers.BigNumber.from(parseInt(gasLimit.toNumber() * 1.5));
     const tx = await scene.game.web3.canvasContract.setColors(
       positions,
       colors,
